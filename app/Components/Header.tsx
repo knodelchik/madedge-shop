@@ -6,7 +6,7 @@ import { Globe, User, ShoppingCart } from "lucide-react";
 
 export default function Header() {
   return (
-    <header className="w-full shadow-md bg-white px-6 py-4 flex items-center justify-between">
+    <header className="sticky top-0 z-50 w-full shadow-md bg-white/70 backdrop-blur-lg px-6 py-4 flex items-center justify-between">
       {/* Лівий логотип/назва */}
       <div className="text-2xl font-bold text-gray-800">MadEdge</div>
 
@@ -16,9 +16,9 @@ export default function Header() {
         <Link href="/shop">Магазин</Link>
 
         {/* Лого між Магазин та Про нас */}
-        <div className="w-15 h-15 relative">
+        <div className="w-14 h-14 relative">
           <Image
-            src="/logo.jpg" // поклади logo.jpg у папку public
+            src="/logo.jpg"
             alt="Логотип"
             fill
             className="object-contain rounded-full"
