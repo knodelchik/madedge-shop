@@ -3,6 +3,7 @@ import Main from './Components/Main';
 import InfoSection from './Components/InfoSection';
 import CardsCarousel from './Components/CardsCarousel';
 import VideoSection from './Components/VideoSection';
+import Footer from './Components/Footer';
 
 export default function Home() {
   return (
@@ -11,6 +12,7 @@ export default function Home() {
       <CardsCarousel />
       <InfoSection />
       <VideoSection />
+      <Footer />
     </>
   );
 }
