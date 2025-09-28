@@ -160,7 +160,7 @@ export default function Carousel({
               key={index}
               className={`relative shrink-0 flex flex-col ${round
                   ? 'items-center justify-center text-center bg-[#060010] border-0'
-                  : 'items-start justify-between bg-[#222] border border-[#222] rounded-[12px]'
+                  : 'items-start justify-between bg-[#222] shadow-lg rounded-[12px]'
                 } overflow-hidden cursor-grab active:cursor-grabbing`}
               style={{
                 width: itemWidth,
@@ -190,26 +190,28 @@ export default function Carousel({
         })}
       </motion.div>
       <div className={`flex w-full justify-center ${round ? 'absolute z-20 bottom-12 left-1/2 -translate-x-1/2' : ''}`}>
-        <div className="mt-4 flex w-[150px] justify-between px-8">
-          {items.map((_, index) => (
-            <motion.div
-              key={index}
-              className={`h-2 w-2 rounded-full cursor-pointer transition-colors duration-150 ${currentIndex % items.length === index
-                  ? round
-                    ? 'bg-white'
-                    : 'bg-[#333333]'
-                  : round
-                    ? 'bg-[#555]'
-                    : 'bg-[rgba(51,51,51,0.4)]'
-                }`}
-              animate={{
-                scale: currentIndex % items.length === index ? 1.2 : 1
-              }}
-              onClick={() => setCurrentIndex(index)}
-              transition={{ duration: 0.15 }}
-            />
-          ))}
-        </div>
+        <div className="mt-4 flex justify-center gap-3">
+  {items.map((_, index) => (
+    <motion.div
+      key={index}
+      className={`h-2 w-2 rounded-full cursor-pointer transition-colors duration-150 ${
+        currentIndex % items.length === index
+          ? round
+            ? 'bg-white'
+            : 'bg-[#333333]'
+          : round
+            ? 'bg-[#555]'
+            : 'bg-[rgba(51,51,51,0.4)]'
+      }`}
+      animate={{
+        scale: currentIndex % items.length === index ? 1.2 : 1
+      }}
+      onClick={() => setCurrentIndex(index)}
+      transition={{ duration: 0.15 }}
+    />
+  ))}
+</div>
+
       </div>
     </div>
   );

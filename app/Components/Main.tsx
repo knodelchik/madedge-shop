@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 
 export default function Main() {
   return (
-    <main className="w-full relative">
+    <main className="w-80% relative">
       {/* Hero секція з анімованим фоном */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 overflow-hidden">
+      <section className="relative min-h-[80vh] flex flex-col items-center justify-center text-center px-6 overflow-hidden">
         {/* Фон Threads тільки тут */}
         <div className="absolute inset-0 -z-10">
           <Threads
