@@ -12,7 +12,6 @@ export default function Home() {
       <CardsCarousel />
       <InfoSection />
       <VideoSection />
-      <Footer />
     </>
   );
 }
