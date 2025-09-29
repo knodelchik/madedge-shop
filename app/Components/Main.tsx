@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 export default function Main() {
   return (
-    <main className="w-80% relative">
+    <main className="w-full h-full relative">
       {/* Hero секція з анімованим фоном */}
       <section className="relative min-h-[80vh] flex flex-col items-center justify-center text-center px-6 overflow-hidden">
         {/* Фон Threads тільки тут */}

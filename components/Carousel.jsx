@@ -4,32 +4,6 @@ import { useEffect, useState, useRef, use } from 'react';
 import { motion, useMotionValue, useTransform } from 'motion/react';
 // replace icons with your own if needed
 
-
-const DEFAULT_ITEMS = [
-  {
-    title: 'Text Animations',
-    description: 'Cool text animations for your projects.',
-    price: '$12.99',
-    image: '/item1.jpg',
-    id: 1,
-  },
-  {
-    title: 'Animations',
-    description: 'Smooth animations for your projects.',
-    price: '$8.50',
-    image: '/item2.jpg',
-    id: 2,
-  },
-  {
-    title: 'Components',
-    description: 'Reusable components for your projects.',
-    price: '$15.00',
-    image: '/item3.jpg',
-    id: 3,
-  },
-];
-
-
 const DRAG_BUFFER = 0;
 const VELOCITY_THRESHOLD = 500;
 const GAP = 16;
@@ -153,8 +127,8 @@ export default function Carousel({
         {carouselItems.map((item, index) => {
           const range = [-(index + 1) * trackItemOffset, -index * trackItemOffset, -(index - 1) * trackItemOffset];
           const outputRange = [90, 0, -90];
-          // eslint-disable-next-line react-hooks/rules-of-hooks
           const rotateY = useTransform(x, range, outputRange, { clamp: false });
+
           return (
             <motion.div
               key={index}
@@ -171,7 +145,7 @@ export default function Carousel({
               transition={effectiveTransition}
             >
               {/* 🖼️ Фото товару */}
-              <div className="w-full h-60 overflow-hidden">
+              <div className="w-full h-60 overflow-hidden pointer-events-none">
                 <img
                   src={item.image}
                   alt={item.title}
@@ -180,37 +154,36 @@ export default function Carousel({
               </div>
 
               {/* 📄 Назва + ціна */}
-              <div className="p-5 flex flex-col gap-2">
+              <div className="p-5 flex flex-col gap-2 pointer-events-none">
                 <div className="font-bold text-lg text-white">{item.title}</div>
                 <div className="text-md font-semibold text-yellow-400">{item.price}</div>
               </div>
             </motion.div>
-
           );
         })}
       </motion.div>
+
       <div className={`flex w-full justify-center ${round ? 'absolute z-20 bottom-12 left-1/2 -translate-x-1/2' : ''}`}>
         <div className="mt-4 flex justify-center gap-3">
-  {items.map((_, index) => (
-    <motion.div
-      key={index}
-      className={`h-2 w-2 rounded-full cursor-pointer transition-colors duration-150 ${
-        currentIndex % items.length === index
-          ? round
-            ? 'bg-white'
-            : 'bg-[#333333]'
-          : round
-            ? 'bg-[#555]'
-            : 'bg-[rgba(51,51,51,0.4)]'
-      }`}
-      animate={{
-        scale: currentIndex % items.length === index ? 1.2 : 1
-      }}
-      onClick={() => setCurrentIndex(index)}
-      transition={{ duration: 0.15 }}
-    />
-  ))}
-</div>
+          {items.map((_, index) => (
+            <motion.div
+              key={index}
+              className={`h-2 w-2 rounded-full cursor-pointer transition-colors duration-150 ${currentIndex % items.length === index
+                  ? round
+                    ? 'bg-white'
+                    : 'bg-[#333333]'
+                  : round
+                    ? 'bg-[#555]'
+                    : 'bg-[rgba(51,51,51,0.4)]'
+                }`}
+              animate={{
+                scale: currentIndex % items.length === index ? 1.2 : 1
+              }}
+              onClick={() => setCurrentIndex(index)}
+              transition={{ duration: 0.15 }}
+            />
+          ))}
+        </div>
 
       </div>
     </div>

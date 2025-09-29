@@ -129,13 +129,14 @@ export default function CardsCarousel() {
   const isLarge = useMediaQuery("(min-width: 1280px)"); // великі екрани
   const isMedium = useMediaQuery("(min-width: 950px) and (max-width: 1100px)"); // середні екрани
   const isMediumPlus = useMediaQuery("(min-width: 1100px) and (max-width: 1280px)"); // середні екрани і більше
+  const isSmallPlus = useMediaQuery("(max-width: 950px) and (min-width: 800px)"); // маленькі екрани і більше
   const isSmall = useMediaQuery("(max-width: 800px)");  // зовсім маленькі
 
-  const baseWidth = isLarge ? 400 : isMediumPlus ? 350 : isMedium ? 300 : 500;
+  const baseWidth = isLarge ? 400 : isMediumPlus ? 350 : isMedium ? 300 : isSmallPlus ? 250 : 500;
   const allItems = [...DEFAULT_ITEMS1, ...DEFAULT_ITEMS2, ...DEFAULT_ITEMS3];
 
   return (
-    <div className="w-full flex flex-col items-center gap-8 px-4">
+    <div className="w-full flex flex-col items-center gap-8 px-4 py-20">
       {isSmall ? (
         // Один слайдер з усіма товарами
         <Carousel
