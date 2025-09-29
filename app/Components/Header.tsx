@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Globe, User, ShoppingCart } from "lucide-react";
+import { Globe, User } from "lucide-react";
+import CartSheet from "./CartSheet"; // імпорт твого компоненту кошика
 
 export default function Header() {
   return (
@@ -37,9 +38,9 @@ export default function Header() {
         <button aria-label="Акаунт">
           <User className="w-6 h-6" />
         </button>
-        <button aria-label="Корзина">
-          <ShoppingCart className="w-6 h-6" />
-        </button>
+
+        {/* Кнопка корзини (через CartSheet) */}
+        <CartSheet />
       </div>
     </header>
   );

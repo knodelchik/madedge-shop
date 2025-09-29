@@ -5,7 +5,7 @@ import { motion, useMotionValue, useTransform } from 'motion/react';
 // replace icons with your own if needed
 
 const DRAG_BUFFER = 0;
-const VELOCITY_THRESHOLD = 500;
+const VELOCITY_THRESHOLD = 1500;
 const GAP = 16;
 const SPRING_OPTIONS = { type: 'spring', stiffness: 300, damping: 30 };
 

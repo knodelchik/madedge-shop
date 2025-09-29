@@ -153,7 +153,7 @@ export default function CardsCarousel() {
           <Carousel
             items={DEFAULT_ITEMS1}
             autoplay
-            autoplayDelay={4000}
+            autoplayDelay={10000}
             pauseOnHover
             baseWidth={baseWidth}
             loop={false}
@@ -169,7 +169,7 @@ export default function CardsCarousel() {
           <Carousel
             items={DEFAULT_ITEMS3}
             autoplay
-            autoplayDelay={5000}
+            autoplayDelay={15000}
             pauseOnHover
             baseWidth={baseWidth}
             loop={false}
