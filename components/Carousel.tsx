@@ -101,11 +101,11 @@ export default function Carousel({
   const dragProps = loop
     ? {}
     : {
-        dragConstraints: {
-          left: -trackItemOffset * (carouselItems.length - 1),
-          right: 0
-        }
-      };
+      dragConstraints: {
+        left: -trackItemOffset * (carouselItems.length - 1),
+        right: 0
+      }
+    };
 
   return (
     <div
@@ -141,7 +141,7 @@ export default function Carousel({
               className={`relative flex flex-col ${round
                 ? 'items-center justify-center text-center bg-[#060010] border-0'
                 : 'items-start justify-between bg-[#222] shadow-lg rounded-[12px]'
-              } overflow-hidden cursor-pointer`}
+                } overflow-hidden cursor-pointer`}
               style={{
                 width: itemWidth,
                 height: round ? itemWidth : '100%',
@@ -155,7 +155,7 @@ export default function Carousel({
                 }
               }}
             >
-              <div className="w-full h-60 overflow-hidden">
+              <div className="w-full h-60 overflow-hidden ">
                 <img
                   src={item.image}
                   alt={item.title}
@@ -163,10 +163,15 @@ export default function Carousel({
                 />
               </div>
 
-              <div className="p-5 flex flex-col gap-2">
-                <div className="font-bold text-lg text-white">{item.title}</div>
-                <div className="text-md font-semibold text-yellow-400">{item.price}</div>
+              <div className="p-5 flex flex-col gap-2 h-32 overflow-hidden justify-between">
+                <div className="font-bold text-lg text-white line-clamp-2">
+                  {item.title}
+                </div>
+                <div className="text-md font-semibold text-gray-300">
+                  {item.price}
+                </div>
               </div>
+
             </motion.div>
           );
         })}
@@ -178,15 +183,14 @@ export default function Carousel({
           {items.map((_, index) => (
             <motion.div
               key={index}
-              className={`h-2 w-2 rounded-full cursor-pointer transition-colors duration-150 ${
-                currentIndex % items.length === index
+              className={`h-2 w-2 rounded-full cursor-pointer transition-colors duration-150 ${currentIndex % items.length === index
                   ? round
                     ? 'bg-white'
                     : 'bg-[#333333]'
                   : round
-                  ? 'bg-[#555]'
-                  : 'bg-[rgba(51,51,51,0.4)]'
-              }`}
+                    ? 'bg-[#555]'
+                    : 'bg-[rgba(51,51,51,0.4)]'
+                }`}
               animate={{ scale: currentIndex % items.length === index ? 1.2 : 1 }}
               onClick={() => setCurrentIndex(index)}
               transition={{ duration: 0.15 }}

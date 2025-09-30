@@ -4,6 +4,7 @@ import React from "react";
 import Carousel from "../../components/Carousel";
 import { Button } from "@/components/ui/button";
 import { products } from "../data/products";
+import Link from "next/link";
 
 function useMediaQuery(query: string) {
   const [matches, setMatches] = React.useState(false);
@@ -110,7 +111,7 @@ export default function CardsCarousel() {
       )}
 
       <Button size="lg" className="px-8 py-4 rounded-2xl shadow-md cursor-pointer">
-        Go to Shop
+       <Link href="/shop">Магазин</Link>
       </Button>
     </div>
   );
