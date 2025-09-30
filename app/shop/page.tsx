@@ -36,22 +36,22 @@ export default function ShopPage() {
           </p>
 
           {/* Кнопки-якорі */}
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-wrap justify-center gap-4 text-white">
             <a
               href="#sharpeners"
-              className="px-6 py-3 bg-yellow-500 hover:bg-yellow-600 rounded-xl font-semibold transition shadow-lg"
+              className="px-6 py-3 bg-black hover:bg-gray-800 rounded-xl font-semibold transition shadow-lg"
             >
               Точилки для ножів
             </a>
             <a
               href="#stones"
-              className="px-6 py-3 bg-yellow-500 hover:bg-yellow-600 rounded-xl font-semibold transition shadow-lg"
+              className="px-6 py-3 bg-black hover:bg-gray-800 rounded-xl font-semibold transition shadow-lg"
             >
               Точильні камені
             </a>
             <a
               href="#accessories"
-              className="px-6 py-3 bg-yellow-500 hover:bg-yellow-600 rounded-xl font-semibold transition shadow-lg"
+              className="px-6 py-3 bg-black hover:bg-gray-800 rounded-xl font-semibold transition shadow-lg"
             >
               Комплектуючі
             </a>

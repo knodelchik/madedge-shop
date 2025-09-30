@@ -1,31 +1,45 @@
 'use client';
 
-import { useParams } from 'next/navigation';
-import { products } from '../../data/products';
-import Link from 'next/link';
 import { useState } from 'react';
+import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { useCartStore } from '../../store/cartStore';
 import { toast } from 'sonner';
+import { useCartStore } from '../../store/cartStore';
+import QuantityCounter from '../../Components/QuantityCounter';
+import { products as allProducts } from '../../data/products';
+
+// Тип продукту
+type Product = {
+  id: number;
+  title: string;
+  description?: string;
+  price: number;
+  images: string[];
+  category?: string;
+};
 
 export default function ProductPage() {
   const { slug } = useParams();
   if (!slug) return null;
 
-  const product = products.find(
+  // Знаходимо продукт за slug
+  const product: Product | undefined = allProducts.find(
     (p) => p.title.replace(/\s+/g, '-').toLowerCase() === slug
   );
-  if (!product)
+  if (!product) {
     return <p className="text-center mt-10 text-gray-500">Товар не знайдено</p>;
+  }
+
+  const { addToCart, increaseQuantity, decreaseQuantity, cartItems } = useCartStore();
+  const itemInCart = cartItems.find((i) => i.id === product.id);
 
   const [currentImage, setCurrentImage] = useState(0);
-  const addToCart = useCartStore((state) => state.addToCart);
+  const [quantity, setQuantity] = useState(itemInCart ? itemInCart.quantity : 1);
 
-  const handleAdd = () => {
-    addToCart({ ...product, quantity: 1 });
-    toast.success('Товар додано в кошик', {
-      description: product.title,
-    });
+  const handleAddToCart = () => {
+    addToCart({ ...product, quantity });
+    toast.success('Товар додано в кошик', { description: product.title });
   };
 
   return (
@@ -34,7 +48,7 @@ export default function ProductPage() {
         ← Повернутися до магазину
       </Link>
 
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col md:flex-row gap-6 p-6">
+      <div className="bg-white overflow-hidden flex flex-col md:flex-row gap-6 p-6 rounded-lg shadow-md">
         {/* Слайдер фото */}
         <div className="relative w-full md:w-1/2 flex items-center justify-center">
           <motion.img
@@ -68,27 +82,36 @@ export default function ProductPage() {
           </button>
         </div>
 
-        {/* Інфо */}
+        {/* Інформація */}
         <div className="flex-1 flex flex-col justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-800">{product.title}</h1>
-            <p className="text-yellow-500 font-semibold text-2xl mt-2">
-              {product.price} $
+            <p className="text-black font-semibold text-2xl mt-2">
+              {product.price.toFixed(2)} $
             </p>
-            <div className="text-gray-600 mt-4">
+            <div className="text-gray-600 mt-4 space-y-2">
               {(product.description ?? '').split('<br />').map((line, i) => (
                 <p key={i}>{line}</p>
               ))}
             </div>
-
           </div>
 
-          <button
-            className="mt-6 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded transition"
-            onClick={handleAdd}
-          >
-            Додати в кошик
-          </button>
+          {/* Кількість + кнопка */}
+          <div className="mt-6 flex items-center gap-4">
+            <QuantityCounter
+              value={quantity}
+              onIncrease={() => setQuantity((q) => q + 1)}
+              onDecrease={() => setQuantity((q) => (q > 1 ? q - 1 : 1))}
+            />
+
+            <button
+              className="flex-1 bg-black hover:bg-gray-800 text-white font-bold py-2 rounded transition"
+              onClick={handleAddToCart}
+            >
+              Додати в кошик
+            </button>
+          </div>
+
         </div>
       </div>
     </div>
