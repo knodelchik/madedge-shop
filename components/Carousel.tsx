@@ -44,7 +44,7 @@ export default function Carousel({
   const x = useMotionValue(0);
   const [isHovered, setIsHovered] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
-  const [isDragging, setIsDragging] = useState(false); // початок свайпу
+  const [isDragging, setIsDragging] = useState(false);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -95,7 +95,7 @@ export default function Carousel({
     } else if (offset > DRAG_BUFFER || velocity > VELOCITY_THRESHOLD) {
       setCurrentIndex(prev => Math.max(prev - 1, 0));
     }
-    setIsDragging(false); // свайп завершено
+    setIsDragging(false);
   };
 
   const dragProps = loop
@@ -117,13 +117,11 @@ export default function Carousel({
         className="flex"
         drag="x"
         {...dragProps}
-        onDragStart={() => setIsDragging(true)} // початок свайпу
+        onDragStart={() => setIsDragging(true)}
         onDragEnd={handleDragEnd}
         style={{
           width: carouselItems.length * trackItemOffset,
           gap: `${GAP}px`,
-          perspective: 1000,
-          perspectiveOrigin: `${currentIndex * trackItemOffset + itemWidth / 2}px 50%`,
           x
         }}
         animate={{ x: -(currentIndex * trackItemOffset) }}
@@ -140,26 +138,26 @@ export default function Carousel({
               key={item.id + '-' + index}
               className={`relative flex flex-col ${round
                 ? 'items-center justify-center text-center bg-[#060010] border-0'
-                : 'items-start justify-between bg-[#222] shadow-lg rounded-[12px]'
+                : 'items-start justify-between bg-[#222] shadow-lg'
                 } overflow-hidden cursor-pointer`}
               style={{
                 width: itemWidth,
-                height: round ? itemWidth : '100%',
+                height: round ? itemWidth : 'auto',
+                borderRadius: round ? "50%" : "12px",
                 rotateY,
-                ...(round && { borderRadius: '50%' })
+                transformStyle: "preserve-3d"
               }}
-              transition={effectiveTransition}
               onClick={() => {
                 if (!isDragging) {
                   window.location.href = `/shop/${item.title.replace(/\s+/g, '-').toLowerCase()}`;
                 }
               }}
             >
-              <div className="w-full h-60 overflow-hidden ">
+              <div className="w-full h-60 overflow-hidden">
                 <img
                   src={item.image}
                   alt={item.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover pointer-events-none"
                 />
               </div>
 
@@ -171,7 +169,6 @@ export default function Carousel({
                   {item.price}
                 </div>
               </div>
-
             </motion.div>
           );
         })}

@@ -3,8 +3,8 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { ShoppingCart } from 'lucide-react';
 import { useCartStore } from '../store/cartStore';
-import Counter from '../../components/Counter';
 import QuantityCounter from './QuantityCounter';
+import Link from 'next/link';
 
 export default function CartSheet() {
   const { cartItems, increaseQuantity, decreaseQuantity } = useCartStore();
@@ -62,7 +62,6 @@ export default function CartSheet() {
                   onIncrease={() => increaseQuantity(item.id)}
                   onDecrease={() => decreaseQuantity(item.id)}
                 />
-
               </div>
             ))}
 
@@ -71,9 +70,13 @@ export default function CartSheet() {
               <span>{totalPrice.toFixed(2)} $</span>
             </div>
 
-            <button className="w-full mt-4 bg-black hover:bg-gray-800 text-white py-3 rounded-lg font-medium transition">
+            {/* Кнопка переходу на сторінку оформлення */}
+            <Link
+              href="/order"
+              className="w-full mt-4 text-center bg-black hover:bg-gray-800 text-white py-3 rounded-lg font-medium transition block"
+            >
               Оформити замовлення
-            </button>
+            </Link>
           </div>
         )}
       </SheetContent>
