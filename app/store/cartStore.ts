@@ -1,43 +1,67 @@
-
 import { create } from 'zustand';
-import { Product } from '../data/products';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
-type CartItem = Product & { quantity: number };
+interface CartItem {
+  id: number;
+  title: string;
+  price: number;
+  images: string[];
+  quantity: number;
+}
 
-type CartState = {
+interface CartStore {
   cartItems: CartItem[];
-  addToCart: (product: Product) => void;
+  addToCart: (item: CartItem) => void;
   removeFromCart: (id: number) => void;
+  increaseQuantity: (id: number) => void;
+  decreaseQuantity: (id: number) => void;
   clearCart: () => void;
-  totalPrice: number;
-};
+}
 
-export const useCartStore = create<CartState>((set, get) => ({
-  cartItems: [],
-  addToCart: (product) =>
-    set((state) => {
-      const existing = state.cartItems.find((item) => item.id === product.id);
-      if (existing) {
-        return {
-          cartItems: state.cartItems.map((item) =>
-            item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+export const useCartStore = create<CartStore>()(
+  persist(
+    (set, get) => ({
+      cartItems: [],
+
+      addToCart: (item) =>
+        set((state) => {
+          const existing = state.cartItems.find((i) => i.id === item.id);
+          if (existing) {
+            return {
+              cartItems: state.cartItems.map((i) =>
+                i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+              ),
+            };
+          }
+          return { cartItems: [...state.cartItems, { ...item, quantity: 1 }] };
+        }),
+
+      removeFromCart: (id) =>
+        set((state) => ({
+          cartItems: state.cartItems.filter((i) => i.id !== id),
+        })),
+
+      increaseQuantity: (id) =>
+        set((state) => ({
+          cartItems: state.cartItems.map((i) =>
+            i.id === id ? { ...i, quantity: i.quantity + 1 } : i
           ),
-        };
-      }
-      return { cartItems: [...state.cartItems, { ...product, quantity: 1 }] };
-    }),
-  removeFromCart: (id) =>
-    set((state) => ({
-      cartItems: state.cartItems.filter((item) => item.id !== id),
-    })),
-  clearCart: () => set({ cartItems: [] }),
-  totalPrice: 0,
-}));
+        })),
 
-// ⚡ Автоматичний підрахунок totalPrice
-useCartStore.subscribe((state) => {
-  state.totalPrice = state.cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-});
+      decreaseQuantity: (id) =>
+        set((state) => ({
+          cartItems: state.cartItems
+            .map((i) =>
+              i.id === id ? { ...i, quantity: i.quantity - 1 } : i
+            )
+            .filter((i) => i.quantity > 0),
+        })),
+
+      clearCart: () => set({ cartItems: [] }),
+    }),
+    {
+      name: 'cart-storage',
+      storage: createJSONStorage(() => localStorage), // ✅ тепер зберігає у localStorage
+    }
+  )
+);

@@ -1,122 +1,16 @@
-// CardsCarousel.tsx
 'use client';
 
-import React, { use } from "react";
+import React from "react";
 import Carousel from "../../components/Carousel";
 import { Button } from "@/components/ui/button";
+import { products } from "../data/products";
 
-const DEFAULT_ITEMS1 = [
-  {
-    title: 'Text Animations',
-    description: 'Cool text animations for your projects.',
-    price: '$12.99',
-    image: '/item1.jpg',
-    id: 1,
-  },
-  {
-    title: 'Animations',
-    description: 'Smooth animations for your projects.',
-    price: '$8.50',
-    image: '/item2.jpg',
-    id: 2,
-  },
-  {
-    title: 'Components',
-    description: 'Reusable components for your projects.',
-    price: '$15.00',
-    image: '/item3.jpg',
-    id: 3,
-  },
-];
-const DEFAULT_ITEMS2 = [
-  {
-    title: 'Text Animations',
-    description: 'Cool text animations for your projects.',
-    price: '$12.99',
-    image: '/item1.jpg',
-    id: 1,
-  },
-  {
-    title: 'Animations',
-    description: 'Smooth animations for your projects.',
-    price: '$8.50',
-    image: '/item2.jpg',
-    id: 2,
-  },
-  {
-    title: 'Components',
-    description: 'Reusable components for your projects.',
-    price: '$15.00',
-    image: '/item3.jpg',
-    id: 3,
-  },
-  {
-    title: 'Text Animations',
-    description: 'Cool text animations for your projects.',
-    price: '$12.99',
-    image: '/item1.jpg',
-    id: 4,
-  },
-  {
-    title: 'Animations',
-    description: 'Smooth animations for your projects.',
-    price: '$8.50',
-    image: '/item2.jpg',
-    id: 5,
-  },
-  {
-    title: 'Components',
-    description: 'Reusable components for your projects.',
-    price: '$15.00',
-    image: '/item3.jpg',
-    id: 6,
-  },
-  {
-    title: 'Text Animations',
-    description: 'Cool text animations for your projects.',
-    price: '$12.99',
-    image: '/item1.jpg',
-    id: 1,
-  },
-  {
-    title: 'Animations',
-    description: 'Smooth animations for your projects.',
-    price: '$8.50',
-    image: '/item2.jpg',
-    id: 2,
-  },
-  {
-    title: 'Components',
-    description: 'Reusable components for your projects.',
-    price: '$15.00',
-    image: '/item3.jpg',
-    id: 3,
-  },
-];
-const DEFAULT_ITEMS3 = [
-  {
-    title: 'Text Animations',
-    description: 'Cool text animations for your projects.',
-    price: '$12.99',
-    image: '/item1.jpg',
-    id: 1,
-  },
-  {
-    title: 'Animations',
-    description: 'Smooth animations for your projects.',
-    price: '$8.50',
-    image: '/item2.jpg',
-    id: 2,
-  },
-];
 function useMediaQuery(query: string) {
   const [matches, setMatches] = React.useState(false);
 
   React.useEffect(() => {
     const media = window.matchMedia(query);
-    if (media.matches !== matches) {
-      setMatches(media.matches);
-    }
+    if (media.matches !== matches) setMatches(media.matches);
     const listener = () => setMatches(media.matches);
     media.addEventListener("change", listener);
     return () => media.removeEventListener("change", listener);
@@ -126,21 +20,59 @@ function useMediaQuery(query: string) {
 }
 
 export default function CardsCarousel() {
-  const isLarge = useMediaQuery("(min-width: 1280px)"); // великі екрани
-  const isMedium = useMediaQuery("(min-width: 950px) and (max-width: 1100px)"); // середні екрани
-  const isMediumPlus = useMediaQuery("(min-width: 1100px) and (max-width: 1280px)"); // середні екрани і більше
-  const isSmallPlus = useMediaQuery("(max-width: 950px) and (min-width: 800px)"); // маленькі екрани і більше
-  const isSmall = useMediaQuery("(max-width: 800px)");  // зовсім маленькі
+  const isLarge = useMediaQuery("(min-width: 1280px)");
+  const isMediumPlus = useMediaQuery("(min-width: 1100px) and (max-width: 1280px)");
+  const isMedium = useMediaQuery("(min-width: 950px) and (max-width: 1100px)");
+  const isSmallPlus = useMediaQuery("(max-width: 950px) and (min-width: 800px)");
+  const isSmall = useMediaQuery("(max-width: 800px)");
 
-  const baseWidth = isLarge ? 400 : isMediumPlus ? 350 : isMedium ? 300 : isSmallPlus ? 250 : 500;
-  const allItems = [...DEFAULT_ITEMS1, ...DEFAULT_ITEMS2, ...DEFAULT_ITEMS3];
+  const baseWidth = isLarge
+    ? 400
+    : isMediumPlus
+    ? 350
+    : isMedium
+    ? 300
+    : isSmallPlus
+    ? 250
+    : 500;
+
+  // Розділяємо продукти по категоріях
+  const sharpeners = products
+    .filter(p => p.category === "sharpeners")
+    .map(p => ({
+      id: p.id,
+      title: p.title,
+      description: p.description,
+      price: `$${p.price.toFixed(2)}`,
+      image: p.images[0],
+    }));
+
+  const stones = products
+    .filter(p => p.category === "stones")
+    .map(p => ({
+      id: p.id,
+      title: p.title,
+      description: p.description,
+      price: `$${p.price.toFixed(2)}`,
+      image: p.images[0],
+    }));
+
+  const accessories = products
+    .filter(p => p.category === "accessories")
+    .map(p => ({
+      id: p.id,
+      title: p.title,
+      description: p.description,
+      price: `$${p.price.toFixed(2)}`,
+      image: p.images[0],
+    }));
 
   return (
     <div className="w-full flex flex-col items-center gap-8 px-4 py-20">
       {isSmall ? (
-        // Один слайдер з усіма товарами
+        // Для маленьких екранів один об'єднаний слайдер
         <Carousel
-          items={allItems}
+          items={[...sharpeners, ...stones, ...accessories]}
           autoplay
           autoplayDelay={4000}
           pauseOnHover
@@ -148,10 +80,10 @@ export default function CardsCarousel() {
           loop={false}
         />
       ) : (
-        // Три окремі слайдери
-        <div className="flex justify-center gap-8 w-full">
+        // Для більших екранів три окремі каруселі
+        <div className="flex justify-center gap-8 w-full flex-wrap">
           <Carousel
-            items={DEFAULT_ITEMS1}
+            items={[...sharpeners]}
             autoplay
             autoplayDelay={10000}
             pauseOnHover
@@ -159,7 +91,7 @@ export default function CardsCarousel() {
             loop={false}
           />
           <Carousel
-            items={DEFAULT_ITEMS2}
+            items={stones}
             autoplay
             autoplayDelay={5000}
             pauseOnHover
@@ -167,7 +99,7 @@ export default function CardsCarousel() {
             loop={false}
           />
           <Carousel
-            items={DEFAULT_ITEMS3}
+            items={accessories}
             autoplay
             autoplayDelay={15000}
             pauseOnHover
@@ -177,7 +109,6 @@ export default function CardsCarousel() {
         </div>
       )}
 
-      {/* Кнопка знизу */}
       <Button size="lg" className="px-8 py-4 rounded-2xl shadow-md cursor-pointer">
         Go to Shop
       </Button>

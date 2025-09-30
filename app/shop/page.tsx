@@ -1,77 +1,141 @@
 'use client';
 
-import { useState } from 'react';
-import { Slider } from '@/components/ui/slider';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
-import { products } from '../data/products'; // ✅ імпорт з файлу products.ts
+import { products } from '../data/products';
 import Link from 'next/link';
+import MagnetLines from '../../components/MagnetLines';
 
 export default function ShopPage() {
-  const [priceRange, setPriceRange] = useState([0, 1000]);
-  const [sort, setSort] = useState('price-asc');
-
-  // 🔎 Фільтрація + сортування
-  const filteredProducts = products
-    .filter(p => p.price >= priceRange[0] && p.price <= priceRange[1])
-    .sort((a, b) => {
-      if (sort === 'price-asc') return a.price - b.price;
-      if (sort === 'price-desc') return b.price - a.price;
-      if (sort === 'title-asc') return a.title.localeCompare(b.title);
-      if (sort === 'title-desc') return b.title.localeCompare(a.title);
-      return 0;
-    });
+  const sharpeners = products.filter((p) => p.category === 'sharpeners');
+  const stones = products.filter((p) => p.category === 'stones');
+  const accessories = products.filter((p) => p.category === 'accessories');
 
   return (
-    <div className="p-6 space-y-6">
-      {/* 🔝 Верхня панель */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Слайдер ціни */}
-        <div>
-          <h2 className="text-lg font-semibold text-white mb-2">Ціна</h2>
-          <Slider
-            defaultValue={[0, 1000]}
-            max={1000}
-            step={10}
-            value={priceRange}
-            onValueChange={setPriceRange}
-          />
-          <div className="flex justify-between text-sm text-gray-400 mt-2">
-            <span>{priceRange[0]} $</span>
-            <span>{priceRange[1]} $</span>
+    <div>
+      {/* 🎯 HERO секція */}
+      <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
+        {/* 🔮 MagnetLines фон */}
+        <MagnetLines
+          rows={15}
+          columns={15}
+          containerSize="160vmin"
+          lineColor="#c0c0c0"
+          lineWidth="0.4vmin"
+          lineHeight="4vmin"
+          baseAngle={0}
+          style={{ margin: "2rem auto" }}
+          className='absolute inset-0 -z-10 opacity-30'
+        />
+
+        {/* 📝 Контент */}
+        <div className="relative z-10 text-center text-black">
+          <h1 className="text-5xl font-extrabold mb-6 drop-shadow-lg">
+            Магазин MadEdge
+          </h1>
+          <p className="text-lg mb-8 text-black-600">
+            Обери свою ідеальну точилку, камінь або аксесуар
+          </p>
+
+          {/* Кнопки-якорі */}
+          <div className="flex flex-wrap justify-center gap-4">
+            <a
+              href="#sharpeners"
+              className="px-6 py-3 bg-yellow-500 hover:bg-yellow-600 rounded-xl font-semibold transition shadow-lg"
+            >
+              Точилки для ножів
+            </a>
+            <a
+              href="#stones"
+              className="px-6 py-3 bg-yellow-500 hover:bg-yellow-600 rounded-xl font-semibold transition shadow-lg"
+            >
+              Точильні камені
+            </a>
+            <a
+              href="#accessories"
+              className="px-6 py-3 bg-yellow-500 hover:bg-yellow-600 rounded-xl font-semibold transition shadow-lg"
+            >
+              Комплектуючі
+            </a>
           </div>
         </div>
+      </section>
 
-        {/* Сортування */}
-        <div>
-          <h2 className="text-lg font-semibold text-white mb-2">Сортувати за</h2>
-          <Select onValueChange={setSort} defaultValue={sort}>
-            <SelectTrigger className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="price-asc">Ціна: зростаюча</SelectItem>
-              <SelectItem value="price-desc">Ціна: спадаюча</SelectItem>
-              <SelectItem value="title-asc">Назва: A-Z</SelectItem>
-              <SelectItem value="title-desc">Назва: Z-A</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+      {/* 🛒 Секції товарів */}
+      <div className="p-6 space-y-16 max-w-7xl mx-auto">
+        {/* 🪒 Точилки */}
+        <section id="sharpeners">
+          <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Точилки для ножів</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            {sharpeners.map((product) => (
+              <Link
+                key={product.id}
+                href={`/shop/${product.title.replace(/\s+/g, '-').toLowerCase()}`}
+              >
+                <div className="cursor-pointer group flex flex-col items-center">
+                  <img
+                    src={product.images[0]}
+                    alt={product.title}
+                    className="w-full h-64 rounded-2xl shadow-lg object-contain group-hover:opacity-90 transition"
+                  />
+                  <div className="flex justify-between items-center mt-3 w-full px-2">
+                    <h3 className="text-lg font-bold text-gray-800">{product.title}</h3>
+                    <p className="text-sm text-gray-600">{product.price} $</p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
 
-      {/* 🛍️ Товари */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {filteredProducts.map(product => (
-          <Link key={product.id} href={`/shop/${product.title.replace(/\s+/g, '-').toLowerCase()}`}>
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:scale-105 transition cursor-pointer">
-              <img src={product.images[0]} alt={product.title} className="w-full h-48 object-cover" />
-              <div className="p-4">
-                <h3 className="text-gray-800 font-bold text-lg">{product.title}</h3>
-                <p className="text-yellow-500 font-semibold">{product.price} $</p>
-                {product.description && <p className="text-gray-500 text-sm mt-1">{product.description}</p>}
-              </div>
-            </div>
-          </Link>
-        ))}
+
+        {/* 🪨 Камені */}
+        <section id="stones">
+          <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Точильні камені</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            {stones.map((product) => (
+              <Link
+                key={product.id}
+                href={`/shop/${product.title.replace(/\s+/g, '-').toLowerCase()}`}
+              >
+                <div className="cursor-pointer group">
+                  <img
+                    src={product.images[0]}
+                    alt={product.title}
+                    className="w-full h-64 object-cover rounded-2xl group-hover:opacity-90 transition"
+                  />
+                  <div className="flex justify-between items-center mt-3">
+                    <h3 className="text-lg font-bold text-gray-800">{product.title}</h3>
+                    <p className="text-sm text-gray-600">{product.price} $</p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* ⚙️ Аксесуари */}
+        <section id="accessories">
+          <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Комплектуючі</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
+            {accessories.map((product) => (
+              <Link
+                key={product.id}
+                href={`/shop/${product.title.replace(/\s+/g, '-').toLowerCase()}`}
+              >
+                <div className="cursor-pointer group">
+                  <img
+                    src={product.images[0]}
+                    alt={product.title}
+                    className="w-full h-64 object-cover rounded-2xl group-hover:opacity-90 transition"
+                  />
+                  <div className="flex justify-between items-center mt-3">
+                    <h3 className="text-lg font-bold text-gray-800">{product.title}</h3>
+                    <p className="text-sm text-gray-600">{product.price} $</p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   );
