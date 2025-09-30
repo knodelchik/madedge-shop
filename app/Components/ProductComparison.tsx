@@ -18,7 +18,7 @@ const products: Product[] = [
   {
     id: 1,
     name: 'MadEdge Model 1',
-    image: '/item1.jpg',
+    image: '/images/madedgemodel1-1.jpg',
     features: [
       { name: 'Sharpening angle', value: '15°-30°' },
       { name: 'Body material', value: 'Aluminum' },
@@ -30,7 +30,7 @@ const products: Product[] = [
   {
     id: 2,
     name: 'MadEdge Model 2',
-    image: '/item2.jpg',
+    image: '/images/madedgemodel2-2.jpg',
     features: [
       { name: 'Sharpening angle', value: '10°-40°' },
       { name: 'Body material', value: 'Steel + Aluminum' },
@@ -42,7 +42,7 @@ const products: Product[] = [
   {
     id: 3,
     name: 'MadEdge Model 3',
-    image: '/item3.jpg',
+    image: '/images/madedgewithdigital-1.jpg',
     features: [
       { name: 'Sharpening angle', value: '20°-35°' },
       { name: 'Body material', value: 'Titanium' },
@@ -54,7 +54,7 @@ const products: Product[] = [
   {
     id: 4,
     name: 'MadEdge Model 4',
-    image: '/item2.jpg',
+    image: '/images/madedgeforconvex-1.jpg',
     features: [
       { name: 'Sharpening angle', value: '12°-38°' },
       { name: 'Body material', value: 'Carbon fiber' },
