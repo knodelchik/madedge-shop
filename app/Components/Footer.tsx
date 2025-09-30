@@ -25,7 +25,7 @@ export default function Footer() {
           {/* Головна */}
           <div className="w-1/2 md:w-auto mb-6 mt-6 md:mb-0">
             <h3 className="font-medium mb-4 text-gray-900 dark:text-white text-base">
-              Головна
+              Home
             </h3>
             <ul className="space-y-3 text-gray-500 dark:text-gray-400">
               <li>
@@ -33,7 +33,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  Документація
+                  Our Products
                 </a>
               </li>
               <li>
@@ -41,7 +41,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  Підтримка
+                  Information
                 </a>
               </li>
               <li>
@@ -49,7 +49,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  Навчання
+                  Comparison
                 </a>
               </li>
               <li>
@@ -57,7 +57,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  Блог
+                  Assembly
                 </a>
               </li>
               <li>
@@ -65,7 +65,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  Команда
+                  Reviews
                 </a>
               </li>
             </ul>
@@ -74,7 +74,7 @@ export default function Footer() {
           {/* Магазин */}
           <div className="w-1/2 md:w-auto mb-6 mt-6 md:mb-0">
             <h3 className="font-medium mb-4 text-gray-900 dark:text-white text-base">
-              Магазин
+              Shop
             </h3>
             <ul className="space-y-3 text-gray-500 dark:text-gray-400">
               <li>
@@ -82,7 +82,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  Електроніка
+                  Knife Sharpeners
                 </a>
               </li>
               <li>
@@ -90,7 +90,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  Одяг
+                  Whetstones
                 </a>
               </li>
               <li>
@@ -98,23 +98,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  Дім і сад
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="hover:text-gray-900 dark:hover:text-white text-sm"
-                >
-                  Спорт
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="hover:text-gray-900 dark:hover:text-white text-sm"
-                >
-                  Новинки
+                  Accessories
                 </a>
               </li>
             </ul>
@@ -123,7 +107,7 @@ export default function Footer() {
           {/* Про нас */}
           <div className="w-1/2 md:w-auto mb-6 mt-6 md:mb-0">
             <h3 className="font-medium mb-4 text-gray-900 dark:text-white text-base">
-              Про нас
+              About us
             </h3>
             <ul className="space-y-3 text-gray-500 dark:text-gray-400">
               <li>
@@ -131,7 +115,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  Про компанію
+                  Our Background
                 </a>
               </li>
               <li>
@@ -139,7 +123,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  Відкритий код
+                  Our Values
                 </a>
               </li>
               <li>
@@ -147,7 +131,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  GitHub
+                  Manufacturing
                 </a>
               </li>
               <li>
@@ -155,7 +139,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  Спільнота
+                  MadEdge Services
                 </a>
               </li>
               <li>
@@ -163,7 +147,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  Випуски
+                  Upcoming Events
                 </a>
               </li>
             </ul>
@@ -172,7 +156,7 @@ export default function Footer() {
           {/* Контакти */}
           <div className="w-1/2 md:w-auto mb-6 mt-6 md:mb-0">
             <h3 className="font-medium mb-4 text-gray-900 dark:text-white text-base">
-              Контакти
+              Contacts
             </h3>
             <ul className="space-y-3 text-gray-500 dark:text-gray-400">
               <li>
@@ -180,7 +164,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  Зв'язатися з нами
+                  Write Us
                 </a>
               </li>
               <li>
@@ -188,23 +172,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  Відділ продажів
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="hover:text-gray-900 dark:hover:text-white text-sm"
-                >
-                  Підтримка
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="hover:text-gray-900 dark:hover:text-white text-sm"
-                >
-                  Партнерство
+                  Social Networks
                 </a>
               </li>
             </ul>
