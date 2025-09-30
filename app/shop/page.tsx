@@ -22,17 +22,17 @@ export default function ShopPage() {
           lineWidth="0.4vmin"
           lineHeight="4vmin"
           baseAngle={0}
-          style={{ margin: "2rem auto" }}
-          className='absolute inset-0 -z-10 opacity-30'
+          style={{ margin: '2rem auto' }}
+          className="absolute inset-0 -z-10 opacity-30"
         />
 
         {/* 📝 Контент */}
         <div className="relative z-10 text-center text-black">
           <h1 className="text-5xl font-extrabold mb-6 drop-shadow-lg">
-            Магазин MadEdge
+            MadEdge Shop
           </h1>
           <p className="text-lg mb-8 text-black-600">
-            Обери свою ідеальну точилку, камінь або аксесуар
+            Choose your ideal sharpener, stone or accessory
           </p>
 
           {/* Кнопки-якорі */}
@@ -41,19 +41,19 @@ export default function ShopPage() {
               href="#sharpeners"
               className="px-6 py-3 bg-black hover:bg-gray-800 rounded-xl font-semibold transition shadow-lg"
             >
-              Точилки для ножів
+              Knife Sharpeners
             </a>
             <a
               href="#stones"
               className="px-6 py-3 bg-black hover:bg-gray-800 rounded-xl font-semibold transition shadow-lg"
             >
-              Точильні камені
+              Grinding stones
             </a>
             <a
               href="#accessories"
               className="px-6 py-3 bg-black hover:bg-gray-800 rounded-xl font-semibold transition shadow-lg"
             >
-              Комплектуючі
+              Accessories
             </a>
           </div>
         </div>
@@ -63,12 +63,16 @@ export default function ShopPage() {
       <div className="p-6 space-y-16 max-w-7xl mx-auto">
         {/* 🪒 Точилки */}
         <section id="sharpeners">
-          <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Точилки для ножів</h2>
+          <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
+            Knife Sharpeners
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             {sharpeners.map((product) => (
               <Link
                 key={product.id}
-                href={`/shop/${product.title.replace(/\s+/g, '-').toLowerCase()}`}
+                href={`/shop/${product.title
+                  .replace(/\s+/g, '-')
+                  .toLowerCase()}`}
               >
                 <div className="cursor-pointer group flex flex-col items-center">
                   <img
@@ -77,7 +81,9 @@ export default function ShopPage() {
                     className="w-full h-64 rounded-2xl shadow-lg object-contain group-hover:opacity-90 transition"
                   />
                   <div className="flex justify-between items-center mt-3 w-full px-2">
-                    <h3 className="text-lg font-bold text-gray-800">{product.title}</h3>
+                    <h3 className="text-lg font-bold text-gray-800">
+                      {product.title}
+                    </h3>
                     <p className="text-sm text-gray-600">{product.price} $</p>
                   </div>
                 </div>
@@ -86,15 +92,18 @@ export default function ShopPage() {
           </div>
         </section>
 
-
         {/* 🪨 Камені */}
         <section id="stones">
-          <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Точильні камені</h2>
+          <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
+            Grinding stones
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             {stones.map((product) => (
               <Link
                 key={product.id}
-                href={`/shop/${product.title.replace(/\s+/g, '-').toLowerCase()}`}
+                href={`/shop/${product.title
+                  .replace(/\s+/g, '-')
+                  .toLowerCase()}`}
               >
                 <div className="cursor-pointer group">
                   <img
@@ -103,7 +112,9 @@ export default function ShopPage() {
                     className="w-full h-64 object-cover rounded-2xl group-hover:opacity-90 transition"
                   />
                   <div className="flex justify-between items-center mt-3">
-                    <h3 className="text-lg font-bold text-gray-800">{product.title}</h3>
+                    <h3 className="text-lg font-bold text-gray-800">
+                      {product.title}
+                    </h3>
                     <p className="text-sm text-gray-600">{product.price} $</p>
                   </div>
                 </div>
@@ -114,12 +125,16 @@ export default function ShopPage() {
 
         {/* ⚙️ Аксесуари */}
         <section id="accessories">
-          <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Комплектуючі</h2>
+          <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
+            Accessories
+          </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
             {accessories.map((product) => (
               <Link
                 key={product.id}
-                href={`/shop/${product.title.replace(/\s+/g, '-').toLowerCase()}`}
+                href={`/shop/${product.title
+                  .replace(/\s+/g, '-')
+                  .toLowerCase()}`}
               >
                 <div className="cursor-pointer group">
                   <img
@@ -128,7 +143,9 @@ export default function ShopPage() {
                     className="w-full h-64 object-cover rounded-2xl group-hover:opacity-90 transition"
                   />
                   <div className="flex justify-between items-center mt-3">
-                    <h3 className="text-lg font-bold text-gray-800">{product.title}</h3>
+                    <h3 className="text-lg font-bold text-gray-800">
+                      {product.title}
+                    </h3>
                     <p className="text-sm text-gray-600">{product.price} $</p>
                   </div>
                 </div>

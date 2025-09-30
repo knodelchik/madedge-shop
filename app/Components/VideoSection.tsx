@@ -39,7 +39,7 @@ export default function VideoSection() {
           viewport={{ once: true }}
         >
           <iframe
-            src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+            src="https://www.youtube.com/embed/WXdFfbQfzBs"
             title="MadEdge Assembly Video"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             className="w-full h-full"
