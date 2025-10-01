@@ -1,7 +1,12 @@
 'use client';
-
 import { useState } from 'react';
-import { MapPin, Phone, Mail, Clock, Send } from 'lucide-react';
+import { Phone, Mail, Clock, Send } from 'lucide-react';
+import {
+  TelegramIcon,
+  YouTubeIcon,
+  InstagramIcon,
+  FacebookIcon,
+} from './icons/SocialIcons';
 
 export default function ContactSection() {
   const [formData, setFormData] = useState({
@@ -23,94 +28,111 @@ export default function ContactSection() {
 
   const handleSubmit = () => {
     console.log('Form submitted:', formData);
-    // Тут додати логіку відправки форми
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-white py-12">
       <div className="max-w-7xl mx-auto px-4">
-        {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Contact Us</h1>
+          <div className="w-24 h-1 bg-gradient-to-r from-purple-600 to-indigo-600 mx-auto rounded-full"></div>
         </div>
 
-        {/* Main Content - Two Columns */}
-        <div className="grid lg:grid-cols-8 gap-10 ">
-          {/* Ліва колонка - Contact Info (2 колонки з 5) */}
-          <div className="lg:col-span-3">
-            <div className="bg-white rounded-lg shadow-lg p-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-                Get in Touch
+        <div className="grid lg:grid-cols-8 gap-10">
+          <div className="lg:col-span-3 mt-12">
+            <div className="bg-white rounded-2xl shadow-2xl p-6 border border-gray-200">
+              <h2 className="text-2xl font-bold mb-3 text-gray-900">
+                Let's Connect
               </h2>
-              <p className="text-gray-600 mb-8">
+              <p className="text-gray-600 mb-6 text-sm">
                 Reach out to us for any questions or inquiries
               </p>
 
-              <div className="space-y-6 mb-8">
-                {/* Address */}
-                <div className="flex items-start space-x-4">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <MapPin className="w-4 h-4 text-blue-600" />
+              <div className="space-y-6 mb-6">
+                <div className="flex items-start space-x-3">
+                  <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center flex-shrink-0 hover:bg-gray-200 transition-all duration-300">
+                    <Phone className="w-4 h-4 text-gray-700" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-1">
-                      Address
+                    <h3 className="font-semibold text-gray-900 mb-1 text-sm">
+                      Phone
                     </h3>
-                    <p className="text-gray-600">123 Craftsman Lane</p>
-                    <p className="text-gray-600">Precision City, PC 12345</p>
+                    <p className="text-gray-600 text-sm">(555) 123-4567</p>
                   </div>
                 </div>
 
-                {/* Phone */}
-                <div className="flex items-start space-x-4">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Phone className="w-4 h-4 text-blue-600" />
+                <div className="flex items-start space-x-3">
+                  <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center flex-shrink-0 hover:bg-gray-200 transition-all duration-300">
+                    <Mail className="w-4 h-4 text-gray-700" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-1">Phone</h3>
-                    <p className="text-gray-600">(555) 123-4567</p>
+                    <h3 className="font-semibold text-gray-900 mb-1 text-sm">
+                      Email
+                    </h3>
+                    <p className="text-gray-600 text-sm">info@madedge.com</p>
                   </div>
                 </div>
 
-                {/* Email */}
-                <div className="flex items-start space-x-4">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Mail className="w-4 h-4 text-blue-600" />
+                <div className="flex items-start space-x-3">
+                  <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center flex-shrink-0 hover:bg-gray-200 transition-all duration-300">
+                    <Clock className="w-4 h-4 text-gray-700" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-1">Email</h3>
-                    <p className="text-gray-600">info@madedge.com</p>
-                  </div>
-                </div>
-
-                {/* Hours */}
-                <div className="flex items-start space-x-4">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Clock className="w-4 h-4 text-blue-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-1">Hours</h3>
-                    <p className="text-gray-600">Mon-Fri: 9:00 AM - 6:00 PM</p>
-                    <p className="text-gray-600">Saturday: 9:00 AM - 4:00 PM</p>
-                    <p className="text-gray-600">Sunday: Closed</p>
+                    <h3 className="font-semibold text-gray-900 mb-1 text-sm">
+                      Business Hours
+                    </h3>
+                    <p className="text-gray-600 text-sm">
+                      Mon-Fri: 9:00 AM - 6:00 PM
+                    </p>
+                    <p className="text-gray-600 text-sm">
+                      Sat: 9:00 AM - 4:00 PM
+                    </p>
+                    <p className="text-gray-600 text-sm">Sun: Closed</p>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Interactive Map */}
-            <div className="bg-gray-200 mt-10 rounded-lg h-64 flex items-center justify-center">
-              <div className="text-center text-gray-500">
-                <MapPin className="w-12 h-12 mx-auto mb-3" />
-                <p className="font-medium">Interactive Map</p>
+              <div className="border-t border-gray-200 pt-6">
+                <h3 className="text-lg font-bold mb-3 text-gray-900">
+                  Follow Us
+                </h3>
+                <p className="text-gray-600 mb-4 text-sm">
+                  Join our community and stay updated
+                </p>
+                <div className="grid grid-cols-4 gap-2">
+                  <a
+                    href="#"
+                    className="w-full aspect-square bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gradient-to-r from-purple-600 to-indigo-600 hover:scale-110 transition-all duration-300 group"
+                  >
+                    <TelegramIcon className="w-8 h-8 text-gray-700 group-hover:text-white transition-colors" />
+                  </a>
+                  <a
+                    href="#"
+                    className="w-full aspect-square bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gradient-to-r from-purple-600 to-indigo-600 hover:scale-110 transition-all duration-300 group"
+                  >
+                    <YouTubeIcon className="w-8 h-8 text-gray-700 group-hover:text-white transition-colors" />
+                  </a>
+
+                  <a
+                    href="#"
+                    className="w-full aspect-square bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gradient-to-r from-purple-600 to-indigo-600 hover:scale-110 transition-all duration-300 group"
+                  >
+                    <FacebookIcon className="w-8 h-8 text-gray-700 group-hover:text-white transition-colors" />
+                  </a>
+                  <a
+                    href="#"
+                    className="w-full aspect-square bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gradient-to-r from-purple-600 to-indigo-600 hover:scale-110 transition-all duration-300 group"
+                  >
+                    <InstagramIcon className="w-8 h-8 text-gray-700 group-hover:text-white transition-colors" />
+                  </a>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Права колонка  */}
           <div className="lg:col-span-5">
-            <div className="bg-white rounded-lg shadow-lg p-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+            <div className="bg-white rounded-2xl shadow-2xl p-8 border border-gray-100">
+              <h2 className="text-3xl font-bold text-black mb-2">
                 Send us a Message
               </h2>
               <p className="text-gray-600 mb-8">
@@ -118,12 +140,11 @@ export default function ContactSection() {
               </p>
 
               <div className="space-y-6">
-                {/* Name and Email Row */}
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <label
                       htmlFor="name"
-                      className="block text-sm font-medium text-gray-700 mb-2"
+                      className="block text-sm font-medium text-black mb-2"
                     >
                       Name
                     </label>
@@ -134,13 +155,13 @@ export default function ContactSection() {
                       value={formData.name}
                       onChange={handleInputChange}
                       placeholder="Your name"
-                      className="w-full px-4 py-3 bg-gray-50 border-0 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-200"
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent focus:bg-white transition-all duration-200"
                     />
                   </div>
                   <div>
                     <label
                       htmlFor="email"
-                      className="block text-sm font-medium text-gray-700 mb-2"
+                      className="block text-sm font-medium text-black mb-2"
                     >
                       Email
                     </label>
@@ -151,16 +172,15 @@ export default function ContactSection() {
                       value={formData.email}
                       onChange={handleInputChange}
                       placeholder="your@email.com"
-                      className="w-full px-4 py-3 bg-gray-50 border-0 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-200"
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent focus:bg-white transition-all duration-200"
                     />
                   </div>
                 </div>
 
-                {/* Subject */}
                 <div>
                   <label
                     htmlFor="subject"
-                    className="block text-sm font-medium text-gray-700 mb-2"
+                    className="block text-sm font-medium text-black mb-2"
                   >
                     Subject
                   </label>
@@ -171,15 +191,14 @@ export default function ContactSection() {
                     value={formData.subject}
                     onChange={handleInputChange}
                     placeholder="What's this about?"
-                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-200"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent focus:bg-white transition-all duration-200"
                   />
                 </div>
 
-                {/* Message */}
                 <div>
                   <label
                     htmlFor="message"
-                    className="block text-sm font-medium text-gray-700 mb-2"
+                    className="block text-sm font-medium text-black mb-2"
                   >
                     Message
                   </label>
@@ -190,18 +209,17 @@ export default function ContactSection() {
                     value={formData.message}
                     onChange={handleInputChange}
                     placeholder="Tell us more about your inquiry..."
-                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-200 resize-none"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent focus:bg-white transition-all duration-200 resize-none"
                   />
                 </div>
 
-                {/* Submit Button */}
                 <button
                   type="button"
                   onClick={handleSubmit}
-                  className="w-full bg-gray-900 text-white py-3 px-6 rounded-lg font-medium hover:bg-gray-800 transition-colors duration-200 flex items-center justify-center space-x-2"
+                  className="w-full bg-black text-white py-4 px-6 rounded-xl font-semibold hover:bg-gray-800 transform hover:scale-[1.02] transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
                 >
                   <span>Send Message</span>
-                  <Send className="w-4 h-4" />
+                  <Send className="w-5 h-5" />
                 </button>
               </div>
             </div>
