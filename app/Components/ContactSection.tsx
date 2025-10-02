@@ -35,7 +35,7 @@ export default function ContactSection() {
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Contact Us</h1>
-          <div className="w-24 h-1 bg-gradient-to-r from-purple-600 to-indigo-600 mx-auto rounded-full"></div>
+          <div className="w-24 h-1 bg-gradient-to-r from-[#450a84] to-[#662987] mx-auto rounded-full"></div>
         </div>
 
         <div className="grid lg:grid-cols-8 gap-10">
@@ -102,26 +102,26 @@ export default function ContactSection() {
                 <div className="grid grid-cols-4 gap-2">
                   <a
                     href="#"
-                    className="w-full aspect-square bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gradient-to-r from-purple-600 to-indigo-600 hover:scale-110 transition-all duration-300 group"
+                    className="w-full aspect-square bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gradient-to-r from-[#450a84] to-[#662987] hover:scale-110 transition-all duration-300 group"
                   >
                     <TelegramIcon className="w-8 h-8 text-gray-700 group-hover:text-white transition-colors" />
                   </a>
                   <a
                     href="#"
-                    className="w-full aspect-square bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gradient-to-r from-purple-600 to-indigo-600 hover:scale-110 transition-all duration-300 group"
+                    className="w-full aspect-square bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gradient-to-r from-[#450a84] to-[#662987] hover:scale-110 transition-all duration-300 group"
                   >
                     <YouTubeIcon className="w-8 h-8 text-gray-700 group-hover:text-white transition-colors" />
                   </a>
 
                   <a
                     href="#"
-                    className="w-full aspect-square bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gradient-to-r from-purple-600 to-indigo-600 hover:scale-110 transition-all duration-300 group"
+                    className="w-full aspect-square bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gradient-to-r from-[#450a84] to-[#662987] hover:scale-110 transition-all duration-300 group"
                   >
                     <FacebookIcon className="w-8 h-8 text-gray-700 group-hover:text-white transition-colors" />
                   </a>
                   <a
                     href="#"
-                    className="w-full aspect-square bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gradient-to-r from-purple-600 to-indigo-600 hover:scale-110 transition-all duration-300 group"
+                    className="w-full aspect-square bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gradient-to-r from-[#450a84] to-[#662987] hover:scale-110 transition-all duration-300 group"
                   >
                     <InstagramIcon className="w-8 h-8 text-gray-700 group-hover:text-white transition-colors" />
                   </a>
