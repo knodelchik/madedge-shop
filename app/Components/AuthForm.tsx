@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { authService } from '../services/authService';
 import { AuthFormData } from '../types/users';
+import { useCartStore } from '../store/cartStore';
+
 
 interface AuthFormProps {
   type: 'signin' | 'signup';
@@ -26,11 +28,16 @@ export default function AuthForm({ type, onSuccess, onToggleType }: AuthFormProp
 
     try {
       let result;
-      
+
       if (type === 'signup') {
         result = await authService.signUp(formData);
       } else {
         result = await authService.signIn(formData);
+      }
+      if (result.user) {
+        // Синхронізуємо корзину після входу
+        await useCartStore.getState().syncCartWithDatabase(result.user.id);
+        onSuccess?.();
       }
 
       if (result.error) {
@@ -42,6 +49,7 @@ export default function AuthForm({ type, onSuccess, onToggleType }: AuthFormProp
       setError('An unexpected error occurred');
     } finally {
       setLoading(false);
+
     }
   };
 
@@ -131,8 +139,8 @@ export default function AuthForm({ type, onSuccess, onToggleType }: AuthFormProp
           onClick={onToggleType}
           className="text-gray-600 hover:text-black transition-colors"
         >
-          {type === 'signup' 
-            ? 'Already have an account? Sign In' 
+          {type === 'signup'
+            ? 'Already have an account? Sign In'
             : "Don't have an account? Sign Up"}
         </button>
       </div>

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Settings, Moon, Sun, Monitor, User } from 'lucide-react';
 import CartSheet from './CartSheet';
+import { useCartStore } from '../store/cartStore';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,6 +28,88 @@ export default function Header() {
   const [user, setUser] = useState<UserType | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+
+  useEffect(() => {
+  const handleAuthChange = async (event: string, session: any) => {
+    console.log('🔐 Auth state changed:', event);
+    
+    if (event === 'SIGNED_IN' && session?.user) {
+      try {
+        setUser(session.user);
+        
+        console.log('👤 User signed in:', session.user.id);
+        
+        // Затримка для стабілізації
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        const { cartItems, lastUser } = useCartStore.getState();
+        console.log('🛒 Current local cart:', cartItems);
+        console.log('👤 Last user:', lastUser);
+        console.log('👤 Current user:', session.user.id);
+        
+        // ЯКЩО це той самий користувач - завантажуємо з бази
+        if (lastUser === session.user.id) {
+          console.log('🔄 Same user - loading from database');
+          await useCartStore.getState().loadCartFromDatabase(session.user.id);
+        } else {
+          // ЯКЩО новий користувач - перевіряємо чи є дані в базі
+          console.log('🔄 New user or different device');
+          
+          // Спочатку завантажуємо з бази
+          await useCartStore.getState().loadCartFromDatabase(session.user.id);
+          
+          const { cartItems: dbCart } = useCartStore.getState();
+          console.log('📊 Cart from database:', dbCart);
+          
+          // Якщо в базі пусто, а локально є товари - синхронізуємо
+          if (dbCart.length === 0 && cartItems.length > 0) {
+            console.log('🔄 Database empty but local has items - syncing');
+            await useCartStore.getState().syncCartWithDatabase(session.user.id);
+          }
+        }
+      } catch (error) {
+        console.error('❌ Error during auth change:', error);
+      }
+    } else if (event === 'SIGNED_OUT') {
+      console.log('👤 User signed out');
+      
+      // Перед виходом синхронізуємо корзину
+      const { cartItems, lastUser } = useCartStore.getState();
+      if (lastUser && cartItems.length > 0) {
+        console.log('🔄 Syncing cart before sign out');
+        await useCartStore.getState().syncCartWithDatabase(lastUser);
+      }
+      
+      setUser(null);
+    }
+  };
+
+  // Слухач змін автентифікації
+  const { data: { subscription } } = authService.supabase.auth.onAuthStateChange(handleAuthChange);
+
+  // Перевірка поточного стану при завантаженні
+  const checkInitialAuth = async () => {
+    try {
+      const { user } = await authService.getCurrentUser();
+      if (user) {
+        console.log('🔍 Initial auth check - user found:', user.id);
+        await handleAuthChange('SIGNED_IN', { user });
+      } else {
+        console.log('🔍 Initial auth check - no user');
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error('❌ Error checking initial auth:', error);
+      setLoading(false);
+    }
+  };
+
+  checkInitialAuth();
+
+  return () => {
+    subscription.unsubscribe();
+  };
+}, []);
 
   useEffect(() => {
     const checkAuth = async () => {
