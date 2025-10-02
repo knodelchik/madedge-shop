@@ -1,76 +1,18 @@
 'use client';
 
 import React, { useState } from 'react';
-
-interface Feature {
-  name: string;
-  value: string;
-}
-
-interface Product {
-  id: number;
-  name: string;
-  image: string;
-  features: Feature[];
-}
-
-const products: Product[] = [
-  {
-    id: 1,
-    name: 'MadEdge Model 1',
-    image: '/images/madedgemodel1-1.jpg',
-    features: [
-      { name: 'Sharpening angle', value: '15°-30°' },
-      { name: 'Body material', value: 'Aluminum' },
-      { name: 'Knife fixation', value: 'Standard' },
-      { name: 'Set', value: 'Basic kit' },
-      { name: 'Price', value: '$170' },
-    ],
-  },
-  {
-    id: 2,
-    name: 'MadEdge Model 2',
-    image: '/images/madedgemodel2-2.jpg',
-    features: [
-      { name: 'Sharpening angle', value: '10°-40°' },
-      { name: 'Body material', value: 'Steel + Aluminum' },
-      { name: 'Knife fixation', value: 'Reinforced with rubber inserts' },
-      { name: 'Set', value: 'Extended kit' },
-      { name: 'Price', value: '$220' },
-    ],
-  },
-  {
-    id: 3,
-    name: 'MadEdge Model 3',
-    image: '/images/madedgewithdigital-1.jpg',
-    features: [
-      { name: 'Sharpening angle', value: '20°-35°' },
-      { name: 'Body material', value: 'Titanium' },
-      { name: 'Knife fixation', value: 'Magnetic' },
-      { name: 'Set', value: 'Pro kit' },
-      { name: 'Price', value: '$280' },
-    ],
-  },
-  {
-    id: 4,
-    name: 'MadEdge Model 4',
-    image: '/images/madedgeforconvex-1.jpg',
-    features: [
-      { name: 'Sharpening angle', value: '12°-38°' },
-      { name: 'Body material', value: 'Carbon fiber' },
-      { name: 'Knife fixation', value: 'Advanced magnetic system' },
-      { name: 'Set', value: 'Ultimate kit' },
-      { name: 'Price', value: '$350' },
-    ],
-  },
-];
+import { useLanguage } from '../context/LanguageContext';
+import { translations } from '../translation/translations';
 
 const ProductComparison: React.FC = () => {
+  const { language } = useLanguage();
+  const t = translations[language];
+
   const [firstId, setFirstId] = useState<number>(1);
   const [secondId, setSecondId] = useState<number>(2);
 
-  const product1 = products.find((p) => p.id === firstId)!;
-  const product2 = products.find((p) => p.id === secondId)!;
+  const product1 = t.products.find((p) => p.id === firstId)!;
+  const product2 = t.products.find((p) => p.id === secondId)!;
 
   const placeholder =
     'data:image/svg+xml;utf8,' +
@@ -90,7 +32,7 @@ const ProductComparison: React.FC = () => {
     <section className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-6">
         <h2 className="text-3xl font-bold text-center mb-10">
-          Product Comparison
+          {t.productComparison}
         </h2>
 
         {/* Selectors */}
@@ -100,7 +42,7 @@ const ProductComparison: React.FC = () => {
             onChange={(e) => setFirstId(Number(e.target.value))}
             className="border rounded-lg px-4 py-2"
           >
-            {products.map((p) => (
+            {t.products.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.name}
               </option>
@@ -112,7 +54,7 @@ const ProductComparison: React.FC = () => {
             onChange={(e) => setSecondId(Number(e.target.value))}
             className="border rounded-lg px-4 py-2"
           >
-            {products.map((p) => (
+            {t.products.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.name}
               </option>
@@ -125,7 +67,7 @@ const ProductComparison: React.FC = () => {
           {/* Product 1 */}
           <div>
             <img
-              src={product1.image}
+              src={`/images/madedgemodel${product1.id}-1.jpg`}
               alt={product1.name}
               onError={onImgError}
               className="mx-auto rounded-xl shadow-lg w-80 h-80 object-cover"
@@ -163,7 +105,7 @@ const ProductComparison: React.FC = () => {
           {/* Product 2 */}
           <div>
             <img
-              src={product2.image}
+              src={`/images/madedgemodel${product2.id}-1.jpg`}
               alt={product2.name}
               onError={onImgError}
               className="mx-auto rounded-xl shadow-lg w-80 h-80 object-cover"

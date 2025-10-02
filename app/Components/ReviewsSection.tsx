@@ -2,8 +2,10 @@
 
 import React, { useState } from 'react';
 import { Star as StarIcon } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
+import { translations } from '../translation/translations';
 
-// Local SpotlightCard
+// Локальна SpotlightCard
 const SpotlightCard: React.FC<{
   image?: React.ReactNode;
   footer?: React.ReactNode;
@@ -21,69 +23,7 @@ const SpotlightCard: React.FC<{
   );
 };
 
-const reviews = [
-  {
-    name: 'Alice Johnson',
-    role: 'Product Manager',
-    text: 'MadEdge completely transformed the way our team collaborates. Highly recommended!',
-  },
-  {
-    name: 'Michael Smith',
-    role: 'Entrepreneur',
-    text: 'I love the clean design and smooth performance. Definitely worth it!',
-  },
-  {
-    name: 'Sophie Lee',
-    role: 'Designer',
-    text: 'The attention to detail is outstanding. It made my workflow so much easier.',
-  },
-  {
-    name: 'Daniel Carter',
-    role: 'Developer',
-    text: 'Finally, a solution that just works. Fast, reliable, and user-friendly.',
-  },
-  {
-    name: 'Emma Wilson',
-    role: 'Marketing Specialist',
-    text: 'Our clients noticed improvements immediately. It has been a game changer.',
-  },
-  {
-    name: 'James Brown',
-    role: 'CEO',
-    text: 'The best investment we made this year. Support team is fantastic as well!',
-  },
-  {
-    name: 'Olivia Martinez',
-    role: 'Content Creator',
-    text: 'It simplified my process and saved me hours every week.',
-  },
-  {
-    name: 'William Taylor',
-    role: 'Consultant',
-    text: 'Professional, clean, and intuitive. Could not ask for more.',
-  },
-  {
-    name: 'Isabella Lopez',
-    role: 'Freelancer',
-    text: 'A tool that finally matches my expectations. Smooth and polished.',
-  },
-  {
-    name: 'Henry Evans',
-    role: 'Startup Founder',
-    text: 'Our team productivity skyrocketed after switching to MadEdge.',
-  },
-  {
-    name: 'Grace Kim',
-    role: 'Engineer',
-    text: 'It feels natural to use and everything just works.',
-  },
-  {
-    name: 'Ethan Davis',
-    role: 'Manager',
-    text: 'The reliability is unmatched. A must-have for serious work.',
-  },
-];
-
+// Аватар
 const Avatar: React.FC<{ name: string }> = ({ name }) => {
   const initials = name
     .split(' ')
@@ -99,12 +39,16 @@ const Avatar: React.FC<{ name: string }> = ({ name }) => {
 };
 
 const ReviewsSection: React.FC = () => {
+  const { language } = useLanguage();
+  const t = translations[language];
+
   const [showAll, setShowAll] = useState(false);
-  const visibleReviews = showAll ? reviews : reviews.slice(0, 3);
+  const visibleReviews = showAll ? t.reviewers : t.reviewers.slice(0, 3);
 
   return (
     <section className="py-12">
       <div className="max-w-6xl mx-auto px-4">
+        {/* Заголовок */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-2">
             {Array.from({ length: 5 }).map((_, i) => (
@@ -113,13 +57,12 @@ const ReviewsSection: React.FC = () => {
           </div>
 
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-            Trusted by 500+ happy customers worldwide
+            {t.reviewsTitle}
           </h2>
-          <p className="text-gray-600 mt-2">
-            Here’s what some of them say about MadEdge
-          </p>
+          <p className="text-gray-600 mt-2">{t.reviewsSubtitle}</p>
         </div>
 
+        {/* Відгуки */}
         <div className="grid gap-6 md:grid-cols-3">
           {visibleReviews.map((r, idx) => (
             <SpotlightCard
@@ -148,12 +91,13 @@ const ReviewsSection: React.FC = () => {
           ))}
         </div>
 
+        {/* Кнопка показати/приховати */}
         <div className="flex justify-center mt-8">
           <button
             onClick={() => setShowAll(!showAll)}
             className="px-6 py-3 rounded-full bg-gray-900 text-white font-medium hover:bg-gray-800 transition"
           >
-            {showAll ? 'Show less' : 'Show more reviews'}
+            {showAll ? t.showLessReviews : t.showMoreReviews}
           </button>
         </div>
       </div>

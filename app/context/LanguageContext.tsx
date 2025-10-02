@@ -1,12 +1,14 @@
 'use client';
 
 import { createContext, useContext, useState, ReactNode } from 'react';
+import { translations } from '../translation/translations';
 
 type Language = 'ua' | 'en';
 
 type LanguageContextType = {
   language: Language;
   setLanguage: (lang: Language) => void;
+  t: (typeof translations)['ua']; // переклади для поточної мови
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(
@@ -14,10 +16,16 @@ const LanguageContext = createContext<LanguageContextType | undefined>(
 );
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState<Language>('ua');
+  const [language, setLanguage] = useState<Language>('en');
+
+  const value: LanguageContextType = {
+    language,
+    setLanguage,
+    t: translations[language],
+  };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage }}>
+    <LanguageContext.Provider value={value}>
       {children}
     </LanguageContext.Provider>
   );
