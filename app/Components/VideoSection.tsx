@@ -2,29 +2,19 @@
 
 import { motion } from 'framer-motion';
 import { Zap, ClipboardList, Target, Wrench } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
+import { translations } from '../translation/translations';
 
 export default function VideoSection() {
-  const steps = [
-    {
-      icon: <Zap className="w-5 h-5 text-yellow-500" />,
-      title: 'Easy Assembly',
-      desc: 'Takes 5-10 minutes',
-    },
-    {
-      icon: <ClipboardList className="w-5 h-5 text-blue-500" />,
-      title: 'Clear Instructions',
-      desc: 'Step by step guidance',
-    },
-    {
-      icon: <Target className="w-5 h-5 text-red-500" />,
-      title: 'Precise Adjustment',
-      desc: 'Perfect angle setup',
-    },
-    {
-      icon: <Wrench className="w-5 h-5 text-gray-600" />,
-      title: 'Complete Kit',
-      desc: 'Everything included',
-    },
+  const { language } = useLanguage();
+  const t = translations[language];
+
+  const icons = [Zap, ClipboardList, Target, Wrench];
+  const colors = [
+    'text-yellow-500',
+    'text-blue-500',
+    'text-red-500',
+    'text-gray-600',
   ];
 
   return (
@@ -40,7 +30,11 @@ export default function VideoSection() {
         >
           <iframe
             src="https://www.youtube.com/embed/WXdFfbQfzBs"
+<<<<<<< HEAD
             title="MadEdge Assembly Video"
+=======
+            title={t.assemblyTitle}
+>>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             className="w-full h-full"
             allowFullScreen
@@ -55,51 +49,49 @@ export default function VideoSection() {
           viewport={{ once: true }}
           className="flex flex-col"
         >
-          {/* Title + Description */}
           <div className="mb-6">
             <h2 className="text-3xl font-bold mb-3 text-gray-900 flex items-center gap-2">
-              Device Assembly
+              {t.assemblyTitle}
             </h2>
             <p className="text-lg text-gray-600 leading-relaxed">
-              A simple assembly process shown in video that takes just a few
-              minutes. All the necessary parts and tools are included in your
-              MadEdge kit.
+              {t.assemblyText}
             </p>
           </div>
 
-          {/* Step cards */}
           <div className="grid grid-cols-2 gap-4 mb-6">
-            {steps.map((item, idx) => (
-              <motion.div
-                key={idx}
-                className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors border border-gray-100 flex items-start gap-3"
-                whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.2 }}
-              >
-                {item.icon}
-                <div>
-                  <div className="font-semibold text-gray-900 text-sm">
-                    {item.title}
+            {t.assemblySteps.map((step, idx) => {
+              const Icon = icons[idx];
+              return (
+                <motion.div
+                  key={idx}
+                  className={`bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors border border-gray-100 flex items-start gap-3`}
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Icon className={`w-5 h-5 ${colors[idx]}`} />
+                  <div>
+                    <div className="font-semibold text-gray-900 text-sm">
+                      {step.title}
+                    </div>
+                    <div className="text-xs text-gray-500">{step.desc}</div>
                   </div>
-                  <div className="text-xs text-gray-500">{item.desc}</div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
           </div>
 
-          {/* Buttons */}
           <div className="flex gap-3">
             <button
-              onClick={() => alert('View detailed instructions')}
+              onClick={() => alert(t.assemblyButtonText)}
               className="flex-1 px-5 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition font-semibold"
             >
-              Detailed Instructions
+              {t.assemblyButtonText}
             </button>
             <button
-              onClick={() => alert('Download PDF')}
+              onClick={() => alert(t.assemblyPdfText)}
               className="px-5 py-3 border border-gray-300 text-gray-700 rounded-lg hover:border-gray-400 transition font-semibold"
             >
-              PDF ↓
+              {t.assemblyPdfText}
             </button>
           </div>
         </motion.div>

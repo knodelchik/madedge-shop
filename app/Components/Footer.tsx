@@ -4,10 +4,14 @@ import { useTheme } from 'next-themes';
 import { useState, useEffect } from 'react';
 import { Youtube, Moon, Sun, Monitor } from 'lucide-react';
 import { InstagramIcon, TelegramIcon, YouTubeIcon } from './icons/SocialIcons';
+import { useLanguage } from '../context/LanguageContext';
+import { translations } from '../translation/translations';
 
 export default function Footer() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const { language } = useLanguage();
+  const t = translations[language];
 
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
@@ -15,9 +19,9 @@ export default function Footer() {
   return (
     <footer className="border-t border-gray-200 dark:border-gray-700 mt-18">
       <div className="max-w-7xl mx-auto px-6 py-5">
-        {/* Main footer content */}
+        {/* Основний контент футера */}
         <div className="flex flex-wrap justify-between text-base">
-          {/* Logo */}
+          {/* Логотип */}
           <div className="w-full md:w-auto mb-6 mt-5 md:mb-0">
             <h2 className="text-2xl font-bold">MadEdge</h2>
           </div>
@@ -25,7 +29,11 @@ export default function Footer() {
           {/* Головна */}
           <div className="w-1/2 md:w-auto mb-6 mt-6 md:mb-0">
             <h3 className="font-medium mb-4 text-gray-900 dark:text-white text-base">
+<<<<<<< HEAD
               Home
+=======
+              {t.footerHome}
+>>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
             </h3>
             <ul className="space-y-3 text-gray-500 dark:text-gray-400">
               <li>
@@ -33,7 +41,11 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
+<<<<<<< HEAD
                   Our Products
+=======
+                  {t.footerOurProducts}
+>>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
               <li>
@@ -41,7 +53,11 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
+<<<<<<< HEAD
                   Information
+=======
+                  {t.footerInformation}
+>>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
               <li>
@@ -49,7 +65,11 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
+<<<<<<< HEAD
                   Comparison
+=======
+                  {t.footerComparison}
+>>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
               <li>
@@ -57,7 +77,11 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
+<<<<<<< HEAD
                   Assembly
+=======
+                  {t.footerAssembly}
+>>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
               <li>
@@ -65,7 +89,11 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
+<<<<<<< HEAD
                   Reviews
+=======
+                  {t.footerReviews}
+>>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
             </ul>
@@ -74,7 +102,11 @@ export default function Footer() {
           {/* Магазин */}
           <div className="w-1/2 md:w-auto mb-6 mt-6 md:mb-0">
             <h3 className="font-medium mb-4 text-gray-900 dark:text-white text-base">
+<<<<<<< HEAD
               Shop
+=======
+              {t.footerShop}
+>>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
             </h3>
             <ul className="space-y-3 text-gray-500 dark:text-gray-400">
               <li>
@@ -82,7 +114,11 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
+<<<<<<< HEAD
                   Knife Sharpeners
+=======
+                  {t.footerKnifeSharpeners}
+>>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
               <li>
@@ -90,7 +126,11 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
+<<<<<<< HEAD
                   Whetstones
+=======
+                  {t.footerWhetstones}
+>>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
               <li>
@@ -98,7 +138,11 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
+<<<<<<< HEAD
                   Accessories
+=======
+                  {t.footerAccessories}
+>>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
             </ul>
@@ -107,7 +151,11 @@ export default function Footer() {
           {/* Про нас */}
           <div className="w-1/2 md:w-auto mb-6 mt-6 md:mb-0">
             <h3 className="font-medium mb-4 text-gray-900 dark:text-white text-base">
+<<<<<<< HEAD
               About us
+=======
+              {t.footerAboutUs}
+>>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
             </h3>
             <ul className="space-y-3 text-gray-500 dark:text-gray-400">
               <li>
@@ -115,7 +163,11 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
+<<<<<<< HEAD
                   Our Background
+=======
+                  {t.footerOurBackground}
+>>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
               <li>
@@ -123,7 +175,11 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
+<<<<<<< HEAD
                   Our Values
+=======
+                  {t.footerOurValues}
+>>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
               <li>
@@ -131,7 +187,11 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
+<<<<<<< HEAD
                   Manufacturing
+=======
+                  {t.footerManufacturing}
+>>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
               <li>
@@ -139,7 +199,11 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
+<<<<<<< HEAD
                   MadEdge Services
+=======
+                  {t.footerMadEdgeServices}
+>>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
               <li>
@@ -147,7 +211,11 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
+<<<<<<< HEAD
                   Upcoming Events
+=======
+                  {t.footerUpcomingEvents}
+>>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
             </ul>
@@ -156,7 +224,11 @@ export default function Footer() {
           {/* Контакти */}
           <div className="w-1/2 md:w-auto mb-6 mt-6 md:mb-0">
             <h3 className="font-medium mb-4 text-gray-900 dark:text-white text-base">
+<<<<<<< HEAD
               Contacts
+=======
+              {t.footerContacts}
+>>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
             </h3>
             <ul className="space-y-3 text-gray-500 dark:text-gray-400">
               <li>
@@ -164,7 +236,11 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
+<<<<<<< HEAD
                   Write Us
+=======
+                  {t.footerWriteUs}
+>>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
               <li>
@@ -172,24 +248,28 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
+<<<<<<< HEAD
                   Social Networks
+=======
+                  {t.footerSocialNetworks}
+>>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
             </ul>
           </div>
 
-          {/* Newsletter*/}
+          {/* Підписка на розсилку */}
           <div className="w-full md:w-80 md:mt-0">
             <h3 className="font-medium mb-3 mt-6 text-gray-900 dark:text-white text-base">
-              Subscribe to our newsletter
+              {t.footerNewsletterTitle}
             </h3>
             <p className="text-gray-500 dark:text-gray-400 mb-4 text-sm">
-              Stay updated on new releases and features
+              {t.footerNewsletterDesc}
             </p>
 
             <form className="relative" onSubmit={(e) => e.preventDefault()}>
               <label htmlFor="ft-email" className="sr-only">
-                Email
+                {t.footerEmailLabel}
               </label>
               <input
                 id="ft-email"
@@ -201,14 +281,14 @@ export default function Footer() {
                 type="submit"
                 className="absolute right-2 top-2 bottom-2 px-3 text-sm bg-white border dark:bg-black text-gray-600 dark:text-white rounded hover:opacity-90 cursor-pointer transition-opacity"
               >
-                Subscribe
+                {t.footerSubscribeButton}
               </button>
             </form>
           </div>
         </div>
       </div>
 
-      {/* Copyright + Theme controls */}
+      {/* Авторські права + перемикач теми */}
       <div>
         <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col sm:flex-row sm:items-center">
@@ -217,14 +297,14 @@ export default function Footer() {
                 © {new Date().getFullYear()} MadEdge, Inc.
               </div>
 
-              {/* Social links with dividers */}
+              {/* Соцмережі */}
               <div className="flex items-center space-x-3 mt-4">
                 <a
                   href="#"
                   aria-label="Telegram"
                   className="text-gray-500 hover:text-gray-900 dark:hover:text-white"
                 >
-                  <TelegramIcon className="h-4 w-4 mb-5  ml-1" />
+                  <TelegramIcon className="h-4 w-4 mb-5 ml-1" />
                 </a>
                 <div className="w-px h-4 bg-gray-300 dark:bg-gray-600 mb-5"></div>
                 <a
@@ -232,7 +312,7 @@ export default function Footer() {
                   aria-label="YouTube"
                   className="text-gray-500 hover:text-gray-900 dark:hover:text-white"
                 >
-                  <YouTubeIcon className="h-4 w-4 mb-5  ml-1" />
+                  <YouTubeIcon className="h-4 w-4 mb-5 ml-1" />
                 </a>
                 <div className="w-px h-4 bg-gray-300 dark:bg-gray-600 mb-5"></div>
                 <a
@@ -246,10 +326,10 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Theme controls */}
+          {/* Кнопки теми */}
           <div className="flex items-center border rounded-full mt-4 sm:mt-0 ">
             <button
-              aria-label="Light theme"
+              aria-label={t.themeLight}
               onClick={() => setTheme('light')}
               className={`p-3 rounded-full transition-colors ${
                 theme === 'light'
@@ -261,7 +341,7 @@ export default function Footer() {
             </button>
 
             <button
-              aria-label="System theme"
+              aria-label={t.themeSystem}
               onClick={() => setTheme('system')}
               className={`p-3 rounded-full transition-colors ${
                 theme === 'system'
@@ -273,7 +353,7 @@ export default function Footer() {
             </button>
 
             <button
-              aria-label="Dark theme"
+              aria-label={t.themeDark}
               onClick={() => setTheme('dark')}
               className={`p-3 rounded-full transition-colors ${
                 theme === 'dark'

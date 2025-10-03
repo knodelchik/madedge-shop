@@ -1,0 +1,631 @@
+'use client';
+import React, { useState } from 'react';
+import {
+  ChevronDown,
+  ChevronRight,
+  Factory,
+  Target,
+  Wrench,
+  Calendar,
+  Info,
+} from 'lucide-react';
+
+interface SubItem {
+  title: string;
+  id: string;
+}
+
+interface MenuItem {
+  title: string;
+  icon: React.ReactNode;
+  items: SubItem[];
+}
+
+const AboutSection = () => {
+  const [activeSection, setActiveSection] = useState('our-background');
+  const [expandedMenus, setExpandedMenus] = useState<string[]>(['About us']);
+
+  const menuData: MenuItem[] = [
+    {
+      title: 'About us',
+      icon: <Info className="w-5 h-5" />,
+      items: [
+        { title: 'Our Background', id: 'our-background' },
+        { title: 'Our Values', id: 'our-values' },
+        { title: 'Manufacturing', id: 'manufacturing' },
+        { title: 'MadEdge Services', id: 'madedge-services' },
+        { title: 'Upcoming Events', id: 'upcoming-events' },
+      ],
+    },
+  ];
+
+  const toggleMenu = (title: string) => {
+    setExpandedMenus((prev) =>
+      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]
+    );
+  };
+
+  const scrollToSection = (id: string) => {
+    setActiveSection(id);
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen bg-white">
+      {/* Sidebar left */}
+      <aside className="w-64 border-r border-gray-200 p-6 sticky top-[80px] self-start h-[calc(100vh-80px)] overflow-y-auto">
+        <div className="mb-8">
+          <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg mb-4">
+            <Factory className="w-5 h-5 text-blue-600" />
+            <div>
+              <div className="font-semibold text-sm text-gray-900">MadEdge</div>
+              <div className="text-xs text-gray-600">Premium Sharpeners</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+            <Target className="w-5 h-5 text-gray-600" />
+            <div>
+              <div className="font-semibold text-sm text-gray-900">
+                Latest Product
+              </div>
+              <div className="text-xs text-gray-600">ProEdge X1</div>
+            </div>
+          </div>
+        </div>
+
+        <nav>
+          {menuData.map((menu) => (
+            <div key={menu.title} className="mb-2">
+              <button
+                onClick={() => toggleMenu(menu.title)}
+                className="flex items-center justify-between w-full p-2 text-left font-semibold text-blue-600 hover:bg-gray-50 rounded-lg transition-colors"
+              >
+                <span className="flex items-center gap-2">
+                  {menu.icon}
+                  {menu.title}
+                </span>
+                {expandedMenus.includes(menu.title) ? (
+                  <ChevronDown className="w-4 h-4" />
+                ) : (
+                  <ChevronRight className="w-4 h-4" />
+                )}
+              </button>
+              {expandedMenus.includes(menu.title) && (
+                <div className="ml-7 mt-1 space-y-1">
+                  {menu.items.map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => scrollToSection(item.id)}
+                      className={`block w-full text-left px-3 py-2 text-sm rounded-lg transition-colors ${
+                        activeSection === item.id
+                          ? 'bg-blue-50 text-blue-600 font-medium'
+                          : 'text-gray-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      {item.title}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </nav>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 px-12 py-20" style={{ paddingBottom: '200px' }}>
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            About MadEdge
+          </h1>
+          <p className="text-lg text-gray-600">
+            Welcome to MadEdge - where precision meets innovation in the world
+            of sharpening solutions.
+          </p>
+        </div>
+
+        {/* Our Background */}
+        <section id="our-background" className="mb-16 scroll-mt-32">
+          <h2 className="text-3xl font-bold text-gray-900 mb-6">
+            Our Background
+          </h2>
+
+          <div className="prose prose-lg max-w-none">
+            <p className="text-gray-700 mb-4">
+              Founded in 2010, MadEdge emerged from a simple observation:
+              artists, craftsmen, and professionals deserved better tools to
+              maintain their instruments. What started as a small workshop in
+              Portland has grown into a leading manufacturer of premium
+              sharpening solutions used by professionals worldwide.
+            </p>
+
+            <h3 className="text-xl font-semibold text-gray-900 mt-8 mb-4">
+              The Journey
+            </h3>
+            <p className="text-gray-700 mb-4">
+              Our founder, Marcus Davidson, a former industrial designer,
+              noticed the frustration artists faced with conventional
+              sharpeners. He spent three years researching metallurgy, blade
+              geometry, and ergonomics to create the first MadEdge prototype.
+              That prototype evolved into our flagship ProEdge series, now
+              trusted by over 100,000 professionals globally.
+            </p>
+
+            <h3 className="text-xl font-semibold text-gray-900 mt-8 mb-4">
+              Milestones
+            </h3>
+            <div className="bg-gray-50 p-6 rounded-lg mb-6">
+              <ul className="space-y-3">
+                <li className="flex items-start">
+                  <span className="font-semibold text-blue-600 mr-3">
+                    2010:
+                  </span>
+                  <span className="text-gray-700">
+                    Company founded in Portland, Oregon
+                  </span>
+                </li>
+                <li className="flex items-start">
+                  <span className="font-semibold text-blue-600 mr-3">
+                    2013:
+                  </span>
+                  <span className="text-gray-700">
+                    First ProEdge model launched
+                  </span>
+                </li>
+                <li className="flex items-start">
+                  <span className="font-semibold text-blue-600 mr-3">
+                    2017:
+                  </span>
+                  <span className="text-gray-700">
+                    Expanded to international markets
+                  </span>
+                </li>
+                <li className="flex items-start">
+                  <span className="font-semibold text-blue-600 mr-3">
+                    2021:
+                  </span>
+                  <span className="text-gray-700">
+                    Introduced sustainable manufacturing practices
+                  </span>
+                </li>
+                <li className="flex items-start">
+                  <span className="font-semibold text-blue-600 mr-3">
+                    2024:
+                  </span>
+                  <span className="text-gray-700">
+                    Reached 100,000+ customers worldwide
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* Our Values */}
+        <section id="our-values" className="mb-16 scroll-mt-32">
+          <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Values</h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div className="bg-blue-50 p-6 rounded-lg">
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                Precision
+              </h3>
+              <p className="text-gray-700">
+                Every MadEdge product is engineered to micron-level accuracy. We
+                believe that true craftsmanship begins with the right tools,
+                maintained to perfection.
+              </p>
+            </div>
+
+            <div className="bg-green-50 p-6 rounded-lg">
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                Sustainability
+              </h3>
+              <p className="text-gray-700">
+                Our commitment to the environment drives us to use recycled
+                materials and minimize waste in every stage of production.
+              </p>
+            </div>
+
+            <div className="bg-purple-50 p-6 rounded-lg">
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                Innovation
+              </h3>
+              <p className="text-gray-700">
+                We continuously invest in R&D to develop cutting-edge sharpening
+                technologies that make maintenance easier and more effective.
+              </p>
+            </div>
+
+            <div className="bg-orange-50 p-6 rounded-lg">
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                Customer Focus
+              </h3>
+              <p className="text-gray-700">
+                Your satisfaction is our priority. We offer lifetime support and
+                a 10-year warranty on all our products.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Manufacturing */}
+        <section id="manufacturing" className="mb-16 scroll-mt-32">
+          <h2 className="text-3xl font-bold text-gray-900 mb-6">
+            Manufacturing
+          </h2>
+
+          <p className="text-gray-700 mb-6">
+            Our state-of-the-art facility in Portland combines traditional
+            craftsmanship with modern automation. Every sharpener goes through
+            rigorous quality control before reaching your hands.
+          </p>
+
+          <h3 className="text-xl font-semibold text-gray-900 mt-8 mb-4">
+            Production Process
+          </h3>
+          <div className="space-y-4 mb-6">
+            <div className="border-l-4 border-blue-600 pl-4 py-2">
+              <h4 className="font-semibold text-gray-900 mb-1">
+                1. Material Selection
+              </h4>
+              <p className="text-gray-700">
+                We source premium tungsten carbide and ceramic materials from
+                certified suppliers.
+              </p>
+            </div>
+
+            <div className="border-l-4 border-blue-600 pl-4 py-2">
+              <h4 className="font-semibold text-gray-900 mb-1">
+                2. Precision Machining
+              </h4>
+              <p className="text-gray-700">
+                CNC machines craft each component to exact specifications with
+                0.001mm tolerance.
+              </p>
+            </div>
+
+            <div className="border-l-4 border-blue-600 pl-4 py-2">
+              <h4 className="font-semibold text-gray-900 mb-1">3. Assembly</h4>
+              <p className="text-gray-700">
+                Skilled technicians hand-assemble each unit, ensuring perfect
+                alignment and functionality.
+              </p>
+            </div>
+
+            <div className="border-l-4 border-blue-600 pl-4 py-2">
+              <h4 className="font-semibold text-gray-900 mb-1">
+                4. Quality Testing
+              </h4>
+              <p className="text-gray-700">
+                Every sharpener undergoes 50+ quality checks including blade
+                angle verification and durability testing.
+              </p>
+            </div>
+
+            <div className="border-l-4 border-blue-600 pl-4 py-2">
+              <h4 className="font-semibold text-gray-900 mb-1">5. Packaging</h4>
+              <p className="text-gray-700">
+                Products are packaged in eco-friendly materials with
+                comprehensive user guides.
+              </p>
+            </div>
+          </div>
+
+          <h3 className="text-xl font-semibold text-gray-900 mt-8 mb-4">
+            Sustainability Initiatives
+          </h3>
+          <p className="text-gray-700 mb-4">
+            Our manufacturing facility runs on 100% renewable energy and we've
+            achieved zero waste to landfill status since 2022. We use recycled
+            aluminum for our casings and biodegradable packaging materials.
+          </p>
+        </section>
+
+        {/* MadEdge Services */}
+        <section id="madedge-services" className="mb-16 scroll-mt-32">
+          <h2 className="text-3xl font-bold text-gray-900 mb-6">
+            MadEdge Services
+          </h2>
+
+          <p className="text-gray-700 mb-6">
+            Beyond manufacturing exceptional products, we offer comprehensive
+            services to ensure you get the most from your MadEdge sharpener.
+          </p>
+
+          <h3 className="text-xl font-semibold text-gray-900 mt-8 mb-4">
+            How to Use Your MadEdge Sharpener
+          </h3>
+          <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-8 rounded-lg mb-8">
+            <h4 className="font-semibold text-gray-900 mb-4 text-lg">
+              Step-by-Step Instructions:
+            </h4>
+
+            <ol className="space-y-4">
+              <li className="flex items-start">
+                <span className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-4">
+                  1
+                </span>
+                <div>
+                  <p className="font-semibold text-gray-900">Preparation</p>
+                  <p className="text-gray-700">
+                    Place the sharpener on a flat, stable surface. Ensure the
+                    blade slot is clean and free of debris.
+                  </p>
+                </div>
+              </li>
+
+              <li className="flex items-start">
+                <span className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-4">
+                  2
+                </span>
+                <div>
+                  <p className="font-semibold text-gray-900">
+                    Insert the Pencil
+                  </p>
+                  <p className="text-gray-700">
+                    Hold the pencil at a 23-degree angle (the sharpener's guide
+                    will help) and insert it gently into the opening.
+                  </p>
+                </div>
+              </li>
+
+              <li className="flex items-start">
+                <span className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-4">
+                  3
+                </span>
+                <div>
+                  <p className="font-semibold text-gray-900">Rotate Smoothly</p>
+                  <p className="text-gray-700">
+                    Turn the pencil clockwise 3-5 times with gentle, consistent
+                    pressure. The sharpener will guide the optimal angle
+                    automatically.
+                  </p>
+                </div>
+              </li>
+
+              <li className="flex items-start">
+                <span className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-4">
+                  4
+                </span>
+                <div>
+                  <p className="font-semibold text-gray-900">Check the Point</p>
+                  <p className="text-gray-700">
+                    Remove the pencil and inspect. For a finer point, repeat
+                    step 3 for 2-3 more rotations.
+                  </p>
+                </div>
+              </li>
+
+              <li className="flex items-start">
+                <span className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-4">
+                  5
+                </span>
+                <div>
+                  <p className="font-semibold text-gray-900">Clean Regularly</p>
+                  <p className="text-gray-700">
+                    Empty the shavings reservoir after every 10-15 uses. Wipe
+                    the blade opening with a soft cloth monthly.
+                  </p>
+                </div>
+              </li>
+            </ol>
+
+            <div className="mt-6 p-4 bg-white rounded-lg border border-blue-200">
+              <p className="text-sm text-gray-700">
+                <strong className="text-blue-600">Pro Tip:</strong> For colored
+                pencils, use slightly less pressure and more rotations for best
+                results. For graphite pencils, standard pressure works
+                perfectly.
+              </p>
+            </div>
+          </div>
+
+          <h3 className="text-xl font-semibold text-gray-900 mt-8 mb-4">
+            Additional Services
+          </h3>
+          <div className="grid grid-cols-1 gap-4 mb-6">
+            <div className="border border-gray-200 p-5 rounded-lg hover:shadow-lg transition-shadow">
+              <h4 className="font-semibold text-gray-900 mb-2 flex items-center">
+                <Wrench className="w-5 h-5 mr-2 text-blue-600" />
+                Maintenance & Repair
+              </h4>
+              <p className="text-gray-700">
+                Free blade replacement for the first year. Lifetime repair
+                service available at cost.
+              </p>
+            </div>
+
+            <div className="border border-gray-200 p-5 rounded-lg hover:shadow-lg transition-shadow">
+              <h4 className="font-semibold text-gray-900 mb-2">
+                Custom Engraving
+              </h4>
+              <p className="text-gray-700">
+                Personalize your MadEdge with custom engraving for corporate
+                gifts or personal use.
+              </p>
+            </div>
+
+            <div className="border border-gray-200 p-5 rounded-lg hover:shadow-lg transition-shadow">
+              <h4 className="font-semibold text-gray-900 mb-2">
+                Educational Workshops
+              </h4>
+              <p className="text-gray-700">
+                Free monthly online workshops on tool maintenance and optimal
+                sharpening techniques.
+              </p>
+            </div>
+
+            <div className="border border-gray-200 p-5 rounded-lg hover:shadow-lg transition-shadow">
+              <h4 className="font-semibold text-gray-900 mb-2">Bulk Orders</h4>
+              <p className="text-gray-700">
+                Special pricing and customization options for schools, studios,
+                and corporations.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Upcoming Events */}
+        <section id="upcoming-events" className="mb-16 scroll-mt-32">
+          <h2 className="text-3xl font-bold text-gray-900 mb-6">
+            Upcoming Events
+          </h2>
+
+          <p className="text-gray-700 mb-6">
+            Join us at these upcoming events to experience MadEdge products
+            firsthand and meet our team.
+          </p>
+
+          <div className="space-y-6">
+            <div className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    International Art Supply Expo
+                  </h3>
+                  <p className="text-gray-600 mt-1">Chicago, IL</p>
+                </div>
+                <Calendar className="w-6 h-6 text-blue-600" />
+              </div>
+              <p className="text-gray-700 mb-3">
+                Visit our booth #A-245 to see live demonstrations of the new
+                ProEdge X2 and participate in our daily raffles.
+              </p>
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-semibold text-blue-600">
+                  November 15-17, 2025
+                </span>
+                <span className="text-gray-500">McCormick Place</span>
+              </div>
+            </div>
+
+            <div className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    MadEdge Factory Tour
+                  </h3>
+                  <p className="text-gray-600 mt-1">Portland, OR</p>
+                </div>
+                <Calendar className="w-6 h-6 text-blue-600" />
+              </div>
+              <p className="text-gray-700 mb-3">
+                Get an exclusive behind-the-scenes look at our manufacturing
+                process. Tours are limited to 20 participants. Registration
+                required.
+              </p>
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-semibold text-blue-600">
+                  December 5, 2025
+                </span>
+                <span className="text-gray-500">MadEdge Headquarters</span>
+              </div>
+            </div>
+
+            <div className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    Professional Artist Workshop Series
+                  </h3>
+                  <p className="text-gray-600 mt-1">Online Event</p>
+                </div>
+                <Calendar className="w-6 h-6 text-blue-600" />
+              </div>
+              <p className="text-gray-700 mb-3">
+                Monthly online workshops featuring professional artists sharing
+                their techniques and tool maintenance tips. Free for MadEdge
+                customers.
+              </p>
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-semibold text-blue-600">
+                  First Saturday of Each Month
+                </span>
+                <span className="text-gray-500">Zoom</span>
+              </div>
+            </div>
+
+            <div className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    New Product Launch Event
+                  </h3>
+                  <p className="text-gray-600 mt-1">New York, NY</p>
+                </div>
+                <Calendar className="w-6 h-6 text-blue-600" />
+              </div>
+              <p className="text-gray-700 mb-3">
+                Be the first to see and try our revolutionary new sharpening
+                system. Special early-bird pricing available for event
+                attendees.
+              </p>
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-semibold text-blue-600">
+                  January 20, 2026
+                </span>
+                <span className="text-gray-500">Javits Center</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <h3 className="font-semibold text-gray-900 mb-3">Stay Updated</h3>
+            <p className="text-gray-700 mb-4">
+              Subscribe to our newsletter to receive notifications about new
+              events, product launches, and exclusive offers.
+            </p>
+            <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+              Subscribe Now
+            </button>
+          </div>
+        </section>
+      </main>
+
+      {/* Sidebar right */}
+      <aside className="w-64 p-6 sticky top-[80px] h-[calc(100vh-80px)] overflow-y-auto hidden xl:block self-start">
+        <h3 className="text-sm font-semibold text-gray-900 mb-4">
+          On this page
+        </h3>
+        <nav className="space-y-2">
+          <a
+            href="#our-background"
+            className="block text-sm text-blue-600 hover:underline"
+          >
+            Our Background
+          </a>
+          <a
+            href="#our-values"
+            className="block text-sm text-gray-600 hover:text-gray-900"
+          >
+            Our Values
+          </a>
+          <a
+            href="#manufacturing"
+            className="block text-sm text-gray-600 hover:text-gray-900"
+          >
+            Manufacturing
+          </a>
+          <a
+            href="#madedge-services"
+            className="block text-sm text-gray-600 hover:text-gray-900"
+          >
+            MadEdge Services
+          </a>
+          <a
+            href="#upcoming-events"
+            className="block text-sm text-gray-600 hover:text-gray-900"
+          >
+            Upcoming Events
+          </a>
+        </nav>
+      </aside>
+    </div>
+  );
+};
+
+export default AboutSection;
