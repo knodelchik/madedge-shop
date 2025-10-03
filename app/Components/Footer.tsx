@@ -29,11 +29,7 @@ export default function Footer() {
           {/* Головна */}
           <div className="w-1/2 md:w-auto mb-6 mt-6 md:mb-0">
             <h3 className="font-medium mb-4 text-gray-900 dark:text-white text-base">
-<<<<<<< HEAD
-              Home
-=======
               {t.footerHome}
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
             </h3>
             <ul className="space-y-3 text-gray-500 dark:text-gray-400">
               <li>
@@ -41,11 +37,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-<<<<<<< HEAD
-                  Our Products
-=======
                   {t.footerOurProducts}
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
               <li>
@@ -53,11 +45,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-<<<<<<< HEAD
-                  Information
-=======
                   {t.footerInformation}
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
               <li>
@@ -65,11 +53,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-<<<<<<< HEAD
-                  Comparison
-=======
                   {t.footerComparison}
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
               <li>
@@ -77,11 +61,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-<<<<<<< HEAD
-                  Assembly
-=======
                   {t.footerAssembly}
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
               <li>
@@ -89,11 +69,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-<<<<<<< HEAD
-                  Reviews
-=======
                   {t.footerReviews}
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
             </ul>
@@ -102,11 +78,7 @@ export default function Footer() {
           {/* Магазин */}
           <div className="w-1/2 md:w-auto mb-6 mt-6 md:mb-0">
             <h3 className="font-medium mb-4 text-gray-900 dark:text-white text-base">
-<<<<<<< HEAD
-              Shop
-=======
               {t.footerShop}
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
             </h3>
             <ul className="space-y-3 text-gray-500 dark:text-gray-400">
               <li>
@@ -114,11 +86,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-<<<<<<< HEAD
-                  Knife Sharpeners
-=======
                   {t.footerKnifeSharpeners}
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
               <li>
@@ -126,11 +94,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-<<<<<<< HEAD
-                  Whetstones
-=======
                   {t.footerWhetstones}
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
               <li>
@@ -138,11 +102,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-<<<<<<< HEAD
-                  Accessories
-=======
                   {t.footerAccessories}
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
             </ul>
@@ -151,11 +111,7 @@ export default function Footer() {
           {/* Про нас */}
           <div className="w-1/2 md:w-auto mb-6 mt-6 md:mb-0">
             <h3 className="font-medium mb-4 text-gray-900 dark:text-white text-base">
-<<<<<<< HEAD
-              About us
-=======
               {t.footerAboutUs}
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
             </h3>
             <ul className="space-y-3 text-gray-500 dark:text-gray-400">
               <li>
@@ -163,11 +119,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-<<<<<<< HEAD
-                  Our Background
-=======
                   {t.footerOurBackground}
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
               <li>
@@ -175,11 +127,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-<<<<<<< HEAD
-                  Our Values
-=======
                   {t.footerOurValues}
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
               <li>
@@ -187,11 +135,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-<<<<<<< HEAD
-                  Manufacturing
-=======
                   {t.footerManufacturing}
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
               <li>
@@ -199,11 +143,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-<<<<<<< HEAD
-                  MadEdge Services
-=======
                   {t.footerMadEdgeServices}
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
               <li>
@@ -211,11 +151,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-<<<<<<< HEAD
-                  Upcoming Events
-=======
                   {t.footerUpcomingEvents}
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
             </ul>
@@ -224,11 +160,7 @@ export default function Footer() {
           {/* Контакти */}
           <div className="w-1/2 md:w-auto mb-6 mt-6 md:mb-0">
             <h3 className="font-medium mb-4 text-gray-900 dark:text-white text-base">
-<<<<<<< HEAD
-              Contacts
-=======
               {t.footerContacts}
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
             </h3>
             <ul className="space-y-3 text-gray-500 dark:text-gray-400">
               <li>
@@ -236,11 +168,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-<<<<<<< HEAD
-                  Write Us
-=======
                   {t.footerWriteUs}
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
               <li>
@@ -248,11 +176,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-<<<<<<< HEAD
-                  Social Networks
-=======
                   {t.footerSocialNetworks}
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </a>
               </li>
             </ul>

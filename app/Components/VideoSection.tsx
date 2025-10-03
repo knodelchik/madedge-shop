@@ -30,11 +30,7 @@ export default function VideoSection() {
         >
           <iframe
             src="https://www.youtube.com/embed/WXdFfbQfzBs"
-<<<<<<< HEAD
-            title="MadEdge Assembly Video"
-=======
             title={t.assemblyTitle}
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             className="w-full h-full"
             allowFullScreen

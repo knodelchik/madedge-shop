@@ -2,14 +2,9 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-<<<<<<< HEAD
-import { Settings, User, Moon, Sun, Monitor } from 'lucide-react';
-import CartSheet from './CartSheet';
-=======
 import { Settings, Moon, Sun, Monitor, User } from 'lucide-react';
 import CartSheet from './CartSheet';
 import { useCartStore } from '../store/cartStore';
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,105 +16,104 @@ import {
 import { useTheme } from 'next-themes';
 import { useLanguage } from '../context/LanguageContext';
 import { useCurrency } from '../context/CurrencyContext';
-<<<<<<< HEAD
-=======
 import { useEffect, useState } from 'react';
 import { authService } from '../services/authService';
 import { User as UserType } from '../types/users';
 import { useRouter } from 'next/navigation';
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
 
 export default function Header() {
   const { setTheme } = useTheme();
   const { language, setLanguage } = useLanguage();
   const { currency, setCurrency } = useCurrency();
-<<<<<<< HEAD
-=======
   const [user, setUser] = useState<UserType | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-  const handleAuthChange = async (event: string, session: any) => {
-    console.log('🔐 Auth state changed:', event);
-    
-    if (event === 'SIGNED_IN' && session?.user) {
-      try {
-        setUser(session.user);
-        
-        console.log('👤 User signed in:', session.user.id);
-        
-        // Затримка для стабілізації
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        const { cartItems, lastUser } = useCartStore.getState();
-        console.log('🛒 Current local cart:', cartItems);
-        console.log('👤 Last user:', lastUser);
-        console.log('👤 Current user:', session.user.id);
-        
-        // ЯКЩО це той самий користувач - завантажуємо з бази
-        if (lastUser === session.user.id) {
-          console.log('🔄 Same user - loading from database');
-          await useCartStore.getState().loadCartFromDatabase(session.user.id);
-        } else {
-          // ЯКЩО новий користувач - перевіряємо чи є дані в базі
-          console.log('🔄 New user or different device');
-          
-          // Спочатку завантажуємо з бази
-          await useCartStore.getState().loadCartFromDatabase(session.user.id);
-          
-          const { cartItems: dbCart } = useCartStore.getState();
-          console.log('📊 Cart from database:', dbCart);
-          
-          // Якщо в базі пусто, а локально є товари - синхронізуємо
-          if (dbCart.length === 0 && cartItems.length > 0) {
-            console.log('🔄 Database empty but local has items - syncing');
-            await useCartStore.getState().syncCartWithDatabase(session.user.id);
+    const handleAuthChange = async (event: string, session: any) => {
+      console.log('🔐 Auth state changed:', event);
+
+      if (event === 'SIGNED_IN' && session?.user) {
+        try {
+          setUser(session.user);
+
+          console.log('👤 User signed in:', session.user.id);
+
+          // Затримка для стабілізації
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+
+          const { cartItems, lastUser } = useCartStore.getState();
+          console.log('🛒 Current local cart:', cartItems);
+          console.log('👤 Last user:', lastUser);
+          console.log('👤 Current user:', session.user.id);
+
+          // ЯКЩО це той самий користувач - завантажуємо з бази
+          if (lastUser === session.user.id) {
+            console.log('🔄 Same user - loading from database');
+            await useCartStore.getState().loadCartFromDatabase(session.user.id);
+          } else {
+            // ЯКЩО новий користувач - перевіряємо чи є дані в базі
+            console.log('🔄 New user or different device');
+
+            // Спочатку завантажуємо з бази
+            await useCartStore.getState().loadCartFromDatabase(session.user.id);
+
+            const { cartItems: dbCart } = useCartStore.getState();
+            console.log('📊 Cart from database:', dbCart);
+
+            // Якщо в базі пусто, а локально є товари - синхронізуємо
+            if (dbCart.length === 0 && cartItems.length > 0) {
+              console.log('🔄 Database empty but local has items - syncing');
+              await useCartStore
+                .getState()
+                .syncCartWithDatabase(session.user.id);
+            }
           }
+        } catch (error) {
+          console.error('❌ Error during auth change:', error);
+        }
+      } else if (event === 'SIGNED_OUT') {
+        console.log('👤 User signed out');
+
+        // Перед виходом синхронізуємо корзину
+        const { cartItems, lastUser } = useCartStore.getState();
+        if (lastUser && cartItems.length > 0) {
+          console.log('🔄 Syncing cart before sign out');
+          await useCartStore.getState().syncCartWithDatabase(lastUser);
+        }
+
+        setUser(null);
+      }
+    };
+
+    // Слухач змін автентифікації
+    const {
+      data: { subscription },
+    } = authService.supabase.auth.onAuthStateChange(handleAuthChange);
+
+    // Перевірка поточного стану при завантаженні
+    const checkInitialAuth = async () => {
+      try {
+        const { user } = await authService.getCurrentUser();
+        if (user) {
+          console.log('🔍 Initial auth check - user found:', user.id);
+          await handleAuthChange('SIGNED_IN', { user });
+        } else {
+          console.log('🔍 Initial auth check - no user');
+          setLoading(false);
         }
       } catch (error) {
-        console.error('❌ Error during auth change:', error);
-      }
-    } else if (event === 'SIGNED_OUT') {
-      console.log('👤 User signed out');
-      
-      // Перед виходом синхронізуємо корзину
-      const { cartItems, lastUser } = useCartStore.getState();
-      if (lastUser && cartItems.length > 0) {
-        console.log('🔄 Syncing cart before sign out');
-        await useCartStore.getState().syncCartWithDatabase(lastUser);
-      }
-      
-      setUser(null);
-    }
-  };
-
-  // Слухач змін автентифікації
-  const { data: { subscription } } = authService.supabase.auth.onAuthStateChange(handleAuthChange);
-
-  // Перевірка поточного стану при завантаженні
-  const checkInitialAuth = async () => {
-    try {
-      const { user } = await authService.getCurrentUser();
-      if (user) {
-        console.log('🔍 Initial auth check - user found:', user.id);
-        await handleAuthChange('SIGNED_IN', { user });
-      } else {
-        console.log('🔍 Initial auth check - no user');
+        console.error('❌ Error checking initial auth:', error);
         setLoading(false);
       }
-    } catch (error) {
-      console.error('❌ Error checking initial auth:', error);
-      setLoading(false);
-    }
-  };
+    };
 
-  checkInitialAuth();
+    checkInitialAuth();
 
-  return () => {
-    subscription.unsubscribe();
-  };
-}, []);
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -133,16 +127,16 @@ export default function Header() {
     checkAuth();
 
     // Слухач змін автентифікації
-    const { data: { subscription } } = authService.supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state changed:', event);
-        if (event === 'SIGNED_IN' && session) {
-          setUser(session.user as UserType);
-        } else if (event === 'SIGNED_OUT') {
-          setUser(null);
-        }
+    const {
+      data: { subscription },
+    } = authService.supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event);
+      if (event === 'SIGNED_IN' && session) {
+        setUser(session.user as UserType);
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
       }
-    );
+    });
 
     return () => {
       subscription.unsubscribe();
@@ -166,7 +160,6 @@ export default function Header() {
       </header>
     );
   }
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
 
   return (
     <header className="sticky top-0 z-50 w-full shadow-md bg-white/70 backdrop-blur-lg px-6 py-4 flex items-center justify-between">
@@ -229,10 +222,6 @@ export default function Header() {
 
             {/* Theme */}
             <DropdownMenuLabel>
-<<<<<<< HEAD
-              {' '}
-=======
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
               {language === 'ua' ? 'Тема' : 'Theme'}
             </DropdownMenuLabel>
             <DropdownMenuItem onClick={() => setTheme('light')}>
@@ -269,8 +258,8 @@ export default function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem 
-                  onClick={handleSignOut} 
+                <DropdownMenuItem
+                  onClick={handleSignOut}
                   className="text-red-600 cursor-pointer"
                 >
                   {language === 'ua' ? 'Вийти' : 'Sign Out'}

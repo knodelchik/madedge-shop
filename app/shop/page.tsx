@@ -38,9 +38,10 @@ export default function ShopPage() {
   }, []);
 
   // Фільтрація товарів
-  const filteredProducts = activeCategory === 'all' 
-    ? products 
-    : products.filter((p) => p.category === activeCategory);
+  const filteredProducts =
+    activeCategory === 'all'
+      ? products
+      : products.filter((p) => p.category === activeCategory);
 
   const sharpeners = products.filter((p) => p.category === 'sharpeners');
   const stones = products.filter((p) => p.category === 'stones');
@@ -77,91 +78,6 @@ export default function ShopPage() {
           <p className="text-lg mb-8 text-black-600">
             Choose your ideal sharpener, stone or accessory
           </p>
-<<<<<<< HEAD
-
-          {/* Кнопки-якорі */}
-          <div className="flex flex-wrap justify-center gap-4 text-white">
-            <a
-              href="#sharpeners"
-              className="px-6 py-3 bg-black hover:bg-gray-800 rounded-xl font-semibold transition shadow-lg"
-            >
-              Knife Sharpeners
-            </a>
-            <a
-              href="#stones"
-              className="px-6 py-3 bg-black hover:bg-gray-800 rounded-xl font-semibold transition shadow-lg"
-            >
-              Grinding stones
-            </a>
-            <a
-              href="#accessories"
-              className="px-6 py-3 bg-black hover:bg-gray-800 rounded-xl font-semibold transition shadow-lg"
-            >
-              Accessories
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* 🛒 Секції товарів */}
-      <div className="p-6 space-y-16 max-w-7xl mx-auto">
-        {/* 🪒 Точилки */}
-        <section id="sharpeners">
-          <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-            Knife Sharpeners
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {sharpeners.map((product) => (
-              <Link
-                key={product.id}
-                href={`/shop/${product.title
-                  .replace(/\s+/g, '-')
-                  .toLowerCase()}`}
-              >
-                <div className="cursor-pointer group flex flex-col items-center">
-                  <img
-                    src={product.images[0]}
-                    alt={product.title}
-                    className="w-full h-64 rounded-2xl shadow-lg object-contain group-hover:opacity-90 transition"
-                  />
-                  <div className="flex justify-between items-center mt-3 w-full px-2">
-                    <h3 className="text-lg font-bold text-gray-800">
-                      {product.title}
-                    </h3>
-                    <p className="text-sm text-gray-600">{product.price} $</p>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* 🪨 Камені */}
-        <section id="stones">
-          <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-            Grinding stones
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            {stones.map((product) => (
-              <Link
-                key={product.id}
-                href={`/shop/${product.title
-                  .replace(/\s+/g, '-')
-                  .toLowerCase()}`}
-              >
-                <div className="cursor-pointer group">
-                  <img
-                    src={product.images[0]}
-                    alt={product.title}
-                    className="w-full h-64 object-cover rounded-2xl group-hover:opacity-90 transition"
-                  />
-                  <div className="flex justify-between items-center mt-3">
-                    <h3 className="text-lg font-bold text-gray-800">
-                      {product.title}
-                    </h3>
-                    <p className="text-sm text-gray-600">{product.price} $</p>
-                  </div>
-=======
         </div>
       </section>
 
@@ -199,38 +115,10 @@ export default function ShopPage() {
                   {sharpeners.map((product) => (
                     <ProductCard key={product.id} product={product} />
                   ))}
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </div>
               </section>
             )}
 
-<<<<<<< HEAD
-        {/* ⚙️ Аксесуари */}
-        <section id="accessories">
-          <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-            Accessories
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
-            {accessories.map((product) => (
-              <Link
-                key={product.id}
-                href={`/shop/${product.title
-                  .replace(/\s+/g, '-')
-                  .toLowerCase()}`}
-              >
-                <div className="cursor-pointer group">
-                  <img
-                    src={product.images[0]}
-                    alt={product.title}
-                    className="w-full h-64 object-cover rounded-2xl group-hover:opacity-90 transition"
-                  />
-                  <div className="flex justify-between items-center mt-3">
-                    <h3 className="text-lg font-bold text-gray-800">
-                      {product.title}
-                    </h3>
-                    <p className="text-sm text-gray-600">{product.price} $</p>
-                  </div>
-=======
             {/* 🪨 Камені */}
             {stones.length > 0 && (
               <section id="stones">
@@ -241,7 +129,6 @@ export default function ShopPage() {
                   {stones.map((product) => (
                     <ProductCard key={product.id} product={product} />
                   ))}
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
                 </div>
               </section>
             )}
@@ -264,7 +151,7 @@ export default function ShopPage() {
           /* 🎯 Фільтровані товари */
           <section>
             <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-              {categories.find(c => c.id === activeCategory)?.name}
+              {categories.find((c) => c.id === activeCategory)?.name}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
               {filteredProducts.map((product) => (
@@ -282,14 +169,13 @@ export default function ShopPage() {
 // В функції ProductCard додайте перевірку images:
 function ProductCard({ product }: { product: Product }) {
   // Переконайтеся, що images - масив і має принаймні один елемент
-  const mainImage = product.images && product.images.length > 0 
-    ? product.images[0] 
-    : '/images/placeholder.jpg';
+  const mainImage =
+    product.images && product.images.length > 0
+      ? product.images[0]
+      : '/images/placeholder.jpg';
 
   return (
-    <Link
-      href={`/shop/${product.title.replace(/\s+/g, '-').toLowerCase()}`}
-    >
+    <Link href={`/shop/${product.title.replace(/\s+/g, '-').toLowerCase()}`}>
       <div className="cursor-pointer group flex flex-col items-center hover:scale-105 transition-transform duration-300">
         <img
           src={mainImage}

@@ -1,19 +1,11 @@
 'use client';
 
-<<<<<<< HEAD
-import React from 'react';
-import Carousel from '../../components/Carousel';
-import { Button } from '@/components/ui/button';
-import { products } from '../data/products';
-import Link from 'next/link';
-=======
 import React, { useEffect, useState } from 'react';
 import Carousel from '../../components/Carousel';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { productsService } from '../services/productService';
 import { Product } from '../types/products';
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
 
 function useMediaQuery(query: string) {
   const [matches, setMatches] = React.useState(false);
@@ -30,13 +22,10 @@ function useMediaQuery(query: string) {
 }
 
 export default function CardsCarousel() {
-<<<<<<< HEAD
-=======
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
   const isLarge = useMediaQuery('(min-width: 1280px)');
   const isMediumPlus = useMediaQuery(
     '(min-width: 1100px) and (max-width: 1280px)'

@@ -4,11 +4,7 @@ import Threads from '../../components/Threads';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { useLanguage } from '../context/LanguageContext';
-<<<<<<< HEAD
-import { translations } from '../translations.ts/translations';
-=======
 import { translations } from '../translation/translations';
->>>>>>> 42be9e3f71fffe1b8437e5102a53e7c4d259d77b
 
 export default function Main() {
   const { language } = useLanguage();
