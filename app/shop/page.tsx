@@ -14,7 +14,6 @@ export default function ShopPage() {
   const [loading, setLoading] = useState(true);
 
   const categories = [
-    { id: 'all' as Category, name: 'All Products' },
     { id: 'sharpeners' as Category, name: 'Knife Sharpeners' },
     { id: 'stones' as Category, name: 'Grinding Stones' },
     { id: 'accessories' as Category, name: 'Accessories' },
@@ -43,10 +42,6 @@ export default function ShopPage() {
       ? products
       : products.filter((p) => p.category === activeCategory);
 
-  const sharpeners = products.filter((p) => p.category === 'sharpeners');
-  const stones = products.filter((p) => p.category === 'stones');
-  const accessories = products.filter((p) => p.category === 'accessories');
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -57,7 +52,7 @@ export default function ShopPage() {
 
   return (
     <div>
-      {/* 🎯 HERO секція */}
+      {/* 🎯 HERO секція з кнопками одразу після тексту */}
       <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
         <MagnetLines
           rows={15}
@@ -78,97 +73,79 @@ export default function ShopPage() {
           <p className="text-lg mb-8 text-black-600">
             Choose your ideal sharpener, stone or accessory
           </p>
+
+          {/* 🎛️ Кнопки фільтрації */}
+<div className="relative w-full flex flex-col items-center gap-4">
+  <div className="relative w-full flex justify-center">
+    {/* Центральна кнопка — завжди по центру */}
+    <button
+      onClick={() => setActiveCategory('stones')}
+      className={`px-6 py-3 rounded-xl font-semibold transition shadow-lg ${
+        activeCategory === 'stones'
+          ? 'bg-black text-white'
+          : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+      }`}
+    >
+      Grinding Stones
+    </button>
+
+    {/* Ліва кнопка — фіксований gap 200px вліво від центру */}
+    <button
+      onClick={() => setActiveCategory('sharpeners')}
+      className={`absolute left-1/2 -translate-x-[calc(50%+200px)] px-6 py-3 rounded-xl font-semibold transition shadow-lg ${
+        activeCategory === 'sharpeners'
+          ? 'bg-black text-white'
+          : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+      }`}
+    >
+      Knife Sharpeners
+    </button>
+
+    {/* Права кнопка — фіксований gap 200px вправо від центру */}
+    <button
+      onClick={() => setActiveCategory('accessories')}
+      className={`absolute right-1/2 translate-x-[calc(50%+180px)] px-6 py-3 rounded-xl font-semibold transition shadow-lg ${
+        activeCategory === 'accessories'
+          ? 'bg-black text-white'
+          : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+      }`}
+    >
+      Accessories
+    </button>
+  </div>
+
+  {/* Кнопка "All Products" під центром */}
+  <button
+    onClick={() => setActiveCategory('all')}
+    className={`px-4 py-2 rounded-lg font-medium transition text-sm ${
+      activeCategory === 'all'
+        ? 'bg-gray-600 text-white'
+        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+    }`}
+  >
+    All Products
+  </button>
+</div>
+
         </div>
       </section>
 
-      {/* 🎛️ Кнопки фільтрації */}
-      <section className="flex justify-center -mt-8 mb-12">
-        <div className="flex flex-wrap justify-center gap-4 bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg">
-          {categories.map((category) => (
-            <button
-              key={category.id}
-              onClick={() => setActiveCategory(category.id)}
-              className={`px-6 py-3 rounded-xl font-semibold transition shadow-lg ${
-                activeCategory === category.id
-                  ? 'bg-black text-white'
-                  : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-              }`}
-            >
-              {category.name}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {/* 🛒 Секція товарів */}
+      {/* 🛒 Секція товарів - всі товари підряд без розділення по категоріям */}
       <div className="p-6 max-w-7xl mx-auto">
-        {activeCategory === 'all' ? (
-          /* 📦 Всі товари */
-          <div className="space-y-16">
-            {/* 🪒 Точилки */}
-            {sharpeners.length > 0 && (
-              <section id="sharpeners">
-                <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-                  Knife Sharpeners
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                  {sharpeners.map((product) => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* 🪨 Камені */}
-            {stones.length > 0 && (
-              <section id="stones">
-                <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-                  Grinding Stones
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                  {stones.map((product) => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* ⚙️ Аксесуари */}
-            {accessories.length > 0 && (
-              <section id="accessories">
-                <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-                  Accessories
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
-                  {accessories.map((product) => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
-                </div>
-              </section>
-            )}
+        <section>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
+            {filteredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
           </div>
-        ) : (
-          /* 🎯 Фільтровані товари */
-          <section>
-            <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-              {categories.find((c) => c.id === activeCategory)?.name}
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
-              {filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          </section>
-        )}
+        </section>
       </div>
     </div>
   );
 }
 
 // Компонент карточки товару
-// В функції ProductCard додайте перевірку images:
 function ProductCard({ product }: { product: Product }) {
-  // Переконайтеся, що images - масив і має принаймні один елемент
   const mainImage =
     product.images && product.images.length > 0
       ? product.images[0]
