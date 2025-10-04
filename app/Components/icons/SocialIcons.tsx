@@ -24,3 +24,52 @@ export const FacebookIcon = ({ className }: IconProps) => (
     <path d="M22.675 0H1.325C.593 0 0 .593 0 1.326v21.348C0 23.407.593 24 1.325 24H12.82v-9.294H9.692V11.41h3.128V8.708c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.464.099 2.797.143v3.24l-1.922.001c-1.508 0-1.799.717-1.799 1.767v2.317h3.596l-.468 3.296h-3.128V24h6.128C23.407 24 24 23.407 24 22.674V1.326C24 .593 23.407 0 22.675 0z" />
   </svg>
 );
+export const CryingIcon = ({ className }: IconProps) => (
+  <svg className={className} viewBox="0 0 32 32" fill="none">
+    {/* Обличчя */}
+    <circle cx="16" cy="16" r="14" stroke="gray" strokeWidth="2" fill="none" />
+    {/* Очі */}
+    <circle cx="11" cy="12" r="1.5" fill="gray" />
+    <circle cx="21" cy="12" r="1.5" fill="gray" />
+    {/* Рот */}
+    <path d="M11 22 Q16 18 21 22" stroke="gray" strokeWidth="2" fill="none" />
+    {/* Сльози */}
+    <ellipse cx="10" cy="16" rx="1.2" ry="2.5" fill="#00BFFF" />
+    <ellipse cx="22" cy="16" rx="1.2" ry="2.5" fill="#00BFFF" />
+  </svg>
+);
+
+export const SadIcon = ({ className }: IconProps) => (
+  <svg className={className} viewBox="0 0 32 32" fill="none">
+    <circle cx="16" cy="16" r="14" stroke="gray" strokeWidth="2" fill="none" />
+    <circle cx="11" cy="12" r="1.5" fill="gray" />
+    <circle cx="21" cy="12" r="1.5" fill="gray" />
+    <path d="M11 22 Q16 17 21 22" stroke="gray" strokeWidth="2" fill="none" />
+  </svg>
+);
+
+export const HappyIcon = ({ className }: IconProps) => (
+  <svg className={className} viewBox="0 0 32 32" fill="none">
+    <circle cx="16" cy="16" r="14" stroke="gray" strokeWidth="2" fill="none" />
+    <circle cx="11" cy="12" r="1.5" fill="gray" />
+    <circle cx="21" cy="12" r="1.5" fill="gray" />
+    <path d="M11 20 Q16 24 21 20" stroke="gray" strokeWidth="2" fill="none" />
+  </svg>
+);
+
+export const StarEyesIcon = ({ className }: IconProps) => (
+  <svg className={className} viewBox="0 0 32 32" fill="none">
+    <circle cx="16" cy="16" r="14" stroke="gray" strokeWidth="2" fill="none" />
+    {/* Зірочки */}
+    <polygon
+      points="11,11 12,14 15,14 12.5,16 13.5,19 11,17 8.5,19 9.5,16 7,14 10,14"
+      fill="orange"
+    />
+    <polygon
+      points="21,11 22,14 25,14 22.5,16 23.5,19 21,17 18.5,19 19.5,16 17,14 20,14"
+      fill="orange"
+    />
+    {/* Усмішка */}
+    <path d="M11 21 Q16 26 21 21" stroke="gray" strokeWidth="2" fill="none" />
+  </svg>
+);
