@@ -16,9 +16,8 @@ export default function Main() {
         {/* Фон Threads */}
         <div className="absolute inset-0 z-0 pointer-events-none">
           <Threads
-            amplitude={0.4}
+            amplitude={0.3}
             distance={0.001}
-            enableMouseInteraction={true}
             color={[1, 1, 1]}
           />
         </div>

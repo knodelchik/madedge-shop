@@ -7,7 +7,6 @@ interface ThreadsProps {
   color?: [number, number, number];
   amplitude?: number;
   distance?: number;
-  enableMouseInteraction?: boolean;
 }
 
 const vertexShader = `
@@ -28,13 +27,12 @@ uniform vec3 iResolution;
 uniform vec3 uColor;
 uniform float uAmplitude;
 uniform float uDistance;
-uniform vec2 uMouse;
 
 #define PI 3.1415926538
 
-const int u_line_count = 40;
-const float u_line_width = 7.0;
-const float u_line_blur = 10.0;
+const int u_line_count = 15;
+const float u_line_width = 5.0;
+const float u_line_blur = 20.0;
 
 float Perlin2D(vec2 P) {
     vec2 Pi = floor(P);
@@ -61,16 +59,15 @@ float pixel(float count, vec2 resolution) {
     return (1.0 / max(resolution.x, resolution.y)) * count;
 }
 
-float lineFn(vec2 st, float width, float perc, float offset, vec2 mouse, float time, float amplitude, float distance) {
+float lineFn(vec2 st, float width, float perc, float offset, float time, float amplitude, float distance) {
     float split_offset = (perc * 0.4);
     float split_point = 0.1 + split_offset;
 
     float amplitude_normal = smoothstep(split_point, 0.7, st.x);
     float amplitude_strength = 0.5;
-    float finalAmplitude = amplitude_normal * amplitude_strength
-                           * amplitude * (1.0 + (mouse.y - 0.5) * 0.2);
+    float finalAmplitude = amplitude_normal * amplitude_strength * amplitude;
 
-    float time_scaled = time / 10.0 + (mouse.x - 0.5) * 1.0;
+    float time_scaled = time / 10.0;
     float blur = smoothstep(split_point, split_point + 0.05, st.x) * perc;
 
     float xnoise = mix(
@@ -111,7 +108,6 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
             u_line_width * pixel(1.0, iResolution.xy) * (1.0 - p),
             p,
             (PI * 1.0) * p,
-            uMouse,
             iTime,
             uAmplitude,
             uDistance
@@ -131,7 +127,6 @@ const Threads: React.FC<ThreadsProps> = ({
   color = [1, 1, 1],
   amplitude = 1,
   distance = 0,
-  enableMouseInteraction = false,
   ...rest
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -159,8 +154,7 @@ const Threads: React.FC<ThreadsProps> = ({
         },
         uColor: { value: new Color(...color) },
         uAmplitude: { value: amplitude },
-        uDistance: { value: distance },
-        uMouse: { value: new Float32Array([0.5, 0.5]) }
+        uDistance: { value: distance }
       }
     });
 
@@ -176,36 +170,8 @@ const Threads: React.FC<ThreadsProps> = ({
     window.addEventListener('resize', resize);
     resize();
 
-    let currentMouse = [0.5, 0.5];
-    let targetMouse = [0.5, 0.5];
-
-    function handleMouseMove(e: MouseEvent) {
-      const rect = container.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width;
-      const y = 1.0 - (e.clientY - rect.top) / rect.height;
-      targetMouse = [x, y];
-    }
-    function handleMouseLeave() {
-      targetMouse = [0.5, 0.5];
-    }
-    if (enableMouseInteraction) {
-      container.addEventListener('mousemove', handleMouseMove);
-      container.addEventListener('mouseleave', handleMouseLeave);
-    }
-
     function update(t: number) {
-      if (enableMouseInteraction) {
-        const smoothing = 0.05;
-        currentMouse[0] += smoothing * (targetMouse[0] - currentMouse[0]);
-        currentMouse[1] += smoothing * (targetMouse[1] - currentMouse[1]);
-        program.uniforms.uMouse.value[0] = currentMouse[0];
-        program.uniforms.uMouse.value[1] = currentMouse[1];
-      } else {
-        program.uniforms.uMouse.value[0] = 0.5;
-        program.uniforms.uMouse.value[1] = 0.5;
-      }
       program.uniforms.iTime.value = t * 0.001;
-
       renderer.render({ scene: mesh });
       animationFrameId.current = requestAnimationFrame(update);
     }
@@ -214,21 +180,13 @@ const Threads: React.FC<ThreadsProps> = ({
     return () => {
       if (animationFrameId.current) cancelAnimationFrame(animationFrameId.current);
       window.removeEventListener('resize', resize);
-
-      if (enableMouseInteraction) {
-        container.removeEventListener('mousemove', handleMouseMove);
-        container.removeEventListener('mouseleave', handleMouseLeave);
-      }
       if (container.contains(gl.canvas)) container.removeChild(gl.canvas);
       gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
-  }, [color, amplitude, distance, enableMouseInteraction]);
+  }, [color, amplitude, distance]);
 
   return (
-    <>
-      <div ref={containerRef} className="w-full h-full relative" {...rest} />
-      
-    </>
+    <div ref={containerRef} className="w-full h-full relative" {...rest} />
   );
 };
 

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import MagnetLines from '../../components/MagnetLines';
 import { productsService } from '../services/productService';
 import { Product } from '../types/products';
+import WishlistButton from '../Components/WishlistButton';
 
 type Category = 'all' | 'sharpeners' | 'stones' | 'accessories';
 
@@ -166,6 +167,10 @@ function ProductCard({ product }: { product: Product }) {
           <p className="text-sm font-semibold text-gray-600 whitespace-nowrap ml-2">
             {product.price} $
           </p>
+          <div className="absolute top-2 right-2 z-10">
+        <WishlistButton productId={product.id} size="sm" />
+      </div>
+
         </div>
       </div>
     </Link>
