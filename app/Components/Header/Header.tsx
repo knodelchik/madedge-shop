@@ -3,11 +3,10 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { authService } from '../../services/authService';
-import { User as UserType } from '../../types/users';
 import { useCartStore } from '../../store/cartStore';
 import { useWishlistStore } from '../../store/wishlistStore';
+import { User } from '../../types/users';
 
-// Імпорт розділених компонентів
 import HeaderSkeleton from './HeaderSkeleton';
 import Navigation from './Navigation';
 import WishlistDropdown from './WishlistDropdown';
@@ -15,71 +14,79 @@ import SettingsDropdown from './SettingsDropdown';
 import UserDropdown from './UserDropdown';
 import CartSheet from '../CartSheet';
 
+// Тип для Supabase Auth Session
+interface SupabaseSession {
+  user?: {
+    id: string;
+    email?: string;
+    user_metadata?: {
+      full_name?: string;
+    };
+    created_at?: string;
+    updated_at?: string;
+  };
+}
+
 export default function Header() {
-  const [user, setUser] = useState<UserType | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const { loadWishlist, clearWishlist } = useWishlistStore();
 
-  const { loadWishlist } = useWishlistStore();
-
-  // Обробник змін авторизації
-  const handleAuthChange = useCallback(async (event: string, session: any) => {
-    console.log('🔐 Auth state changed:', event);
-
+  const handleAuthChange = useCallback(async (event: string, session: SupabaseSession | null) => {
     try {
       if (event === 'SIGNED_IN' && session?.user) {
-        setUser(session.user);
+        // Конвертуємо Supabase user в наш тип User
+        const userData: User = {
+          id: session.user.id,
+          email: session.user.email || '',
+          full_name: session.user.user_metadata?.full_name,
+          created_at: session.user.created_at,
+          updated_at: session.user.updated_at
+        };
         
-        // Завантажуємо корзину та wishlist
+        setUser(userData);
         await useCartStore.getState().loadCartFromDatabase(session.user.id);
         await loadWishlist(session.user.id);
-        
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
         useCartStore.getState().clearCart();
-        useWishlistStore.getState().clearWishlist();
+        clearWishlist();
       }
     } catch (error) {
-      console.error('❌ Error during auth change:', error);
+      console.error('❌ Auth change error:', error);
     } finally {
       setLoading(false);
     }
-  }, [loadWishlist]);
+  }, [loadWishlist, clearWishlist]);
 
-  // Ініціалізація авторизації
   useEffect(() => {
     let mounted = true;
 
-    const initializeAuth = async () => {
+    const initAuth = async () => {
       try {
         const { user, error } = await authService.getCurrentUser();
-        
         if (mounted) {
           if (user) {
             setUser(user);
             await useCartStore.getState().loadCartFromDatabase(user.id);
             await loadWishlist(user.id);
           }
+          if (error) console.error(error);
           setLoading(false);
-        }
-
-        if (error) {
-          console.error('❌ Auth initialization error:', error);
         }
       } catch (error) {
-        console.error('❌ Unexpected auth error:', error);
-        if (mounted) {
-          setLoading(false);
-        }
+        console.error('❌ initAuth error:', error);
+        setLoading(false);
       }
     };
 
-    const { data: { subscription } } = authService.supabase.auth.onAuthStateChange(handleAuthChange);
-    initializeAuth();
+    const { data: listener } = authService.supabase.auth.onAuthStateChange(handleAuthChange);
+    initAuth();
 
     return () => {
       mounted = false;
-      subscription.unsubscribe();
+      listener.subscription.unsubscribe();
     };
   }, [handleAuthChange, loadWishlist]);
 
@@ -89,7 +96,7 @@ export default function Header() {
       await authService.signOut();
       setUser(null);
       useCartStore.getState().clearCart();
-      useWishlistStore.getState().clearWishlist();
+      clearWishlist();
       router.push('/');
     } catch (error) {
       console.error('❌ Sign out error:', error);
@@ -98,20 +105,15 @@ export default function Header() {
     }
   };
 
-  if (loading) {
-    return <HeaderSkeleton />;
-  }
+  if (loading) return <HeaderSkeleton />;
 
   return (
-    <header className="sticky top-0 z-50 w-full shadow-md bg-white/70 backdrop-blur-lg px-6 py-4 flex items-center justify-between">
-      {/* Лого */}
-      <div className="text-2xl font-bold text-gray-800">MadEdge</div>
-
-      {/* Навігація */}
+    <header className="sticky top-0 z-50 w-full bg-white/70 dark:bg-gray-900/70 backdrop-blur-lg shadow-md px-6 py-4 flex items-center justify-between">
+      <div className="text-2xl font-bold text-gray-800 dark:text-white cursor-pointer" onClick={() => router.push('/')}>
+        MadEdge
+      </div>
       <Navigation />
-
-      {/* Елементи управління */}
-      <div className="flex items-center gap-4 text-gray-700">
+      <div className="flex items-center gap-4 text-gray-700 dark:text-gray-200">
         <WishlistDropdown user={user} />
         <SettingsDropdown />
         <UserDropdown user={user} onSignOut={handleSignOut} />

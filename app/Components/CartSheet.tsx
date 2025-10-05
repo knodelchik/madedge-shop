@@ -5,6 +5,7 @@ import { ShoppingCart } from 'lucide-react';
 import { useCartStore } from '../store/cartStore';
 import QuantityCounter from './QuantityCounter';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function CartSheet() {
   const { cartItems, increaseQuantity, decreaseQuantity } = useCartStore();
@@ -33,12 +34,12 @@ export default function CartSheet() {
         {cartItems.length === 0 ? (
           <div className="flex flex-col items-center mt-8 gap-4">
             <p className="text-gray-500 text-center">Кошик порожній</p>
-            <a
+            <Link
               href="/shop"
               className="bg-black hover:bg-gray-800 text-white py-2 px-6 rounded-lg font-medium transition"
             >
               Перейти до покупок
-            </a>
+            </Link>
           </div>
         ) : (
           <div className="flex flex-col gap-6">
@@ -47,9 +48,11 @@ export default function CartSheet() {
                 key={item.id}
                 className="flex items-center gap-4 p-3 rounded-lg shadow-sm bg-white border border-gray-200"
               >
-                <img
+                <Image
                   src={item.images[0]}
                   alt={item.title}
+                  width={80}
+                  height={80}
                   className="w-20 h-20 object-cover rounded-md"
                 />
                 <div className="flex-1 flex flex-col justify-between">

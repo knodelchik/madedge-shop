@@ -1,6 +1,7 @@
 'use client';
 
 import { Heart, ShoppingCart, Trash2 } from 'lucide-react';
+import Image from 'next/image';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,9 +16,28 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import Link from 'next/link';
+import { User } from '../../types/users';
 
 interface WishlistDropdownProps {
-  user: any;
+  user: User | null;
+}
+
+interface WishlistItem {
+  id: string;
+  product_id: number;
+  products: {
+    title: string;
+    price: number;
+    images: string[];
+  };
+}
+
+interface WishlistItemsProps {
+  items: WishlistItem[];
+  movingItem: number | null;
+  onMoveToCart: (productId: number) => void;
+  onRemove: (productId: number) => void;
+  language: string;
 }
 
 export default function WishlistDropdown({ user }: WishlistDropdownProps) {
@@ -52,7 +72,7 @@ export default function WishlistDropdown({ user }: WishlistDropdownProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button 
+        <button
           className="relative flex items-center gap-2 hover:text-gray-600 transition-colors p-2 rounded-lg hover:bg-gray-100"
           aria-label="Wishlist"
         >
@@ -66,15 +86,15 @@ export default function WishlistDropdown({ user }: WishlistDropdownProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80">
         <DropdownMenuLabel>
-          {language === 'ua' ? 'Список бажань' : 'Wishlist'} 
+          {language === 'ua' ? 'Список бажань' : 'Wishlist'}
           {wishlistItems.length > 0 && ` (${wishlistItems.length})`}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        
+
         {wishlistItems.length === 0 ? (
           <EmptyWishlist language={language} />
         ) : (
-          <WishlistItems 
+          <WishlistItems
             items={wishlistItems}
             movingItem={movingItem}
             onMoveToCart={handleMoveToCart}
@@ -82,13 +102,18 @@ export default function WishlistDropdown({ user }: WishlistDropdownProps) {
             language={language}
           />
         )}
-        
+
         {wishlistItems.length > 0 && (
           <>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild className="cursor-pointer text-center justify-center">
+            <DropdownMenuItem
+              asChild
+              className="cursor-pointer text-center justify-center"
+            >
               <Link href="/shop" className="w-full">
-                {language === 'ua' ? 'Перейти до магазину' : 'Continue shopping'}
+                {language === 'ua'
+                  ? 'Перейти до магазину'
+                  : 'Continue shopping'}
               </Link>
             </DropdownMenuItem>
           </>
@@ -103,35 +128,39 @@ function EmptyWishlist({ language }: { language: string }) {
   return (
     <div className="px-2 py-4 text-center text-gray-500">
       <Heart className="w-8 h-8 mx-auto mb-2 opacity-50" />
-      <p>{language === 'ua' ? 'Список бажань порожній' : 'Wishlist is empty'}</p>
+      <p>
+        {language === 'ua' ? 'Список бажань порожній' : 'Wishlist is empty'}
+      </p>
       <p className="text-sm mt-1">
-        {language === 'ua' ? 'Додавайте товари, які сподобались' : 'Add items you like'}
+        {language === 'ua'
+          ? 'Додавайте товари, які сподобались'
+          : 'Add items you like'}
       </p>
     </div>
   );
 }
 
 // Підкомпонент для списку товарів
-interface WishlistItemsProps {
-  items: any[];
-  movingItem: number | null;
-  onMoveToCart: (productId: number) => void;
-  onRemove: (productId: number) => void;
-  language: string;
-}
-
-function WishlistItems({ items, movingItem, onMoveToCart, onRemove, language }: WishlistItemsProps) {
+function WishlistItems({
+  items,
+  movingItem,
+  onMoveToCart,
+  onRemove,
+  language,
+}: WishlistItemsProps) {
   return (
     <div className="max-h-96 overflow-y-auto">
       {items.map((item) => (
         <div key={item.id} className="px-2 py-3 border-b last:border-b-0">
           <div className="flex items-center gap-3">
-            <img
+            <Image
               src={item.products.images?.[0] || '/images/placeholder.jpg'}
               alt={item.products.title}
-              className="w-12 h-12 object-cover rounded-lg flex-shrink-0"
+              width={48}
+              height={48}
+              className="object-cover rounded-lg flex-shrink-0"
             />
-            
+
             <div className="flex-1 min-w-0">
               <p className="font-medium text-sm truncate">
                 {item.products.title}
@@ -140,7 +169,7 @@ function WishlistItems({ items, movingItem, onMoveToCart, onRemove, language }: 
                 ${item.products.price}
               </p>
             </div>
-            
+
             <div className="flex flex-col gap-1">
               <button
                 onClick={() => onMoveToCart(item.product_id)}
@@ -161,7 +190,9 @@ function WishlistItems({ items, movingItem, onMoveToCart, onRemove, language }: 
           </div>
           {movingItem === item.product_id && (
             <div className="text-xs text-green-600 mt-1">
-              {language === 'ua' ? 'Додається до корзини...' : 'Adding to cart...'}
+              {language === 'ua'
+                ? 'Додається до корзини...'
+                : 'Adding to cart...'}
             </div>
           )}
         </div>

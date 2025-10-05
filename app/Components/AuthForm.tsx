@@ -5,7 +5,6 @@ import { authService } from '../services/authService';
 import { AuthFormData } from '../types/users';
 import { useCartStore } from '../store/cartStore';
 
-
 interface AuthFormProps {
   type: 'signin' | 'signup';
   onSuccess?: () => void;
@@ -45,11 +44,10 @@ export default function AuthForm({ type, onSuccess, onToggleType }: AuthFormProp
       } else {
         onSuccess?.();
       }
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred');
     } finally {
       setLoading(false);
-
     }
   };
 

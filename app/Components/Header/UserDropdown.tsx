@@ -11,9 +11,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useLanguage } from '../../context/LanguageContext';
 import Link from 'next/link';
+import { User as UserType } from '../../types/users';
 
 interface UserDropdownProps {
-  user: any;
+  user: UserType | null;
   onSignOut: () => void;
 }
 

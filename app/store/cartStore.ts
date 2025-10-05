@@ -21,14 +21,14 @@ interface CartStore {
     addToCart: (product: Product & { quantity: number }) => void;
     removeFromCart: (productId: number) => void;
     updateQuantity: (productId: number, quantity: number) => void;
-    increaseQuantity: (productId: number) => void; // ДОДАЄМО
-    decreaseQuantity: (productId: number) => void; // ДОДАЄМО
+    increaseQuantity: (productId: number) => void;
+    decreaseQuantity: (productId: number) => void;
     clearCart: () => void;
 
     // Синхронізація з базою даних
     syncCartWithDatabase: (userId: string) => Promise<void>;
     loadCartFromDatabase: (userId: string) => Promise<void>;
-    handleAuthChange: (user: any | null) => Promise<void>;
+    handleAuthChange: (user: { id: string } | null) => Promise<void>;
 }
 
 export const useCartStore = create<CartStore>()(
@@ -39,7 +39,7 @@ export const useCartStore = create<CartStore>()(
             lastUser: null,
 
             addToCart: (product) => {
-                const { cartItems, lastUser } = get();
+                const { cartItems } = get();
                 const existingItem = cartItems.find(item => item.id === product.id);
 
                 let newCartItems: CartItem[];
@@ -115,24 +115,22 @@ export const useCartStore = create<CartStore>()(
                 syncWithDB();
             },
 
-            // ДОДАЄМО ФУНКЦІЇ ДЛЯ ЗБІЛЬШЕННЯ/ЗМЕНШЕННЯ
             increaseQuantity: (productId: number) => {
-                const { cartItems, updateQuantity } = get();
+                const { cartItems } = get();
                 const item = cartItems.find(item => item.id === productId);
 
                 if (item) {
-                    updateQuantity(productId, item.quantity + 1);
+                    get().updateQuantity(productId, item.quantity + 1);
                 }
             },
 
             decreaseQuantity: (productId: number) => {
-                const { cartItems, updateQuantity } = get();
+                const { cartItems } = get();
                 const item = cartItems.find(item => item.id === productId);
 
                 if (item && item.quantity > 1) {
-                    updateQuantity(productId, item.quantity - 1);
+                    get().updateQuantity(productId, item.quantity - 1);
                 } else if (item && item.quantity === 1) {
-                    // Якщо кількість 1, то видаляємо товар
                     get().removeFromCart(productId);
                 }
             },
@@ -181,7 +179,6 @@ export const useCartStore = create<CartStore>()(
                     const formattedCartItems: CartItem[] = cartItemsFromDB.map(item => {
                         console.log('🔍 Processing item:', item);
 
-                        // Перевірка чи products існує
                         if (!item.products) {
                             console.error('❌ Missing products data for item:', item);
                             return null;
@@ -194,7 +191,7 @@ export const useCartStore = create<CartStore>()(
                             images: item.products.images,
                             quantity: item.quantity
                         };
-                    }).filter(item => item !== null) as CartItem[]; // Фільтруємо null значення
+                    }).filter(item => item !== null) as CartItem[];
 
                     console.log('✅ Loaded cart items:', formattedCartItems);
                     set({
@@ -208,17 +205,14 @@ export const useCartStore = create<CartStore>()(
                 }
             },
 
-            handleAuthChange: async (user: any) => {
+            handleAuthChange: async (user: { id: string } | null) => {
                 if (user) {
-                    // Користувач увійшов - завантажуємо корзину з бази
                     console.log('👤 User signed in, loading cart from DB');
                     await get().loadCartFromDatabase(user.id);
                 } else {
-                    // Користувач вийшов - зберігаємо локально
                     console.log('👤 User signed out, keeping cart locally');
                     const { lastUser, cartItems } = get();
 
-                    // Якщо були товари в корзині, синхронізуємо перед виходом
                     if (lastUser && cartItems.length > 0) {
                         console.log('🔄 Syncing cart before sign out');
                         await get().syncCartWithDatabase(lastUser);

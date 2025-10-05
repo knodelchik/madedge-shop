@@ -1,24 +1,19 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import MagnetLines from '../../components/MagnetLines';
-import { productsService } from '../services/productService';
-import { Product } from '../types/products';
-import WishlistButton from '../Components/WishlistButton';
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import MagnetLines from "../../components/MagnetLines";
+import { productsService } from "../services/productService";
+import { Product } from "../types/products";
+import WishlistButton from "../Components/WishlistButton";
+import Image from "next/image";
 
-type Category = 'all' | 'sharpeners' | 'stones' | 'accessories';
+type Category = "all" | "sharpeners" | "stones" | "accessories";
 
 export default function ShopPage() {
-  const [activeCategory, setActiveCategory] = useState<Category>('all');
+  const [activeCategory, setActiveCategory] = useState<Category>("all");
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const categories = [
-    { id: 'sharpeners' as Category, name: 'Knife Sharpeners' },
-    { id: 'stones' as Category, name: 'Grinding Stones' },
-    { id: 'accessories' as Category, name: 'Accessories' },
-  ];
 
   // Завантаження товарів
   useEffect(() => {
@@ -28,7 +23,7 @@ export default function ShopPage() {
         const data = await productsService.getAllProducts();
         setProducts(data);
       } catch (error) {
-        console.error('Failed to load products:', error);
+        console.error("Failed to load products:", error);
       } finally {
         setLoading(false);
       }
@@ -39,7 +34,7 @@ export default function ShopPage() {
 
   // Фільтрація товарів
   const filteredProducts =
-    activeCategory === 'all'
+    activeCategory === "all"
       ? products
       : products.filter((p) => p.category === activeCategory);
 
@@ -63,7 +58,7 @@ export default function ShopPage() {
           lineWidth="0.4vmin"
           lineHeight="4vmin"
           baseAngle={0}
-          style={{ margin: '2rem auto' }}
+          style={{ margin: "2rem auto" }}
           className="absolute inset-0 -z-10 opacity-30"
         />
 
@@ -76,58 +71,57 @@ export default function ShopPage() {
           </p>
 
           {/* 🎛️ Кнопки фільтрації */}
-<div className="relative w-full flex flex-col items-center gap-4">
-  <div className="relative w-full flex justify-center">
-    {/* Центральна кнопка — завжди по центру */}
-    <button
-      onClick={() => setActiveCategory('stones')}
-      className={`px-6 py-3 rounded-xl font-semibold transition shadow-lg ${
-        activeCategory === 'stones'
-          ? 'bg-black text-white'
-          : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-      }`}
-    >
-      Grinding Stones
-    </button>
+          <div className="relative w-full flex flex-col items-center gap-4">
+            <div className="relative w-full flex justify-center">
+              {/* Центральна кнопка — завжди по центру */}
+              <button
+                onClick={() => setActiveCategory("stones")}
+                className={`px-6 py-3 rounded-xl font-semibold transition shadow-lg ${
+                  activeCategory === "stones"
+                    ? "bg-black text-white"
+                    : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                }`}
+              >
+                Grinding Stones
+              </button>
 
-    {/* Ліва кнопка — фіксований gap 200px вліво від центру */}
-    <button
-      onClick={() => setActiveCategory('sharpeners')}
-      className={`absolute left-1/2 -translate-x-[calc(50%+200px)] px-6 py-3 rounded-xl font-semibold transition shadow-lg ${
-        activeCategory === 'sharpeners'
-          ? 'bg-black text-white'
-          : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-      }`}
-    >
-      Knife Sharpeners
-    </button>
+              {/* Ліва кнопка — фіксований gap 200px вліво від центру */}
+              <button
+                onClick={() => setActiveCategory("sharpeners")}
+                className={`absolute left-1/2 -translate-x-[calc(50%+200px)] px-6 py-3 rounded-xl font-semibold transition shadow-lg ${
+                  activeCategory === "sharpeners"
+                    ? "bg-black text-white"
+                    : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                }`}
+              >
+                Knife Sharpeners
+              </button>
 
-    {/* Права кнопка — фіксований gap 200px вправо від центру */}
-    <button
-      onClick={() => setActiveCategory('accessories')}
-      className={`absolute right-1/2 translate-x-[calc(50%+180px)] px-6 py-3 rounded-xl font-semibold transition shadow-lg ${
-        activeCategory === 'accessories'
-          ? 'bg-black text-white'
-          : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-      }`}
-    >
-      Accessories
-    </button>
-  </div>
+              {/* Права кнопка — фіксований gap 200px вправо від центру */}
+              <button
+                onClick={() => setActiveCategory("accessories")}
+                className={`absolute right-1/2 translate-x-[calc(50%+180px)] px-6 py-3 rounded-xl font-semibold transition shadow-lg ${
+                  activeCategory === "accessories"
+                    ? "bg-black text-white"
+                    : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                }`}
+              >
+                Accessories
+              </button>
+            </div>
 
-  {/* Кнопка "All Products" під центром */}
-  <button
-    onClick={() => setActiveCategory('all')}
-    className={`px-4 py-2 rounded-lg font-medium transition text-sm ${
-      activeCategory === 'all'
-        ? 'bg-gray-600 text-white'
-        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-    }`}
-  >
-    All Products
-  </button>
-</div>
-
+            {/* Кнопка "All Products" під центром */}
+            <button
+              onClick={() => setActiveCategory("all")}
+              className={`px-4 py-2 rounded-lg font-medium transition text-sm ${
+                activeCategory === "all"
+                  ? "bg-gray-600 text-white"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              All Products
+            </button>
+          </div>
         </div>
       </section>
 
@@ -150,14 +144,16 @@ function ProductCard({ product }: { product: Product }) {
   const mainImage =
     product.images && product.images.length > 0
       ? product.images[0]
-      : '/images/placeholder.jpg';
+      : "/images/placeholder.jpg";
 
   return (
-    <Link href={`/shop/${product.title.replace(/\s+/g, '-').toLowerCase()}`}>
+    <Link href={`/shop/${product.title.replace(/\s+/g, "-").toLowerCase()}`}>
       <div className="cursor-pointer group flex flex-col items-center hover:scale-105 transition-transform duration-300">
-        <img
+        <Image
           src={mainImage}
           alt={product.title}
+          width={300}
+          height={256}
           className="w-full h-64 rounded-2xl shadow-lg object-contain group-hover:opacity-90 transition"
         />
         <div className="flex justify-between items-center mt-3 w-full px-2">
@@ -168,9 +164,8 @@ function ProductCard({ product }: { product: Product }) {
             {product.price} $
           </p>
           <div className="absolute top-2 right-2 z-10">
-        <WishlistButton productId={product.id} size="sm" />
-      </div>
-
+            <WishlistButton productId={product.id} size="sm" />
+          </div>
         </div>
       </div>
     </Link>
