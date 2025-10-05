@@ -8,7 +8,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { translations } from '../translation/translations';
 
 export default function Footer() {
-  const { theme, setTheme } = useTheme();
+  const { setTheme } = useTheme(); // Видалено невикористовувану змінну theme
   const [mounted, setMounted] = useState(false);
   const { language } = useLanguage();
   const t = translations[language];

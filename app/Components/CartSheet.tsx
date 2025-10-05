@@ -7,11 +7,27 @@ import QuantityCounter from './QuantityCounter';
 import Link from 'next/link';
 import Image from 'next/image';
 
+interface CartItem {
+  id: number;
+  title: string;
+  price: number;
+  images: string[];
+  quantity: number;
+}
+
 export default function CartSheet() {
   const { cartItems, increaseQuantity, decreaseQuantity } = useCartStore();
 
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  // Функція для отримання безпечного зображення
+  const getSafeImage = (item: CartItem) => {
+    if (!item.images || item.images.length === 0) {
+      return '/images/placeholder.jpg';
+    }
+    return item.images[0];
+  };
 
   return (
     <Sheet>
@@ -49,7 +65,7 @@ export default function CartSheet() {
                 className="flex items-center gap-4 p-3 rounded-lg shadow-sm bg-white border border-gray-200"
               >
                 <Image
-                  src={item.images[0]}
+                  src={getSafeImage(item)}
                   alt={item.title}
                   width={80}
                   height={80}

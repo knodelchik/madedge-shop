@@ -2,9 +2,10 @@
 
 import { useCartStore } from '../store/cartStore';
 import { useState } from 'react';
+import Image from 'next/image';
 
 export default function OrderPage() {
-  const { cartItems, clearCart } = useCartStore();
+  const { cartItems } = useCartStore(); // Видалено невикористовувану змінну clearCart
   const [paymentMethod, setPaymentMethod] = useState<'fondy' | 'paypal'>('fondy');
 
   const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -37,7 +38,13 @@ export default function OrderPage() {
             key={item.id}
             className="flex items-center gap-4 p-3 rounded-lg shadow-sm bg-white border border-gray-200"
           >
-            <img src={item.images[0]} alt={item.title} className="w-20 h-20 object-cover rounded-md" />
+            <Image 
+              src={item.images[0]} 
+              alt={item.title} 
+              width={80}
+              height={80}
+              className="w-20 h-20 object-cover rounded-md" 
+            />
             <div className="flex-1">
               <p className="font-medium">{item.title}</p>
               <p className="text-gray-500">{item.quantity} × {item.price.toFixed(2)} $</p>

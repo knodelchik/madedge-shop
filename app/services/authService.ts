@@ -2,7 +2,7 @@ import { supabase } from '../lib/supabase';
 import { User, AuthFormData } from '../types/users';
 
 export const authService = {
-  supabase, // Додаємо доступ до supabase instance
+  supabase,
 
   // Реєстрація
   async signUp({ email, password, full_name }: AuthFormData): Promise<{ user: User | null; error: string | null }> {
@@ -20,7 +20,7 @@ export const authService = {
       return { user: null, error: error.message };
     }
 
-    return { user: data.user as any, error: null };
+    return { user: data.user as User, error: null };
   },
 
   // Вхід
@@ -34,7 +34,7 @@ export const authService = {
       return { user: null, error: error.message };
     }
 
-    return { user: data.user as any, error: null };
+    return { user: data.user as User, error: null };
   },
 
   // Вихід
@@ -51,7 +51,7 @@ export const authService = {
       return { user: null, error: error.message };
     }
 
-    return { user: user as any, error: null };
+    return { user: user as User, error: null };
   },
 
   // Отримати профіль користувача

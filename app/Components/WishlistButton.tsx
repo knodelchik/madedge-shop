@@ -15,7 +15,7 @@ interface WishlistButtonProps {
 export default function WishlistButton({ productId, size = 'md', className = '' }: WishlistButtonProps) {
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<{ id: string } | null>(null);
   
   const { addToWishlist, removeFromWishlist, isInWishlist: checkInWishlist } = useWishlistStore();
   const router = useRouter();
@@ -24,14 +24,23 @@ export default function WishlistButton({ productId, size = 'md', className = '' 
   useEffect(() => {
     const checkUser = async () => {
       const { user } = await authService.getCurrentUser();
-      setUser(user);
+      // Використовуємо тільки id, оскільки він нам потрібен
+      if (user) {
+        setUser({ id: user.id });
+      } else {
+        setUser(null);
+      }
     };
 
     checkUser();
 
     // Слухаємо зміни авторизації
     const { data: { subscription } } = authService.supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user || null);
+      if (session?.user) {
+        setUser({ id: session.user.id });
+      } else {
+        setUser(null);
+      }
     });
 
     return () => subscription.unsubscribe();

@@ -7,44 +7,10 @@ import Link from 'next/link';
 import { productsService } from '../services/productService';
 import { Product } from '../types/products';
 
-function useMediaQuery(query: string) {
-  const [matches, setMatches] = React.useState(false);
-
-  React.useEffect(() => {
-    const media = window.matchMedia(query);
-    if (media.matches !== matches) setMatches(media.matches);
-    const listener = () => setMatches(media.matches);
-    media.addEventListener('change', listener);
-    return () => media.removeEventListener('change', listener);
-  }, [matches, query]);
-
-  return matches;
-}
-
 export default function CardsCarousel() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const isLarge = useMediaQuery('(min-width: 1280px)');
-  const isMediumPlus = useMediaQuery(
-    '(min-width: 1100px) and (max-width: 1280px)'
-  );
-  const isMedium = useMediaQuery('(min-width: 950px) and (max-width: 1100px)');
-  const isSmallPlus = useMediaQuery(
-    '(max-width: 950px) and (min-width: 800px)'
-  );
-  const isSmall = useMediaQuery('(max-width: 800px)');
-
-  const baseWidth = isLarge
-    ? 400
-    : isMediumPlus
-    ? 350
-    : isMedium
-    ? 300
-    : isSmallPlus
-    ? 250
-    : 500;
 
   // Завантаження товарів з Supabase
   useEffect(() => {
@@ -128,55 +94,61 @@ export default function CardsCarousel() {
 
   return (
     <div className="w-full flex flex-col items-center gap-8 px-4 py-20">
-      {isSmall ? (
-        // Для маленьких екранів один об'єднаний слайдер
+      {/* Mobile - один карусель */}
+      <div className="block md:hidden w-full max-w-md mx-auto">
         <Carousel
           items={[...sharpeners, ...stones, ...accessories]}
           autoplay
           autoplayDelay={4000}
           pauseOnHover
-          baseWidth={baseWidth}
+          className="w-full"
           loop={false}
         />
-      ) : (
-        // Для більших екранів три окремі каруселі
-        <div className="flex justify-center gap-8 w-full flex-wrap">
-          {sharpeners.length > 0 && (
+      </div>
+
+      {/* Desktop - три каруселі */}
+      <div className="hidden md:flex flex-col lg:flex-row justify-center items-center gap-6 lg:gap-8 w-full max-w-7xl mx-auto">
+        {sharpeners.length > 0 && (
+          <div className="w-full lg:w-1/3 max-w-sm">
             <Carousel
               items={sharpeners}
               autoplay
               autoplayDelay={10000}
               pauseOnHover
-              baseWidth={baseWidth}
+              className="w-full"
               loop={false}
             />
-          )}
-          {stones.length > 0 && (
+          </div>
+        )}
+        {stones.length > 0 && (
+          <div className="w-full lg:w-1/3 max-w-sm">
             <Carousel
               items={stones}
               autoplay
               autoplayDelay={5000}
               pauseOnHover
-              baseWidth={baseWidth}
+              className="w-full"
               loop={false}
             />
-          )}
-          {accessories.length > 0 && (
+          </div>
+        )}
+        {accessories.length > 0 && (
+          <div className="w-full lg:w-1/3 max-w-sm">
             <Carousel
               items={accessories}
               autoplay
               autoplayDelay={15000}
               pauseOnHover
-              baseWidth={baseWidth}
+              className="w-full"
               loop={false}
             />
-          )}
-        </div>
-      )}
+          </div>
+        )}
+      </div>
 
       <Button
         size="lg"
-        className="px-8 py-4 rounded-2xl shadow-md cursor-pointer"
+        className="px-8 py-4 rounded-2xl shadow-md cursor-pointer mt-8"
       >
         <Link href="/shop">Shop</Link>
       </Button>

@@ -1,6 +1,5 @@
 import { supabase } from '../lib/supabase';
-import { CartItem, CartItemWithProduct } from '../types/cart';
-import { Product } from '../types/products';
+import { CartItemWithProduct } from '../types/cart';
 
 export const cartService = {
   // Отримати корзину користувача

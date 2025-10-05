@@ -1,6 +1,5 @@
-// services/wishlistService.ts
 import { supabase } from '../lib/supabase';
-import { WishlistItem, WishlistItemWithProduct } from '../types/wishlist';
+import { WishlistItemWithProduct } from '../types/wishlist';
 
 export const wishlistService = {
   // Отримати список бажань

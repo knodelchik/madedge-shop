@@ -110,7 +110,7 @@ export default function AboutPage() {
               Innovation
             </h3>
             <p className="text-gray-700">
-              We continuously invest in R&D to develop cutting-edge sharpening
+              We continuously invest in R&amp;D to develop cutting-edge sharpening
               technologies that make maintenance easier and more effective.
             </p>
           </div>
@@ -192,7 +192,7 @@ export default function AboutPage() {
           Sustainability Initiatives
         </h3>
         <p className="text-gray-700 mb-4">
-          Our manufacturing facility runs on 100% renewable energy and we've
+          Our manufacturing facility runs on 100% renewable energy and we&apos;ve
           achieved zero waste to landfill status since 2022. We use recycled
           aluminum for our casings and biodegradable packaging materials.
         </p>
@@ -238,7 +238,7 @@ export default function AboutPage() {
               <div>
                 <p className="font-semibold text-gray-900">Insert the Pencil</p>
                 <p className="text-gray-700">
-                  Hold the pencil at a 23-degree angle (the sharpener's guide
+                  Hold the pencil at a 23-degree angle (the sharpener&apos;s guide
                   will help) and insert it gently into the opening.
                 </p>
               </div>
@@ -301,7 +301,7 @@ export default function AboutPage() {
           <div className="border border-gray-200 p-5 rounded-lg hover:shadow-lg transition-shadow">
             <h4 className="font-semibold text-gray-900 mb-2 flex items-center">
               <Wrench className="w-5 h-5 mr-2 text-blue-600" />
-              Maintenance & Repair
+              Maintenance &amp; Repair
             </h4>
             <p className="text-gray-700">
               Free blade replacement for the first year. Lifetime repair service

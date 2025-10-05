@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation'; // Видалено useRouter
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -9,10 +9,10 @@ import { useCartStore } from '../../store/cartStore';
 import QuantityCounter from '../../Components/QuantityCounter';
 import { productsService } from '../../services/productService';
 import { Product } from '../../types/products';
+import Image from 'next/image';
 
 export default function ProductPage() {
   const { slug } = useParams();
-  const router = useRouter();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentImage, setCurrentImage] = useState(0);
@@ -146,9 +146,11 @@ export default function ProductPage() {
                           : 'border-gray-200 hover:border-gray-400'
                       }`}
                     >
-                      <img
+                      <Image
                         src={image}
                         alt={`${product.title} ${index + 1}`}
+                        width={80}
+                        height={80}
                         className="w-full h-20 object-cover"
                       />
                     </button>

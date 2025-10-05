@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { useLanguage } from '../context/LanguageContext';
 import { translations } from '../translation/translations';
 
@@ -66,9 +67,11 @@ const ProductComparison: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 items-start text-center">
           {/* Product 1 */}
           <div>
-            <img
+            <Image
               src={`/images/madedgemodel${product1.id}-1.jpg`}
               alt={product1.name}
+              width={320}
+              height={320}
               onError={onImgError}
               className="mx-auto rounded-xl shadow-lg w-80 h-80 object-cover"
             />
@@ -104,9 +107,11 @@ const ProductComparison: React.FC = () => {
 
           {/* Product 2 */}
           <div>
-            <img
+            <Image
               src={`/images/madedgemodel${product2.id}-1.jpg`}
               alt={product2.name}
+              width={320}
+              height={320}
               onError={onImgError}
               className="mx-auto rounded-xl shadow-lg w-80 h-80 object-cover"
             />
