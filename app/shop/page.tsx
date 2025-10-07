@@ -140,34 +140,57 @@ export default function ShopPage() {
 }
 
 // Компонент карточки товару
+// Компонент карточки товару з плавною анімацією
 function ProductCard({ product }: { product: Product }) {
+  const [isHovered, setIsHovered] = useState(false);
   const mainImage =
     product.images && product.images.length > 0
       ? product.images[0]
       : "/images/placeholder.jpg";
 
   return (
-    <Link href={`/shop/${product.title.replace(/\s+/g, "-").toLowerCase()}`}>
-      <div className="cursor-pointer group flex flex-col items-center hover:scale-105 transition-transform duration-300">
-        <Image
-          src={mainImage}
-          alt={product.title}
-          width={300}
-          height={256}
-          className="w-full h-64 rounded-2xl shadow-lg object-contain group-hover:opacity-90 transition"
+    <div 
+      className="group flex flex-col items-center hover:scale-105 transition-transform duration-300 relative"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Кнопка Wishlist - з плавною появою */}
+      <div className={`absolute top-2 right-2 z-20 transition-all duration-300 ${
+        isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
+      }`}>
+        <WishlistButton 
+          productId={product.id} 
+          size="sm" 
+          onClick={(e: React.MouseEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
         />
-        <div className="flex justify-between items-center mt-3 w-full px-2">
-          <h3 className="text-lg font-bold text-gray-800 line-clamp-2">
-            {product.title}
-          </h3>
-          <p className="text-sm font-semibold text-gray-600 whitespace-nowrap ml-2">
-            {product.price} $
-          </p>
-          <div className="absolute top-2 right-2 z-10">
-            <WishlistButton productId={product.id} size="sm" />
+      </div>
+      
+      {/* Основна частина картки - обгорнута в Link */}
+      <Link 
+        href={`/shop/${product.title.replace(/\s+/g, "-").toLowerCase()}`}
+        className="w-full"
+      >
+        <div className="cursor-pointer flex flex-col items-center w-full">
+          <Image
+            src={mainImage}
+            alt={product.title}
+            width={300}
+            height={256}
+            className="w-full h-64 rounded-2xl shadow-lg object-contain group-hover:opacity-90 transition"
+          />
+          <div className="flex justify-between items-center mt-3 w-full px-2">
+            <h3 className="text-lg font-bold text-gray-800 line-clamp-2">
+              {product.title}
+            </h3>
+            <p className="text-sm font-semibold text-gray-600 whitespace-nowrap ml-2">
+              {product.price} $
+            </p>
           </div>
         </div>
-      </div>
-    </Link>
+      </Link>
+    </div>
   );
 }

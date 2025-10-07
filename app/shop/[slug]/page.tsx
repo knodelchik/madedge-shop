@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation'; // Видалено useRouter
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { useCartStore } from '../../store/cartStore';
 import QuantityCounter from '../../Components/QuantityCounter';
+import WishlistButton from '../../Components/WishlistButton'; // Додаємо імпорт
 import { productsService } from '../../services/productService';
 import { Product } from '../../types/products';
 import Image from 'next/image';
@@ -104,6 +105,8 @@ export default function ProductPage() {
             {/* Слайдер фото */}
             <div className="space-y-4">
               <div className="relative w-full flex items-center justify-center bg-gray-100 rounded-2xl p-4">
+               
+                
                 <motion.img
                   key={product.images[currentImage]}
                   src={product.images[currentImage]}
@@ -179,25 +182,49 @@ export default function ProductPage() {
                 </div>
               )}
 
-              {/* Кількість та кнопка додавання */}
-              <div className="flex items-center gap-4 pt-4">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-gray-700">
-                    Кількість:
-                  </span>
-                  <QuantityCounter
-                    value={quantity}
-                    onIncrease={() => setQuantity(q => q + 1)}
-                    onDecrease={() => setQuantity(q => q > 1 ? q - 1 : 1)}
-                  />
+              {/* Кількість та кнопки додавання */}
+              <div className="space-y-4 pt-4">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-gray-700">
+                      Кількість:
+                    </span>
+                    <QuantityCounter
+                      value={quantity}
+                      onIncrease={() => setQuantity(q => q + 1)}
+                      onDecrease={() => setQuantity(q => q > 1 ? q - 1 : 1)}
+                    />
+                  </div>
                 </div>
 
-                <button
-                  onClick={handleAddToCart}
-                  className="flex-1 bg-black text-white px-8 py-3 rounded-xl font-semibold hover:bg-gray-800 transition-colors"
-                >
-                  Додати в кошик
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleAddToCart}
+                    className="flex-1 bg-black text-white px-8 py-3 rounded-xl font-semibold hover:bg-gray-800 transition-colors"
+                  >
+                    Додати в кошик
+                  </button>
+                  
+                  {/* Додаткова кнопка Wishlist для мобільних пристроїв */}
+                  <div className="md:hidden">
+                    <WishlistButton 
+                      productId={product.id} 
+                      size="md"
+                      className="border-2 border-gray-300 hover:border-red-300"
+                    />
+                  </div>
+                </div>
+
+                {/* Альтернативний варіант Wishlist кнопки для десктопу */}
+                <div className="hidden md:flex items-center gap-2 pt-2">
+                  <WishlistButton 
+                    productId={product.id} 
+                    size="sm"
+                  />
+                  <span className="text-sm text-gray-600">
+                    Додати до списку бажань
+                  </span>
+                </div>
               </div>
 
               {/* Категорія */}

@@ -14,10 +14,10 @@ export default function Main() {
     <main className="w-full h-full relative">
       <section className="relative min-h-[80vh] flex flex-col items-center justify-center text-center px-6 overflow-hidden">
         {/* Фон Threads */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute -z-1 top-0 left-0 w-full h-full">
           <Threads
-            amplitude={0.3}
-            distance={0.001}
+            amplitude={1.2}
+            distance={0.0001}
             color={[1, 1, 1]}
           />
         </div>
