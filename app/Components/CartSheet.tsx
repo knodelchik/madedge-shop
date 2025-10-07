@@ -42,14 +42,14 @@ export default function CartSheet() {
         </button>
       </SheetTrigger>
 
-      <SheetContent side="right" className="w-[400px] sm:w-[500px] p-6">
-        <SheetHeader className="mb-4">
+      <SheetContent side="right" className="w-[400px] sm:w-[500px] p-0 flex flex-col h-full">
+        <SheetHeader className="p-6 border-b shrink-0">
           <SheetTitle className="text-xl font-bold">Ваш кошик</SheetTitle>
         </SheetHeader>
 
         {cartItems.length === 0 ? (
-          <div className="flex flex-col items-center mt-8 gap-4">
-            <p className="text-gray-500 text-center">Кошик порожній</p>
+          <div className="flex flex-col items-center justify-center flex-1 p-6">
+            <p className="text-gray-500 text-center mb-4">Кошик порожній</p>
             <Link
               href="/shop"
               className="bg-black hover:bg-gray-800 text-white py-2 px-6 rounded-lg font-medium transition"
@@ -58,44 +58,50 @@ export default function CartSheet() {
             </Link>
           </div>
         ) : (
-          <div className="flex flex-col gap-6">
-            {cartItems.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center gap-4 p-3 rounded-lg shadow-sm bg-white border border-gray-200"
-              >
-                <Image
-                  src={getSafeImage(item)}
-                  alt={item.title}
-                  width={80}
-                  height={80}
-                  className="w-20 h-20 object-cover rounded-md"
-                />
-                <div className="flex-1 flex flex-col justify-between">
-                  <p className="font-medium text-gray-800">{item.title}</p>
-                  <p className="text-sm text-gray-500 mt-1">{item.price.toFixed(2)} $</p>
+          <div className="flex flex-col flex-1 min-h-0">
+            {/* Контейнер для товарів з прокруткою */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+              {cartItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center gap-4 p-3 rounded-lg shadow-sm bg-white border border-gray-200"
+                >
+                  <Image
+                    src={getSafeImage(item)}
+                    alt={item.title}
+                    width={80}
+                    height={80}
+                    className="w-20 h-20 object-cover rounded-md flex-shrink-0"
+                  />
+                  <div className="flex-1 flex flex-col justify-between min-w-0">
+                    <p className="font-medium text-gray-800 truncate">{item.title}</p>
+                    <p className="text-sm text-gray-500 mt-1">{item.price.toFixed(2)} $</p>
+                  </div>
+
+                  <QuantityCounter
+                    value={item.quantity}
+                    onIncrease={() => increaseQuantity(item.id)}
+                    onDecrease={() => decreaseQuantity(item.id)}
+                  />
                 </div>
-
-                <QuantityCounter
-                  value={item.quantity}
-                  onIncrease={() => increaseQuantity(item.id)}
-                  onDecrease={() => decreaseQuantity(item.id)}
-                />
-              </div>
-            ))}
-
-            <div className="mt-6 flex justify-between items-center font-semibold text-lg text-gray-800 border-t pt-4">
-              <span>Разом:</span>
-              <span>{totalPrice.toFixed(2)} $</span>
+              ))}
             </div>
 
-            {/* Кнопка переходу на сторінку оформлення */}
-            <Link
-              href="/order"
-              className="w-full mt-4 text-center bg-black hover:bg-gray-800 text-white py-3 rounded-lg font-medium transition block"
-            >
-              Оформити замовлення
-            </Link>
+            {/* Фіксований блок з підсумком і кнопкою */}
+            <div className="border-t p-6 bg-white shrink-0">
+              <div className="flex justify-between items-center font-semibold text-lg text-gray-800 mb-4">
+                <span>Разом:</span>
+                <span>{totalPrice.toFixed(2)} $</span>
+              </div>
+
+              {/* Кнопка переходу на сторінку оформлення */}
+              <Link
+                href="/order"
+                className="w-full text-center bg-black hover:bg-gray-800 text-white py-3 rounded-lg font-medium transition block"
+              >
+                Оформити замовлення
+              </Link>
+            </div>
           </div>
         )}
       </SheetContent>

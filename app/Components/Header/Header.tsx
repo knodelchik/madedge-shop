@@ -114,9 +114,10 @@ export default function Header() {
       </div>
       <Navigation />
       <div className="flex items-center gap-4 text-gray-700 dark:text-gray-200">
-        <WishlistDropdown user={user} />
+        
         <SettingsDropdown />
         <UserDropdown user={user} onSignOut={handleSignOut} />
+        <WishlistDropdown user={user} />
         <CartSheet />
       </div>
     </header>
