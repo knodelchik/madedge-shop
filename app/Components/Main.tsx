@@ -12,7 +12,7 @@ export default function Main() {
 
   return (
     <main className="w-full h-full relative">
-      <section className="relative min-h-[80vh] flex flex-col items-center justify-center text-center px-6 overflow-hidden">
+      <section className="relative h-[100vh] flex flex-col items-center justify-center text-center px-6 overflow-hidden">
         {/* Фон Threads */}
         <div className="absolute -z-1 top-0 left-0 w-full h-full">
           <Threads
