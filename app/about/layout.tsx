@@ -3,7 +3,14 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ChevronsUpDown, Factory, Target, Info, Scissors } from 'lucide-react';
+import {
+  ChevronsUpDown,
+  Factory,
+  Target,
+  Info,
+  Scissors,
+  Gem,
+} from 'lucide-react';
 import {
   CryingIcon,
   SadIcon,
@@ -45,6 +52,12 @@ export default function AboutLayout({
       id: 'sharpeners',
       href: '/about/sharpeners',
     },
+    {
+      title: 'Grinding Stones',
+      icon: <Gem className="w-5 h-5" />,
+      id: 'grindingstones',
+      href: '/about/grindingstones',
+    },
   ];
 
   const pageSections: SectionMap = {
@@ -61,9 +74,33 @@ export default function AboutLayout({
       { title: 'MadEdge Model 2', id: 'model-2' },
       { title: 'MadEdge for Convex Blades', id: 'convex' },
     ],
+    '/about/grindingstones': [
+      { title: 'Professional Grinding Stone', id: 'professional-stone' },
+      { title: 'Premium Ultra-Fine Stone', id: 'premium-stone' },
+      { title: 'How to Use', id: 'usage-guide' },
+      { title: 'Care & Maintenance', id: 'care-instructions' },
+    ],
   };
 
   const currentSections = pageSections[pathname] || [];
+
+  // Динамічна навігація між сторінками
+  const navigationPages = [
+    { href: '/about/contribution-guide', title: 'Contribution Guide' },
+    { href: '/about', title: 'About Us' },
+    { href: '/about/sharpeners', title: 'Sharpeners' },
+    { href: '/about/grindingstones', title: 'Grinding Stones' },
+  ];
+
+  const currentPageIndex = navigationPages.findIndex(
+    (page) => page.href === pathname
+  );
+  const previousPage =
+    currentPageIndex > 0 ? navigationPages[currentPageIndex - 1] : null;
+  const nextPage =
+    currentPageIndex < navigationPages.length - 1
+      ? navigationPages[currentPageIndex + 1]
+      : null;
 
   const handleSubmit = () => {
     console.log('Feedback:', { rating: selectedRating, feedback });
@@ -109,11 +146,10 @@ export default function AboutLayout({
                     : 'text-gray-700 hover:bg-gray-50'
                 }`}
               >
-                <span className="flex items-center gap-2 font-semibold">
+                <span className="flex items-center gap-2 font-normal">
                   {menu.icon}
                   {menu.title}
                 </span>
-                <ChevronsUpDown className="w-4 h-4 text-black" />
               </Link>
             ))}
           </nav>
@@ -146,51 +182,59 @@ export default function AboutLayout({
       {/* Навігація Previous/Next */}
       <div className="border-t border-gray-200 py-6 px-6 md:px-12">
         <div className="max-w-4xl mx-auto flex justify-between items-center">
-          <Link
-            href="/about/contribution-guide"
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          {previousPage ? (
+            <Link
+              href={previousPage.href}
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            <div className="text-left">
-              <div className="text-sm text-gray-500">Previous</div>
-              <div className="font-semibold">Contribution Guide</div>
-            </div>
-          </Link>
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+              <div className="text-left">
+                <div className="text-sm text-gray-500">Previous</div>
+                <div className="font-semibold">{previousPage.title}</div>
+              </div>
+            </Link>
+          ) : (
+            <div />
+          )}
 
-          <Link
-            href="/about/sharpeners"
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition"
-          >
-            <div className="text-right">
-              <div className="text-sm text-gray-500">Next</div>
-              <div className="font-semibold">Sharpeners</div>
-            </div>
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          {nextPage ? (
+            <Link
+              href={nextPage.href}
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </Link>
+              <div className="text-right">
+                <div className="text-sm text-gray-500">Next</div>
+                <div className="font-semibold">{nextPage.title}</div>
+              </div>
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </Link>
+          ) : (
+            <div />
+          )}
         </div>
       </div>
 

@@ -41,7 +41,7 @@ export default function ContactSection() {
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             {t.contactTitle}
           </h1>
-          <div className="w-24 h-1 bg-gradient-to-r from-[#877e4e] to-[#dbc767] mx-auto rounded-full"></div>
+          <div className="w-24 h-1 bg-gradient-to-r from-[#475fd8] to-[#35297e] mx-auto rounded-full"></div>
         </div>
 
         <div className="grid lg:grid-cols-8 gap-10">
@@ -108,7 +108,7 @@ export default function ContactSection() {
                       <a
                         key={idx}
                         href="#"
-                        className="w-full aspect-square bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gradient-to-r from-[#877e4e] to-[#dbc767] hover:scale-110 transition-all duration-300 group"
+                        className="w-full aspect-square bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gradient-to-r from-[#475fd8] to-[#35297e] hover:scale-110 transition-all duration-300 group"
                       >
                         <Icon className="w-8 h-8 text-gray-700 group-hover:text-white transition-colors" />
                       </a>
