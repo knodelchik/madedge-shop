@@ -1,5 +1,6 @@
 interface IconProps {
   className?: string;
+  title?: string;
 }
 
 export const TelegramIcon = ({ className }: IconProps) => (
