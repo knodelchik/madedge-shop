@@ -24,6 +24,7 @@ export default function RootLayout({
           <LanguageProvider>
             <CurrencyProvider>
               <Header />
+              
               <main>{children}</main>
               <Toaster richColors position="top-left" />
               <Footer />

@@ -24,7 +24,7 @@ const slides: Slide[] = [
   },
   {
     title: "Sharpeners",
-    img: "/images/Airbrush-Image-Enhancer-1759925034201.jpg",
+    img: "/images/sharpeners.jpg",
     desc: "Professional sharpeners for blades, tools, and knives.",
     category: "sharpeners",
   },
@@ -58,12 +58,12 @@ export default function CardCarousel(): JSX.Element {
                 backgroundPosition: "center",
               }}
             >
-              <div className="absolute inset-0 bg-black/20" />
+              <div className="absolute inset-0 bg-gray-900/10" />
               <motion.div
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
-                className="relative z-10 text-center bg-white/10 backdrop-blur-sm p-8 rounded-2xl shadow-2xl max-w-xl flex flex-col items-center justify-center"
+                className="relative z-10 text-center bg-gray-200/60 backdrop-blur-sm p-8 rounded-2xl shadow-[0_4px_30px_-4px_rgba(0,0,0,0.3)] max-w-xl flex flex-col items-center justify-center"
               >
                 <h1 className="text-4xl text-black/90 font-bold mb-3 tracking-tight">
                   {slide.title}
@@ -73,7 +73,7 @@ export default function CardCarousel(): JSX.Element {
                 </p>
                 <Link
                   href={`/shop?category=${slide.category}`}
-                  className="px-5 py-2 bg-white text-black font-semibold rounded-full hover:bg-gray-200 transition"
+                  className="px-5 py-2 bg-gray-300/30 text-black font-semibold rounded-full hover:bg-gray-200 transition border border-gray-400/10 hover:border-gray-600/25"
                 >
                   View {slide.title}
                 </Link>

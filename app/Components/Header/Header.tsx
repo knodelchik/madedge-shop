@@ -7,12 +7,16 @@ import { useCartStore } from '../../store/cartStore';
 import { useWishlistStore } from '../../store/wishlistStore';
 import { User } from '../../types/users';
 
+import { Heart, ShoppingCart } from 'lucide-react';
+import BurgerMenu from './BurgerMenu'; 
+
 import HeaderSkeleton from './HeaderSkeleton';
 import Navigation from './Navigation';
 import WishlistDropdown from './WishlistDropdown';
 import SettingsDropdown from './SettingsDropdown';
 import UserDropdown from './UserDropdown';
 import CartSheet from '../CartSheet';
+
 
 // Тип для Supabase Auth Session
 interface SupabaseSession {
@@ -108,18 +112,33 @@ export default function Header() {
   if (loading) return <HeaderSkeleton />;
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white/70 dark:bg-gray-900/70 backdrop-blur-lg shadow-md px-6 py-4 flex items-center justify-between">
-      <div className="text-2xl font-bold text-gray-800 dark:text-white cursor-pointer" onClick={() => router.push('/')}>
-        MadEdge
+    <header className="sticky top-0 z-50 w-full bg-white/70 dark:bg-gray-900/70 backdrop-blur-lg shadow-md px-6 py-4 grid grid-cols-3 items-center">
+  {/* Ліва частина */}
+  <div
+    className="text-2xl font-bold text-gray-800 dark:text-white cursor-pointer justify-self-start"
+    onClick={() => router.push('/')}
+  >
+    MadEdge
+  </div>
+
+  {/* Центр */}
+  <div className="justify-self-center hidden md:block">
+    <Navigation />
+  </div>
+
+  {/* Права частина */}
+  <div className="hidden md:flex  items-center gap-4 text-gray-700 dark:text-gray-200 justify-self-end">
+    <SettingsDropdown />
+    <UserDropdown user={user} onSignOut={handleSignOut} />
+    <WishlistDropdown user={user} />
+    <CartSheet />
+
+    {/* Мобільне меню */}
+      <div className="md:hidden">
+        <BurgerMenu user={user} onSignOut={handleSignOut} />
       </div>
-      <Navigation />
-      <div className="flex items-center gap-4 text-gray-700 dark:text-gray-200">
-        
-        <SettingsDropdown />
-        <UserDropdown user={user} onSignOut={handleSignOut} />
-        <WishlistDropdown user={user} />
-        <CartSheet />
-      </div>
-    </header>
+  </div>
+</header>
+
   );
 }

@@ -33,7 +33,7 @@ export default function Main() {
             <Button
               asChild
               size="lg"
-              className="px-8 py-4 rounded-2xl shadow-md cursor-pointer z-10"
+              className="px-8 py-4 rounded-2xl border border-black shadow-md cursor-pointer z-10 hover:bg-gray-300/30 hover:border-gray-400/10 hover:text-black transition duration-200"
             >
               <span>{t.shop}</span>
             </Button>
@@ -44,7 +44,7 @@ export default function Main() {
               asChild
               size="lg"
               variant="secondary"
-              className="px-8 py-4 rounded-2xl shadow-md cursor-pointer z-10"
+              className="px-8 py-4 rounded-2xl shadow-md cursor-pointer z-10 bg-gray-300/30 border border-gray-400/10 text-black hover:text-black/80 transition duration-200"
             >
               <span>{t.about}</span>
             </Button>
