@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import MagnetLines from "../../components/MagnetLines";
 import { productsService } from "../services/productService";
@@ -11,9 +12,23 @@ import Image from "next/image";
 type Category = "all" | "sharpeners" | "stones" | "accessories";
 
 export default function ShopPage() {
-  const [activeCategory, setActiveCategory] = useState<Category>("all");
+  const searchParams = useSearchParams();
+  const urlCategory = searchParams.get('category') as Category | null;
+  
+  const [activeCategory, setActiveCategory] = useState<Category>(
+    urlCategory && ["sharpeners", "stones", "accessories"].includes(urlCategory) 
+      ? urlCategory 
+      : "all"
+  );
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Оновлюємо активну категорію при зміні URL параметра
+  useEffect(() => {
+    if (urlCategory && ["sharpeners", "stones", "accessories"].includes(urlCategory)) {
+      setActiveCategory(urlCategory);
+    }
+  }, [urlCategory]);
 
   // Завантаження товарів
   useEffect(() => {
@@ -127,19 +142,31 @@ export default function ShopPage() {
 
       {/* 🛒 Секція товарів - всі товари підряд без розділення по категоріям */}
       <div className="p-6 max-w-7xl mx-auto">
+        
         <section>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
             {filteredProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
+          
+          {filteredProducts.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-lg">No products found in this category</p>
+              <button
+                onClick={() => setActiveCategory("all")}
+                className="mt-4 px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition"
+              >
+                View All Products
+              </button>
+            </div>
+          )}
         </section>
       </div>
     </div>
   );
 }
 
-// Компонент карточки товару
 // Компонент карточки товару з плавною анімацією
 function ProductCard({ product }: { product: Product }) {
   const [isHovered, setIsHovered] = useState(false);

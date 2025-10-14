@@ -3,41 +3,45 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
-import { Navigation, Autoplay } from "swiper/modules";
+import { Autoplay } from "swiper/modules";
 import { motion } from "framer-motion";
 import { JSX } from "react";
+import Link from "next/link";
 
 interface Slide {
   title: string;
   img: string;
   desc: string;
+  category: "sharpeners" | "stones" | "accessories";
 }
 
 const slides: Slide[] = [
   {
     title: "Grinding Stones",
-    img: "https://images.unsplash.com/photo-1602524205734-28e95b220d9f",
+    img: "/images/grindingstones.jpg",
     desc: "High-quality grinding stones designed for precision sharpening.",
+    category: "stones",
   },
   {
     title: "Sharpeners",
-    img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c",
+    img: "/images/Airbrush-Image-Enhancer-1759925034201.jpg",
     desc: "Professional sharpeners for blades, tools, and knives.",
+    category: "sharpeners",
   },
   {
     title: "Accessories",
-    img: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f",
+    img: "/images/accseroies.jpg",
     desc: "Essential accessories to complement your sharpening setup.",
+    category: "accessories",
   },
 ];
 
 export default function CardCarousel(): JSX.Element {
   return (
-    <section className="relative w-full h-[60vh] flex items-center justify-center text-white overflow-hidden">
+    <section className="relative w-full h-[60vh] flex items-center justify-center text-white overflow-hidden mb-30">
       <Swiper
-        modules={[Navigation, Autoplay]}
-        navigation
-        autoplay={{ delay: 4000, disableOnInteraction: false }}
+        modules={[Autoplay]}
+        autoplay={{ delay: 4000, disableOnInteraction: true }}
         loop
         spaceBetween={40}
         slidesPerView={1}
@@ -50,25 +54,29 @@ export default function CardCarousel(): JSX.Element {
               style={{
                 backgroundImage: `url(${slide.img})`,
                 backgroundSize: "cover",
+                backgroundRepeat: "no-repeat",
                 backgroundPosition: "center",
               }}
             >
-              <div className="absolute inset-0 bg-black/50" />
+              <div className="absolute inset-0 bg-black/20" />
               <motion.div
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
-                className="relative z-10 text-center bg-white/10 backdrop-blur-md p-8 rounded-2xl shadow-2xl max-w-xl flex flex-col items-center justify-center"
+                className="relative z-10 text-center bg-white/10 backdrop-blur-sm p-8 rounded-2xl shadow-2xl max-w-xl flex flex-col items-center justify-center"
               >
-                <h1 className="text-4xl font-bold mb-3 tracking-tight">
+                <h1 className="text-4xl text-black/90 font-bold mb-3 tracking-tight">
                   {slide.title}
                 </h1>
-                <p className="text-gray-200 text-lg mb-4 text-center max-w-md">
+                <p className="text-black/90 text-lg mb-4 text-center max-w-md">
                   {slide.desc}
                 </p>
-                <button className="px-5 py-2 bg-white text-black font-semibold rounded-full hover:bg-gray-200 transition">
-                  View Collection
-                </button>
+                <Link
+                  href={`/shop?category=${slide.category}`}
+                  className="px-5 py-2 bg-white text-black font-semibold rounded-full hover:bg-gray-200 transition"
+                >
+                  View {slide.title}
+                </Link>
               </motion.div>
             </div>
           </SwiperSlide>
