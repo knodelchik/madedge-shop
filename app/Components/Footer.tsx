@@ -4,20 +4,23 @@ import { useTheme } from 'next-themes';
 import { useState, useEffect } from 'react';
 import { Youtube, Moon, Sun, Monitor } from 'lucide-react';
 import { InstagramIcon, TelegramIcon, YouTubeIcon } from './icons/SocialIcons';
+import { useLanguage } from '../context/LanguageContext';
+import { translations } from '../translation/translations';
 
 export default function Footer() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const { language } = useLanguage();
+  const t = translations[language];
 
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
-
   return (
     <footer className="border-t border-gray-200 dark:border-gray-700 mt-18">
       <div className="max-w-7xl mx-auto px-6 py-5">
-        {/* Main footer content */}
+        {/* Основний контент футера */}
         <div className="flex flex-wrap justify-between text-base">
-          {/* Logo */}
+          {/* Логотип */}
           <div className="w-full md:w-auto mb-6 mt-5 md:mb-0">
             <h2 className="text-2xl font-bold">MadEdge</h2>
           </div>
@@ -25,7 +28,7 @@ export default function Footer() {
           {/* Головна */}
           <div className="w-1/2 md:w-auto mb-6 mt-6 md:mb-0">
             <h3 className="font-medium mb-4 text-gray-900 dark:text-white text-base">
-              Головна
+              {t.footerHome}
             </h3>
             <ul className="space-y-3 text-gray-500 dark:text-gray-400">
               <li>
@@ -33,7 +36,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  Документація
+                  {t.footerOurProducts}
                 </a>
               </li>
               <li>
@@ -41,7 +44,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  Підтримка
+                  {t.infoTitle}
                 </a>
               </li>
               <li>
@@ -49,7 +52,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  Навчання
+                  {t.footerComparison}
                 </a>
               </li>
               <li>
@@ -57,7 +60,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  Блог
+                  {t.footerAssembly}
                 </a>
               </li>
               <li>
@@ -65,7 +68,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  Команда
+                  {t.footerReviews}
                 </a>
               </li>
             </ul>
@@ -74,7 +77,7 @@ export default function Footer() {
           {/* Магазин */}
           <div className="w-1/2 md:w-auto mb-6 mt-6 md:mb-0">
             <h3 className="font-medium mb-4 text-gray-900 dark:text-white text-base">
-              Магазин
+              {t.footerShop}
             </h3>
             <ul className="space-y-3 text-gray-500 dark:text-gray-400">
               <li>
@@ -82,7 +85,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  Електроніка
+                  {t.footerKnifeSharpeners}
                 </a>
               </li>
               <li>
@@ -90,7 +93,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  Одяг
+                  {t.footerWhetstones}
                 </a>
               </li>
               <li>
@@ -98,23 +101,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  Дім і сад
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="hover:text-gray-900 dark:hover:text-white text-sm"
-                >
-                  Спорт
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="hover:text-gray-900 dark:hover:text-white text-sm"
-                >
-                  Новинки
+                  {t.footerAccessories}
                 </a>
               </li>
             </ul>
@@ -123,7 +110,7 @@ export default function Footer() {
           {/* Про нас */}
           <div className="w-1/2 md:w-auto mb-6 mt-6 md:mb-0">
             <h3 className="font-medium mb-4 text-gray-900 dark:text-white text-base">
-              Про нас
+              {t.footerAboutUs}
             </h3>
             <ul className="space-y-3 text-gray-500 dark:text-gray-400">
               <li>
@@ -131,7 +118,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  Про компанію
+                  {t.footerOurBackground}
                 </a>
               </li>
               <li>
@@ -139,7 +126,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  Відкритий код
+                  {t.footerManufacturing}
                 </a>
               </li>
               <li>
@@ -147,7 +134,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  GitHub
+                  {t.footerSharperensKnowledge}
                 </a>
               </li>
               <li>
@@ -155,7 +142,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  Спільнота
+                  {t.footerStonesKnowledge}
                 </a>
               </li>
               <li>
@@ -163,7 +150,23 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  Випуски
+                  {t.footerAccessoriessKnowledge}
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className="hover:text-gray-900 dark:hover:text-white text-sm"
+                >
+                  {t.footerDeliveryCostCalculator}
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className="hover:text-gray-900 dark:hover:text-white text-sm"
+                >
+                  {t.footerDeliveryPolicy}
                 </a>
               </li>
             </ul>
@@ -172,7 +175,7 @@ export default function Footer() {
           {/* Контакти */}
           <div className="w-1/2 md:w-auto mb-6 mt-6 md:mb-0">
             <h3 className="font-medium mb-4 text-gray-900 dark:text-white text-base">
-              Контакти
+              {t.footerContacts}
             </h3>
             <ul className="space-y-3 text-gray-500 dark:text-gray-400">
               <li>
@@ -180,7 +183,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  Зв'язатися з нами
+                  {t.footerWriteUs}
                 </a>
               </li>
               <li>
@@ -188,23 +191,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  Відділ продажів
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="hover:text-gray-900 dark:hover:text-white text-sm"
-                >
-                  Підтримка
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="hover:text-gray-900 dark:hover:text-white text-sm"
-                >
-                  Партнерство
+                  {t.footerSocialNetworks}
                 </a>
               </li>
             </ul>
@@ -213,27 +200,27 @@ export default function Footer() {
           {/* Newsletter*/}
           <div className="w-full md:w-80 md:mt-0">
             <h3 className="font-medium mb-3 mt-6 text-gray-900 dark:text-white text-base">
-              Subscribe to our newsletter
+              {t.footerNewsletterTitle}
             </h3>
             <p className="text-gray-500 dark:text-gray-400 mb-4 text-sm">
-              Stay updated on new releases and features
+              {t.footerNewsletterDesc}
             </p>
 
             <form className="relative" onSubmit={(e) => e.preventDefault()}>
               <label htmlFor="ft-email" className="sr-only">
-                Email
+                {t.footerEmailLabel}
               </label>
               <input
                 id="ft-email"
                 type="email"
-                placeholder="you@domain.com"
+                placeholder={t.formEmailPlaceholder}
                 className="w-full pl-4 pr-24 py-3 text-sm rounded-md bg-gray-100 dark:border-gray-600 dark:bg-gray-800 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-400"
               />
               <button
                 type="submit"
                 className="absolute right-2 top-2 bottom-2 px-3 text-sm bg-white border dark:bg-black text-gray-600 dark:text-white rounded hover:opacity-90 cursor-pointer transition-opacity"
               >
-                Subscribe
+                {t.footerSubscribeButton}
               </button>
             </form>
           </div>
