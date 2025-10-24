@@ -174,10 +174,12 @@ export default function ShopPage() {
 // Компонент карточки товару з плавною анімацією
 function ProductCard({ product }: { product: Product }) {
   const [isHovered, setIsHovered] = useState(false);
+  
+  // ✅ Ця логіка коректно працює з масивом URL-адрес
   const mainImage =
     product.images && product.images.length > 0
       ? product.images[0]
-      : '/images/placeholder.jpg';
+      : '/images/placeholder.jpg'; // Запасне зображення
 
   return (
     <div
@@ -213,6 +215,8 @@ function ProductCard({ product }: { product: Product }) {
             width={300}
             height={256}
             className="w-full h-64 rounded-2xl shadow-lg object-contain group-hover:opacity-90 transition"
+            // ✅ Додано обробник помилок
+            onError={(e) => { e.currentTarget.src = '/images/placeholder.jpg'; }}
           />
           <div className="flex justify-between items-center mt-3 w-full px-2">
             <h3 className="text-lg font-bold text-gray-800 line-clamp-2">
