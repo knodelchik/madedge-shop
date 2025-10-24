@@ -10,14 +10,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useWishlistStore } from '../../store/wishlistStore';
-import { useCartStore } from '../../store/cartStore';
-import { useLanguage } from '../../context/LanguageContext';
+import { useWishlistStore } from '../../[locale]/store/wishlistStore';
+import { useCartStore } from '../../[locale]/store/cartStore';
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { User } from '../../types/users';
-import { productsService } from '../../services/productService';
+import { productsService } from '../../[locale]/services/productService';
 import { Product } from '../../types/products';
 
 interface WishlistDropdownProps {
@@ -39,7 +39,6 @@ interface WishlistItemsProps {
   movingItem: number | null;
   onMoveToCart: (productId: number) => void;
   onRemove: (productId: number) => void;
-  language: string;
 }
 
 interface LocalWishlistItemsProps {
@@ -47,21 +46,20 @@ interface LocalWishlistItemsProps {
   movingItem: number | null;
   onMoveToCart: (productId: number) => void;
   onRemove: (productId: number) => void;
-  language: string;
   productsData: Product[];
 }
 
 export default function WishlistDropdown({ user }: WishlistDropdownProps) {
+  const t = useTranslations('Wishlist');
   const [movingItem, setMovingItem] = useState<number | null>(null);
   const [localProducts, setLocalProducts] = useState<Product[]>([]);
   const router = useRouter();
-  const { language } = useLanguage();
-  const { 
-    wishlistItems, 
-    localWishlist, 
-    removeFromWishlist, 
+  const {
+    wishlistItems,
+    localWishlist,
+    removeFromWishlist,
     moveToCart,
-    removeFromLocalWishlist 
+    removeFromLocalWishlist,
   } = useWishlistStore();
   const { addToCart } = useCartStore();
 
@@ -71,7 +69,7 @@ export default function WishlistDropdown({ user }: WishlistDropdownProps) {
       if (localWishlist.length > 0) {
         try {
           const allProducts = await productsService.getAllProducts();
-          const localProductsData = allProducts.filter(product => 
+          const localProductsData = allProducts.filter((product) =>
             localWishlist.includes(product.id)
           );
           setLocalProducts(localProductsData);
@@ -94,7 +92,7 @@ export default function WishlistDropdown({ user }: WishlistDropdownProps) {
         await moveToCart(user.id, productId);
       } else {
         // Для неавторизованих - додаємо безпосередньо до кошика
-        const product = localProducts.find(p => p.id === productId);
+        const product = localProducts.find((p) => p.id === productId);
         if (product) {
           addToCart({ ...product, quantity: 1 });
         }
@@ -136,13 +134,13 @@ export default function WishlistDropdown({ user }: WishlistDropdownProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80">
         <DropdownMenuLabel>
-          {language === 'ua' ? 'Список бажань' : 'Wishlist'}
+          {t('title')}
           {totalItems > 0 && ` (${totalItems})`}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 
         {totalItems === 0 ? (
-          <EmptyWishlist language={language} />
+          <EmptyWishlist />
         ) : user ? (
           // Для авторизованих користувачів
           <WishlistItems
@@ -150,7 +148,6 @@ export default function WishlistDropdown({ user }: WishlistDropdownProps) {
             movingItem={movingItem}
             onMoveToCart={handleMoveToCart}
             onRemove={handleRemoveFromWishlist}
-            language={language}
           />
         ) : (
           // Для неавторизованих користувачів
@@ -159,7 +156,6 @@ export default function WishlistDropdown({ user }: WishlistDropdownProps) {
             movingItem={movingItem}
             onMoveToCart={handleMoveToCart}
             onRemove={handleRemoveFromWishlist}
-            language={language}
             productsData={localProducts}
           />
         )}
@@ -172,9 +168,7 @@ export default function WishlistDropdown({ user }: WishlistDropdownProps) {
               className="cursor-pointer text-center justify-center"
             >
               <Link href="/shop" className="w-full">
-                {language === 'ua'
-                  ? 'Перейти до магазину'
-                  : 'Continue shopping'}
+                {t('continueShopping')}
               </Link>
             </DropdownMenuItem>
           </>
@@ -185,18 +179,14 @@ export default function WishlistDropdown({ user }: WishlistDropdownProps) {
 }
 
 // Підкомпонент для порожнього wishlist
-function EmptyWishlist({ language }: { language: string }) {
+function EmptyWishlist() {
+  const t = useTranslations('Wishlist');
+
   return (
     <div className="px-2 py-4 text-center text-gray-500">
       <Heart className="w-8 h-8 mx-auto mb-2 opacity-50" />
-      <p>
-        {language === 'ua' ? 'Список бажань порожній' : 'Wishlist is empty'}
-      </p>
-      <p className="text-sm mt-1">
-        {language === 'ua'
-          ? 'Додавайте товари, які сподобались'
-          : 'Add items you like'}
-      </p>
+      <p>{t('empty')}</p>
+      <p className="text-sm mt-1">{t('emptyDescription')}</p>
     </div>
   );
 }
@@ -207,8 +197,9 @@ function WishlistItems({
   movingItem,
   onMoveToCart,
   onRemove,
-  language,
 }: WishlistItemsProps) {
+  const t = useTranslations('Wishlist');
+
   return (
     <div className="max-h-96 overflow-y-auto">
       {items.map((item) => (
@@ -236,14 +227,14 @@ function WishlistItems({
                 onClick={() => onMoveToCart(item.product_id)}
                 disabled={movingItem === item.product_id}
                 className="p-1 text-green-600 hover:bg-green-50 rounded transition disabled:opacity-50"
-                title={language === 'ua' ? 'Додати до корзини' : 'Add to cart'}
+                title={t('addToCart')}
               >
                 <ShoppingCart className="w-4 h-4" />
               </button>
               <button
                 onClick={() => onRemove(item.product_id)}
                 className="p-1 text-red-600 hover:bg-red-50 rounded transition"
-                title={language === 'ua' ? 'Видалити' : 'Remove'}
+                title={t('remove')}
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -251,9 +242,7 @@ function WishlistItems({
           </div>
           {movingItem === item.product_id && (
             <div className="text-xs text-green-600 mt-1">
-              {language === 'ua'
-                ? 'Додається до корзини...'
-                : 'Adding to cart...'}
+              {t('addingToCart')}
             </div>
           )}
         </div>
@@ -268,14 +257,15 @@ function LocalWishlistItems({
   movingItem,
   onMoveToCart,
   onRemove,
-  language,
   productsData,
 }: LocalWishlistItemsProps) {
+  const t = useTranslations('Wishlist');
+
   return (
     <div className="max-h-96 overflow-y-auto">
       {productIds.map((productId) => {
-        const product = productsData.find(p => p.id === productId);
-        
+        const product = productsData.find((p) => p.id === productId);
+
         return (
           <div key={productId} className="px-2 py-3 border-b last:border-b-0">
             <div className="flex items-center gap-3">
@@ -292,7 +282,7 @@ function LocalWishlistItems({
                   {product?.title || `Product #${productId}`}
                 </p>
                 <p className="text-green-600 font-semibold text-sm">
-                  {product ? `$${product.price}` : 'Loading...'}
+                  {product ? `$${product.price}` : t('loading')}
                 </p>
               </div>
 
@@ -301,14 +291,14 @@ function LocalWishlistItems({
                   onClick={() => onMoveToCart(productId)}
                   disabled={movingItem === productId}
                   className="p-1 text-green-600 hover:bg-green-50 rounded transition disabled:opacity-50"
-                  title={language === 'ua' ? 'Додати до корзини' : 'Add to cart'}
+                  title={t('addToCart')}
                 >
                   <ShoppingCart className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => onRemove(productId)}
                   className="p-1 text-red-600 hover:bg-red-50 rounded transition"
-                  title={language === 'ua' ? 'Видалити' : 'Remove'}
+                  title={t('remove')}
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -316,15 +306,11 @@ function LocalWishlistItems({
             </div>
             {movingItem === productId && (
               <div className="text-xs text-green-600 mt-1">
-                {language === 'ua'
-                  ? 'Додається до корзини...'
-                  : 'Adding to cart...'}
+                {t('addingToCart')}
               </div>
             )}
             {!product && (
-              <div className="text-xs text-gray-500 mt-1">
-                {language === 'ua' ? 'Завантаження...' : 'Loading...'}
-              </div>
+              <div className="text-xs text-gray-500 mt-1">{t('loading')}</div>
             )}
           </div>
         );

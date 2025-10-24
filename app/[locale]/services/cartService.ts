@@ -1,29 +1,31 @@
-import { supabase } from '../lib/supabase';
-import { CartItemWithProduct } from '../types/cart';
+import { supabase } from '../../lib/supabase';
+import { CartItemWithProduct } from '../../types/cart';
 
 export const cartService = {
   // Отримати корзину користувача
   async getCart(userId: string): Promise<CartItemWithProduct[]> {
     console.log('🛒 Fetching cart for user:', userId);
-    
+
     try {
       const { data, error, status } = await supabase
         .from('cart_items')
-        .select(`
+        .select(
+          `
           *,
           products (*)
-        `)
+        `
+        )
         .eq('user_id', userId)
         .order('created_at', { ascending: true });
 
       console.log('📊 Get cart - Status:', status, 'Data:', data);
-      
+
       if (error) {
         console.error('❌ Full cart error details:', {
           message: error.message,
           code: error.code,
           details: error.details,
-          hint: error.hint
+          hint: error.hint,
         });
         return [];
       }
@@ -37,19 +39,24 @@ export const cartService = {
   },
 
   // Додати товар в корзину
-  async addToCart(userId: string, productId: number, quantity: number = 1): Promise<boolean> {
+  async addToCart(
+    userId: string,
+    productId: number,
+    quantity: number = 1
+  ): Promise<boolean> {
     console.log('🛒 Adding to cart:', { userId, productId, quantity });
-    
+
     try {
-      const { error, status, data } = await supabase
-        .from('cart_items')
-        .upsert({
+      const { error, status, data } = await supabase.from('cart_items').upsert(
+        {
           user_id: userId,
           product_id: productId,
-          quantity: quantity
-        }, {
-          onConflict: 'user_id,product_id'
-        });
+          quantity: quantity,
+        },
+        {
+          onConflict: 'user_id,product_id',
+        }
+      );
 
       console.log('📊 Add to cart - Status:', status, 'Data:', data);
 
@@ -58,7 +65,7 @@ export const cartService = {
           message: error.message,
           code: error.code,
           details: error.details,
-          hint: error.hint
+          hint: error.hint,
         });
         return false;
       }
@@ -72,7 +79,11 @@ export const cartService = {
   },
 
   // Оновити кількість товару
-  async updateQuantity(userId: string, productId: number, quantity: number): Promise<boolean> {
+  async updateQuantity(
+    userId: string,
+    productId: number,
+    quantity: number
+  ): Promise<boolean> {
     if (quantity <= 0) {
       return this.removeFromCart(userId, productId);
     }
@@ -123,16 +134,23 @@ export const cartService = {
   },
 
   // Синхронізувати локальну корзину з базою даних
-  async syncCart(userId: string, localCart: { productId: number; quantity: number }[]): Promise<boolean> {
+  async syncCart(
+    userId: string,
+    localCart: { productId: number; quantity: number }[]
+  ): Promise<boolean> {
     console.log('🔄 Syncing cart for user:', userId, 'items:', localCart);
-    
+
     try {
       // Спочатку очищаємо корзину
       await this.clearCart(userId);
 
       // Потім додаємо всі товари
       for (const item of localCart) {
-        const success = await this.addToCart(userId, item.productId, item.quantity);
+        const success = await this.addToCart(
+          userId,
+          item.productId,
+          item.quantity
+        );
         if (!success) {
           console.error('❌ Failed to add item during sync:', item);
           return false;
@@ -145,5 +163,5 @@ export const cartService = {
       console.error('❌ Error syncing cart:', error);
       return false;
     }
-  }
+  },
 };

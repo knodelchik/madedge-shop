@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { authService } from '../services/authService';
+import { authService } from '../[locale]/services/authService';
 import { User } from '../types/users';
 
 export default function UserProfile() {
@@ -38,16 +38,18 @@ export default function UserProfile() {
   return (
     <div className="max-w-md mx-auto bg-white rounded-2xl shadow-lg p-6">
       <h2 className="text-xl font-bold text-gray-800 mb-4">Profile</h2>
-      
+
       <div className="space-y-3">
         <div>
           <label className="text-sm font-medium text-gray-600">Email:</label>
           <p className="text-gray-800">{user.email}</p>
         </div>
-        
+
         {user.full_name && (
           <div>
-            <label className="text-sm font-medium text-gray-600">Full Name:</label>
+            <label className="text-sm font-medium text-gray-600">
+              Full Name:
+            </label>
             <p className="text-gray-800">{user.full_name}</p>
           </div>
         )}

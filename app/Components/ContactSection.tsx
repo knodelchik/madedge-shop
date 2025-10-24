@@ -1,18 +1,16 @@
 'use client';
 import { useState } from 'react';
 import { Phone, Mail, Clock, Send } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
+import { useTranslations } from 'next-intl';
 import {
   TelegramIcon,
   YouTubeIcon,
   InstagramIcon,
   FacebookIcon,
 } from './icons/SocialIcons';
-import { translations } from '../translation/translations';
 
 export default function ContactSection() {
-  const { language } = useLanguage();
-  const t = translations[language];
+  const tContacts = useTranslations('Contacts');
 
   const [formData, setFormData] = useState({
     name: '',
@@ -30,7 +28,10 @@ export default function ContactSection() {
 
   const handleSubmit = () => {
     console.log('Form submitted:', formData);
-    alert(t.formSubmit);
+    console.log(
+      `[SUCCESS] Notification placeholder: ${tContacts('formSubmit')}`
+    );
+    // Optionally reset form: setFormData({ name: '', email: '', subject: '', message: '' });
   };
 
   return (
@@ -39,7 +40,7 @@ export default function ContactSection() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            {t.contactTitle}
+            {tContacts('contactTitle')}
           </h1>
           <div className="w-24 h-1 bg-gradient-to-r from-[#475fd8] to-[#35297e] mx-auto rounded-full"></div>
         </div>
@@ -49,9 +50,11 @@ export default function ContactSection() {
           <div className="lg:col-span-3 mt-12">
             <div className="bg-white rounded-2xl shadow-2xl p-6 border border-gray-200">
               <h2 className="text-2xl font-bold mb-3 text-gray-900">
-                {t.connectTitle}
+                {tContacts('connectTitle')}
               </h2>
-              <p className="text-gray-600 mb-6 text-sm">{t.connectDesc}</p>
+              <p className="text-gray-600 mb-6 text-sm">
+                {tContacts('connectDesc')}
+              </p>
 
               <div className="space-y-6 mb-6">
                 {/* Phone */}
@@ -61,9 +64,11 @@ export default function ContactSection() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-1 text-sm">
-                      {t.phoneTitle}
+                      {tContacts('phoneTitle')}
                     </h3>
-                    <p className="text-gray-600 text-sm">{t.phoneValue}</p>
+                    <p className="text-gray-600 text-sm">
+                      {tContacts('phoneValue')}
+                    </p>
                   </div>
                 </div>
 
@@ -74,9 +79,11 @@ export default function ContactSection() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-1 text-sm">
-                      {t.emailTitle}
+                      {tContacts('emailTitle')}
                     </h3>
-                    <p className="text-gray-600 text-sm">{t.emailValue}</p>
+                    <p className="text-gray-600 text-sm">
+                      {tContacts('emailValue')}
+                    </p>
                   </div>
                 </div>
 
@@ -87,11 +94,17 @@ export default function ContactSection() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-1 text-sm">
-                      {t.hoursTitle}
+                      {tContacts('hoursTitle')}
                     </h3>
-                    <p className="text-gray-600 text-sm">{t.hoursMonFri}</p>
-                    <p className="text-gray-600 text-sm">{t.hoursSat}</p>
-                    <p className="text-gray-600 text-sm">{t.hoursSun}</p>
+                    <p className="text-gray-600 text-sm">
+                      {tContacts('hoursMonFri')}
+                    </p>
+                    <p className="text-gray-600 text-sm">
+                      {tContacts('hoursSat')}
+                    </p>
+                    <p className="text-gray-600 text-sm">
+                      {tContacts('hoursSun')}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -99,9 +112,11 @@ export default function ContactSection() {
               {/* Social */}
               <div className="border-t border-gray-200 pt-6">
                 <h3 className="text-lg font-bold mb-3 text-gray-900">
-                  {t.followUsTitle}
+                  {tContacts('followUsTitle')}
                 </h3>
-                <p className="text-gray-600 mb-4 text-sm">{t.followUsDesc}</p>
+                <p className="text-gray-600 mb-4 text-sm">
+                  {tContacts('followUsDesc')}
+                </p>
                 <div className="grid grid-cols-4 gap-2">
                   {[TelegramIcon, YouTubeIcon, FacebookIcon, InstagramIcon].map(
                     (Icon, idx) => (
@@ -123,9 +138,9 @@ export default function ContactSection() {
           <div className="lg:col-span-5">
             <div className="bg-white rounded-2xl shadow-2xl p-8 border border-gray-100">
               <h2 className="text-3xl font-bold text-black mb-2">
-                {t.formTitle}
+                {tContacts('formTitle')}
               </h2>
-              <p className="text-gray-600 mb-8">{t.formSubtitle}</p>
+              <p className="text-gray-600 mb-8">{tContacts('formSubtitle')}</p>
 
               <div className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-4">
@@ -134,7 +149,7 @@ export default function ContactSection() {
                       htmlFor="name"
                       className="block text-sm font-medium text-black mb-2"
                     >
-                      {t.formNameLabel}
+                      {tContacts('formNameLabel')}
                     </label>
                     <input
                       type="text"
@@ -142,7 +157,7 @@ export default function ContactSection() {
                       name="name"
                       value={formData.name}
                       onChange={handleInputChange}
-                      placeholder={t.formNamePlaceholder}
+                      placeholder={tContacts('formNamePlaceholder')}
                       className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent focus:bg-white transition-all duration-200"
                     />
                   </div>
@@ -151,7 +166,7 @@ export default function ContactSection() {
                       htmlFor="email"
                       className="block text-sm font-medium text-black mb-2"
                     >
-                      {t.formEmailLabel}
+                      {tContacts('formEmailLabel')}
                     </label>
                     <input
                       type="email"
@@ -159,7 +174,7 @@ export default function ContactSection() {
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      placeholder={t.formEmailPlaceholder}
+                      placeholder={tContacts('formEmailPlaceholder')}
                       className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent focus:bg-white transition-all duration-200"
                     />
                   </div>
@@ -170,7 +185,7 @@ export default function ContactSection() {
                     htmlFor="subject"
                     className="block text-sm font-medium text-black mb-2"
                   >
-                    {t.formSubjectLabel}
+                    {tContacts('formSubjectLabel')}
                   </label>
                   <input
                     type="text"
@@ -178,7 +193,7 @@ export default function ContactSection() {
                     name="subject"
                     value={formData.subject}
                     onChange={handleInputChange}
-                    placeholder={t.formSubjectPlaceholder}
+                    placeholder={tContacts('formSubjectPlaceholder')}
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent focus:bg-white transition-all duration-200"
                   />
                 </div>
@@ -188,7 +203,7 @@ export default function ContactSection() {
                     htmlFor="message"
                     className="block text-sm font-medium text-black mb-2"
                   >
-                    {t.formMessageLabel}
+                    {tContacts('formMessageLabel')}
                   </label>
                   <textarea
                     id="message"
@@ -196,7 +211,7 @@ export default function ContactSection() {
                     rows={6}
                     value={formData.message}
                     onChange={handleInputChange}
-                    placeholder={t.formMessagePlaceholder}
+                    placeholder={tContacts('formMessagePlaceholder')}
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent focus:bg-white transition-all duration-200 resize-none"
                   />
                 </div>
@@ -206,7 +221,7 @@ export default function ContactSection() {
                   onClick={handleSubmit}
                   className="w-full bg-black text-white py-4 px-6 rounded-xl font-semibold hover:bg-gray-800 transform hover:scale-[1.02] transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
                 >
-                  <span>{t.formSubmit}</span>
+                  <span>{tContacts('formSubmit')}</span>
                   <Send className="w-5 h-5" />
                 </button>
               </div>

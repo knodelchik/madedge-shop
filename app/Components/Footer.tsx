@@ -2,19 +2,25 @@
 
 import { useTheme } from 'next-themes';
 import { useState, useEffect } from 'react';
-import { Youtube, Moon, Sun, Monitor } from 'lucide-react';
+import { Moon, Sun, Monitor } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { InstagramIcon, TelegramIcon, YouTubeIcon } from './icons/SocialIcons';
-import { useLanguage } from '../context/LanguageContext';
-import { translations } from '../translation/translations';
 
 export default function Footer() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const { language } = useLanguage();
-  const t = translations[language];
+
+  // Отримання перекладів через next-intl
+  const tFooter = useTranslations('Footer');
+  const tInfo = useTranslations('Info');
+  const tContacts = useTranslations('Contacts');
+  const tTheme = useTranslations('Theme');
 
   useEffect(() => setMounted(true), []);
+
+  // Рендеринг лише після монтування для коректної роботи теми
   if (!mounted) return null;
+
   return (
     <footer className="border-t border-gray-200 dark:border-gray-700 mt-18">
       <div className="max-w-7xl mx-auto px-6 py-5">
@@ -28,7 +34,7 @@ export default function Footer() {
           {/* Головна */}
           <div className="w-1/2 md:w-auto mb-6 mt-6 md:mb-0">
             <h3 className="font-medium mb-4 text-gray-900 dark:text-white text-base">
-              {t.footerHome}
+              {tFooter('footerHome')}
             </h3>
             <ul className="space-y-3 text-gray-500 dark:text-gray-400">
               <li>
@@ -36,7 +42,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  {t.footerOurProducts}
+                  {tFooter('footerOurProducts')}
                 </a>
               </li>
               <li>
@@ -44,7 +50,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  {t.infoTitle}
+                  {tInfo('infoTitle')}
                 </a>
               </li>
               <li>
@@ -52,7 +58,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  {t.footerComparison}
+                  {tFooter('footerComparison')}
                 </a>
               </li>
               <li>
@@ -60,7 +66,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  {t.footerAssembly}
+                  {tFooter('footerAssembly')}
                 </a>
               </li>
               <li>
@@ -68,7 +74,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  {t.footerReviews}
+                  {tFooter('footerReviews')}
                 </a>
               </li>
             </ul>
@@ -77,7 +83,7 @@ export default function Footer() {
           {/* Магазин */}
           <div className="w-1/2 md:w-auto mb-6 mt-6 md:mb-0">
             <h3 className="font-medium mb-4 text-gray-900 dark:text-white text-base">
-              {t.footerShop}
+              {tFooter('footerShop')}
             </h3>
             <ul className="space-y-3 text-gray-500 dark:text-gray-400">
               <li>
@@ -85,7 +91,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  {t.footerKnifeSharpeners}
+                  {tFooter('footerKnifeSharpeners')}
                 </a>
               </li>
               <li>
@@ -93,7 +99,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  {t.footerWhetstones}
+                  {tFooter('footerWhetstones')}
                 </a>
               </li>
               <li>
@@ -101,7 +107,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  {t.footerAccessories}
+                  {tFooter('footerAccessories')}
                 </a>
               </li>
             </ul>
@@ -110,7 +116,7 @@ export default function Footer() {
           {/* Про нас */}
           <div className="w-1/2 md:w-auto mb-6 mt-6 md:mb-0">
             <h3 className="font-medium mb-4 text-gray-900 dark:text-white text-base">
-              {t.footerAboutUs}
+              {tFooter('footerAboutUs')}
             </h3>
             <ul className="space-y-3 text-gray-500 dark:text-gray-400">
               <li>
@@ -118,7 +124,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  {t.footerOurBackground}
+                  {tFooter('footerOurBackground')}
                 </a>
               </li>
               <li>
@@ -126,7 +132,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  {t.footerManufacturing}
+                  {tFooter('footerManufacturing')}
                 </a>
               </li>
               <li>
@@ -134,7 +140,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  {t.footerSharperensKnowledge}
+                  {tFooter('footerSharperensKnowledge')}
                 </a>
               </li>
               <li>
@@ -142,7 +148,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  {t.footerStonesKnowledge}
+                  {tFooter('footerStonesKnowledge')}
                 </a>
               </li>
               <li>
@@ -150,7 +156,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  {t.footerAccessoriessKnowledge}
+                  {tFooter('footerAccessoriessKnowledge')}
                 </a>
               </li>
               <li>
@@ -158,7 +164,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  {t.footerDeliveryCostCalculator}
+                  {tFooter('footerDeliveryCostCalculator')}
                 </a>
               </li>
               <li>
@@ -166,7 +172,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  {t.footerDeliveryPolicy}
+                  {tFooter('footerDeliveryPolicy')}
                 </a>
               </li>
             </ul>
@@ -175,7 +181,7 @@ export default function Footer() {
           {/* Контакти */}
           <div className="w-1/2 md:w-auto mb-6 mt-6 md:mb-0">
             <h3 className="font-medium mb-4 text-gray-900 dark:text-white text-base">
-              {t.footerContacts}
+              {tFooter('footerContacts')}
             </h3>
             <ul className="space-y-3 text-gray-500 dark:text-gray-400">
               <li>
@@ -183,7 +189,7 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  {t.footerWriteUs}
+                  {tFooter('footerWriteUs')}
                 </a>
               </li>
               <li>
@@ -191,36 +197,36 @@ export default function Footer() {
                   href="#"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
-                  {t.footerSocialNetworks}
+                  {tFooter('footerSocialNetworks')}
                 </a>
               </li>
             </ul>
           </div>
 
-          {/* Newsletter*/}
+          {/* Newsletter */}
           <div className="w-full md:w-80 md:mt-0">
             <h3 className="font-medium mb-3 mt-6 text-gray-900 dark:text-white text-base">
-              {t.footerNewsletterTitle}
+              {tFooter('footerNewsletterTitle')}
             </h3>
             <p className="text-gray-500 dark:text-gray-400 mb-4 text-sm">
-              {t.footerNewsletterDesc}
+              {tFooter('footerNewsletterDesc')}
             </p>
 
             <form className="relative" onSubmit={(e) => e.preventDefault()}>
               <label htmlFor="ft-email" className="sr-only">
-                {t.footerEmailLabel}
+                {tFooter('footerEmailLabel')}
               </label>
               <input
                 id="ft-email"
                 type="email"
-                placeholder={t.formEmailPlaceholder}
+                placeholder={tContacts('formEmailPlaceholder')}
                 className="w-full pl-4 pr-24 py-3 text-sm rounded-md bg-gray-100 dark:border-gray-600 dark:bg-gray-800 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-400"
               />
               <button
                 type="submit"
                 className="absolute right-2 top-2 bottom-2 px-3 text-sm bg-white border dark:bg-black text-gray-600 dark:text-white rounded hover:opacity-90 cursor-pointer transition-opacity"
               >
-                {t.footerSubscribeButton}
+                {tFooter('footerSubscribeButton')}
               </button>
             </form>
           </div>
@@ -243,7 +249,7 @@ export default function Footer() {
                   aria-label="Telegram"
                   className="text-gray-500 hover:text-gray-900 dark:hover:text-white"
                 >
-                  <TelegramIcon className="h-4 w-4 mb-5  ml-1" />
+                  <TelegramIcon className="h-4 w-4 mb-5 ml-1" />
                 </a>
                 <div className="w-px h-4 bg-gray-300 dark:bg-gray-600 mb-5"></div>
                 <a
@@ -251,7 +257,7 @@ export default function Footer() {
                   aria-label="YouTube"
                   className="text-gray-500 hover:text-gray-900 dark:hover:text-white"
                 >
-                  <YouTubeIcon className="h-4 w-4 mb-5  ml-1" />
+                  <YouTubeIcon className="h-4 w-4 mb-5 ml-1" />
                 </a>
                 <div className="w-px h-4 bg-gray-300 dark:bg-gray-600 mb-5"></div>
                 <a
@@ -266,9 +272,9 @@ export default function Footer() {
           </div>
 
           {/* Theme controls */}
-          <div className="flex items-center border rounded-full mt-4 sm:mt-0 ">
+          <div className="flex items-center border rounded-full mt-4 sm:mt-0">
             <button
-              aria-label="Light theme"
+              aria-label={tTheme('themeLight')}
               onClick={() => setTheme('light')}
               className={`p-3 rounded-full transition-colors ${
                 theme === 'light'
@@ -280,7 +286,7 @@ export default function Footer() {
             </button>
 
             <button
-              aria-label="System theme"
+              aria-label={tTheme('themeSystem')}
               onClick={() => setTheme('system')}
               className={`p-3 rounded-full transition-colors ${
                 theme === 'system'
@@ -292,7 +298,7 @@ export default function Footer() {
             </button>
 
             <button
-              aria-label="Dark theme"
+              aria-label={tTheme('themeDark')}
               onClick={() => setTheme('dark')}
               className={`p-3 rounded-full transition-colors ${
                 theme === 'dark'

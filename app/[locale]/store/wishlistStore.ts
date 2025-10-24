@@ -1,28 +1,31 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { WishlistItemWithProduct } from '../types/wishlist';
+import { WishlistItemWithProduct } from '../../types/wishlist';
 import { wishlistService } from '../services/wishlistService';
 import { useCartStore } from './cartStore';
-import { Product } from '../types/products';
+import { Product } from '../../types/products';
 
 interface WishlistState {
   wishlistItems: WishlistItemWithProduct[];
   localWishlist: number[]; // IDs продуктів для неавторизованих користувачів
   loading: boolean;
-  
+
   // Для авторизованих користувачів
   loadWishlist: (userId: string) => Promise<void>;
   addToWishlist: (userId: string | null, productId: number) => Promise<void>;
-  removeFromWishlist: (userId: string | null, productId: number) => Promise<void>;
+  removeFromWishlist: (
+    userId: string | null,
+    productId: number
+  ) => Promise<void>;
   isInWishlist: (userId: string | null, productId: number) => Promise<boolean>;
   moveToCart: (userId: string, productId: number) => Promise<void>;
   clearWishlist: () => void;
-  
+
   // Для неавторизованих користувачів
   addToLocalWishlist: (productId: number) => void;
   removeFromLocalWishlist: (productId: number) => void;
   isInLocalWishlist: (productId: number) => boolean;
-  
+
   // Синхронізація
   syncLocalWishlist: (userId: string) => Promise<void>;
 }
@@ -55,7 +58,10 @@ export const useWishlistStore = create<WishlistState>()(
         }
 
         try {
-          const success = await wishlistService.addToWishlist(userId, productId);
+          const success = await wishlistService.addToWishlist(
+            userId,
+            productId
+          );
           if (success) {
             await get().loadWishlist(userId);
           }
@@ -72,10 +78,15 @@ export const useWishlistStore = create<WishlistState>()(
         }
 
         try {
-          const success = await wishlistService.removeFromWishlist(userId, productId);
+          const success = await wishlistService.removeFromWishlist(
+            userId,
+            productId
+          );
           if (success) {
-            set(state => ({
-              wishlistItems: state.wishlistItems.filter(item => item.product_id !== productId)
+            set((state) => ({
+              wishlistItems: state.wishlistItems.filter(
+                (item) => item.product_id !== productId
+              ),
             }));
           }
         } catch (error) {
@@ -83,7 +94,10 @@ export const useWishlistStore = create<WishlistState>()(
         }
       },
 
-      isInWishlist: async (userId: string | null, productId: number): Promise<boolean> => {
+      isInWishlist: async (
+        userId: string | null,
+        productId: number
+      ): Promise<boolean> => {
         if (!userId) {
           // Для неавторизованих - перевіряємо локальний список
           return get().isInLocalWishlist(productId);
@@ -94,12 +108,14 @@ export const useWishlistStore = create<WishlistState>()(
       moveToCart: async (userId: string, productId: number) => {
         try {
           const success = await wishlistService.moveToCart(userId, productId);
-          
+
           if (success) {
-            set(state => ({
-              wishlistItems: state.wishlistItems.filter(item => item.product_id !== productId)
+            set((state) => ({
+              wishlistItems: state.wishlistItems.filter(
+                (item) => item.product_id !== productId
+              ),
             }));
-            
+
             await useCartStore.getState().loadCartFromDatabase(userId);
           }
         } catch (error) {
@@ -113,14 +129,14 @@ export const useWishlistStore = create<WishlistState>()(
 
       // Для неавторизованих користувачів
       addToLocalWishlist: (productId: number) => {
-        set(state => ({
-          localWishlist: [...state.localWishlist, productId]
+        set((state) => ({
+          localWishlist: [...state.localWishlist, productId],
         }));
       },
 
       removeFromLocalWishlist: (productId: number) => {
-        set(state => ({
-          localWishlist: state.localWishlist.filter(id => id !== productId)
+        set((state) => ({
+          localWishlist: state.localWishlist.filter((id) => id !== productId),
         }));
       },
 
@@ -131,7 +147,7 @@ export const useWishlistStore = create<WishlistState>()(
       // Синхронізація локального wishlist з базою даних при авторизації
       syncLocalWishlist: async (userId: string) => {
         const { localWishlist } = get();
-        
+
         if (localWishlist.length === 0) return;
 
         try {
@@ -139,25 +155,25 @@ export const useWishlistStore = create<WishlistState>()(
           for (const productId of localWishlist) {
             await wishlistService.addToWishlist(userId, productId);
           }
-          
+
           // Очищаємо локальний wishlist
           set({ localWishlist: [] });
-          
+
           // Завантажуємо оновлений wishlist з бази даних
           await get().loadWishlist(userId);
-          
+
           console.log('✅ Local wishlist synced with database');
         } catch (error) {
           console.error('❌ Failed to sync local wishlist:', error);
         }
-      }
+      },
     }),
     {
       name: 'wishlist-storage',
-      partialize: (state) => ({ 
+      partialize: (state) => ({
         wishlistItems: state.wishlistItems,
-        localWishlist: state.localWishlist // Зберігаємо локальний wishlist
-      })
+        localWishlist: state.localWishlist, // Зберігаємо локальний wishlist
+      }),
     }
   )
 );

@@ -1,7 +1,9 @@
 'use client';
+
 import React from 'react';
+// 1. Використовуємо функцію для отримання перекладів на клієнті
+import { useTranslations } from 'next-intl';
 import { Lightbulb, Info, Plane, Headphones } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
 
 interface SpotlightCardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
@@ -87,29 +89,31 @@ type Feature = {
   isSpecial?: boolean;
 };
 
-const InfoSection: React.FC = () => {
-  const { t } = useLanguage(); // тепер можна використовувати {t.xxx}
+// 3. InfoSection тепер Client Component
+const InfoSection = () => {
+  // ✅ Викликаємо useTranslations на клієнті
+  const t = useTranslations('Info');
 
   const features: Feature[] = [
     {
       icon: <Lightbulb className="w-8 h-8" />,
-      title: t.refundPolicyTitle,
-      description: t.refundPolicyText,
+      title: t('refundPolicyTitle'),
+      description: t('refundPolicyText'),
     },
     {
       icon: <Info className="w-8 h-8" />,
-      title: t.buyerProtectionTitle,
-      description: t.buyerProtectionText,
+      title: t('buyerProtectionTitle'),
+      description: t('buyerProtectionText'),
     },
     {
       icon: <Plane className="w-8 h-8" />,
-      title: t.shippingTitle,
-      description: t.shippingText,
+      title: t('shippingTitle'),
+      description: t('shippingText'),
     },
     {
       icon: <Headphones className="w-8 h-8" />,
-      title: t.needHelpTitle,
-      description: t.needHelpText,
+      title: t('needHelpTitle'),
+      description: t('needHelpText'),
       isSpecial: true,
     },
   ];
@@ -119,9 +123,9 @@ const InfoSection: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4">
         <div className="mb-16 text-center">
           <h1 className="text-4xl lg:text-4xl font-bold text-gray-900 mb-4">
-            {t.infoTitle}{' '}
+            {t('infoTitle')}{' '}
             <span className="text-gray-600 font-normal lg:text-2xl ">
-              {t.sectionWhatIs}
+              {t('sectionWhatIs')}
             </span>
           </h1>
         </div>

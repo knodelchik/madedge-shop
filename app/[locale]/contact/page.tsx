@@ -1,4 +1,4 @@
-import ContactSection from '../Components/ContactSection';
+import ContactSection from '../../Components/ContactSection';
 
 export const metadata = {
   title: 'Контакти | MadEdge',

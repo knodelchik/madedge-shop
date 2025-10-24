@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useLanguage } from '../../context/LanguageContext';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { User as UserType } from '../../types/users';
 
@@ -19,8 +19,6 @@ interface UserDropdownProps {
 }
 
 export default function UserDropdown({ user, onSignOut }: UserDropdownProps) {
-  const { language } = useLanguage();
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -30,24 +28,24 @@ export default function UserDropdown({ user, onSignOut }: UserDropdownProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         {user ? (
-          <AuthenticatedMenu onSignOut={onSignOut} language={language} />
+          <AuthenticatedMenu onSignOut={onSignOut} />
         ) : (
-          <UnauthenticatedMenu language={language} />
+          <UnauthenticatedMenu />
         )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
 }
 
-function AuthenticatedMenu({ onSignOut, language }: { onSignOut: () => void; language: string }) {
+function AuthenticatedMenu({ onSignOut }: { onSignOut: () => void }) {
+  const t = useTranslations('UserDropdown');
+
   return (
     <>
-      <DropdownMenuLabel>
-        {language === 'ua' ? 'Мій акаунт' : 'My Account'}
-      </DropdownMenuLabel>
+      <DropdownMenuLabel>{t('myAccount')}</DropdownMenuLabel>
       <DropdownMenuItem asChild>
         <Link href="/profile" className="cursor-pointer">
-          {language === 'ua' ? 'Профіль' : 'Profile'}
+          {t('profile')}
         </Link>
       </DropdownMenuItem>
       <DropdownMenuSeparator />
@@ -56,26 +54,26 @@ function AuthenticatedMenu({ onSignOut, language }: { onSignOut: () => void; lan
         className="text-red-600 cursor-pointer"
       >
         <LogOut className="mr-2 w-4 h-4" />
-        {language === 'ua' ? 'Вийти' : 'Sign Out'}
+        {t('signOut')}
       </DropdownMenuItem>
     </>
   );
 }
 
-function UnauthenticatedMenu({ language }: { language: string }) {
+function UnauthenticatedMenu() {
+  const t = useTranslations('UserDropdown');
+
   return (
     <>
-      <DropdownMenuLabel>
-        {language === 'ua' ? 'Акаунт' : 'Account'}
-      </DropdownMenuLabel>
+      <DropdownMenuLabel>{t('account')}</DropdownMenuLabel>
       <DropdownMenuItem asChild>
         <Link href="/auth" className="cursor-pointer">
-          {language === 'ua' ? 'Увійти' : 'Sign In'}
+          {t('signIn')}
         </Link>
       </DropdownMenuItem>
       <DropdownMenuItem asChild>
         <Link href="/auth" className="cursor-pointer">
-          {language === 'ua' ? 'Зареєструватися' : 'Sign Up'}
+          {t('signUp')}
         </Link>
       </DropdownMenuItem>
     </>

@@ -1,11 +1,18 @@
 'use client';
 
 import React, { useState } from 'react';
+// ✅ Імпортуємо useTranslations з next-intl
+import { useTranslations } from 'next-intl';
 import { Star as StarIcon } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
-import { translations } from '../translation/translations';
 
-// Локальна SpotlightCard
+// Тип для рецензентів
+type Reviewer = {
+  name: string;
+  role: string;
+  text: string;
+};
+
+// Локальна SpotlightCard (залишається як є)
 const SpotlightCard: React.FC<{
   image?: React.ReactNode;
   footer?: React.ReactNode;
@@ -23,7 +30,7 @@ const SpotlightCard: React.FC<{
   );
 };
 
-// Аватар
+// Аватар (залишається як є)
 const Avatar: React.FC<{ name: string }> = ({ name }) => {
   const initials = name
     .split(' ')
@@ -39,11 +46,15 @@ const Avatar: React.FC<{ name: string }> = ({ name }) => {
 };
 
 const ReviewsSection: React.FC = () => {
-  const { language } = useLanguage();
-  const t = translations[language];
+  // ✅ Використовуємо useTranslations, вказуючи простір імен 'Reviews'
+  const t = useTranslations('Reviews');
 
   const [showAll, setShowAll] = useState(false);
-  const visibleReviews = showAll ? t.reviewers : t.reviewers.slice(0, 3);
+
+  // Отримуємо масив рецензентів, використовуючи t.raw()
+  const reviewers = t.raw('reviewers') as Reviewer[];
+
+  const visibleReviews = showAll ? reviewers : reviewers.slice(0, 3);
 
   return (
     <section className="py-12">
@@ -57,9 +68,10 @@ const ReviewsSection: React.FC = () => {
           </div>
 
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-            {t.reviewsTitle}
+            {/* ✅ Використовуємо t() */}
+            {t('reviewsTitle')}
           </h2>
-          <p className="text-gray-600 mt-2">{t.reviewsSubtitle}</p>
+          <p className="text-gray-600 mt-2">{t('reviewsSubtitle')}</p>
         </div>
 
         {/* Відгуки */}
@@ -97,7 +109,8 @@ const ReviewsSection: React.FC = () => {
             onClick={() => setShowAll(!showAll)}
             className="px-6 py-3 rounded-full bg-gray-900 text-white font-medium hover:bg-gray-800 transition"
           >
-            {showAll ? t.showLessReviews : t.showMoreReviews}
+            {/* ✅ Використовуємо t() з умовою */}
+            {showAll ? t('showLessReviews') : t('showMoreReviews')}
           </button>
         </div>
       </div>

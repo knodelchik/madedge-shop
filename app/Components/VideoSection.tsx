@@ -2,12 +2,18 @@
 
 import { motion } from 'framer-motion';
 import { Zap, ClipboardList, Target, Wrench } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
-import { translations } from '../translation/translations';
+// ✅ Замість useLanguage та translations
+import { useTranslations } from 'next-intl';
 
 export default function VideoSection() {
-  const { language } = useLanguage();
-  const t = translations[language];
+  // ✅ Використовуємо useTranslations, вказуючи простір імен 'Assembly'
+  const t = useTranslations('Assembly');
+
+  // Отримуємо масив кроків, використовуючи t.raw() та приводячи його до типу
+  const assemblySteps = t.raw('assemblySteps') as {
+    title: string;
+    desc: string;
+  }[];
 
   const icons = [Zap, ClipboardList, Target, Wrench];
   const colors = [
@@ -16,6 +22,12 @@ export default function VideoSection() {
     'text-red-500',
     'text-gray-600',
   ];
+
+  // Функція-замінник для alert
+  const handleButtonClick = (action: string) => {
+    console.log(`Action requested: ${action}`);
+    // Тут у реальному застосунку можна відкрити модальне вікно або перейти за посиланням
+  };
 
   return (
     <section className="w-full bg-white py-20">
@@ -29,8 +41,9 @@ export default function VideoSection() {
           viewport={{ once: true }}
         >
           <iframe
+            // ✅ Використовуємо t()
             src="https://www.youtube.com/embed/WXdFfbQfzBs"
-            title={t.assemblyTitle}
+            title={t('assemblyTitle')}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             className="w-full h-full"
             allowFullScreen
@@ -47,15 +60,16 @@ export default function VideoSection() {
         >
           <div className="mb-6">
             <h2 className="text-3xl font-bold mb-3 text-gray-900 flex items-center gap-2">
-              {t.assemblyTitle}
+              {t('assemblyTitle')}
             </h2>
             <p className="text-lg text-gray-600 leading-relaxed">
-              {t.assemblyText}
+              {t('assemblyText')}
             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4 mb-6">
-            {t.assemblySteps.map((step, idx) => {
+            {/* ✅ Проходимо по масиву, отриманому через t.raw() */}
+            {assemblySteps.map((step, idx) => {
               const Icon = icons[idx];
               return (
                 <motion.div
@@ -78,16 +92,16 @@ export default function VideoSection() {
 
           <div className="flex gap-3">
             <button
-              onClick={() => alert(t.assemblyButtonText)}
+              onClick={() => handleButtonClick(t('assemblyButtonText'))}
               className="flex-1 px-5 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition font-semibold"
             >
-              {t.assemblyButtonText}
+              {t('assemblyButtonText')}
             </button>
             <button
-              onClick={() => alert(t.assemblyPdfText)}
+              onClick={() => handleButtonClick(t('assemblyPdfText'))}
               className="px-5 py-3 border border-gray-300 text-gray-700 rounded-lg hover:border-gray-400 transition font-semibold"
             >
-              {t.assemblyPdfText}
+              {t('assemblyPdfText')}
             </button>
           </div>
         </motion.div>

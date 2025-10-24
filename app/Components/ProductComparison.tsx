@@ -2,18 +2,37 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { useLanguage } from '../context/LanguageContext';
-import { translations } from '../translation/translations';
+import { useTranslations } from 'next-intl';
 
 const ProductComparison: React.FC = () => {
-  const { language } = useLanguage();
-  const t = translations[language];
+  // ✅ Використовуємо useTranslations, вказуючи простір імен 'Product'
+  // Він повинен бути доступний через NextIntlClientProvider у вашому layout.tsx
+  const t = useTranslations('Product');
 
   const [firstId, setFirstId] = useState<number>(1);
   const [secondId, setSecondId] = useState<number>(2);
 
-  const product1 = t.products.find((p) => p.id === firstId)!;
-  const product2 = t.products.find((p) => p.id === secondId)!;
+  // Оскільки t тепер є функцією, ми використовуємо t('products')
+  // next-intl поверне об'єкт або масив з файлу перекладів.
+  // Ми повинні явно привести його тип, оскільки next-intl не може знати його структуру.
+  const products = t.raw('products') as {
+    id: number;
+    name: string;
+    features: { name: string; value: string }[];
+  }[];
+
+  const product1 = products.find((p) => p.id === firstId)!;
+  const product2 = products.find((p) => p.id === secondId)!;
+
+  // Перевірка, чи продукти знайдені, щоб уникнути помилок, якщо ID не дійсні
+  if (!product1 || !product2) {
+    // У реальному додатку тут слід відобразити завантажувач або повідомлення про помилку
+    return (
+      <section className="py-16 bg-white text-center">
+        Loading comparison data...
+      </section>
+    );
+  }
 
   const placeholder =
     'data:image/svg+xml;utf8,' +
@@ -32,8 +51,9 @@ const ProductComparison: React.FC = () => {
   return (
     <section className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-6">
+        {/* ✅ Використовуємо t() для простого рядка */}
         <h2 className="text-3xl font-bold text-center mb-10">
-          {t.productComparison}
+          {t('productComparison')}
         </h2>
 
         {/* Selectors */}
@@ -43,7 +63,8 @@ const ProductComparison: React.FC = () => {
             onChange={(e) => setFirstId(Number(e.target.value))}
             className="border rounded-lg px-4 py-2"
           >
-            {t.products.map((p) => (
+            {/* ✅ Проходимо по масиву продуктів */}
+            {products.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.name}
               </option>
@@ -55,7 +76,8 @@ const ProductComparison: React.FC = () => {
             onChange={(e) => setSecondId(Number(e.target.value))}
             className="border rounded-lg px-4 py-2"
           >
-            {t.products.map((p) => (
+            {/* ✅ Проходимо по масиву продуктів */}
+            {products.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.name}
               </option>

@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { authService } from '../services/authService';
+import { authService } from '../[locale]/services/authService';
 import { AuthFormData } from '../types/users';
-import { useCartStore } from '../store/cartStore';
+import { useCartStore } from '../[locale]/store/cartStore';
 
 interface AuthFormProps {
   type: 'signin' | 'signup';
@@ -11,11 +11,15 @@ interface AuthFormProps {
   onToggleType?: () => void;
 }
 
-export default function AuthForm({ type, onSuccess, onToggleType }: AuthFormProps) {
+export default function AuthForm({
+  type,
+  onSuccess,
+  onToggleType,
+}: AuthFormProps) {
   const [formData, setFormData] = useState<AuthFormData>({
     email: '',
     password: '',
-    full_name: ''
+    full_name: '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,9 +56,9 @@ export default function AuthForm({ type, onSuccess, onToggleType }: AuthFormProp
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }));
   };
 
@@ -73,7 +77,10 @@ export default function AuthForm({ type, onSuccess, onToggleType }: AuthFormProp
       <form onSubmit={handleSubmit} className="space-y-4">
         {type === 'signup' && (
           <div>
-            <label htmlFor="full_name" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="full_name"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Full Name
             </label>
             <input
@@ -90,7 +97,10 @@ export default function AuthForm({ type, onSuccess, onToggleType }: AuthFormProp
         )}
 
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Email
           </label>
           <input
@@ -106,7 +116,10 @@ export default function AuthForm({ type, onSuccess, onToggleType }: AuthFormProp
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Password
           </label>
           <input
@@ -127,7 +140,11 @@ export default function AuthForm({ type, onSuccess, onToggleType }: AuthFormProp
           disabled={loading}
           className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? 'Loading...' : (type === 'signup' ? 'Create Account' : 'Sign In')}
+          {loading
+            ? 'Loading...'
+            : type === 'signup'
+            ? 'Create Account'
+            : 'Sign In'}
         </button>
       </form>
 

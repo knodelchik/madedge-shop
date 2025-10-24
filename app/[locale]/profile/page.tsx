@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { authService } from '../services/authService';
-import { User } from '../types/users';
+import { User } from '../../types/users';
 
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
@@ -26,13 +26,13 @@ export default function ProfilePage() {
     checkAuth();
 
     // Слухач змін автентифікації
-    const { data: { subscription } } = authService.supabase.auth.onAuthStateChange(
-      (event) => {
-        if (event === 'SIGNED_OUT') {
-          router.push('/auth');
-        }
+    const {
+      data: { subscription },
+    } = authService.supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_OUT') {
+        router.push('/auth');
       }
-    );
+    });
 
     return () => {
       subscription.unsubscribe();
@@ -51,26 +51,30 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="container mx-auto px-4">
         <div className="max-w-md mx-auto bg-white rounded-2xl shadow-lg p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">
-            Profile
-          </h2>
-          
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">Profile</h2>
+
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-gray-600">Email:</label>
+              <label className="text-sm font-medium text-gray-600">
+                Email:
+              </label>
               <p className="text-gray-800">{user?.email}</p>
             </div>
-            
+
             {user?.full_name && (
               <div>
-                <label className="text-sm font-medium text-gray-600">Full Name:</label>
+                <label className="text-sm font-medium text-gray-600">
+                  Full Name:
+                </label>
                 <p className="text-gray-800">{user.full_name}</p>
               </div>
             )}
 
             {user?.phone && (
               <div>
-                <label className="text-sm font-medium text-gray-600">Phone:</label>
+                <label className="text-sm font-medium text-gray-600">
+                  Phone:
+                </label>
                 <p className="text-gray-800">{user.phone}</p>
               </div>
             )}

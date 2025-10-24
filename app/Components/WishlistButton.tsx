@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { Heart } from 'lucide-react';
-import { useWishlistStore } from '../store/wishlistStore';
-import { authService } from '../services/authService';
+import { useWishlistStore } from '../[locale]/store/wishlistStore';
+import { authService } from '../[locale]/services/authService';
 
 interface WishlistButtonProps {
   productId: number;
@@ -12,20 +12,20 @@ interface WishlistButtonProps {
   onClick?: (e: React.MouseEvent) => void;
 }
 
-export default function WishlistButton({ 
-  productId, 
-  size = 'md', 
+export default function WishlistButton({
+  productId,
+  size = 'md',
   className = '',
-  onClick 
+  onClick,
 }: WishlistButtonProps) {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<{ id: string } | null>(null);
-  
-  const { 
-    addToWishlist, 
-    removeFromWishlist, 
+
+  const {
+    addToWishlist,
+    removeFromWishlist,
     wishlistItems,
-    isInLocalWishlist
+    isInLocalWishlist,
   } = useWishlistStore();
 
   // Перевіряємо поточного користувача
@@ -41,7 +41,9 @@ export default function WishlistButton({
 
     checkUser();
 
-    const { data: { subscription } } = authService.supabase.auth.onAuthStateChange((event, session) => {
+    const {
+      data: { subscription },
+    } = authService.supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
         setUser({ id: session.user.id });
       } else {
@@ -53,8 +55,10 @@ export default function WishlistButton({
   }, []);
 
   // Визначаємо чи товар в wishlist
-  const isInWishlist = user 
-    ? wishlistItems.some(item => item.product_id === productId && item.user_id === user.id)
+  const isInWishlist = user
+    ? wishlistItems.some(
+        (item) => item.product_id === productId && item.user_id === user.id
+      )
     : isInLocalWishlist(productId);
 
   const handleClick = async (e: React.MouseEvent) => {
@@ -79,7 +83,7 @@ export default function WishlistButton({
   const sizeClasses = {
     sm: 'w-8 h-8',
     md: 'w-10 h-10',
-    lg: 'w-12 h-12'
+    lg: 'w-12 h-12',
   };
 
   return (
@@ -90,20 +94,21 @@ export default function WishlistButton({
         ${sizeClasses[size]} 
         flex items-center justify-center 
         rounded-full border transition-all
-        ${isInWishlist 
-          ? 'bg-red-500 border-red-500 text-white' 
-          : 'bg-white border-gray-300 text-gray-400 hover:border-red-300 hover:text-red-400'
+        ${
+          isInWishlist
+            ? 'bg-red-500 border-red-500 text-white'
+            : 'bg-white border-gray-300 text-gray-400 hover:border-red-300 hover:text-red-400'
         }
         ${className}
       `}
       aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
     >
-      <Heart 
+      <Heart
         className={`
           ${size === 'sm' ? 'w-4 h-4' : size === 'md' ? 'w-5 h-5' : 'w-6 h-6'}
           ${isInWishlist ? 'fill-current' : ''}
           transition-all duration-300
-        `} 
+        `}
       />
     </button>
   );

@@ -1,8 +1,14 @@
 'use client';
 
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 import { ShoppingCart } from 'lucide-react';
-import { useCartStore } from '../store/cartStore';
+import { useCartStore } from '../[locale]/store/cartStore';
 import QuantityCounter from './QuantityCounter';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -19,7 +25,10 @@ export default function CartSheet() {
   const { cartItems, increaseQuantity, decreaseQuantity } = useCartStore();
 
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const totalPrice = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
 
   // Функція для отримання безпечного зображення
   const getSafeImage = (item: CartItem) => {
@@ -42,7 +51,10 @@ export default function CartSheet() {
         </button>
       </SheetTrigger>
 
-      <SheetContent side="right" className="w-[400px] sm:w-[500px] p-0 flex flex-col h-full">
+      <SheetContent
+        side="right"
+        className="w-[400px] sm:w-[500px] p-0 flex flex-col h-full"
+      >
         <SheetHeader className="p-6 border-b shrink-0">
           <SheetTitle className="text-xl font-bold">Ваш кошик</SheetTitle>
         </SheetHeader>
@@ -74,8 +86,12 @@ export default function CartSheet() {
                     className="w-20 h-20 object-cover rounded-md flex-shrink-0"
                   />
                   <div className="flex-1 flex flex-col justify-between min-w-0">
-                    <p className="font-medium text-gray-800 truncate">{item.title}</p>
-                    <p className="text-sm text-gray-500 mt-1">{item.price.toFixed(2)} $</p>
+                    <p className="font-medium text-gray-800 truncate">
+                      {item.title}
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {item.price.toFixed(2)} $
+                    </p>
                   </div>
 
                   <QuantityCounter

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import AuthForm from '../Components/AuthForm';
+import AuthForm from '../../Components/AuthForm';
 
 export default function AuthPage() {
   const [authType, setAuthType] = useState<'signin' | 'signup'>('signin');
@@ -13,7 +13,7 @@ export default function AuthPage() {
   };
 
   const toggleAuthType = () => {
-    setAuthType(prev => prev === 'signin' ? 'signup' : 'signin');
+    setAuthType((prev) => (prev === 'signin' ? 'signup' : 'signin'));
   };
 
   return (

@@ -17,7 +17,7 @@ import {
   SadIcon,
   HappyIcon,
   StarEyesIcon,
-} from '../Components/icons/SocialIcons';
+} from '../../Components/icons/SocialIcons';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // ... (Інтерфейси MenuItem та SectionMap залишаються без змін)

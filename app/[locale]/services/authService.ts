@@ -1,19 +1,23 @@
-import { supabase } from '../lib/supabase';
-import { User, AuthFormData } from '../types/users';
+import { supabase } from '../../lib/supabase';
+import { User, AuthFormData } from '../../types/users';
 
 export const authService = {
   supabase,
 
   // Реєстрація
-  async signUp({ email, password, full_name }: AuthFormData): Promise<{ user: User | null; error: string | null }> {
+  async signUp({
+    email,
+    password,
+    full_name,
+  }: AuthFormData): Promise<{ user: User | null; error: string | null }> {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
-          full_name
-        }
-      }
+          full_name,
+        },
+      },
     });
 
     if (error) {
@@ -24,10 +28,13 @@ export const authService = {
   },
 
   // Вхід
-  async signIn({ email, password }: AuthFormData): Promise<{ user: User | null; error: string | null }> {
+  async signIn({
+    email,
+    password,
+  }: AuthFormData): Promise<{ user: User | null; error: string | null }> {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
-      password
+      password,
     });
 
     if (error) {
@@ -45,8 +52,11 @@ export const authService = {
 
   // Отримати поточного користувача
   async getCurrentUser(): Promise<{ user: User | null; error: string | null }> {
-    const { data: { user }, error } = await supabase.auth.getUser();
-    
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
+
     if (error) {
       return { user: null, error: error.message };
     }
@@ -55,7 +65,9 @@ export const authService = {
   },
 
   // Отримати профіль користувача
-  async getUserProfile(userId: string): Promise<{ profile: User | null; error: string | null }> {
+  async getUserProfile(
+    userId: string
+  ): Promise<{ profile: User | null; error: string | null }> {
     const { data, error } = await supabase
       .from('users')
       .select('*')
@@ -70,7 +82,10 @@ export const authService = {
   },
 
   // Оновити профіль
-  async updateProfile(userId: string, updates: Partial<User>): Promise<{ profile: User | null; error: string | null }> {
+  async updateProfile(
+    userId: string,
+    updates: Partial<User>
+  ): Promise<{ profile: User | null; error: string | null }> {
     const { data, error } = await supabase
       .from('users')
       .update(updates)
@@ -83,5 +98,5 @@ export const authService = {
     }
 
     return { profile: data, error: null };
-  }
+  },
 };

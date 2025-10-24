@@ -1,15 +1,17 @@
-import { supabase } from '../lib/supabase';
-import { WishlistItemWithProduct } from '../types/wishlist';
+import { supabase } from '../../lib/supabase';
+import { WishlistItemWithProduct } from '../../types/wishlist';
 
 export const wishlistService = {
   // Отримати список бажань
   async getWishlist(userId: string): Promise<WishlistItemWithProduct[]> {
     const { data, error } = await supabase
       .from('wishlist_items')
-      .select(`
+      .select(
+        `
         *,
         products (*)
-      `)
+      `
+      )
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
 
@@ -23,14 +25,15 @@ export const wishlistService = {
 
   // Додати в список бажань
   async addToWishlist(userId: string, productId: number): Promise<boolean> {
-    const { error } = await supabase
-      .from('wishlist_items')
-      .upsert({
+    const { error } = await supabase.from('wishlist_items').upsert(
+      {
         user_id: userId,
-        product_id: productId
-      }, {
-        onConflict: 'user_id,product_id'
-      });
+        product_id: productId,
+      },
+      {
+        onConflict: 'user_id,product_id',
+      }
+    );
 
     if (error) {
       console.error('Error adding to wishlist:', error);
@@ -41,7 +44,10 @@ export const wishlistService = {
   },
 
   // Видалити з списку бажань
-  async removeFromWishlist(userId: string, productId: number): Promise<boolean> {
+  async removeFromWishlist(
+    userId: string,
+    productId: number
+  ): Promise<boolean> {
     const { error } = await supabase
       .from('wishlist_items')
       .delete()
@@ -77,18 +83,22 @@ export const wishlistService = {
     try {
       // Додаємо в корзину
       const cartService = await import('./cartService');
-      const success = await cartService.cartService.addToCart(userId, productId, 1);
-      
+      const success = await cartService.cartService.addToCart(
+        userId,
+        productId,
+        1
+      );
+
       if (success) {
         // Видаляємо з wishlist
         await this.removeFromWishlist(userId, productId);
         return true;
       }
-      
+
       return false;
     } catch (error) {
       console.error('Error moving to cart:', error);
       return false;
     }
-  }
+  },
 };

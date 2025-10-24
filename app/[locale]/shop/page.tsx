@@ -1,31 +1,34 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import Link from "next/link";
-import MagnetLines from "../../components/MagnetLines";
-import { productsService } from "../services/productService";
-import { Product } from "../types/products";
-import WishlistButton from "../Components/WishlistButton";
-import Image from "next/image";
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import MagnetLines from '../../../components/MagnetLines';
+import { productsService } from '../services/productService';
+import { Product } from '../../types/products';
+import WishlistButton from '../../Components/WishlistButton';
+import Image from 'next/image';
 
-type Category = "all" | "sharpeners" | "stones" | "accessories";
+type Category = 'all' | 'sharpeners' | 'stones' | 'accessories';
 
 export default function ShopPage() {
   const searchParams = useSearchParams();
   const urlCategory = searchParams.get('category') as Category | null;
-  
+
   const [activeCategory, setActiveCategory] = useState<Category>(
-    urlCategory && ["sharpeners", "stones", "accessories"].includes(urlCategory) 
-      ? urlCategory 
-      : "all"
+    urlCategory && ['sharpeners', 'stones', 'accessories'].includes(urlCategory)
+      ? urlCategory
+      : 'all'
   );
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Оновлюємо активну категорію при зміні URL параметра
   useEffect(() => {
-    if (urlCategory && ["sharpeners", "stones", "accessories"].includes(urlCategory)) {
+    if (
+      urlCategory &&
+      ['sharpeners', 'stones', 'accessories'].includes(urlCategory)
+    ) {
       setActiveCategory(urlCategory);
     }
   }, [urlCategory]);
@@ -38,7 +41,7 @@ export default function ShopPage() {
         const data = await productsService.getAllProducts();
         setProducts(data);
       } catch (error) {
-        console.error("Failed to load products:", error);
+        console.error('Failed to load products:', error);
       } finally {
         setLoading(false);
       }
@@ -49,7 +52,7 @@ export default function ShopPage() {
 
   // Фільтрація товарів
   const filteredProducts =
-    activeCategory === "all"
+    activeCategory === 'all'
       ? products
       : products.filter((p) => p.category === activeCategory);
 
@@ -73,7 +76,7 @@ export default function ShopPage() {
           lineWidth="0.4vmin"
           lineHeight="4vmin"
           baseAngle={0}
-          style={{ margin: "2rem auto" }}
+          style={{ margin: '2rem auto' }}
           className="absolute inset-0 -z-10 opacity-30"
         />
 
@@ -90,11 +93,11 @@ export default function ShopPage() {
             <div className="relative w-full flex justify-center">
               {/* Центральна кнопка — завжди по центру */}
               <button
-                onClick={() => setActiveCategory("stones")}
+                onClick={() => setActiveCategory('stones')}
                 className={`px-6 py-3 rounded-xl font-semibold transition shadow-lg ${
-                  activeCategory === "stones"
-                    ? "bg-black text-white"
-                    : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                  activeCategory === 'stones'
+                    ? 'bg-black text-white'
+                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
                 }`}
               >
                 Grinding Stones
@@ -102,11 +105,11 @@ export default function ShopPage() {
 
               {/* Ліва кнопка — фіксований gap 200px вліво від центру */}
               <button
-                onClick={() => setActiveCategory("sharpeners")}
+                onClick={() => setActiveCategory('sharpeners')}
                 className={`absolute left-1/2 -translate-x-[calc(50%+200px)] px-6 py-3 rounded-xl font-semibold transition shadow-lg ${
-                  activeCategory === "sharpeners"
-                    ? "bg-black text-white"
-                    : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                  activeCategory === 'sharpeners'
+                    ? 'bg-black text-white'
+                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
                 }`}
               >
                 Knife Sharpeners
@@ -114,11 +117,11 @@ export default function ShopPage() {
 
               {/* Права кнопка — фіксований gap 200px вправо від центру */}
               <button
-                onClick={() => setActiveCategory("accessories")}
+                onClick={() => setActiveCategory('accessories')}
                 className={`absolute right-1/2 translate-x-[calc(50%+180px)] px-6 py-3 rounded-xl font-semibold transition shadow-lg ${
-                  activeCategory === "accessories"
-                    ? "bg-black text-white"
-                    : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                  activeCategory === 'accessories'
+                    ? 'bg-black text-white'
+                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
                 }`}
               >
                 Accessories
@@ -127,11 +130,11 @@ export default function ShopPage() {
 
             {/* Кнопка "All Products" під центром */}
             <button
-              onClick={() => setActiveCategory("all")}
+              onClick={() => setActiveCategory('all')}
               className={`px-4 py-2 rounded-lg font-medium transition text-sm ${
-                activeCategory === "all"
-                  ? "bg-gray-600 text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                activeCategory === 'all'
+                  ? 'bg-gray-600 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
               All Products
@@ -142,19 +145,20 @@ export default function ShopPage() {
 
       {/* 🛒 Секція товарів - всі товари підряд без розділення по категоріям */}
       <div className="p-6 max-w-7xl mx-auto">
-        
         <section>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
             {filteredProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
-          
+
           {filteredProducts.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">No products found in this category</p>
+              <p className="text-gray-500 text-lg">
+                No products found in this category
+              </p>
               <button
-                onClick={() => setActiveCategory("all")}
+                onClick={() => setActiveCategory('all')}
                 className="mt-4 px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition"
               >
                 View All Products
@@ -173,31 +177,33 @@ function ProductCard({ product }: { product: Product }) {
   const mainImage =
     product.images && product.images.length > 0
       ? product.images[0]
-      : "/images/placeholder.jpg";
+      : '/images/placeholder.jpg';
 
   return (
-    <div 
+    <div
       className="group flex flex-col items-center hover:scale-105 transition-transform duration-300 relative"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Кнопка Wishlist - з плавною появою */}
-      <div className={`absolute top-2 right-2 z-20 transition-all duration-300 ${
-        isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
-      }`}>
-        <WishlistButton 
-          productId={product.id} 
-          size="sm" 
+      <div
+        className={`absolute top-2 right-2 z-20 transition-all duration-300 ${
+          isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
+        }`}
+      >
+        <WishlistButton
+          productId={product.id}
+          size="sm"
           onClick={(e: React.MouseEvent) => {
             e.preventDefault();
             e.stopPropagation();
           }}
         />
       </div>
-      
+
       {/* Основна частина картки - обгорнута в Link */}
-      <Link 
-        href={`/shop/${product.title.replace(/\s+/g, "-").toLowerCase()}`}
+      <Link
+        href={`/shop/${product.title.replace(/\s+/g, '-').toLowerCase()}`}
         className="w-full"
       >
         <div className="cursor-pointer flex flex-col items-center w-full">
