@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Select from 'react-select'; // !!! ПОТРІБЕН ІМПОРТ !!!
+import Select from 'react-select';
 import {
   Truck,
   Skull,
@@ -12,8 +12,9 @@ import {
   Globe,
 } from 'lucide-react';
 import { Country, ICountry, State, IState } from 'country-state-city';
+import { useTranslations } from 'next-intl'; // 👈 Додаємо імпорт
 
-// --- Types and Constants ---
+// --- Types and Constants (unchanged) ---
 
 interface SelectOption {
   value: string;
@@ -153,12 +154,17 @@ const DELIVERY_DATA: DeliveryCost = {
   ],
 };
 
+// Перекладемо ці значення в messages
 const SERVICE_OPTIONS: SelectOption[] = [
   { label: 'Standard', value: 'Standard' },
   { label: 'Express', value: 'Express' },
 ];
 
 export default function DeliveryPage() {
+  const t = useTranslations('DeliveryPage');
+  const t_calc = useTranslations('DeliveryPage.calculator');
+  const t_returns = useTranslations('DeliveryPage.returns');
+
   const allCountriesOptions: SelectOption[] = Country.getAllCountries().map(
     (c) => ({
       value: c.isoCode,
@@ -295,6 +301,7 @@ export default function DeliveryPage() {
 
         if (canApplySurcharge) {
           finalPrice = (finalPrice as number) + 20;
+          // Тут використовуємо статичний текст, оскільки він має бути доданий до service
           finalService = `${opt.service} (+ Remote Surcharge)`;
           finalSurcharge = true;
         }
@@ -369,42 +376,33 @@ export default function DeliveryPage() {
       {/* Hero Section */}
       <div className="mb-16">
         <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-4">
-          Shipping & Delivery
+          {t('hero.title')}
         </h1>
         <p className="mt-4 text-xl text-gray-500 border-b pb-6 border-gray-200">
-          Find estimated shipping costs and delivery times for your region.
-          Prices vary based on destination and selected service level.
+          {t('hero.subtitle')}
         </p>
       </div>
 
       {/* --- Delivery Policy --- */}
       <section id="policy" className="mb-20 scroll-mt-24">
         <h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-gray-900 pl-3">
-          International Delivery Policy
+          {t('policy.title')}
         </h2>
-        <p className="text-gray-700 mb-6 text-lg">
-          MadEdge proudly ships worldwide. Due to varying logistics networks and
-          local customs regulations, delivery costs and times are calculated
-          dynamically based on the destination country, state/province, and
-          chosen carrier.
-        </p>
+        <p className="text-gray-700 mb-6 text-lg">{t('policy.intro')}</p>
         <div className="bg-blue-50 p-6 rounded-xl border border-blue-200">
           <h3 className="font-bold text-gray-900 mb-3 flex items-center">
-            <Truck className="w-5 h-5 mr-3 text-blue-600" /> Key Information:
+            <Truck className="w-5 h-5 mr-3 text-blue-600" />{' '}
+            {t('policy.keyTitle')}
           </h3>
           <ul className="space-y-2 text-gray-700 list-disc list-inside ml-4">
             <li>
-              <strong>Free Shipping:</strong> Standard delivery to Ukraine is
-              **FREE**.
+              <strong>{t('policy.key1Strong')}:</strong> {t('policy.key1Text')}
             </li>
             <li>
-              <strong>Remote Area Surcharge:</strong> Applied to deliveries in
-              remote or island locations. Select or type a remote region name to
-              see the surcharge.
+              <strong>{t('policy.key2Strong')}:</strong> {t('policy.key2Text')}
             </li>
             <li>
-              <strong>Customs & Duties:</strong> Buyer is responsible for all
-              import duties and taxes levied by the destination country.
+              <strong>{t('policy.key3Strong')}:</strong> {t('policy.key3Text')}
             </li>
           </ul>
         </div>
@@ -418,12 +416,9 @@ export default function DeliveryPage() {
         className="mb-20 scroll-mt-24 bg-gray-50 p-8 rounded-xl border border-gray-200 shadow-lg"
       >
         <h2 className="text-3xl font-bold text-gray-900 mb-6 ">
-          Delivery Cost Calculator
+          {t_calc('title')}
         </h2>
-        <p className="text-gray-700 mb-6">
-          Use the search feature below to quickly find your country and
-          preferred service.
-        </p>
+        <p className="text-gray-700 mb-6">{t_calc('intro')}</p>
 
         {/* --- Form / Inputs --- */}
         <div className="flex flex-col md:flex-row gap-4 mb-8">
@@ -433,14 +428,14 @@ export default function DeliveryPage() {
               htmlFor="country"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Select Country:
+              {t_calc('labelCountry')}
             </label>
             <Select
               id="country"
               options={allCountriesOptions}
               value={selectedCountryOption}
               onChange={handleCountryChange}
-              placeholder="Type country name..."
+              placeholder={t_calc('placeholderCountry')}
               styles={customStyles}
             />
           </div>
@@ -451,7 +446,7 @@ export default function DeliveryPage() {
               htmlFor="state"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              State / Remote Area (Optional):
+              {t_calc('labelState')}
             </label>
             <Select
               id="state"
@@ -460,8 +455,8 @@ export default function DeliveryPage() {
               onChange={handleStateChange}
               placeholder={
                 selectedCountryCode === 'UA'
-                  ? 'Not applicable for Ukraine'
-                  : 'Select state or type a remote region'
+                  ? t_calc('placeholderStateUA')
+                  : t_calc('placeholderStateDefault')
               }
               isDisabled={selectedCountryCode === 'UA'}
               styles={customStyles}
@@ -474,7 +469,7 @@ export default function DeliveryPage() {
               htmlFor="service"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Delivery Service:
+              {t_calc('labelService')}
             </label>
             <Select
               id="service"
@@ -489,22 +484,22 @@ export default function DeliveryPage() {
         {/* --- Remote Surcharge Message --- */}
         {surchargeApplied && (
           <div className="mb-4 p-3 text-sm font-medium text-orange-800 bg-orange-100 rounded-lg border border-orange-300">
-            <span className="font-bold">NOTE:</span> A $20 remote area surcharge
-            has been applied to this price based on the region entered.
+            <span className="font-bold">{t_calc('surchargeNoteStrong')}:</span>{' '}
+            {t_calc('surchargeNoteText')}
           </div>
         )}
 
         {/* --- Results --- */}
         <div className="mt-8 pt-6 border-t border-gray-300">
           <h3 className="text-xl font-bold text-gray-900 mb-4">
-            Estimated Options for {selectedCountryName}:
+            {t_calc('resultsTitle', { country: selectedCountryName })}
           </h3>
 
           {isCalculating ? (
             <div className="flex items-center justify-center p-8 bg-white rounded-lg">
               <Loader className="w-6 h-6 animate-spin mr-3 text-blue-600" />
               <span className="text-lg text-blue-600">
-                Calculating the best route...
+                {t_calc('resultsLoading')}
               </span>
             </div>
           ) : (
@@ -533,7 +528,9 @@ export default function DeliveryPage() {
                     <p className="font-semibold text-gray-900">
                       {option.service}
                     </p>
-                    <p className="text-sm text-gray-600">Time: {option.time}</p>
+                    <p className="text-sm text-gray-600">
+                      {t_calc('resultsTime')}: {option.time}
+                    </p>
                   </div>
 
                   <div className="flex-shrink-0 text-right">
@@ -548,13 +545,15 @@ export default function DeliveryPage() {
                       }`}
                     >
                       {option.price === 'Free'
-                        ? 'FREE'
+                        ? t_calc('resultsFree')
                         : option.price === 'N/A'
-                        ? 'N/A'
+                        ? t_calc('resultsNA')
                         : `$${(option.price as number).toFixed(2)}`}
                     </p>
                     {option.price !== 'N/A' && (
-                      <p className="text-xs text-gray-500">Approx. price</p>
+                      <p className="text-xs text-gray-500">
+                        {t_calc('resultsApproxPrice')}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -562,10 +561,7 @@ export default function DeliveryPage() {
 
               {shippingOptions.length === 0 && (
                 <div className="p-5 bg-yellow-50 rounded-lg text-yellow-800">
-                  <p>
-                    No specific shipping options are available for the selected
-                    criteria. Showing Rest of World options by default.
-                  </p>
+                  <p>{t_calc('resultsNoOptions')}</p>
                 </div>
               )}
             </div>
@@ -578,14 +574,10 @@ export default function DeliveryPage() {
       {/* --- Returns & Warranty Policy --- */}
       <section id="returns-warranty" className="mb-20 scroll-mt-24">
         <h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-gray-900 pl-3">
-          Returns, Exchanges, and Warranty
+          {t_returns('title')}
         </h2>
 
-        <p className="text-gray-700 mb-8 text-lg">
-          We stand by the quality of MadEdge products. Review our policy
-          regarding returns, exchanges, and warranty claims for items received
-          via delivery.
-        </p>
+        <p className="text-gray-700 mb-8 text-lg">{t_returns('intro')}</p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Column 1: Returns */}
@@ -604,14 +596,9 @@ export default function DeliveryPage() {
                   d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
                 ></path>
               </svg>
-              30-Day Returns
+              {t_returns('returnTitle')}
             </h3>
-            <p className="text-gray-700 text-sm">
-              You may return most new, unopened items within **30 days of
-              delivery** for a full refund. Items must be returned in their
-              original packaging. Return shipping costs are borne by the
-              customer, except in cases of damage.
-            </p>
+            <p className="text-gray-700 text-sm">{t_returns('returnText')}</p>
           </div>
 
           {/* Column 2: Warranty */}
@@ -630,14 +617,9 @@ export default function DeliveryPage() {
                   d="M9 12l2 2 4-4m5.618-4.018A9.955 9.955 0 0112 5.053 10.038 10.038 0 003.055 7.5c-.714 2.21-1.077 4.603-1.055 7.417C2.023 18.913 5.483 22 10 22h4c4.517 0 7.977-3.087 7.977-7.03c.022-2.814-.341-5.207-1.055-7.417z"
                 ></path>
               </svg>
-              10-Year Warranty
+              {t_returns('warrantyTitle')}
             </h3>
-            <p className="text-gray-700 text-sm">
-              All MadEdge sharpening systems are covered by our **10-year
-              manufacturing warranty** against defects in materials and
-              workmanship. This excludes normal wear and tear of consumable
-              parts like grinding stones.
-            </p>
+            <p className="text-gray-700 text-sm">{t_returns('warrantyText')}</p>
           </div>
 
           {/* Column 3: Lost Shipments */}
@@ -656,14 +638,9 @@ export default function DeliveryPage() {
                   d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.3 16c-.77 1.333.192 3 1.732 3z"
                 ></path>
               </svg>
-              Lost Shipment
+              {t_returns('lostTitle')}
             </h3>
-            <p className="text-gray-700 text-sm">
-              If your tracking information stalls for more than 15 business
-              days, please **contact our support team**. We will file a claim
-              with the carrier and ship a replacement unit if the package is
-              confirmed lost.
-            </p>
+            <p className="text-gray-700 text-sm">{t_returns('lostText')}</p>
           </div>
         </div>
       </section>

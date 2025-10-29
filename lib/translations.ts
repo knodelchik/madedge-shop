@@ -6,7 +6,7 @@ export const translations = {
       heroSubtitle:
         'Відкрийте для себе найкращі точилки для ножів. Купуйте зараз та насолоджуйтесь ексклюзивними знижками з гарантією преміум якості!',
       shop: 'Магазин',
-      about: 'Про нас',
+      about: 'Блог',
     },
     Info: {
       infoTitle: 'Що таке MadEdge?',
@@ -23,6 +23,17 @@ export const translations = {
       needHelpTitle: 'Потрібна допомога?',
       needHelpText:
         'Ми працюємо 24/7, щоб відповісти на всі ваші запитання. Напишіть нам в будь-який час і отримайте швидку відповідь від нашої служби підтримки.',
+    },
+    CardCarousel: {
+      titleGrindingStones: 'Точильні Камені',
+      descGrindingStones:
+        'Високоякісні точильні камені, розроблені для точного заточування.',
+      titleSharpeners: 'Точилки',
+      descSharpeners: 'Професійні точилки для лез, інструментів та ножів.',
+      titleAccessories: 'Аксесуари',
+      descAccessories:
+        'Основні аксесуари для доповнення вашого набору для заточування.',
+      viewCategory: 'Переглянути {title}',
     },
     Product: {
       productComparisonTitle: 'Порівняння продуктів',
@@ -172,7 +183,7 @@ export const translations = {
       footerKnifeSharpeners: 'Точилки для ножів',
       footerWhetstones: 'Точильні камені',
       footerAccessories: 'Аксесуари',
-      footerAboutUs: 'Про нас',
+      footerAboutUs: 'Блог',
       footerOurBackground: 'Наша історія',
       footerOurValues: 'Наші цінності',
       footerManufacturing: 'Виготовлення',
@@ -241,7 +252,7 @@ export const translations = {
       navigation: {
         home: 'Головна',
         shop: 'Магазин',
-        about: 'Про нас',
+        about: 'Блог',
         contact: 'Контакти',
       },
       quickAccess: {
@@ -272,6 +283,64 @@ export const translations = {
         copyright: '© 2024 MadEdge. Всі права захищено.',
       },
     },
+    Shop: {
+      // Секція завантаження та помилок
+      loadingProducts: 'Завантаження товарів...',
+      noProductsFound: 'Товарів у цій категорії не знайдено',
+      viewAllProducts: 'Переглянути всі товари',
+
+      // HERO
+      heroTitle: 'Магазин MadEdge',
+      heroSubtitle: 'Оберіть ідеальну точилку, камінь чи аксесуар',
+
+      // Кнопки фільтрації
+      grindingStones: 'Точильні Камені',
+      knifeSharpeners: 'Точилки для ножів',
+      accessories: 'Аксесуари',
+      allProducts: 'Всі товари',
+
+      // Картка товару (ProductCard)
+      priceUnit: '$', // Можна використовувати як суфікс для ціни
+      placeholderImageAlt: 'Запасне зображення товару',
+    },
+    ProductPage: {
+      loading: 'Завантаження...',
+      errorLoading: 'Помилка завантаження товару',
+      notFound: 'Товар не знайдено',
+      backToShop: 'Повернутися до магазину',
+      backToShopButton: '← Повернутися до магазину',
+      quantityLabel: 'Кількість:',
+      addToCart: 'Додати в кошик',
+      addToCartSuccess: 'Товар додано в кошик',
+      addToWishlist: 'Додати до списку бажань',
+      categoryLabel: 'Категорія:',
+      imageAltPrefix: 'Зображення',
+    },
+    Profile: {
+      loading: 'Завантаження...',
+      title: 'Профіль',
+      emailLabel: 'Електронна пошта:',
+      fullNameLabel: "Повне ім'я:",
+      phoneLabel: 'Телефон:',
+    },
+    Order: {
+      emptyCart: 'Ваш кошик порожній',
+      title: 'Оформлення замовлення',
+      totalLabel: 'Разом:',
+      paymentMethodLabel: 'Спосіб оплати:',
+      payButton: 'Оплатити',
+      paymentError: 'Помилка при створенні платежу',
+      priceUnit: '$',
+    },
+    CartSheet: {
+      title: 'Ваш кошик',
+      emptyMessage: 'Кошик порожній',
+      goToShop: 'Перейти до покупок',
+      totalLabel: 'Разом:',
+      checkoutButton: 'Оформити замовлення',
+      priceUnit: '$',
+      placeholderAlt: 'Запасне зображення товару',
+    },
     Contacts: {
       contactTitle: "Зв'яжіться з нами",
       contactSubtitle: 'Звертайтесь до нас з будь-якими питаннями або запитами',
@@ -299,6 +368,599 @@ export const translations = {
       formMessagePlaceholder: 'Розкажіть нам більше про ваш запит...',
       formSubmit: 'Відправити повідомлення',
     },
+    AboutPage: {
+      // Hero
+      title: 'Про нас',
+      subtitle:
+        'Ласкаво просимо до MadEdge — де точність зустрічається з інноваціями у світі рішень для заточування.',
+
+      // Our Background
+      backgroundTitle: 'Наша історія',
+      backgroundText1:
+        'Заснована у **2010** році, MadEdge виникла з простого спостереження: художники, ремісники та професіонали заслуговують на кращі інструменти для обслуговування свого обладнання. Те, що починалося як невелика майстерня в Портленді, перетворилося на провідного виробника преміальних рішень для заточування, які використовуються професіоналами по всьому світу.',
+      journeySubtitle: 'Подорож',
+      journeyText:
+        'Наш засновник, **Маркус Девідсон**, колишній промисловий дизайнер, помітив розчарування, з яким стикалися митці, використовуючи звичайні точилки. Він витратив три роки на дослідження металургії, геометрії лез та ергономіки, щоб створити перший прототип MadEdge. Цей прототип перетворився на нашу флагманську серію ProEdge, якій зараз довіряють понад **100 000 професіоналів** у всьому світі.',
+      milestonesSubtitle: 'Ключові етапи',
+      milestone2010: 'Компанія заснована в Портленді, Орегон',
+      milestone2013: 'Випущено першу модель ProEdge',
+      milestone2017: 'Вихід на міжнародні ринки',
+      milestone2021: 'Впроваджено практики сталого виробництва',
+      milestone2024: 'Досягнуто понад 100 000 клієнтів по всьому світу',
+
+      // Our Values
+      valuesTitle: 'Наші основні цінності',
+
+      valuePrecisionTitle: 'Точність',
+      valuePrecisionText:
+        'Кожен продукт MadEdge спроєктований із **мікронною точністю**. Ми віримо, що справжня майстерність починається з правильних інструментів, доведених до досконалості.',
+
+      valueSustainabilityTitle: 'Екологічність',
+      valueSustainabilityText:
+        'Наша прихильність до довкілля спонукає нас використовувати **перероблені матеріали** та мінімізувати відходи на кожному етапі виробництва.',
+
+      valueInnovationTitle: 'Інновації',
+      valueInnovationText:
+        'Ми постійно інвестуємо в R&D для розробки **передових технологій заточування**, які роблять обслуговування простішим та ефективнішим.',
+
+      valueCustomerFocusTitle: 'Орієнтація на клієнта',
+      valueCustomerFocusText:
+        'Ваше задоволення є нашим пріоритетом. Ми пропонуємо **довічну підтримку** та 10-річну гарантію на всі наші продукти.',
+
+      // Manufacturing
+      manufacturingTitle: 'Виробництво',
+      manufacturingText:
+        'Наше сучасне підприємство в Портленді поєднує **традиційну майстерність із сучасною автоматизацією**. Кожна точилка проходить суворий контроль якості, перш ніж потрапити до ваших рук.',
+      productionProcessSubtitle: 'Процес виробництва',
+
+      step1Title: '1. Вибір матеріалів',
+      step1Text:
+        'Ми закуповуємо преміальні матеріали, такі як карбід вольфраму та кераміку, у сертифікованих постачальників.',
+
+      step2Title: '2. Точна механічна обробка',
+      step2Text:
+        'Верстати з ЧПК виготовляють кожен компонент відповідно до точних специфікацій із **допуском 0.001 мм**.',
+
+      step3Title: '3. Збірка',
+      step3Text:
+        'Кваліфіковані техніки вручну збирають кожен пристрій, забезпечуючи ідеальне вирівнювання та функціональність.',
+
+      step4Title: '4. Тестування якості',
+      step4Text:
+        'Кожна точилка проходить понад **50 перевірок якості**, включаючи верифікацію кута леза та тестування на довговічність.',
+
+      step5Title: '5. Пакування',
+      step5Text:
+        'Продукція пакується в **екологічно чисті матеріали** з вичерпними посібниками користувача.',
+
+      sustainabilitySubtitle: 'Ініціативи сталості',
+      sustainabilityText:
+        'Наше виробництво працює на **100% відновлюваній енергії**, і ми досягли статусу **нульових відходів на звалища** з 2022 року. Ми використовуємо перероблений алюміній для корпусів і біорозкладні пакувальні матеріали.',
+
+      // MadEdge Services
+      servicesTitle: 'Послуги MadEdge',
+      servicesText:
+        'Окрім виробництва виняткових продуктів, ми пропонуємо комплексні послуги, щоб ви отримали максимальну віддачу від своєї точилки MadEdge.',
+      howToUseSubtitle: 'Як користуватися вашою точилкою MadEdge',
+      instructionsTitle: 'Покрокова інструкція:',
+
+      inst1Title: '1. Підготовка',
+      inst1Text:
+        'Помістіть точилку на плоску, стійку поверхню. Переконайтеся, що слот для леза чистий і вільний від сміття.',
+
+      inst2Title: '2. Вставте олівець', // Припускаємо, що це інструкція для олівців (Pencil), хоча це дивно для виробника точилок для ножів. Залишаю "олівець" як у оригіналі.
+      inst2Text:
+        'Тримайте олівець під кутом 23 градуси (направляюча точилки допоможе) і обережно вставте його в отвір.',
+
+      inst3Title: '3. Плавно обертайте',
+      inst3Text:
+        "Поверніть олівець за годинниковою стрілкою 3-5 разів з м'яким, постійним тиском. Точилка автоматично спрямує оптимальний кут.",
+
+      inst4Title: '4. Перевірте вістря',
+      inst4Text:
+        'Вийміть олівець та огляньте. Для більш тонкого вістря повторіть крок 3 ще 2-3 оберти.',
+
+      inst5Title: '5. Регулярно чистіть',
+      inst5Text:
+        "Спорожнюйте резервуар для стружки після кожних 10-15 використань. Щомісяця протирайте отвір для леза м'якою тканиною.",
+
+      proTipStrong: 'Професійна порада:',
+      proTipText:
+        'Для кольорових олівців використовуйте трохи менший тиск і більше обертів для найкращих результатів. Для графітових олівців стандартний тиск працює ідеально.',
+
+      additionalServicesSubtitle: 'Додаткові послуги',
+
+      serviceMaintenanceTitle: 'Обслуговування та ремонт',
+      serviceMaintenanceText:
+        'Безкоштовна заміна леза протягом першого року. Довічне обслуговування ремонту доступне за собівартістю.',
+
+      serviceEngravingTitle: 'Індивідуальне гравіювання',
+      serviceEngravingText:
+        'Персоналізуйте свій MadEdge за допомогою індивідуального гравіювання для корпоративних подарунків або особистого використання.',
+
+      serviceWorkshopsTitle: 'Освітні майстер-класи',
+      serviceWorkshopsText:
+        'Безкоштовні щомісячні онлайн-майстер-класи з обслуговування інструментів та оптимальних технік заточування.',
+
+      serviceBulkOrdersTitle: 'Гуртові замовлення',
+      serviceBulkOrdersText:
+        'Спеціальні ціни та опції налаштування для шкіл, студій та корпорацій.',
+
+      // Upcoming Events
+      eventsTitle: 'Майбутні події',
+      eventsText:
+        'Приєднуйтесь до нас на цих майбутніх заходах, щоб особисто оцінити продукцію MadEdge та зустрітися з нашою командою.',
+
+      expoTitle: 'Міжнародна виставка художнього приладдя',
+      expoLocation: 'Чикаго, Іллінойс',
+      expoDesc:
+        'Відвідайте наш стенд #A-245, щоб побачити живі демонстрації нової ProEdge X2 та взяти участь у наших щоденних розіграшах.',
+      expoDate: '15-17 листопада 2025 року',
+      expoVenue: 'McCormick Place',
+
+      factoryTourTitle: 'Екскурсія заводом MadEdge',
+      factoryTourLocation: 'Портленд, Орегон',
+      factoryTourDesc:
+        'Отримайте ексклюзивний погляд за лаштунки нашого виробничого процесу. Кількість учасників обмежена до 20 осіб. Потрібна реєстрація.',
+      factoryTourDate: '5 грудня 2025 року',
+      factoryTourVenue: 'Головний офіс MadEdge',
+
+      artistWorkshopTitle: 'Серія майстер-класів для професійних художників',
+      artistWorkshopLocation: 'Онлайн-подія',
+      artistWorkshopDesc:
+        'Щомісячні онлайн-майстер-класи за участю професійних художників, які діляться своїми техніками та порадами з обслуговування інструментів. Безкоштовно для клієнтів MadEdge.',
+      artistWorkshopDate: 'Перша субота кожного місяця',
+      artistWorkshopVenue: 'Zoom',
+
+      newProductTitle: 'Презентація нового продукту',
+      newProductDesc:
+        'Будьте першими, хто побачить і випробує нашу революційну нову систему заточування. Спеціальні ціни для ранніх пташок доступні для відвідувачів заходу.',
+      newProductDate: '20 січня 2026 року',
+      newProductLocation: 'Нью-Йорк, Нью-Йорк',
+      newProductVenue: 'Місце буде оголошено',
+
+      stayUpdatedTitle: 'Будьте в курсі',
+      stayUpdatedText:
+        'Підпишіться на нашу розсилку, щоб отримувати сповіщення про нові події, запуски продуктів та ексклюзивні пропозиції.',
+      subscribeButton: 'Підписатися зараз',
+    },
+    AboutLayout: {
+      // Бічна панель
+      sidebar: {
+        premiumSharpeners: 'Преміальні точила',
+        latestProduct: 'Останній продукт',
+        onThisPage: 'На цій сторінці',
+      },
+
+      // Навігаційне меню (AboutLayout Sidebar)
+      menu: {
+        aboutUs: 'Про нас',
+        sharpeners: 'Точила',
+        grindingStones: 'Заточувальні камені',
+        accessories: 'Аксесуари',
+        delivery: 'Доставка',
+      },
+
+      // Навігація Previous/Next
+      nav: {
+        previous: 'Попередня',
+        next: 'Наступна',
+        guide: 'Посібник зі співпраці', // Contribution Guide
+        aboutUs: 'Про нас',
+        sharpeners: 'Точила',
+        grindingStones: 'Заточувальні камені',
+        accessories: 'Аксесуари',
+        delivery: 'Доставка',
+      },
+
+      // Заголовки розділів (для "On this page")
+      sections: {
+        // /about
+        background: 'Наша історія',
+        values: 'Наші цінності',
+        manufacturing: 'Виробництво',
+        services: 'Послуги MadEdge',
+        events: 'Майбутні події',
+
+        // /about/sharpeners
+        model1: 'MadEdge Модель 1',
+        digitalAngle: 'Вимірювання кута',
+        model2: 'MadEdge Модель 2',
+        convexBlades: 'Для вигнутих лез',
+
+        // /about/grindingstones
+        diamondStones: 'Алмазні камені',
+        oxideStones: 'Камені з оксиду алюмінію',
+        stoneComparison: 'Порівняння каменів',
+        stoneUsage: 'Посібник з використання',
+        stoneCare: 'Догляд та обслуговування',
+
+        // /about/accessories
+        rotaryMechanism: 'Поворотний механізм',
+        tableMount: 'Кріплення до столу',
+        hingeRestHook: 'Шарнір із гачком',
+        clampFullFlat: 'Затискач для плоских лез',
+        adapterChisels: 'Адаптер для зубил',
+        adapterClamps: 'Адаптер для затискачів',
+        hingeConvex: 'Шарнір для вигнутих лез',
+        fineTuning: 'Адаптер для точного налаштування',
+
+        // /about/delivery
+        policy: 'Політика доставки',
+        calculator: 'Калькулятор вартості',
+        returnsWarranty: 'Повернення та Гарантія',
+      },
+
+      // Форма відгуку
+      feedback: {
+        title: 'Ця інформація була корисною?',
+        placeholder: 'Ваш відгук...',
+        supported: 'підтримується', // 'M↓ supported'
+        send: 'Надіслати',
+      },
+    },
+    SharpenersPage: {
+      hero: {
+        title: 'Точила MadEdge',
+        subtitle:
+          'Відкрийте для себе повну лінійку наших професійних інструментів для заточування, розроблених для точності, довговічності та комфорту. Кожна модель створена для певної мети — від художників до промислових майстрів.',
+      },
+
+      // --- Model 1 ---
+      model1: {
+        title: 'MadEdge Модель 1',
+        description:
+          'Модульне точило з поворотним механізмом, заснованим на передовій технології обертових затискачів. - Затискачі виготовлені зі сталі (не алюміній). - Усі деталі поворотного механізму сталеві; тертьові поверхні загартовані до 900HV. - Система MadEdge містить сферичну гайку для компенсації перекосу гвинта на тонких ножах. - Компенсація зносу можлива лише в системі MadEdge. - Антифрикційна бронзова втулка в шарнірі забезпечує плавний рух каменю. - Рукоятка тримача для каменю виготовлена з мореного дуба. - Мінімальний кут заточування: 10° на сторону. - Сумісний з ножами, ножицями та зубилами. - Кути заточування від 10° до 40° на сторону. - Камені фіксуються від 12 мм шириною і до 220 мм довжиною. - Сумісний як з бланковими, так і зі стандартними каменями. - Точність поворотного механізму: 0.2°.',
+        imageAlt: 'MadEdge Модель 1 - Класичне точило',
+        feature1: 'Ідеально підходить для графітних та вугільних олівців',
+        feature2: 'Нековзка основа з магнітною кришкою для стружки',
+        feature3: 'Ручна роторна система з прецизійним редуктором',
+        price: '149.99 $',
+      },
+
+      // --- Digital Model ---
+      digital: {
+        title: 'MadEdge з цифровим вимірюванням кута заточування',
+        // Використовуємо t.raw через boding (**built-in digital angle display**)
+        description:
+          'Тільки у нас! MadEdge з інтегрованим цифровим вимірюванням кута заточування. Ця конфігурація дозволяє уникнути встановлення додаткової маси на затискну раму та додаткового тиску на заточувальний камінь. Поєднуючи сучасні технології з традиційною інженерією, ця модель містить **вбудований цифровий дисплей кута** для точного заточування кожного разу. Ідеально підходить для професіоналів, які вимагають точності.',
+        imageAlt: 'MadEdge Модель з цифровим вимірюванням кута',
+        feature1: 'Цифровий РК-індикатор кута (точність ±0.1°)',
+        feature2: 'Система живлення з можливістю перезарядки через USB-C',
+        feature3: 'Розумна функція автостопу для послідовних результатів',
+        price: '89.99 $',
+      },
+
+      // --- Model 2 ---
+      model2: {
+        title: 'MadEdge Модель 2',
+        description:
+          'На відміну від Моделі 1, вона має додаткову пару затискачів, закріплених по центру. Всі деталі виготовлені зі сталі, без алюмінію. Поверхні тертя загартовані до твердості 900HV. Затискачі оснащені сферичною гайкою для компенсації перекосу гвинта при закріпленні тонких ножів. Крім того, у випадку зносу різьблення в затискачах необхідно замінити лише гайку і гвинт, а не весь дорогий затискач. Деталі покриті полімерним зносостійким покриттям, яке використовується для автомобільних коліс. Присутній механізм регулювання зносу посадкових місць поворотного механізму. Напрямна термічно оброблена до твердості 60HRC; для плавності руху ковзання здійснюється по підшипнику. Шарнір має розширені кути повороту, що забезпечує комфортне заточування довгих ножів. Тримач каменю має підкладку, що дозволяє використовувати камені як з бланком, так і без нього. Основа спирається на 3 точки, що забезпечує стійкість точила на будь-якій поверхні.',
+        imageAlt: 'MadEdge Модель 2 - Професійне точило',
+        feature1: 'Посилений керамічний заточувальний круг',
+        feature2: 'Регульований опір заточуванню',
+        feature3: 'Безшумний режим роботи',
+        price: '69.99 $',
+      },
+
+      // --- Convex ---
+      convex: {
+        title: 'MadEdge для вигнутих лез',
+        description:
+          '1. Затискачі виготовлені зі сталі, не алюмінію. 2. Усі деталі поворотного механізму також виготовлені зі сталі, а не з бронзи та алюмінію. Поверхні тертя загартовані до твердості 740HV. 3. Тільки в системі MadEdge затискачі мають сферичну гайку для компенсації перекосу гвинта при кріпленні тонких ножів. 4. Тільки в системі MadEdge можлива компенсація зносу поворотного механізму. 5. В шарнір ковзаючого вузла запресована антифрикційна бронзова втулка, яка забезпечує підвищену плавність руху каменю. 6. Рукоятка тримача для каменю виготовлена з мореного дуба. 7. Мінімальний кут заточування — 12 градусів на сторону.',
+        imageAlt: 'MadEdge Convex - Спеціалізоване точило для вигнутих лез',
+        feature1: 'Система корекції подвійної фаски',
+        feature2: 'Підтримує кути кромки 15°–45°',
+        feature3: 'Антиблікова поверхня з регульованою рукояткою',
+        proTipStrong: 'Професійна порада:',
+        proTipText:
+          ' Для кращого заточування вигнутих лез обертайте лезо обережно, зберігаючи рівномірний тиск протягом усього ходу.',
+        price: '79.99 $',
+      },
+    },
+    GrindingStonesPage: {
+      hero: {
+        title: 'Заточувальні камені',
+        subtitle:
+          'Професійні камені для точної реставрації ріжучої кромки. Оберіть між брусками з алмазним покриттям для надзвичайної довговічності або камінням з оксиду алюмінію для традиційної якості заточування.',
+      },
+
+      // --- Diamond Stones ---
+      diamond: {
+        tag: 'ПРЕМІУМ',
+        title: 'Алмазні камені',
+        description:
+          'Набір із чотирьох високоточних алмазних каменів з моношаровою металевою зв’язкою. Алмази рівномірно розподілені по всьому об’єму, що забезпечує стабільну якість заточування та виняткову довговічність.',
+        specsTitle: 'Технічні характеристики',
+        specTypeLabel: 'Тип',
+        specTypeValue: 'Моношарова металева зв’язка з алмазами',
+        specSizeLabel: 'Розмір',
+        specSizeValue: '150 × 25 × 3 мм',
+        specMaterialLabel: 'Матеріал',
+        specMaterialValue: 'Мідно-олов’яна зв’язка',
+        specConcLabel: 'Концентрація алмазів',
+        specConcValue: '100%',
+        specToleranceLabel: 'Допуск',
+        specToleranceValue: '±0.1 мм',
+        imageAlt: 'Набір алмазних каменів MadEdge',
+        feature1: 'Надміцне алмазне покриття',
+        feature2: 'Підходить для твердосплавної та загартованої сталі',
+        feature3: 'Ідеально для промислового та прецизійного використання',
+        price: '$84.99',
+        priceNote: 'Включено набір із 4 каменів',
+      },
+
+      // --- Aluminum Oxide Stones ---
+      oxide: {
+        tag: 'ТРАДИЦІЙНИЙ',
+        title: 'Заточувальні камені з оксиду алюмінію',
+        description:
+          'Преміальні камені з оксиду алюмінію, розроблені для універсального застосування. Чотири різні рівні зернистості забезпечують повний цикл — від початкового формування до тонкого полірування.',
+        specsTitle: 'Технічні характеристики',
+        specSizeLabel: 'Розмір',
+        specSizeValue: '160 × 25 × 6 мм',
+        specMaterialLabel: 'Матеріал',
+        specMaterialValue: 'Оксид алюмінію',
+        specGritLabel: 'Варіанти зернистості',
+        specGritValue: '200 / 400 / 800 / 1500',
+        specShapeLabel: 'Форма',
+        specShapeValue: 'Прямокутний брусок',
+        imageAlt: 'Заточувальні камені з оксиду алюмінію MadEdge',
+        feature1: 'Чотири рівні зернистості: 200 / 400 / 800 / 1500',
+        feature2: 'Заточування на водній основі (замочити перед використанням)',
+        feature3: 'Ідеально для кухонних ножів та столярних інструментів',
+        price: '$36.99',
+        priceNote: 'Включено набір із 4 каменів',
+      },
+
+      // --- Comparison Table ---
+      comparison: {
+        title: 'Порівняння каменів',
+        feature: 'Характеристика',
+        diamondStonesTitle: 'Алмазні камені',
+        aluminumOxideTitle: 'Оксид алюмінію',
+        material: 'Матеріал',
+        materialDiamond: 'Алмаз + Мідно-олов’яна зв’язка',
+        materialOxide: 'Оксид алюмінію',
+        size: 'Розмір (мм)',
+        gritRange: 'Діапазон зернистості',
+        gritRangeDiamond: 'Різний (4 камені)',
+        gritRangeOxide: '200 / 400 / 800 / 1500',
+        durability: 'Довговічність',
+        durabilityDiamond: 'Надзвичайна',
+        durabilityOxide: 'Висока',
+        bestFor: 'Найкраще для',
+        bestForDiamond: 'Промислові, твердосплавні',
+        bestForOxide: 'Загального призначення',
+        price: 'Ціна',
+      },
+
+      // --- Usage Guide ---
+      usageGuide: {
+        title: 'Як користуватися заточувальними каменями',
+        step1: {
+          heading: 'Підготуйте камінь',
+          text: 'Для каменів з оксиду алюмінію замочіть у воді на 10 хвилин. Алмазні камені можна використовувати сухими або з легкою олією.',
+        },
+        step2: {
+          heading: 'Встановіть кут',
+          text: 'Дотримуйтесь постійного кута: 15–20° для ножів, 25–30° для інструментів.',
+        },
+        step3: {
+          heading: 'Почніть із грубої зернистості',
+          text: 'Почніть із зернистості 200–400, щоб сформувати край.',
+        },
+        step4: {
+          heading: 'Послідовно збільшуйте зернистість',
+          text: 'Переходьте до дрібнішої зернистості: 400 → 800 → 1500 для полірованого краю.',
+        },
+        step5: {
+          heading: 'Використовуйте плавні рухи',
+          text: 'Прикладайте рівномірний тиск по всій довжині леза.',
+        },
+        step6: {
+          heading: 'Очистіть та зберігайте',
+          text: 'Промийте камені з оксиду алюмінію, витріть алмазні камені.',
+        },
+      },
+
+      // --- Care Instructions ---
+      care: {
+        title: 'Догляд та обслуговування каменів',
+        diamondTitle: 'Алмазні камені',
+        diamond1: 'Можна використовувати сухими або з легкою олією',
+        diamond2: 'Чистити м’якою щіткою та водою',
+        diamond3: 'Не вимагають вирівнювання',
+        diamond4: 'Зберігати в захисному чохлі, коли не використовуються',
+        oxideTitle: 'Камені з оксиду алюмінію',
+        oxide1: 'Замочувати у воді перед використанням (10 хвилин)',
+        oxide2: 'Чистити лише водою, без мила',
+        oxide3: 'Періодично вирівнювати поверхню вирівнювальним каменем',
+        oxide4: 'Повністю висушити перед зберіганням',
+      },
+    },
+    DeliveryPage: {
+      hero: {
+        title: 'Доставка та Відправлення',
+        subtitle:
+          'Дізнайтеся орієнтовну вартість доставки та терміни для вашого регіону. Ціни залежать від місця призначення та обраного рівня обслуговування.',
+      },
+      policy: {
+        title: 'Політика міжнародної доставки',
+        intro:
+          "MadEdge здійснює доставку по всьому світу. У зв'язку з різницею в логістичних мережах та місцевих митних правилах, вартість і терміни доставки розраховуються динамічно на основі країни призначення, штату/провінції та обраного перевізника.",
+        keyTitle: 'Ключова інформація:',
+        key1Strong: 'Безкоштовна доставка',
+        key1Text: 'Стандартна доставка в Україну є **БЕЗКОШТОВНОЮ**.',
+        key2Strong: 'Доплата за віддалений район',
+        key2Text:
+          'Застосовується до відправлень у віддалені або острівні місця. Оберіть або введіть назву віддаленого регіону, щоб побачити доплату.',
+        key3Strong: 'Мито та збори',
+        key3Text:
+          'Покупець несе відповідальність за всі імпортні мита та податки, що стягуються країною призначення.',
+      },
+      calculator: {
+        title: 'Калькулятор вартості доставки',
+        intro:
+          'Використовуйте форму пошуку нижче, щоб швидко знайти вашу країну та бажану службу.',
+        labelCountry: 'Оберіть країну:',
+        placeholderCountry: 'Введіть назву країни...',
+        labelState: 'Штат / Місто (Опціонально):',
+        placeholderStateUA: 'Не застосовується для України',
+        placeholderStateDefault: 'Оберіть штат або Місто',
+        labelService: 'Служба доставки:',
+        surchargeNoteStrong: 'ПРИМІТКА',
+        surchargeNoteText:
+          'Через віддаленість регіону до цієї ціни додано $20 доплати.',
+        resultsTitle: 'Орієнтовні варіанти для {country}:',
+        resultsLoading: 'Розраховуємо найкращий маршрут...',
+        resultsTime: 'Час',
+        resultsFree: 'БЕЗКОШТОВНО',
+        resultsNA: 'Н/Д',
+        resultsApproxPrice: 'Прибл. ціна',
+        resultsNoOptions:
+          'Немає конкретних варіантів доставки для обраних критеріїв. За замовчуванням відображаються варіанти "Інші країни світу".',
+      },
+      returns: {
+        title: 'Повернення, обмін та гарантія',
+        intro:
+          'Ми підтримуємо якість продукції MadEdge. Ознайомтеся з нашою політикою щодо повернення, обміну та гарантійних претензій на товари, отримані поштою.',
+        returnTitle: '30-денне повернення',
+        returnText:
+          'Ви можете повернути більшість нових, нерозпакованих товарів протягом **30 днів з моменту доставки** для повного відшкодування. Товари повинні бути повернуті в оригінальній упаковці. Витрати на зворотну доставку несе клієнт, за винятком випадків пошкодження.',
+        warrantyTitle: '10-річна гарантія',
+        warrantyText:
+          'Усі системи заточування MadEdge покриваються нашою **10-річною гарантією виробника** на дефекти матеріалів та виготовлення. Це не стосується нормального зносу витратних частин, таких як заточувальні камені.',
+        lostTitle: 'Втрачене відправлення',
+        lostText:
+          "Якщо інформація про відстеження не оновлюється понад 15 робочих днів, будь ласка, **зв'яжіться з нашою командою підтримки**. Ми подамо претензію перевізнику та надішлемо замінний пристрій, якщо посилка буде підтверджена як втрачена.",
+      },
+    },
+    AccessoriesPage: {
+      heroTitle: 'Аксесуари',
+      heroSubtitle:
+        'Ознайомтеся з детальними характеристиками та особливостями наших професійних аксесуарів, розроблених для розширення універсальності, точності та продуктивності вашої системи заточування MadEdge.',
+
+      itemPrice: 'Ціна',
+      itemFeaturesTitle: 'Ключові особливості',
+      itemDetailsTitle: 'Технічні характеристики та примітки',
+
+      // --- Масив даних для аксесуарів ---
+      accessoriesData: [
+        {
+          id: 'rotary-mechanism',
+          name: 'Поворотний механізм MadEdge Модель 1',
+          price: 80,
+          imageSrc: '/images/rotarymechanism-1.jpg',
+          features: [
+            'Дві симетричні фіксовані поворотні позиції для стабільного налаштування.',
+            'Легке обертання завдяки потужній пружині, що усуває необхідність тягнути механізм.',
+            'Регулювальна гайка для зміни сили стиснення пружини.',
+            'Усі частини, що труться, виготовлені з **загартованої сталі** для максимального терміну служби.',
+            'Зносостійке полімерне покриття (схоже на автомобільні колеса).',
+          ],
+          details: [
+            'Довжина поворотної рами: 200 мм.',
+            'Затискні губки з **термообробленої сталі** з нахилом 8 градусів на бік.',
+            'Підтримує кути заточування до 12 градусів на бік.',
+            'Сферична гайка у затискачах компенсує невідповідність гвинта при роботі з тонкими ножами.',
+            'Мінімальна довжина леза для двох затискачів: ~80 мм.',
+          ],
+        },
+        {
+          id: 'table-mount',
+          name: 'Кріплення до столу',
+          price: 16,
+          imageSrc: '/images/tablemount-1.jpg',
+          features: [
+            'Забезпечує **стабільну та надійну** основу для системи заточування.',
+            'Призначене для міцного затискання системи MadEdge до будь-якої горизонтальної поверхні.',
+          ],
+          details: [
+            'Забезпечує максимальну жорсткість та мінімізує вібрацію під час роботи.',
+          ],
+        },
+        {
+          id: 'hinge-rest-hook',
+          name: 'Шарнір з гачком-обмежувачем',
+          price: 10,
+          imageSrc: '/images/hinge-1.jpg',
+          features: [
+            'Діаметр отвору: 8 мм.',
+            'Оснащений **впресованою втулкою** з антифрикційної бронзи.',
+          ],
+          details: [
+            'Бронзова втулка гарантує **підвищену плавність** руху, що має вирішальне значення для сталості кута.',
+          ],
+        },
+        {
+          id: 'clamp-full-flat',
+          name: 'Затискач MadEdge для клинків "Full Flat"',
+          price: 23, // Ціна за штуку
+          imageSrc: '/images/adapterclamps-1.jpg',
+          features: [
+            'Виготовлений із **термообробленої пружинної сталі** для оптимальної міцності та фіксації.',
+            'Спеціально розроблений для надійної фіксації ножів із **прямими спусками від обуха (full flat grind)**.',
+          ],
+          details: [
+            'Забезпечує рівномірний тиск та запобігає пошкодженню леза.',
+            'Вказана ціна за 1 шт. Пара затискачів коштує $46.',
+          ],
+        },
+        {
+          id: 'adapter-flat-chisels',
+          name: 'Адаптер для заточування плоских стамесок',
+          price: 13,
+          imageSrc: '/images/adaptersharp-1.jpg',
+          features: [
+            'Розширює можливості системи MadEdge для роботи з плоскими стамесками.',
+            'Забезпечує необхідну **жорстку та пряму фіксацію** для заточування.',
+          ],
+          details: ['Дозволяє високоточно заточувати неножові інструменти.'],
+        },
+        {
+          id: 'adapter-for-clamps',
+          name: 'Адаптер центрального затискача',
+          price: 10,
+          imageSrc: '/images/clamp-2.jpg',
+          features: [
+            'Дозволяє ближче розташувати затискачі для **заточування коротких лез**.',
+            'Забезпечує жорстку фіксацію навіть при мінімальній відстані між затискачами.',
+          ],
+          details: ['Примітка: Адаптер продається без затискачів.'],
+        },
+        {
+          id: 'hinge-convex',
+          name: 'Шарнір для опуклого заточування (Convex)',
+          price: 9,
+          imageSrc: '/images/hingeconvex-1.jpg',
+          features: [
+            'Спеціалізований шарнір для заточування ножів з **опуклою (лінзовидною) кромкою**.',
+            'Дозволяє контрольований рух, необхідний для досягнення ідеального Convex-профілю.',
+          ],
+          details: ['Всі деталі виготовлені з міцної сталі.'],
+        },
+        {
+          id: 'fine-turning-adapter',
+          name: 'Адаптер для точного налаштування',
+          price: 4,
+          imageSrc: '/images/fineadapter-1.jpg',
+          features: [
+            'Простий інструмент для **точного регулювання та підтримки** кута заточування.',
+            'Діаметр отвору: 8 мм.',
+          ],
+          details: [
+            'Ключовий елемент для досягнення мікро-фасок та фінальної точності заточування.',
+          ],
+        },
+      ],
+
+      // --- Блок автентичності ---
+      authenticity: {
+        title: 'Гарантія автентичності',
+        text: 'У <strong >MadEdge</strong> ми гарантуємо, що всі продукти та аксесуари, перераховані тут, є <strong >100% оригінальними, власними розробками</strong>. Ми прагнемо виготовляти інструменти найвищої якості, використовуючи наші ексклюзивні матеріали та інженерні процеси. Обираючи MadEdge, ви інвестуєте в <strong >автентичну, високоточну систему заточування</strong>, створену для надійності та продуктивності. Ми не продаємо копії або імітації від третіх сторін.',
+      },
+    },
   },
   en: {
     Main: {
@@ -306,7 +968,7 @@ export const translations = {
       heroSubtitle:
         'Discover the best sharpeners for your knives. Shop now and enjoy exclusive deals with premium quality guaranteed!',
       shop: 'Shop',
-      about: 'About',
+      about: 'Blog',
     },
     Info: {
       infoTitle: "What's MadEdge?",
@@ -323,6 +985,17 @@ export const translations = {
       needHelpTitle: 'Need Help?',
       needHelpText:
         'We are available 24/7 to answer any questions you may have. Send us a message anytime and get a quick response from our support team.',
+    },
+    CardCarousel: {
+      titleGrindingStones: 'Grinding Stones',
+      descGrindingStones:
+        'High-quality grinding stones designed for precision sharpening.',
+      titleSharpeners: 'Sharpeners',
+      descSharpeners: 'Professional sharpeners for blades, tools, and knives.',
+      titleAccessories: 'Accessories',
+      descAccessories:
+        'Essential accessories to complement your sharpening setup.',
+      viewCategory: 'View {title}',
     },
     Product: {
       productComparisonTitle: 'Product Comparison',
@@ -472,7 +1145,7 @@ export const translations = {
       footerKnifeSharpeners: 'Knife Sharpeners',
       footerWhetstones: 'Grinding Stones',
       footerAccessories: 'Accessories',
-      footerAboutUs: 'About us',
+      footerAboutUs: 'Blog',
       footerOurBackground: 'Our Background',
       footerOurValues: 'Our Values',
       footerManufacturing: 'Manufacturing',
@@ -541,7 +1214,7 @@ export const translations = {
       navigation: {
         home: 'Home',
         shop: 'Shop',
-        about: 'About',
+        about: 'Blog',
         contact: 'Contact',
       },
       quickAccess: {
@@ -572,6 +1245,64 @@ export const translations = {
         copyright: '© 2024 MadEdge. All rights reserved.',
       },
     },
+    Shop: {
+      // Секція завантаження та помилок
+      loadingProducts: 'Loading products...',
+      noProductsFound: 'No products found in this category',
+      viewAllProducts: 'View All Products',
+
+      // HERO
+      heroTitle: 'MadEdge Shop',
+      heroSubtitle: 'Choose your ideal sharpener, stone, or accessory',
+
+      // Кнопки фільтрації
+      grindingStones: 'Grinding Stones',
+      knifeSharpeners: 'Knife Sharpeners',
+      accessories: 'Accessories',
+      allProducts: 'All Products',
+
+      // Картка товару (ProductCard)
+      priceUnit: '$', // Can be used as a price suffix
+      placeholderImageAlt: 'Placeholder product image',
+    },
+    ProductPage: {
+      loading: 'Loading...',
+      errorLoading: 'Error loading product',
+      notFound: 'Product not found',
+      backToShop: 'Back to shop',
+      backToShopButton: '← Back to shop',
+      quantityLabel: 'Quantity:',
+      addToCart: 'Add to Cart',
+      addToCartSuccess: 'Product added to cart',
+      addToWishlist: 'Add to Wishlist',
+      categoryLabel: 'Category:',
+      imageAltPrefix: 'Image',
+    },
+    Profile: {
+      loading: 'Loading...',
+      title: 'Profile',
+      emailLabel: 'Email:',
+      fullNameLabel: 'Full Name:',
+      phoneLabel: 'Phone:',
+    },
+    Order: {
+      emptyCart: 'Your cart is empty',
+      title: 'Checkout',
+      totalLabel: 'Total:',
+      paymentMethodLabel: 'Payment Method:',
+      payButton: 'Pay',
+      paymentError: 'Error creating payment',
+      priceUnit: '$',
+    },
+    CartSheet: {
+      title: 'Your Cart',
+      emptyMessage: 'Your cart is empty',
+      goToShop: 'Go to shop',
+      totalLabel: 'Total:',
+      checkoutButton: 'Checkout',
+      priceUnit: '$',
+      placeholderAlt: 'Placeholder product image',
+    },
     Contacts: {
       contactTitle: 'Contact Us',
       contactSubtitle: 'Reach out to us for any questions or inquiries',
@@ -598,6 +1329,600 @@ export const translations = {
       formMessageLabel: 'Message',
       formMessagePlaceholder: 'Tell us more about your inquiry...',
       formSubmit: 'Send Message',
+    },
+    AboutPage: {
+      // Hero
+      title: 'About Us',
+      subtitle:
+        'Welcome to MadEdge — where precision meets innovation in the world of sharpening solutions.',
+
+      // Our Background
+      backgroundTitle: 'Our Background',
+      backgroundText1:
+        'Founded in **2010**, MadEdge emerged from a simple observation: artists, craftsmen, and professionals deserved better tools to maintain their instruments. What started as a small workshop in Portland has grown into a leading manufacturer of premium sharpening solutions used by professionals worldwide.',
+      journeySubtitle: 'The Journey',
+      journeyText:
+        'Our founder, **Marcus Davidson**, a former industrial designer, noticed the frustration artists faced with conventional sharpeners. He spent three years researching metallurgy, blade geometry, and ergonomics to create the first MadEdge prototype. That prototype evolved into our flagship ProEdge series, now trusted by over **100,000 professionals** globally.',
+      milestonesSubtitle: 'Milestones',
+      milestone2010: 'Company founded in Portland, Oregon',
+      milestone2013: 'First ProEdge model launched',
+      milestone2017: 'Expanded to international markets',
+      milestone2021: 'Introduced sustainable manufacturing practices',
+      milestone2024: 'Reached 100,000+ customers worldwide',
+
+      // Our Values
+      valuesTitle: 'Our Core Values',
+
+      valuePrecisionTitle: 'Precision',
+      valuePrecisionText:
+        'Every MadEdge product is engineered to **micron-level accuracy**. We believe that true craftsmanship begins with the right tools, maintained to perfection.',
+
+      valueSustainabilityTitle: 'Sustainability',
+      valueSustainabilityText:
+        'Our commitment to the environment drives us to use **recycled materials** and minimize waste in every stage of production.',
+
+      valueInnovationTitle: 'Innovation',
+      valueInnovationText:
+        'We continuously invest in R&D to develop **cutting-edge sharpening** technologies that make maintenance easier and more effective.',
+
+      valueCustomerFocusTitle: 'Customer Focus',
+      valueCustomerFocusText:
+        'Your satisfaction is our priority. We offer **lifetime support** and a 10-year warranty on all our products.',
+
+      // Manufacturing
+      manufacturingTitle: 'Manufacturing',
+      manufacturingText:
+        'Our state-of-the-art facility in Portland combines **traditional craftsmanship with modern automation**. Every sharpener goes through rigorous quality control before reaching your hands.',
+      productionProcessSubtitle: 'Production Process',
+
+      step1Title: '1. Material Selection',
+      step1Text:
+        'We source premium tungsten carbide and ceramic materials from certified suppliers.',
+
+      step2Title: '2. Precision Machining',
+      step2Text:
+        'CNC machines craft each component to exact specifications with **0.001mm tolerance**.',
+
+      step3Title: '3. Assembly',
+      step3Text:
+        'Skilled technicians hand-assemble each unit, ensuring perfect alignment and functionality.',
+
+      step4Title: '4. Quality Testing',
+      step4Text:
+        'Every sharpener undergoes **50+ quality checks** including blade angle verification and durability testing.',
+
+      step5Title: '5. Packaging',
+      step5Text:
+        'Products are packaged in **eco-friendly materials** with comprehensive user guides.',
+
+      sustainabilitySubtitle: 'Sustainability Initiatives',
+      sustainabilityText:
+        "Our manufacturing facility runs on **100% renewable energy** and we've achieved **zero waste to landfill** status since 2022. We use recycled aluminum for our casings and biodegradable packaging materials.",
+
+      // MadEdge Services
+      servicesTitle: 'MadEdge Services',
+      servicesText:
+        'Beyond manufacturing exceptional products, we offer comprehensive services to ensure you get the most from your MadEdge sharpener.',
+      howToUseSubtitle: 'How to Use Your MadEdge Sharpener',
+      instructionsTitle: 'Step-by-Step Instructions:',
+
+      inst1Title: '1. Preparation',
+      inst1Text:
+        'Place the sharpener on a flat, stable surface. Ensure the blade slot is clean and free of debris.',
+
+      inst2Title: '2. Insert the Pencil',
+      inst2Text:
+        "Hold the pencil at a 23-degree angle (the sharpener's guide will help) and insert it gently into the opening.",
+
+      inst3Title: '3. Rotate Smoothly',
+      inst3Text:
+        'Turn the pencil clockwise 3-5 times with gentle, consistent pressure. The sharpener will guide the optimal angle automatically.',
+
+      inst4Title: '4. Check the Point',
+      inst4Text:
+        'Remove the pencil and inspect. For a finer point, repeat step 3 for 2-3 more rotations.',
+
+      inst5Title: '5. Clean Regularly',
+      inst5Text:
+        'Empty the shavings reservoir after every 10-15 uses. Wipe the blade opening with a soft cloth monthly.',
+
+      proTipStrong: 'Pro Tip:',
+      proTipText:
+        'For colored pencils, use slightly less pressure and more rotations for best results. For graphite pencils, standard pressure works perfectly.',
+
+      additionalServicesSubtitle: 'Additional Services',
+
+      serviceMaintenanceTitle: 'Maintenance & Repair',
+      serviceMaintenanceText:
+        'Free blade replacement for the first year. Lifetime repair service available at cost.',
+
+      serviceEngravingTitle: 'Custom Engraving',
+      serviceEngravingText:
+        'Personalize your MadEdge with custom engraving for corporate gifts or personal use.',
+
+      serviceWorkshopsTitle: 'Educational Workshops',
+      serviceWorkshopsText:
+        'Free monthly online workshops on tool maintenance and optimal sharpening techniques.',
+
+      serviceBulkOrdersTitle: 'Bulk Orders',
+      serviceBulkOrdersText:
+        'Special pricing and customization options for schools, studios, and corporations.',
+
+      // Upcoming Events
+      eventsTitle: 'Upcoming Events',
+      eventsText:
+        'Join us at these upcoming events to experience MadEdge products firsthand and meet our team.',
+
+      expoTitle: 'International Art Supply Expo',
+      expoLocation: 'Chicago, IL',
+      expoDesc:
+        'Visit our booth #A-245 to see live demonstrations of the new ProEdge X2 and participate in our daily raffles.',
+      expoDate: 'November 15-17, 2025',
+      expoVenue: 'McCormick Place',
+
+      factoryTourTitle: 'MadEdge Factory Tour',
+      factoryTourLocation: 'Portland, OR',
+      factoryTourDesc:
+        'Get an exclusive behind-the-scenes look at our manufacturing process. Tours are limited to 20 participants. Registration required.',
+      factoryTourDate: 'December 5, 2025',
+      factoryTourVenue: 'MadEdge Headquarters',
+
+      artistWorkshopTitle: 'Professional Artist Workshop Series',
+      artistWorkshopLocation: 'Online Event',
+      artistWorkshopDesc:
+        'Monthly online workshops featuring professional artists sharing their techniques and tool maintenance tips. Free for MadEdge customers.',
+      artistWorkshopDate: 'First Saturday of Each Month',
+      artistWorkshopVenue: 'Zoom',
+
+      newProductTitle: 'New Product Launch Event',
+      newProductLocation: 'New York, NY',
+      newProductDesc:
+        'Be the first to see and try our revolutionary new sharpening system. Special early-bird pricing available for event attendees.',
+      newProductDate: 'January 20, 2026',
+      newProductVenue: 'Venue TBD',
+
+      stayUpdatedTitle: 'Stay Updated',
+      stayUpdatedText:
+        'Subscribe to our newsletter to receive notifications about new events, product launches, and exclusive offers.',
+      subscribeButton: 'Subscribe Now',
+    },
+    AboutLayout: {
+      // Sidebar
+      sidebar: {
+        premiumSharpeners: 'Premium Sharpeners',
+        latestProduct: 'Latest Product',
+        onThisPage: 'On this page',
+      },
+
+      // Navigation Menu (AboutLayout Sidebar)
+      menu: {
+        aboutUs: 'About us',
+        sharpeners: 'Sharpeners',
+        grindingStones: 'Grinding Stones',
+        accessories: 'Accessories',
+        delivery: 'Delivery',
+      },
+
+      // Previous/Next Navigation
+      nav: {
+        previous: 'Previous',
+        next: 'Next',
+        guide: 'Contribution Guide',
+        aboutUs: 'About Us',
+        sharpeners: 'Sharpeners',
+        grindingStones: 'Grinding Stones',
+        accessories: 'Accessories',
+        delivery: 'Delivery',
+      },
+
+      // Section Headings (for "On this page")
+      sections: {
+        // /about
+        background: 'Our Background',
+        values: 'Our Values',
+        manufacturing: 'Manufacturing',
+        services: 'MadEdge Services',
+        events: 'Upcoming Events',
+
+        // /about/sharpeners
+        model1: 'MadEdge Model 1',
+        digitalAngle: 'Digital Angle Measurement',
+        model2: 'MadEdge Model 2',
+        convexBlades: 'MadEdge for Convex Blades',
+
+        // /about/grindingstones
+        diamondStones: 'Diamond Stones',
+        oxideStones: 'Aluminum Oxide Stones',
+        stoneComparison: 'Stone Comparison',
+        stoneUsage: 'How to Use',
+        stoneCare: 'Care & Maintenance',
+
+        // /about/accessories
+        rotaryMechanism: 'Rotary Mechanism',
+        tableMount: 'Table Mount',
+        hingeRestHook: 'Hinge with Rest Hook',
+        clampFullFlat: 'Clamp for Full Flat',
+        adapterChisels: 'Adapter for Chisels',
+        adapterClamps: 'Adapter for Clamps',
+        hingeConvex: 'Hinge for Convex',
+        fineTuning: 'Fine-Tuning Adapter',
+
+        // /about/delivery
+        policy: 'Delivery Policy',
+        calculator: 'Cost Calculator',
+        returnsWarranty: 'Returns, Exchanges, and Warranty',
+      },
+
+      // Feedback Form
+      feedback: {
+        title: 'Was this helpful?',
+        placeholder: 'Your feedback...',
+        supported: 'supported', // 'M↓ supported'
+        send: 'Send',
+      },
+    },
+    SharpenersPage: {
+      hero: {
+        title: 'MadEdge Sharpeners',
+        subtitle:
+          'Discover our full lineup of professional sharpening tools designed for precision, durability, and comfort. Each model is crafted to serve a specific purpose — from artists to industrial craftsmen.',
+      },
+
+      // --- Model 1 ---
+      model1: {
+        title: 'MadEdge Model 1',
+        description:
+          'Modular sharpener with a rotary mechanism based on cutting-edge rotating clamp technology. - Clamps are made of steel (not aluminum). - All parts of the rotary mechanism are steel; rubbing surfaces hardened to 900HV. - MadEdge system includes a spherical nut to compensate for screw skew on thin knives. - Wear compensation is possible only in the MadEdge system. - Antifriction bronze bushing in the hinge ensures smooth stone movement. - Stone holder handle made of stained oak. - Minimum grinding angle: 10° per side. - Compatible with knives, scissors, and chisels. - Sharpening angles from 10° to 40° per side. - Stones fixed from 12 mm width and up to 220 mm length. - Compatible with both blank and standard stones. - Rotary mechanism accuracy: 0.2°.',
+        imageAlt: 'MadEdge Model 1 - Classic pencil sharpener',
+        feature1: 'Ideal for graphite and charcoal pencils',
+        feature2: 'Non-slip base with magnetic dust cover',
+        feature3: 'Manual rotary system with precision gear',
+        price: '$149.99',
+      },
+
+      // --- Digital Model ---
+      digital: {
+        title: 'MadEdge with Digital Sharpening Angle Measurement',
+        description:
+          'Only we have! MadEdge with integrated Digital Sharpening Angle Measurement. This configuration avoids the installation of additional mass on the clamping frame and avoids additional pressure on the grinding stone. Combining modern technology with traditional engineering, this model includes a **built-in digital angle display** for precise sharpening every time. Perfect for professionals who demand accuracy.',
+        imageAlt: 'MadEdge Model with Digital angle measurement',
+        feature1: 'Digital LCD angle indicator (accuracy ±0.1°)',
+        feature2: 'USB-C rechargeable power system',
+        feature3: 'Smart auto-stop for consistent results',
+        price: '$89.99',
+      },
+
+      // --- Model 2 ---
+      model2: {
+        title: 'MadEdge Model 2',
+        description:
+          'Unlike Model1, it has an additional pair of clamps fixed in the center. All parts are made of steel, no aluminum. Friction surfaces are hardened to a hardness of 900HV. The clamps are equipped with a spherical nut to compensate for the misalignment of the screw when securing thin knives. Moreover, in the case of thread wear in the clamps, it is necessary to replace only the nut and screw, and not the entire expensive clamp. Parts are coated with a polymer wear-resistant coating that covers car wheels. There is a mechanism for adjusting the wear of the seats of the rotary mechanism. The guide is heat-treated to a hardness of 60HRC; for smoothness of movement, sliding is carried out along the bearing. The hinge has extended turning angles, which provides a comfortable sharpening of long knives. The stone holder has a substrate, which allows you to use stones with blank and without blank. The base is supported on 3 points, which ensures the stability of the sharpener on any surface.',
+        imageAlt: 'MadEdge Model 2 - Professional sharpener',
+        feature1: 'Reinforced ceramic sharpening wheel',
+        feature2: 'Adjustable sharpening resistance',
+        feature3: 'Silent operation mode',
+        price: '$69.99',
+      },
+
+      // --- Convex ---
+      convex: {
+        title: 'MadEdge for Convex Blades',
+        description:
+          '1. Clamps are made of steel, not aluminum. 2. All parts of the rotary mechanism are also made of steel, and not of bronze and aluminum. Rubbing surfaces are hardened to hardness 740HV. 3. Only in the MadEdge system, the clamps have a spherical nut to compensate for the screw skew when attaching thin knives. 4. Only in the MadEdge system is it possible to compensate for the wear of the turning mechanism. 5. An antifriction bronze bushing is pressed into the hinge of the sliding assembly, which ensures an increased smoothness of the movement of the stone. 6. The handle of the stone holder is made of stained oak. 7. The minimum angle of grinding is 12 degrees per side.',
+        imageAlt: 'MadEdge Convex - Specialist sharpener for convex blades',
+        feature1: 'Dual-bevel correction system',
+        feature2: 'Supports edge angles 15°–45°',
+        feature3: 'Anti-glare surface with adjustable grip',
+        proTipStrong: 'Pro Tip:',
+        proTipText:
+          ' For best convex sharpening, rotate the blade gently while maintaining even pressure throughout the stroke.',
+        price: '$79.99',
+      },
+    },
+    GrindingStonesPage: {
+      hero: {
+        title: 'Grinding Stones',
+        subtitle:
+          'Professional sharpening stones for precision edge restoration. Choose between diamond-embedded bars for extreme durability or aluminum oxide stones for traditional sharpening excellence.',
+      },
+
+      // --- Diamond Stones ---
+      diamond: {
+        tag: 'PREMIUM',
+        title: 'Diamond Stones',
+        description:
+          'Set of four precision-engineered diamond stones with monolayer metal bond. Diamonds evenly distributed throughout the volume ensure consistent sharpening performance and exceptional longevity.',
+        specsTitle: 'Technical Specifications',
+        specTypeLabel: 'Type',
+        specTypeValue: 'Monolayer metal bond with diamonds',
+        specSizeLabel: 'Size',
+        specSizeValue: '150 × 25 × 3 mm',
+        specMaterialLabel: 'Material',
+        specMaterialValue: 'Copper-tin bond',
+        specConcLabel: 'Diamond Concentration',
+        specConcValue: '100%',
+        specToleranceLabel: 'Tolerance',
+        specToleranceValue: '±0.1 mm',
+        imageAlt: 'MadEdge Diamond Stones Set',
+        feature1: 'Ultra-durable diamond coating',
+        feature2: 'Suitable for carbide and hardened steel',
+        feature3: 'Ideal for industrial and precision use',
+        price: '$84.99',
+        priceNote: 'Set of 4 stones included',
+      },
+
+      // --- Aluminum Oxide Stones ---
+      oxide: {
+        tag: 'TRADITIONAL',
+        title: 'Aluminum Oxide Sharpening Stones',
+        description:
+          'Premium aluminum oxide stones designed for versatile sharpening applications. Four different grit levels provide everything from initial shaping to fine polishing.',
+        specsTitle: 'Technical Specifications',
+        specSizeLabel: 'Size',
+        specSizeValue: '160mm × 25mm × 6mm',
+        specMaterialLabel: 'Material',
+        specMaterialValue: 'Aluminum oxide',
+        specGritLabel: 'Grit Options',
+        specGritValue: '200 / 400 / 800 / 1500',
+        specShapeLabel: 'Shape',
+        specShapeValue: 'Rectangular bar',
+        imageAlt: 'MadEdge Aluminum Oxide Sharpening Stones',
+        feature1: 'Four grit levels: 200 / 400 / 800 / 1500',
+        feature2: 'Water-based sharpening (soak before use)',
+        feature3: 'Ideal for kitchen knives and woodworking tools',
+        price: '$36.99',
+        priceNote: 'Set of 4 stones included',
+      },
+
+      // --- Comparison Table ---
+      comparison: {
+        title: 'Stone Comparison',
+        feature: 'Feature',
+        diamondStonesTitle: 'Diamond Stones',
+        aluminumOxideTitle: 'Aluminum Oxide',
+        material: 'Material',
+        materialDiamond: 'Diamond + Copper-tin bond',
+        materialOxide: 'Aluminum oxide',
+        size: 'Size (mm)',
+        gritRange: 'Grit Range',
+        gritRangeDiamond: 'Various (4 stones)',
+        gritRangeOxide: '200 / 400 / 800 / 1500',
+        durability: 'Durability',
+        durabilityDiamond: 'Extreme',
+        durabilityOxide: 'High',
+        bestFor: 'Best For',
+        bestForDiamond: 'Industrial, carbide',
+        bestForOxide: 'General purpose',
+        price: 'Price',
+      },
+
+      // --- Usage Guide ---
+      usageGuide: {
+        title: 'How to Use Sharpening Stones',
+        step1: {
+          heading: 'Prepare the Stone',
+          text: 'For aluminum oxide stones, soak in water for 10 minutes. Diamond stones can be used dry or with light oil.',
+        },
+        step2: {
+          heading: 'Set the Angle',
+          text: 'Maintain consistent angle: 15-20° for knives, 25-30° for tools.',
+        },
+        step3: {
+          heading: 'Start with Coarse Grit',
+          text: 'Begin with 200-400 grit to establish the edge.',
+        },
+        step4: {
+          heading: 'Progress Through Grits',
+          text: 'Move to finer grits: 400 → 800 → 1500 for polished edge.',
+        },
+        step5: {
+          heading: 'Use Smooth Strokes',
+          text: 'Apply even pressure along the entire blade length.',
+        },
+        step6: {
+          heading: 'Clean & Store',
+          text: 'Rinse aluminum oxide stones, wipe diamond stones clean.',
+        },
+      },
+
+      // --- Care Instructions ---
+      care: {
+        title: 'Stone Care & Maintenance',
+        diamondTitle: 'Diamond Stones',
+        diamond1: 'Can be used dry or with light oil',
+        diamond2: 'Clean with soft brush and water',
+        diamond3: 'Do not require flattening',
+        diamond4: 'Store in protective case when not in use',
+        oxideTitle: 'Aluminum Oxide Stones',
+        oxide1: 'Soak in water before use (10 minutes)',
+        oxide2: 'Clean with water only, no soap',
+        oxide3: 'Flatten surface periodically with flattening stone',
+        oxide4: 'Dry completely before storing',
+      },
+    },
+    DeliveryPage: {
+      hero: {
+        title: 'Shipping & Delivery',
+        subtitle:
+          'Find estimated shipping costs and delivery times for your region. Prices vary based on destination and selected service level.',
+      },
+      policy: {
+        title: 'International Delivery Policy',
+        intro:
+          'MadEdge proudly ships worldwide. Due to varying logistics networks and local customs regulations, delivery costs and times are calculated dynamically based on the destination country, state/province, and chosen carrier.',
+        keyTitle: 'Key Information:',
+        key1Strong: 'Free Shipping',
+        key1Text: 'Standard delivery to Ukraine is **FREE**.',
+        key2Strong: 'Remote Area Surcharge',
+        key2Text:
+          'Applied to deliveries in remote or island locations. Select or type a remote region name to see the surcharge.',
+        key3Strong: 'Customs & Duties',
+        key3Text:
+          'Buyer is responsible for all import duties and taxes levied by the destination country.',
+      },
+      calculator: {
+        title: 'Delivery Cost Calculator',
+        intro:
+          'Use the search feature below to quickly find your country and preferred service.',
+        labelCountry: 'Select Country:',
+        placeholderCountry: 'Type country name...',
+        labelState: 'State / Remote Area (Optional):',
+        placeholderStateUA: 'Not applicable for Ukraine',
+        placeholderStateDefault: 'Select state or type a remote region',
+        labelService: 'Delivery Service:',
+        surchargeNoteStrong: 'NOTE',
+        surchargeNoteText:
+          'A $20 remote area surcharge has been applied to this price based on the region entered.',
+        resultsTitle: 'Estimated Options for {country}:',
+        resultsLoading: 'Calculating the best route...',
+        resultsTime: 'Time',
+        resultsFree: 'FREE',
+        resultsNA: 'N/A',
+        resultsApproxPrice: 'Approx. price',
+        resultsNoOptions:
+          'No specific shipping options are available for the selected criteria. Showing Rest of World options by default.',
+      },
+      returns: {
+        title: 'Returns, Exchanges, and Warranty',
+        intro:
+          'We stand by the quality of MadEdge products. Review our policy regarding returns, exchanges, and warranty claims for items received via delivery.',
+        returnTitle: '30-Day Returns',
+        returnText:
+          'You may return most new, unopened items within **30 days of delivery** for a full refund. Items must be returned in their original packaging. Return shipping costs are borne by the customer, except in cases of damage.',
+        warrantyTitle: '10-Year Warranty',
+        warrantyText:
+          'All MadEdge sharpening systems are covered by our **10-year manufacturing warranty** against defects in materials and workmanship. This excludes normal wear and tear of consumable parts like grinding stones.',
+        lostTitle: 'Lost Shipment',
+        lostText:
+          'If your tracking information stalls for more than 15 business days, please **contact our support team**. We will file a claim with the carrier and ship a replacement unit if the package is confirmed lost.',
+      },
+    },
+    AccessoriesPage: {
+      heroTitle: 'Accessories',
+      heroSubtitle:
+        'Explore the detailed specifications and features of our professional accessories, designed to extend the versatility, precision, and performance of your MadEdge sharpening system.',
+
+      itemPrice: 'Price',
+      itemFeaturesTitle: 'Key Features',
+      itemDetailsTitle: 'Technical Specifications & Notes',
+
+      // --- Accessory Data Array ---
+      accessoriesData: [
+        {
+          id: 'rotary-mechanism',
+          name: 'MadEdge Rotary Mechanism Model 1',
+          price: 80,
+          imageSrc: '/images/rotarymechanism-1.jpg',
+          features: [
+            'Dual symmetrical fixed rotary positions for consistent setup.',
+            'Easy rotation despite a powerful spring, eliminating the need to pull the mechanism.',
+            'Adjusting nut to modify spring compression force.',
+            'All rubbing parts are **hardened steel** for maximum service life.',
+            'Wear-resistant polymer coating (similar to car wheels).',
+          ],
+          details: [
+            'Rotary frame length: 200 mm.',
+            'Clamping jaws are **heat-treated steel** with an 8-degree slant per side.',
+            'Supports sharpening angles up to 12 degrees per side.',
+            'Spherical nut in clamps compensates for screw misalignment with thin knives.',
+            'Minimum blade length for two clamps: ~80 mm.',
+          ],
+        },
+        {
+          id: 'table-mount',
+          name: 'Table Mount',
+          price: 16,
+          imageSrc: '/images/tablemount-1.jpg',
+          features: [
+            'Provides a **stable and secure** base for the sharpening system.',
+            'Designed to firmly clamp the MadEdge system to any horizontal surface.',
+          ],
+          details: [
+            'Ensures maximum rigidity and minimizes vibration during operation.',
+          ],
+        },
+        {
+          id: 'hinge-rest-hook',
+          name: 'Hinge with Rest Hook',
+          price: 10,
+          imageSrc: '/images/hinge-1.jpg',
+          features: [
+            'Hole diameter: 8 mm.',
+            'Features a **pressed-in sleeve** made of anti-friction bronze.',
+          ],
+          details: [
+            'The bronze sleeve guarantees **increased smoothness** of movement, crucial for angle consistency.',
+          ],
+        },
+        {
+          id: 'clamp-full-flat',
+          name: 'MadEdge Clamp for Full Flat',
+          price: 23, // Price per piece
+          imageSrc: '/images/adapterclamps-1.jpg',
+          features: [
+            'Made of **heat-treated spring steel** for optimal strength and retention.',
+            'Specifically designed for securely fixing knives with a **full flat grind**.',
+          ],
+          details: [
+            'Ensures even pressure and prevents blade damage.',
+            'Price listed is for 1 pc. A pair of clamps costs $46.',
+          ],
+        },
+        {
+          id: 'adapter-flat-chisels',
+          name: 'Adapter for Sharpening Flat Chisels',
+          price: 13,
+          imageSrc: '/images/adaptersharp-1.jpg',
+          features: [
+            'Expands the MadEdge system capability to include flat chisels.',
+            'Provides the necessary **rigid and straight fixation** for chiseled edges.',
+          ],
+          details: [
+            'Allows non-knife tools to be sharpened with high precision.',
+          ],
+        },
+        {
+          id: 'adapter-for-clamps',
+          name: 'Center Clamp Adapter',
+          price: 10,
+          imageSrc: '/images/clamp-2.jpg',
+          features: [
+            'Enables closer positioning of clamps for **sharpening short blades**.',
+            'Ensures a rigid fixing position even at minimal clamp spacing.',
+          ],
+          details: ['Note: Adapter is sold without clamps.'],
+        },
+        {
+          id: 'hinge-convex',
+          name: 'Hinge for Convex',
+          price: 9,
+          imageSrc: '/images/hingeconvex-1.jpg',
+          features: [
+            'Specialized hinge for sharpening knives with a **convex (lenticular) edge**.',
+            'Allows for the controlled movement necessary to achieve a perfect convex profile.',
+          ],
+          details: ['All parts are constructed from durable steel.'],
+        },
+        {
+          id: 'fine-turning-adapter',
+          name: 'Fine-Tuning Adapter',
+          price: 4,
+          imageSrc: '/images/fineadapter-1.jpg',
+          features: [
+            'Simple tool for **precisely adjusting and maintaining** the sharpening angle.',
+            'Hole diameter: 8 mm.',
+          ],
+          details: [
+            'A crucial element for achieving micro-bevels and final sharpening accuracy.',
+          ],
+        },
+      ],
+
+      // --- Authenticity Block ---
+      authenticity: {
+        title: 'Commitment to Authenticity',
+        text: 'At <strong>MadEdge</strong>, we guarantee that all products and accessories listed here are <strong>100% original, proprietary designs</strong>. We are committed to manufacturing tools of the highest quality using our exclusive materials and engineering processes. When you choose MadEdge, you are investing in an <strong>authentic, precision sharpening system</strong> built for reliability and performance. We do not sell copies or third-party imitations.',
+      },
     },
   },
 } as const;

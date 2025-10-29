@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+// ПРИПУЩЕННЯ: імпорт useTranslations
+import { useTranslations } from 'next-intl';
 import MagnetLines from '../../../components/MagnetLines';
 import { productsService } from '../services/productService';
 import { Product } from '../../types/products';
@@ -12,6 +14,8 @@ import Image from 'next/image';
 type Category = 'all' | 'sharpeners' | 'stones' | 'accessories';
 
 export default function ShopPage() {
+  const t = useTranslations('Shop'); // 👈 Використовуємо ключ 'Shop'
+
   const searchParams = useSearchParams();
   const urlCategory = searchParams.get('category') as Category | null;
 
@@ -22,6 +26,8 @@ export default function ShopPage() {
   );
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // ... (логіка useEffect залишається незмінною) ...
 
   // Оновлюємо активну категорію при зміні URL параметра
   useEffect(() => {
@@ -59,7 +65,8 @@ export default function ShopPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Loading products...</div>
+        {/* 🚀 Замінено "Loading products..." */}
+        <div className="text-xl">{t('loadingProducts')}</div>
       </div>
     );
   }
@@ -81,17 +88,17 @@ export default function ShopPage() {
         />
 
         <div className="relative z-10 text-center text-black">
+          {/* 🚀 Замінено "MadEdge Shop" */}
           <h1 className="text-5xl font-extrabold mb-6 drop-shadow-lg">
-            MadEdge Shop
+            {t('heroTitle')}
           </h1>
-          <p className="text-lg mb-8 text-black-600">
-            Choose your ideal sharpener, stone or accessory
-          </p>
+          {/* 🚀 Замінено "Choose your ideal sharpener, stone or accessory" */}
+          <p className="text-lg mb-8 text-black-600">{t('heroSubtitle')}</p>
 
           {/* 🎛️ Кнопки фільтрації */}
           <div className="relative w-full flex flex-col items-center gap-4">
             <div className="relative w-full flex justify-center">
-              {/* Центральна кнопка — завжди по центру */}
+              {/* Центральна кнопка — Grinding Stones */}
               <button
                 onClick={() => setActiveCategory('stones')}
                 className={`px-6 py-3 rounded-xl font-semibold transition shadow-lg ${
@@ -100,10 +107,11 @@ export default function ShopPage() {
                     : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
                 }`}
               >
-                Grinding Stones
+                {/* 🚀 Замінено "Grinding Stones" */}
+                {t('grindingStones')}
               </button>
 
-              {/* Ліва кнопка — фіксований gap 200px вліво від центру */}
+              {/* Ліва кнопка — Knife Sharpeners */}
               <button
                 onClick={() => setActiveCategory('sharpeners')}
                 className={`absolute left-1/2 -translate-x-[calc(50%+200px)] px-6 py-3 rounded-xl font-semibold transition shadow-lg ${
@@ -112,10 +120,11 @@ export default function ShopPage() {
                     : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
                 }`}
               >
-                Knife Sharpeners
+                {/* 🚀 Замінено "Knife Sharpeners" */}
+                {t('knifeSharpeners')}
               </button>
 
-              {/* Права кнопка — фіксований gap 200px вправо від центру */}
+              {/* Права кнопка — Accessories */}
               <button
                 onClick={() => setActiveCategory('accessories')}
                 className={`absolute right-1/2 translate-x-[calc(50%+180px)] px-6 py-3 rounded-xl font-semibold transition shadow-lg ${
@@ -124,7 +133,8 @@ export default function ShopPage() {
                     : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
                 }`}
               >
-                Accessories
+                {/* 🚀 Замінено "Accessories" */}
+                {t('accessories')}
               </button>
             </div>
 
@@ -137,13 +147,14 @@ export default function ShopPage() {
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
-              All Products
+              {/* 🚀 Замінено "All Products" */}
+              {t('allProducts')}
             </button>
           </div>
         </div>
       </section>
 
-      {/* 🛒 Секція товарів - всі товари підряд без розділення по категоріям */}
+      {/* 🛒 Секція товарів */}
       <div className="p-6 max-w-7xl mx-auto">
         <section>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
@@ -154,14 +165,14 @@ export default function ShopPage() {
 
           {filteredProducts.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">
-                No products found in this category
-              </p>
+              {/* 🚀 Замінено "No products found in this category" */}
+              <p className="text-gray-500 text-lg">{t('noProductsFound')}</p>
               <button
                 onClick={() => setActiveCategory('all')}
                 className="mt-4 px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition"
               >
-                View All Products
+                {/* 🚀 Замінено "View All Products" */}
+                {t('viewAllProducts')}
               </button>
             </div>
           )}
@@ -173,13 +184,15 @@ export default function ShopPage() {
 
 // Компонент карточки товару з плавною анімацією
 function ProductCard({ product }: { product: Product }) {
+  const t = useTranslations('Shop'); // 👈 Використовуємо ключ 'Shop'
+
   const [isHovered, setIsHovered] = useState(false);
-  
-  // ✅ Ця логіка коректно працює з масивом URL-адрес
+
+  // ... (логіка зображень залишається незмінною) ...
   const mainImage =
     product.images && product.images.length > 0
       ? product.images[0]
-      : '/images/placeholder.jpg'; // Запасне зображення
+      : '/images/placeholder.jpg';
 
   return (
     <div
@@ -187,7 +200,7 @@ function ProductCard({ product }: { product: Product }) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Кнопка Wishlist - з плавною появою */}
+      {/* ... (WishlistButton залишається незмінним) ... */}
       <div
         className={`absolute top-2 right-2 z-20 transition-all duration-300 ${
           isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
@@ -215,15 +228,18 @@ function ProductCard({ product }: { product: Product }) {
             width={300}
             height={256}
             className="w-full h-64 rounded-2xl shadow-lg object-contain group-hover:opacity-90 transition"
-            // ✅ Додано обробник помилок
-            onError={(e) => { e.currentTarget.src = '/images/placeholder.jpg'; }}
+            // 🚀 Додано переклад для alt запасного зображення (хоча alt часто залишають без перекладу)
+            onError={(e) => {
+              e.currentTarget.src = '/images/placeholder.jpg';
+            }}
           />
           <div className="flex justify-between items-center mt-3 w-full px-2">
             <h3 className="text-lg font-bold text-gray-800 line-clamp-2">
               {product.title}
             </h3>
             <p className="text-sm font-semibold text-gray-600 whitespace-nowrap ml-2">
-              {product.price} $
+              {/* 🚀 Використано переклад для одиниці валюти */}
+              {product.price} {t('priceUnit')}
             </p>
           </div>
         </div>

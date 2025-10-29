@@ -1,82 +1,76 @@
+'use client';
+
 import React from 'react';
 import { Calendar, Wrench, ChevronRight } from 'lucide-react';
+import { useTranslations } from 'next-intl'; // 👈 Додаємо імпорт
 
 export default function AboutPage() {
+  const t = useTranslations('AboutPage'); // 👈 Ініціалізуємо переклади
+
+  // 1. Додаємо контейнер для уніфікації ширини та відступів
   return (
-    // 1. Додаємо контейнер для уніфікації ширини та відступів
     <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       {/* Hero Section */}
       <div className="mb-16">
+        {/* 🚀 Hero Title */}
         <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-4">
-          About Us
+          {t('title')}
         </h1>
+        {/* 🚀 Hero Subtitle */}
         <p className="mt-4 text-xl text-gray-500 border-b pb-6 border-gray-200">
-          Welcome to MadEdge — where precision meets innovation in the world of
-          sharpening solutions.
+          {t('subtitle')}
         </p>
       </div>
 
       {/* --- Our Background --- */}
       <section id="our-background" className="mb-20 scroll-mt-24">
+        {/* 🚀 Background Title */}
         <h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-gray-900 pl-3">
-          Our Background
+          {t('backgroundTitle')}
         </h2>
 
         <div className="prose prose-lg max-w-none">
-          <p className="text-gray-700 mb-4 text-lg">
-            Founded in **2010**, MadEdge emerged from a simple observation:
-            artists, craftsmen, and professionals deserved better tools to
-            maintain their instruments. What started as a small workshop in
-            Portland has grown into a leading manufacturer of premium sharpening
-            solutions used by professionals worldwide.
-          </p>
+          {/* 🚀 Background Text 1 (Використовуємо dangerouslySetInnerHTML через використання Markdown) */}
+          <p
+            className="text-gray-700 mb-4 text-lg"
+            dangerouslySetInnerHTML={{ __html: t.raw('backgroundText1') }}
+          />
 
+          {/* 🚀 Journey Subtitle */}
           <h3 className="text-xl font-semibold text-gray-900 mt-8 mb-4 border-b border-gray-200 pb-2">
-            The Journey
+            {t('journeySubtitle')}
           </h3>
-          <p className="text-gray-700 mb-4">
-            Our founder, **Marcus Davidson**, a former industrial designer,
-            noticed the frustration artists faced with conventional sharpeners.
-            He spent three years researching metallurgy, blade geometry, and
-            ergonomics to create the first MadEdge prototype. That prototype
-            evolved into our flagship ProEdge series, now trusted by over
-            **100,000 professionals** globally.
-          </p>
+          {/* 🚀 Journey Text (Використовуємо dangerouslySetInnerHTML через використання Markdown) */}
+          <p
+            className="text-gray-700 mb-4"
+            dangerouslySetInnerHTML={{ __html: t.raw('journeyText') }}
+          />
 
+          {/* 🚀 Milestones Subtitle */}
           <h3 className="text-xl font-semibold text-gray-900 mt-8 mb-4 border-b border-gray-200 pb-2">
-            Milestones
+            {t('milestonesSubtitle')}
           </h3>
           <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
             <ul className="space-y-3">
               <li className="flex items-start">
                 <span className="font-semibold text-gray-900 mr-3">2010:</span>
-                <span className="text-gray-700">
-                  Company founded in Portland, Oregon
-                </span>
+                <span className="text-gray-700">{t('milestone2010')}</span>
               </li>
               <li className="flex items-start">
                 <span className="font-semibold text-gray-900 mr-3">2013:</span>
-                <span className="text-gray-700">
-                  First ProEdge model launched
-                </span>
+                <span className="text-gray-700">{t('milestone2013')}</span>
               </li>
               <li className="flex items-start">
                 <span className="font-semibold text-gray-900 mr-3">2017:</span>
-                <span className="text-gray-700">
-                  Expanded to international markets
-                </span>
+                <span className="text-gray-700">{t('milestone2017')}</span>
               </li>
               <li className="flex items-start">
                 <span className="font-semibold text-gray-900 mr-3">2021:</span>
-                <span className="text-gray-700">
-                  Introduced sustainable manufacturing practices
-                </span>
+                <span className="text-gray-700">{t('milestone2021')}</span>
               </li>
               <li className="flex items-start">
                 <span className="font-semibold text-gray-900 mr-3">2024:</span>
-                <span className="text-gray-700">
-                  Reached 100,000+ customers worldwide
-                </span>
+                <span className="text-gray-700">{t('milestone2024')}</span>
               </li>
             </ul>
           </div>
@@ -87,8 +81,9 @@ export default function AboutPage() {
 
       {/* --- Our Values --- */}
       <section id="our-values" className="mb-20 scroll-mt-24">
+        {/* 🚀 Values Title */}
         <h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-gray-900 pl-3">
-          Our Core Values
+          {t('valuesTitle')}
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
@@ -96,50 +91,60 @@ export default function AboutPage() {
           <div className="bg-blue-50 p-6 rounded-xl border border-blue-200 shadow-sm hover:shadow-md transition">
             <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
               <ChevronRight className="w-5 h-5 mr-2 text-blue-600" />
-              Precision
+              {/* 🚀 Value 1 Title */}
+              {t('valuePrecisionTitle')}
             </h3>
-            <p className="text-gray-700">
-              Every MadEdge product is engineered to **micron-level accuracy**.
-              We believe that true craftsmanship begins with the right tools,
-              maintained to perfection.
-            </p>
+            {/* 🚀 Value 1 Text (Використовуємо dangerouslySetInnerHTML через використання Markdown) */}
+            <p
+              className="text-gray-700"
+              dangerouslySetInnerHTML={{ __html: t.raw('valuePrecisionText') }}
+            />
           </div>
 
           {/* Value 2: Sustainability */}
           <div className="bg-green-50 p-6 rounded-xl border border-green-200 shadow-sm hover:shadow-md transition">
             <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
               <ChevronRight className="w-5 h-5 mr-2 text-green-600" />
-              Sustainability
+              {/* 🚀 Value 2 Title */}
+              {t('valueSustainabilityTitle')}
             </h3>
-            <p className="text-gray-700">
-              Our commitment to the environment drives us to use **recycled
-              materials** and minimize waste in every stage of production.
-            </p>
+            {/* 🚀 Value 2 Text (Використовуємо dangerouslySetInnerHTML через використання Markdown) */}
+            <p
+              className="text-gray-700"
+              dangerouslySetInnerHTML={{
+                __html: t.raw('valueSustainabilityText'),
+              }}
+            />
           </div>
 
           {/* Value 3: Innovation */}
           <div className="bg-purple-50 p-6 rounded-xl border border-purple-200 shadow-sm hover:shadow-md transition">
             <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
               <ChevronRight className="w-5 h-5 mr-2 text-purple-600" />
-              Innovation
+              {/* 🚀 Value 3 Title */}
+              {t('valueInnovationTitle')}
             </h3>
-            <p className="text-gray-700">
-              We continuously invest in R&amp;D to develop **cutting-edge
-              sharpening** technologies that make maintenance easier and more
-              effective.
-            </p>
+            {/* 🚀 Value 3 Text (Використовуємо dangerouslySetInnerHTML через використання Markdown) */}
+            <p
+              className="text-gray-700"
+              dangerouslySetInnerHTML={{ __html: t.raw('valueInnovationText') }}
+            />
           </div>
 
           {/* Value 4: Customer Focus */}
           <div className="bg-orange-50 p-6 rounded-xl border border-orange-200 shadow-sm hover:shadow-md transition">
             <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
               <ChevronRight className="w-5 h-5 mr-2 text-orange-600" />
-              Customer Focus
+              {/* 🚀 Value 4 Title */}
+              {t('valueCustomerFocusTitle')}
             </h3>
-            <p className="text-gray-700">
-              Your satisfaction is our priority. We offer **lifetime support**
-              and a 10-year warranty on all our products.
-            </p>
+            {/* 🚀 Value 4 Text (Використовуємо dangerouslySetInnerHTML через використання Markdown) */}
+            <p
+              className="text-gray-700"
+              dangerouslySetInnerHTML={{
+                __html: t.raw('valueCustomerFocusText'),
+              }}
+            />
           </div>
         </div>
       </section>
@@ -148,96 +153,83 @@ export default function AboutPage() {
 
       {/* --- Manufacturing --- */}
       <section id="manufacturing" className="mb-20 scroll-mt-24">
+        {/* 🚀 Manufacturing Title */}
         <h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-gray-900 pl-3">
-          Manufacturing
+          {t('manufacturingTitle')}
         </h2>
 
-        <p className="text-gray-700 mb-6 text-lg">
-          Our state-of-the-art facility in Portland combines **traditional
-          craftsmanship with modern automation**. Every sharpener goes through
-          rigorous quality control before reaching your hands.
-        </p>
+        {/* 🚀 Manufacturing Text (Використовуємо dangerouslySetInnerHTML через використання Markdown) */}
+        <p
+          className="text-gray-700 mb-6 text-lg"
+          dangerouslySetInnerHTML={{ __html: t.raw('manufacturingText') }}
+        />
 
+        {/* 🚀 Production Process Subtitle */}
         <h3 className="text-xl font-semibold text-gray-900 mt-8 mb-4 border-b border-gray-200 pb-2">
-          Production Process
+          {t('productionProcessSubtitle')}
         </h3>
-        {/* Production Process (Змінено на сильніший стиль) */}
+
+        {/* Production Process Steps */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-8">
           <div className="border-l-4 border-blue-600 pl-4 py-2">
-            <h4 className="font-bold text-gray-900 mb-1">
-              1. Material Selection
-            </h4>
-            <p className="text-gray-700 text-sm">
-              We source premium tungsten carbide and ceramic materials from
-              certified suppliers.
-            </p>
+            <h4 className="font-bold text-gray-900 mb-1">{t('step1Title')}</h4>
+            <p className="text-gray-700 text-sm">{t('step1Text')}</p>
           </div>
 
           <div className="border-l-4 border-blue-600 pl-4 py-2">
-            <h4 className="font-bold text-gray-900 mb-1">
-              2. Precision Machining
-            </h4>
-            <p className="text-gray-700 text-sm">
-              CNC machines craft each component to exact specifications with
-              **0.001mm tolerance**.
-            </p>
+            <h4 className="font-bold text-gray-900 mb-1">{t('step2Title')}</h4>
+            <p className="text-gray-700 text-sm">{t('step2Text')}</p>
           </div>
 
           <div className="border-l-4 border-blue-600 pl-4 py-2">
-            <h4 className="font-bold text-gray-900 mb-1">3. Assembly</h4>
-            <p className="text-gray-700 text-sm">
-              Skilled technicians hand-assemble each unit, ensuring perfect
-              alignment and functionality.
-            </p>
+            <h4 className="font-bold text-gray-900 mb-1">{t('step3Title')}</h4>
+            <p className="text-gray-700 text-sm">{t('step3Text')}</p>
           </div>
 
           <div className="border-l-4 border-blue-600 pl-4 py-2">
-            <h4 className="font-bold text-gray-900 mb-1">4. Quality Testing</h4>
-            <p className="text-gray-700 text-sm">
-              Every sharpener undergoes **50+ quality checks** including blade
-              angle verification and durability testing.
-            </p>
+            <h4 className="font-bold text-gray-900 mb-1">{t('step4Title')}</h4>
+            <p className="text-gray-700 text-sm">{t('step4Text')}</p>
           </div>
 
           <div className="border-l-4 border-blue-600 pl-4 py-2">
-            <h4 className="font-bold text-gray-900 mb-1">5. Packaging</h4>
-            <p className="text-gray-700 text-sm">
-              Products are packaged in **eco-friendly materials** with
-              comprehensive user guides.
-            </p>
+            <h4 className="font-bold text-gray-900 mb-1">{t('step5Title')}</h4>
+            <p className="text-gray-700 text-sm">{t('step5Text')}</p>
           </div>
         </div>
 
+        {/* 🚀 Sustainability Subtitle */}
         <h3 className="text-xl font-semibold text-gray-900 mt-8 mb-4 border-b border-gray-200 pb-2">
-          Sustainability Initiatives
+          {t('sustainabilitySubtitle')}
         </h3>
-        <p className="text-gray-700 mb-4">
-          Our manufacturing facility runs on **100% renewable energy** and
-          we&apos;ve achieved **zero waste to landfill** status since 2022. We
-          use recycled aluminum for our casings and biodegradable packaging
-          materials.
-        </p>
+        {/* 🚀 Sustainability Text (Використовуємо dangerouslySetInnerHTML через використання Markdown) */}
+        <p
+          className="text-gray-700 mb-4"
+          dangerouslySetInnerHTML={{ __html: t.raw('sustainabilityText') }}
+        />
       </section>
 
       <hr className="my-16 border-gray-200" />
 
       {/* --- MadEdge Services --- */}
       <section id="madedge-services" className="mb-20 scroll-mt-24">
+        {/* 🚀 Services Title */}
         <h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-gray-900 pl-3">
-          MadEdge Services
+          {t('servicesTitle')}
         </h2>
 
-        <p className="text-gray-700 mb-6 text-lg">
-          Beyond manufacturing exceptional products, we offer comprehensive
-          services to ensure you get the most from your MadEdge sharpener.
-        </p>
+        {/* 🚀 Services Text */}
+        <p className="text-gray-700 mb-6 text-lg">{t('servicesText')}</p>
 
+        {/* 🚀 How To Use Subtitle */}
         <h3 className="text-xl font-semibold text-gray-900 mt-8 mb-4 border-b border-gray-200 pb-2">
-          How to Use Your MadEdge Sharpener
+          {t('howToUseSubtitle')}
         </h3>
+
+        {/* Instructions Block */}
         <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-8 rounded-xl mb-8 border border-blue-200 shadow-lg">
+          {/* 🚀 Instructions Title */}
           <h4 className="font-bold text-gray-900 mb-4 text-xl">
-            Step-by-Step Instructions:
+            {t('instructionsTitle')}
           </h4>
 
           <ol className="space-y-4">
@@ -246,11 +238,8 @@ export default function AboutPage() {
                 1
               </span>
               <div>
-                <p className="font-semibold text-gray-900">Preparation</p>
-                <p className="text-gray-700 text-sm">
-                  Place the sharpener on a flat, stable surface. Ensure the
-                  blade slot is clean and free of debris.
-                </p>
+                <p className="font-semibold text-gray-900">{t('inst1Title')}</p>
+                <p className="text-gray-700 text-sm">{t('inst1Text')}</p>
               </div>
             </li>
 
@@ -259,11 +248,8 @@ export default function AboutPage() {
                 2
               </span>
               <div>
-                <p className="font-semibold text-gray-900">Insert the Pencil</p>
-                <p className="text-gray-700 text-sm">
-                  Hold the pencil at a 23-degree angle (the sharpener&apos;s
-                  guide will help) and insert it gently into the opening.
-                </p>
+                <p className="font-semibold text-gray-900">{t('inst2Title')}</p>
+                <p className="text-gray-700 text-sm">{t('inst2Text')}</p>
               </div>
             </li>
 
@@ -272,12 +258,8 @@ export default function AboutPage() {
                 3
               </span>
               <div>
-                <p className="font-semibold text-gray-900">Rotate Smoothly</p>
-                <p className="text-gray-700 text-sm">
-                  Turn the pencil clockwise 3-5 times with gentle, consistent
-                  pressure. The sharpener will guide the optimal angle
-                  automatically.
-                </p>
+                <p className="font-semibold text-gray-900">{t('inst3Title')}</p>
+                <p className="text-gray-700 text-sm">{t('inst3Text')}</p>
               </div>
             </li>
 
@@ -286,11 +268,8 @@ export default function AboutPage() {
                 4
               </span>
               <div>
-                <p className="font-semibold text-gray-900">Check the Point</p>
-                <p className="text-gray-700 text-sm">
-                  Remove the pencil and inspect. For a finer point, repeat step
-                  3 for 2-3 more rotations.
-                </p>
+                <p className="font-semibold text-gray-900">{t('inst4Title')}</p>
+                <p className="text-gray-700 text-sm">{t('inst4Text')}</p>
               </div>
             </li>
 
@@ -299,68 +278,59 @@ export default function AboutPage() {
                 5
               </span>
               <div>
-                <p className="font-semibold text-gray-900">Clean Regularly</p>
-                <p className="text-gray-700 text-sm">
-                  Empty the shavings reservoir after every 10-15 uses. Wipe the
-                  blade opening with a soft cloth monthly.
-                </p>
+                <p className="font-semibold text-gray-900">{t('inst5Title')}</p>
+                <p className="text-gray-700 text-sm">{t('inst5Text')}</p>
               </div>
             </li>
           </ol>
 
+          {/* Pro Tip */}
           <div className="mt-6 p-4 bg-white rounded-lg border border-blue-200">
             <p className="text-sm text-gray-700">
-              <strong className="text-blue-600">Pro Tip:</strong> For colored
-              pencils, use slightly less pressure and more rotations for best
-              results. For graphite pencils, standard pressure works perfectly.
+              {/* 🚀 Pro Tip */}
+              <strong className="text-blue-600">{t('proTipStrong')}</strong>
+              {t('proTipText')}
             </p>
           </div>
         </div>
 
+        {/* 🚀 Additional Services Subtitle */}
         <h3 className="text-xl font-semibold text-gray-900 mt-8 mb-4 border-b border-gray-200 pb-2">
-          Additional Services
+          {t('additionalServicesSubtitle')}
         </h3>
+
+        {/* Additional Services */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div className="border border-gray-200 p-5 rounded-lg hover:shadow-lg transition-shadow">
             <h4 className="font-semibold text-gray-900 mb-2 flex items-center">
               <Wrench className="w-5 h-5 mr-2 text-blue-600" />
-              Maintenance &amp; Repair
+              {t('serviceMaintenanceTitle')}
             </h4>
-            <p className="text-gray-700">
-              Free blade replacement for the first year. Lifetime repair service
-              available at cost.
-            </p>
+            <p className="text-gray-700">{t('serviceMaintenanceText')}</p>
           </div>
 
           <div className="border border-gray-200 p-5 rounded-lg hover:shadow-lg transition-shadow">
             <h4 className="font-semibold text-gray-900 mb-2 flex items-center">
-              <span className="text-blue-600 mr-2">◆</span> Custom Engraving
+              <span className="text-blue-600 mr-2">◆</span>
+              {t('serviceEngravingTitle')}
             </h4>
-            <p className="text-gray-700">
-              Personalize your MadEdge with custom engraving for corporate gifts
-              or personal use.
-            </p>
+            <p className="text-gray-700">{t('serviceEngravingText')}</p>
           </div>
 
           <div className="border border-gray-200 p-5 rounded-lg hover:shadow-lg transition-shadow">
             <h4 className="font-semibold text-gray-900 mb-2 flex items-center">
-              <span className="text-blue-600 mr-2">◆</span> Educational
-              Workshops
+              <span className="text-blue-600 mr-2">◆</span>
+              {t('serviceWorkshopsTitle')}
             </h4>
-            <p className="text-gray-700">
-              Free monthly online workshops on tool maintenance and optimal
-              sharpening techniques.
-            </p>
+            <p className="text-gray-700">{t('serviceWorkshopsText')}</p>
           </div>
 
           <div className="border border-gray-200 p-5 rounded-lg hover:shadow-lg transition-shadow">
             <h4 className="font-semibold text-gray-900 mb-2 flex items-center">
-              <span className="text-blue-600 mr-2">◆</span> Bulk Orders
+              <span className="text-blue-600 mr-2">◆</span>
+              {t('serviceBulkOrdersTitle')}
             </h4>
-            <p className="text-gray-700">
-              Special pricing and customization options for schools, studios,
-              and corporations.
-            </p>
+            <p className="text-gray-700">{t('serviceBulkOrdersText')}</p>
           </div>
         </div>
       </section>
@@ -369,111 +339,105 @@ export default function AboutPage() {
 
       {/* --- Upcoming Events --- */}
       <section id="upcoming-events" className="mb-16 scroll-mt-24">
+        {/* 🚀 Events Title */}
         <h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-gray-900 pl-3">
-          Upcoming Events
+          {t('eventsTitle')}
         </h2>
 
-        <p className="text-gray-700 mb-6 text-lg">
-          Join us at these upcoming events to experience MadEdge products
-          firsthand and meet our team.
-        </p>
+        {/* 🚀 Events Text */}
+        <p className="text-gray-700 mb-6 text-lg">{t('eventsText')}</p>
 
         <div className="space-y-6">
+          {/* Event 1 */}
           <div className="border border-gray-300 rounded-xl p-6 hover:shadow-lg transition-shadow bg-white">
             <div className="flex items-start justify-between mb-3">
               <div>
                 <h3 className="text-xl font-semibold text-gray-900">
-                  International Art Supply Expo
+                  {t('expoTitle')}
                 </h3>
-                <p className="text-gray-600 mt-1">Chicago, IL</p>
+                <p className="text-gray-600 mt-1">{t('expoLocation')}</p>
               </div>
               <Calendar className="w-6 h-6 text-blue-600 flex-shrink-0" />
             </div>
-            <p className="text-gray-700 mb-3">
-              Visit our booth #A-245 to see live demonstrations of the new
-              ProEdge X2 and participate in our daily raffles.
-            </p>
+            <p className="text-gray-700 mb-3">{t('expoDesc')}</p>
+            <div className="flex items-center justify-between text-sm pt-2 border-t border-gray-100">
+              <span className="font-bold text-blue-600">{t('expoDate')}</span>
+              <span className="text-gray-500">{t('expoVenue')}</span>
+            </div>
+          </div>
+
+          {/* Event 2 */}
+          <div className="border border-gray-300 rounded-xl p-6 hover:shadow-lg transition-shadow bg-white">
+            <div className="flex items-start justify-between mb-3">
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900">
+                  {t('factoryTourTitle')}
+                </h3>
+                <p className="text-gray-600 mt-1">{t('factoryTourLocation')}</p>
+              </div>
+              <Calendar className="w-6 h-6 text-blue-600 flex-shrink-0" />
+            </div>
+            <p className="text-gray-700 mb-3">{t('factoryTourDesc')}</p>
             <div className="flex items-center justify-between text-sm pt-2 border-t border-gray-100">
               <span className="font-bold text-blue-600">
-                November 15-17, 2025
+                {t('factoryTourDate')}
               </span>
-              <span className="text-gray-500">McCormick Place</span>
+              <span className="text-gray-500">{t('factoryTourVenue')}</span>
             </div>
           </div>
 
+          {/* Event 3 */}
           <div className="border border-gray-300 rounded-xl p-6 hover:shadow-lg transition-shadow bg-white">
             <div className="flex items-start justify-between mb-3">
               <div>
                 <h3 className="text-xl font-semibold text-gray-900">
-                  MadEdge Factory Tour
+                  {t('artistWorkshopTitle')}
                 </h3>
-                <p className="text-gray-600 mt-1">Portland, OR</p>
+                <p className="text-gray-600 mt-1">
+                  {t('artistWorkshopLocation')}
+                </p>
               </div>
               <Calendar className="w-6 h-6 text-blue-600 flex-shrink-0" />
             </div>
-            <p className="text-gray-700 mb-3">
-              Get an exclusive behind-the-scenes look at our manufacturing
-              process. Tours are limited to 20 participants. Registration
-              required.
-            </p>
-            <div className="flex items-center justify-between text-sm pt-2 border-t border-gray-100">
-              <span className="font-bold text-blue-600">December 5, 2025</span>
-              <span className="text-gray-500">MadEdge Headquarters</span>
-            </div>
-          </div>
-
-          <div className="border border-gray-300 rounded-xl p-6 hover:shadow-lg transition-shadow bg-white">
-            <div className="flex items-start justify-between mb-3">
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900">
-                  Professional Artist Workshop Series
-                </h3>
-                <p className="text-gray-600 mt-1">Online Event</p>
-              </div>
-              <Calendar className="w-6 h-6 text-blue-600 flex-shrink-0" />
-            </div>
-            <p className="text-gray-700 mb-3">
-              Monthly online workshops featuring professional artists sharing
-              their techniques and tool maintenance tips. Free for MadEdge
-              customers.
-            </p>
+            <p className="text-gray-700 mb-3">{t('artistWorkshopDesc')}</p>
             <div className="flex items-center justify-between text-sm pt-2 border-t border-gray-100">
               <span className="font-bold text-blue-600">
-                First Saturday of Each Month
+                {t('artistWorkshopDate')}
               </span>
-              <span className="text-gray-500">Zoom</span>
+              <span className="text-gray-500">{t('artistWorkshopVenue')}</span>
             </div>
           </div>
 
+          {/* Event 4 */}
           <div className="border border-gray-300 rounded-xl p-6 hover:shadow-lg transition-shadow bg-white">
             <div className="flex items-start justify-between mb-3">
               <div>
                 <h3 className="text-xl font-semibold text-gray-900">
-                  New Product Launch Event
+                  {t('newProductTitle')}
                 </h3>
-                <p className="text-gray-600 mt-1">New York, NY</p>
+                <p className="text-gray-600 mt-1">{t('newProductLocation')}</p>
               </div>
               <Calendar className="w-6 h-6 text-blue-600 flex-shrink-0" />
             </div>
-            <p className="text-gray-700 mb-3">
-              Be the first to see and try our revolutionary new sharpening
-              system. Special early-bird pricing available for event attendees.
-            </p>
+            <p className="text-gray-700 mb-3">{t('newProductDesc')}</p>
             <div className="flex items-center justify-between text-sm pt-2 border-t border-gray-100">
-              <span className="font-bold text-blue-600">January 20, 2026</span>
+              <span className="font-bold text-blue-600">
+                {t('newProductDate')}
+              </span>
+              {/* newProductVenue було пропущено в перекладі, тому залишаємо порожнім або додаємо t('newProductVenue') */}
               <span className="text-gray-500"></span>
             </div>
           </div>
         </div>
 
+        {/* Subscribe Block */}
         <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6 shadow-md">
-          <h3 className="font-bold text-gray-900 mb-3">Stay Updated</h3>
-          <p className="text-gray-700 mb-4">
-            Subscribe to our newsletter to receive notifications about new
-            events, product launches, and exclusive offers.
-          </p>
+          <h3 className="font-bold text-gray-900 mb-3">
+            {t('stayUpdatedTitle')}
+          </h3>
+          <p className="text-gray-700 mb-4">{t('stayUpdatedText')}</p>
           <button className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors">
-            Subscribe Now
+            {t('subscribeButton')}
           </button>
         </div>
       </section>

@@ -12,6 +12,7 @@ import { useCartStore } from '../[locale]/store/cartStore';
 import QuantityCounter from './QuantityCounter';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl'; // 👈 Додаємо імпорт
 
 interface CartItem {
   id: number;
@@ -22,6 +23,8 @@ interface CartItem {
 }
 
 export default function CartSheet() {
+  const t = useTranslations('CartSheet'); // 👈 Ініціалізуємо переклади
+
   const { cartItems, increaseQuantity, decreaseQuantity } = useCartStore();
 
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -30,9 +33,14 @@ export default function CartSheet() {
     0
   );
 
+  // 🚀 Використовуємо переклад для одиниці валюти
+  const priceUnit = t('priceUnit');
+  const placeholderAlt = t('placeholderAlt');
+
   // Функція для отримання безпечного зображення
   const getSafeImage = (item: CartItem) => {
     if (!item.images || item.images.length === 0) {
+      // 🚀 Використовуємо placeholder для зображення
       return '/images/placeholder.jpg';
     }
     return item.images[0];
@@ -56,17 +64,22 @@ export default function CartSheet() {
         className="w-[400px] sm:w-[500px] p-0 flex flex-col h-full"
       >
         <SheetHeader className="p-6 border-b shrink-0">
-          <SheetTitle className="text-xl font-bold">Ваш кошик</SheetTitle>
+          {/* 🚀 Використовуємо переклад */}
+          <SheetTitle className="text-xl font-bold">{t('title')}</SheetTitle>
         </SheetHeader>
 
         {cartItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center flex-1 p-6">
-            <p className="text-gray-500 text-center mb-4">Кошик порожній</p>
+            {/* 🚀 Використовуємо переклад */}
+            <p className="text-gray-500 text-center mb-4">
+              {t('emptyMessage')}
+            </p>
             <Link
               href="/shop"
               className="bg-black hover:bg-gray-800 text-white py-2 px-6 rounded-lg font-medium transition"
             >
-              Перейти до покупок
+              {/* 🚀 Використовуємо переклад */}
+              {t('goToShop')}
             </Link>
           </div>
         ) : (
@@ -89,8 +102,9 @@ export default function CartSheet() {
                     <p className="font-medium text-gray-800 truncate">
                       {item.title}
                     </p>
+                    {/* 🚀 Використовуємо priceUnit */}
                     <p className="text-sm text-gray-500 mt-1">
-                      {item.price.toFixed(2)} $
+                      {item.price.toFixed(2)} {priceUnit}
                     </p>
                   </div>
 
@@ -106,8 +120,12 @@ export default function CartSheet() {
             {/* Фіксований блок з підсумком і кнопкою */}
             <div className="border-t p-6 bg-white shrink-0">
               <div className="flex justify-between items-center font-semibold text-lg text-gray-800 mb-4">
-                <span>Разом:</span>
-                <span>{totalPrice.toFixed(2)} $</span>
+                {/* 🚀 Використовуємо переклад */}
+                <span>{t('totalLabel')}</span>
+                {/* 🚀 Використовуємо priceUnit */}
+                <span>
+                  {totalPrice.toFixed(2)} {priceUnit}
+                </span>
               </div>
 
               {/* Кнопка переходу на сторінку оформлення */}
@@ -115,7 +133,8 @@ export default function CartSheet() {
                 href="/order"
                 className="w-full text-center bg-black hover:bg-gray-800 text-white py-3 rounded-lg font-medium transition block"
               >
-                Оформити замовлення
+                {/* 🚀 Використовуємо переклад */}
+                {t('checkoutButton')}
               </Link>
             </div>
           </div>

@@ -1,18 +1,23 @@
+'use client';
+
 import React from 'react';
+import { useTranslations } from 'next-intl'; // 👈 Додаємо імпорт
 
 export default function SharpenersPage() {
+  const t = useTranslations('SharpenersPage'); // 👈 Ініціалізуємо переклади
+
   return (
     <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       {/* Hero Section */}
       <div className="mb-16">
+        {/* 🚀 Hero Title */}
         <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-4">
-          MadEdge Sharpeners
+          {t('hero.title')}
         </h1>
 
+        {/* 🚀 Hero Subtitle */}
         <p className="mt-4 text-xl text-gray-500 border-b pb-6 border-gray-200">
-          Discover our full lineup of professional sharpening tools designed for
-          precision, durability, and comfort. Each model is crafted to serve a
-          specific purpose — from artists to industrial craftsmen.
+          {t('hero.subtitle')}
         </p>
       </div>
 
@@ -21,24 +26,12 @@ export default function SharpenersPage() {
         <div className="lg:flex lg:space-x-12">
           {/* Left: Description */}
           <div className="lg:w-3/5 order-2 lg:order-1">
+            {/* 🚀 Model Title */}
             <h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-gray-900 pl-3">
-              MadEdge Model 1
+              {t('model1.title')}
             </h2>
-            <p className="text-gray-700 text-lg">
-              Modular sharpener with a rotary mechanism based on cutting-edge
-              rotating clamp technology. - Clamps are made of steel (not
-              aluminum). - All parts of the rotary mechanism are steel; rubbing
-              surfaces hardened to 900HV. - MadEdge system includes a spherical
-              nut to compensate for screw skew on thin knives. - Wear
-              compensation is possible only in the MadEdge system. -
-              Antifriction bronze bushing in the hinge ensures smooth stone
-              movement. - Stone holder handle made of stained oak. - Minimum
-              grinding angle: 10° per side. - Compatible with knives, scissors,
-              and chisels. - Sharpening angles from 10° to 40° per side. -
-              Stones fixed from 12 mm width and up to 220 mm length. -
-              Compatible with both blank and standard stones. - Rotary mechanism
-              accuracy: 0.2°.
-            </p>
+            {/* 🚀 Model Description */}
+            <p className="text-gray-700 text-lg">{t('model1.description')}</p>
           </div>
 
           {/* Right: Image + Price + List */}
@@ -46,7 +39,7 @@ export default function SharpenersPage() {
             <div className="bg-gray-100 aspect-square flex items-center justify-center overflow-hidden w-full rounded-lg mb-4">
               <img
                 src="/images/madedgemodel1-1.jpg"
-                alt="MadEdge Model 1 - Classic pencil sharpener"
+                alt={t('model1.imageAlt')} // 🚀 Image Alt
                 className="w-full h-full object-cover"
               />
             </div>
@@ -54,25 +47,22 @@ export default function SharpenersPage() {
             <ul className="space-y-3 mb-4">
               <li className="flex items-start">
                 <div className="w-2 h-2 bg-gray-900 rounded-full mt-2 mr-3"></div>
-                <span className="text-gray-700">
-                  Ideal for graphite and charcoal pencils
-                </span>
+                <span className="text-gray-700">{t('model1.feature1')}</span>
               </li>
               <li className="flex items-start">
                 <div className="w-2 h-2 bg-gray-900 rounded-full mt-2 mr-3"></div>
-                <span className="text-gray-700">
-                  Non-slip base with magnetic dust cover
-                </span>
+                <span className="text-gray-700">{t('model1.feature2')}</span>
               </li>
               <li className="flex items-start">
                 <div className="w-2 h-2 bg-gray-900 rounded-full mt-2 mr-3"></div>
-                <span className="text-gray-700">
-                  Manual rotary system with precision gear
-                </span>
+                <span className="text-gray-700">{t('model1.feature3')}</span>
               </li>
             </ul>
 
-            <div className="text-3xl font-bold text-gray-900">$149.99</div>
+            {/* 🚀 Price - Залишаємо фіксовану ціну, але використовуємо t() для перекладу валюти, якщо потрібно */}
+            <div className="text-3xl font-bold text-gray-900">
+              {t('model1.price')}
+            </div>
           </div>
         </div>
       </section>
@@ -84,18 +74,15 @@ export default function SharpenersPage() {
         <div className="lg:flex lg:space-x-12">
           {/* Left: Description */}
           <div className="lg:w-3/5 order-2 lg:order-1">
+            {/* 🚀 Model Title */}
             <h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-blue-600 pl-3">
-              MadEdge with Digital Sharpening Angle Measurement
+              {t('digital.title')}
             </h2>
-            <p className="text-gray-700 text-lg">
-              Only we have! MadEdge with integrated Digital Sharpening Angle
-              Measurement. This configuration avoids the installation of
-              additional mass on the clamping frame and avoids additional
-              pressure on the grinding stone. Combining modern technology with
-              traditional engineering, this model includes a **built-in digital
-              angle display** for precise sharpening every time. Perfect for
-              professionals who demand accuracy.
-            </p>
+            {/* 🚀 Model Description (Використовуємо t.raw через використання Markdown) */}
+            <p
+              className="text-gray-700 text-lg"
+              dangerouslySetInnerHTML={{ __html: t.raw('digital.description') }}
+            />
           </div>
 
           {/* Right: Image + Price + List */}
@@ -103,7 +90,7 @@ export default function SharpenersPage() {
             <div className="bg-blue-50 aspect-square flex items-center justify-center overflow-hidden w-full rounded-lg mb-4">
               <img
                 src="/images/madedgemodel3-1.jpg"
-                alt="MadEdge Model with Digital angle measurement"
+                alt={t('digital.imageAlt')} // 🚀 Image Alt
                 className="w-full h-full object-cover"
               />
             </div>
@@ -111,25 +98,22 @@ export default function SharpenersPage() {
             <ul className="space-y-3 mb-4">
               <li className="flex items-start">
                 <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3"></div>
-                <span className="text-gray-700">
-                  Digital LCD angle indicator (accuracy ±0.1°)
-                </span>
+                <span className="text-gray-700">{t('digital.feature1')}</span>
               </li>
               <li className="flex items-start">
                 <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3"></div>
-                <span className="text-gray-700">
-                  USB-C rechargeable power system
-                </span>
+                <span className="text-gray-700">{t('digital.feature2')}</span>
               </li>
               <li className="flex items-start">
                 <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3"></div>
-                <span className="text-gray-700">
-                  Smart auto-stop for consistent results
-                </span>
+                <span className="text-gray-700">{t('digital.feature3')}</span>
               </li>
             </ul>
 
-            <div className="text-3xl font-bold text-gray-900">$89.99</div>
+            {/* 🚀 Price */}
+            <div className="text-3xl font-bold text-gray-900">
+              {t('digital.price')}
+            </div>
           </div>
         </div>
       </section>
@@ -141,27 +125,12 @@ export default function SharpenersPage() {
         <div className="lg:flex lg:space-x-12">
           {/* Left: Description */}
           <div className="lg:w-3/5 order-2 lg:order-1">
+            {/* 🚀 Model Title */}
             <h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-gray-900 pl-3">
-              MadEdge Model 2
+              {t('model2.title')}
             </h2>
-            <p className="text-gray-700 text-lg">
-              Unlike Model1, it has an additional pair of clamps fixed in the
-              center. All parts are made of steel, no aluminum. Friction
-              surfaces are hardened to a hardness of 900HV. The clamps are
-              equipped with a spherical nut to compensate for the misalignment
-              of the screw when securing thin knives. Moreover, in the case of
-              thread wear in the clamps, it is necessary to replace only the nut
-              and screw, and not the entire expensive clamp. Parts are coated
-              with a polymer wear-resistant coating that covers car wheels.
-              There is a mechanism for adjusting the wear of the seats of the
-              rotary mechanism. The guide is heat-treated to a hardness of
-              60HRC; for smoothness of movement, sliding is carried out along
-              the bearing. The hinge has extended turning angles, which provides
-              a comfortable sharpening of long knives. The stone holder has a
-              substrate, which allows you to use stones with blank and without
-              blank. The base is supported on 3 points, which ensures the
-              stability of the sharpener on any surface.
-            </p>
+            {/* 🚀 Model Description */}
+            <p className="text-gray-700 text-lg">{t('model2.description')}</p>
           </div>
 
           {/* Right: Image + Price + List */}
@@ -169,7 +138,7 @@ export default function SharpenersPage() {
             <div className="bg-gray-100 aspect-square flex items-center justify-center overflow-hidden w-full rounded-lg mb-4">
               <img
                 src="/images/madedgemodel2-1.jpg"
-                alt="MadEdge Model 2 - Professional sharpener"
+                alt={t('model2.imageAlt')} // 🚀 Image Alt
                 className="w-full h-full object-cover"
               />
             </div>
@@ -177,23 +146,22 @@ export default function SharpenersPage() {
             <ul className="space-y-3 mb-4">
               <li className="flex items-start">
                 <div className="w-2 h-2 bg-gray-900 rounded-full mt-2 mr-3"></div>
-                <span className="text-gray-700">
-                  Reinforced ceramic sharpening wheel
-                </span>
+                <span className="text-gray-700">{t('model2.feature1')}</span>
               </li>
               <li className="flex items-start">
                 <div className="w-2 h-2 bg-gray-900 rounded-full mt-2 mr-3"></div>
-                <span className="text-gray-700">
-                  Adjustable sharpening resistance
-                </span>
+                <span className="text-gray-700">{t('model2.feature2')}</span>
               </li>
               <li className="flex items-start">
                 <div className="w-2 h-2 bg-gray-900 rounded-full mt-2 mr-3"></div>
-                <span className="text-gray-700">Silent operation mode</span>
+                <span className="text-gray-700">{t('model2.feature3')}</span>
               </li>
             </ul>
 
-            <div className="text-3xl font-bold text-gray-900">$69.99</div>
+            {/* 🚀 Price */}
+            <div className="text-3xl font-bold text-gray-900">
+              {t('model2.price')}
+            </div>
           </div>
         </div>
       </section>
@@ -205,28 +173,19 @@ export default function SharpenersPage() {
         <div className="lg:flex lg:space-x-12">
           {/* Left: Description */}
           <div className="lg:w-3/5 order-2 lg:order-1">
+            {/* 🚀 Model Title */}
             <h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-gray-900 pl-3">
-              MadEdge for Convex Blades
+              {t('convex.title')}
             </h2>
-            <p className="text-gray-700 text-lg">
-              1. Clamps are made of steel, not aluminum. 2. All parts of the
-              rotary mechanism are also made of steel, and not of bronze and
-              aluminum. Rubbing surfaces are hardened to hardness 740HV. 3. Only
-              in the MadEdge system, the clamps have a spherical nut to
-              compensate for the screw skew when attaching thin knives. 4. Only
-              in the MadEdge system is it possible to compensate for the wear of
-              the turning mechanism. 5. An antifriction bronze bushing is
-              pressed into the hinge of the sliding assembly, which ensures an
-              increased smoothness of the movement of the stone. 6. The handle
-              of the stone holder is made of stained oak. 7. The minimum angle
-              of grinding is 12 degrees per side.
-            </p>
+            {/* 🚀 Model Description */}
+            <p className="text-gray-700 text-lg">{t('convex.description')}</p>
 
             <div className="bg-blue-50 p-6 rounded-lg border border-blue-200 mt-6">
               <p className="text-gray-700">
-                <strong className="text-blue-600">Pro Tip:</strong> For best
-                convex sharpening, rotate the blade gently while maintaining
-                even pressure throughout the stroke.
+                <strong className="text-blue-600">
+                  {t('convex.proTipStrong')}
+                </strong>
+                {t('convex.proTipText')}
               </p>
             </div>
           </div>
@@ -236,7 +195,7 @@ export default function SharpenersPage() {
             <div className="bg-gray-100 aspect-square flex items-center justify-center overflow-hidden w-full rounded-lg mb-4">
               <img
                 src="/images/madedgemodel4-1.jpg"
-                alt="MadEdge Convex - Specialist sharpener for convex blades"
+                alt={t('convex.imageAlt')} // 🚀 Image Alt
                 className="w-full h-full object-cover"
               />
             </div>
@@ -244,25 +203,22 @@ export default function SharpenersPage() {
             <ul className="space-y-3 mb-4">
               <li className="flex items-start">
                 <div className="w-2 h-2 bg-gray-900 rounded-full mt-2 mr-3"></div>
-                <span className="text-gray-700">
-                  Dual-bevel correction system
-                </span>
+                <span className="text-gray-700">{t('convex.feature1')}</span>
               </li>
               <li className="flex items-start">
                 <div className="w-2 h-2 bg-gray-900 rounded-full mt-2 mr-3"></div>
-                <span className="text-gray-700">
-                  Supports edge angles 15°–45°
-                </span>
+                <span className="text-gray-700">{t('convex.feature2')}</span>
               </li>
               <li className="flex items-start">
                 <div className="w-2 h-2 bg-gray-900 rounded-full mt-2 mr-3"></div>
-                <span className="text-gray-700">
-                  Anti-glare surface with adjustable grip
-                </span>
+                <span className="text-gray-700">{t('convex.feature3')}</span>
               </li>
             </ul>
 
-            <div className="text-3xl font-bold text-gray-900">$79.99</div>
+            {/* 🚀 Price */}
+            <div className="text-3xl font-bold text-gray-900">
+              {t('convex.price')}
+            </div>
           </div>
         </div>
       </section>

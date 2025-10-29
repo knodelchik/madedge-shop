@@ -6,14 +6,17 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { useCartStore } from '../../store/cartStore';
-import QuantityCounter from '../../../Components/QuantityCounter';
-import WishlistButton from '../../../Components/WishlistButton'; // Додаємо імпорт
+import QuantityCounter from '@/app/Components/QuantityCounter';
+import WishlistButton from '@/app/Components/WishlistButton';
 import { productsService } from '../../services/productService';
-import { Product } from '../../../types/products';
+import { Product } from '@/app/types/products';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 export default function ProductPage() {
   const { slug } = useParams();
+  const t = useTranslations('ProductPage');
+
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentImage, setCurrentImage] = useState(0);
@@ -38,20 +41,20 @@ export default function ProductPage() {
         setProduct(foundProduct || null);
       } catch (error) {
         console.error('Error loading product:', error);
-        toast.error('Помилка завантаження товару');
+        toast.error(t('errorLoading'));
       } finally {
         setLoading(false);
       }
     };
 
     loadProduct();
-  }, [slug]);
+  }, [slug, t]);
 
   const handleAddToCart = () => {
     if (!product) return;
 
     addToCart({ ...product, quantity });
-    toast.success('Товар додано в кошик', {
+    toast.success(t('addToCartSuccess'), {
       description: product.title,
     });
   };
@@ -73,7 +76,7 @@ export default function ProductPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Завантаження...</div>
+        <div className="text-xl">{t('loading')}</div>
       </div>
     );
   }
@@ -82,12 +85,12 @@ export default function ProductPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-2xl text-center">
-          <p>Товар не знайдено</p>
+          <p>{t('notFound')}</p>
           <Link
             href="/shop"
             className="text-blue-500 underline mt-4 inline-block"
           >
-            Повернутися до магазину
+            {t('backToShop')}
           </Link>
         </div>
       </div>
@@ -102,7 +105,7 @@ export default function ProductPage() {
           href="/shop"
           className="inline-flex items-center text-blue-500 hover:text-blue-700 mb-6"
         >
-          ← Повернутися до магазину
+          {t('backToShopButton')}
         </Link>
 
         <div className="bg-white rounded-2xl shadow-lg p-8">
@@ -113,7 +116,7 @@ export default function ProductPage() {
                 <motion.img
                   key={product.images[currentImage]}
                   src={product.images[currentImage]}
-                  alt={product.title}
+                  alt={`${t('imageAltPrefix')} ${currentImage + 1}`}
                   className="w-full h-80 object-contain rounded-lg"
                   initial={{ opacity: 0.5, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -154,7 +157,7 @@ export default function ProductPage() {
                     >
                       <Image
                         src={image}
-                        alt={`${product.title} ${index + 1}`}
+                        alt={`${t('imageAltPrefix')} ${index + 1}`}
                         width={80}
                         height={80}
                         className="w-full h-20 object-cover"
@@ -190,7 +193,7 @@ export default function ProductPage() {
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-gray-700">
-                      Кількість:
+                      {t('quantityLabel')}
                     </span>
                     <QuantityCounter
                       value={quantity}
@@ -205,7 +208,7 @@ export default function ProductPage() {
                     onClick={handleAddToCart}
                     className="flex-1 bg-black text-white px-8 py-3 rounded-xl font-semibold hover:bg-gray-800 transition-colors"
                   >
-                    Додати в кошик
+                    {t('addToCart')}
                   </button>
 
                   {/* Додаткова кнопка Wishlist для мобільних пристроїв */}
@@ -222,7 +225,7 @@ export default function ProductPage() {
                 <div className="hidden md:flex items-center gap-2 pt-2">
                   <WishlistButton productId={product.id} size="sm" />
                   <span className="text-sm text-gray-600">
-                    Додати до списку бажань
+                    {t('addToWishlist')}
                   </span>
                 </div>
               </div>
@@ -231,7 +234,7 @@ export default function ProductPage() {
               {product.category && (
                 <div className="pt-4 border-t border-gray-200">
                   <span className="text-sm text-gray-500">
-                    Категорія: {product.category}
+                    {t('categoryLabel')} {product.category}
                   </span>
                 </div>
               )}

@@ -1,6 +1,9 @@
-import React from 'react';
+'use client';
 
-// Компонент ціни (залишаємо без змін)
+import React from 'react';
+import { useTranslations } from 'next-intl'; // 👈 Додаємо імпорт
+
+// Компонент ціни (залишаємо без змін, але локалізуємо note)
 const PriceBlock = ({ price, note }: { price: string; note: string }) => (
   <div className="mt-2">
     <p className="text-3xl font-bold text-gray-900">{price}</p>
@@ -9,17 +12,18 @@ const PriceBlock = ({ price, note }: { price: string; note: string }) => (
 );
 
 export default function GrindingStonesPage() {
+  const t = useTranslations('GrindingStonesPage'); // 👈 Ініціалізуємо переклади
+  const t_comp = useTranslations('GrindingStonesPage.comparison'); // 👈 Окремий простір для таблиці
+
   return (
     <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       {/* Hero Section */}
       <div className="mb-16">
         <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-4">
-          Grinding Stones
+          {t('hero.title')}
         </h1>
         <p className="mt-4 text-xl text-gray-500 border-b pb-6 border-gray-200">
-          Professional sharpening stones for precision edge restoration. Choose
-          between diamond-embedded bars for extreme durability or aluminum oxide
-          stones for traditional sharpening excellence.
+          {t('hero.subtitle')}
         </p>
       </div>
       {/* --- Diamond Stones --- */}
@@ -28,77 +32,74 @@ export default function GrindingStonesPage() {
           {/* Left Content */}
           <div className="lg:w-3/5 space-y-8 order-2 lg:order-1">
             <div className="inline-block bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded mb-3">
-              PREMIUM
+              {t('diamond.tag')}
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-6  border-l-4 border-blue-600 pl-2">
-              Diamond Stones
+            <h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-blue-600 pl-2">
+              {t('diamond.title')}
             </h2>
 
             <p className="text-gray-700 text-lg leading-relaxed">
-              Set of four precision-engineered diamond stones with monolayer
-              metal bond. Diamonds evenly distributed throughout the volume
-              ensure consistent sharpening performance and exceptional
-              longevity.
+              {t('diamond.description')}
             </p>
 
             {/* Technical Details */}
             <div>
               <h3 className="text-xl font-semibold text-gray-800 mb-3 ">
-                Technical Specifications
+                {t('diamond.specsTitle')}
               </h3>
               <p className="space-y-2 text-md text-gray-600 list-disc list-inside ">
                 <ol>
-                  <strong>Type:</strong> Monolayer metal bond with diamonds
+                  <strong>{t('diamond.specTypeLabel')}:</strong>{' '}
+                  {t('diamond.specTypeValue')}
                 </ol>
                 <ol>
-                  <strong>Size:</strong> 150 × 25 × 3 mm
+                  <strong>{t('diamond.specSizeLabel')}:</strong>{' '}
+                  {t('diamond.specSizeValue')}
                 </ol>
                 <ol>
-                  <strong>Material:</strong> Copper-tin bond
+                  <strong>{t('diamond.specMaterialLabel')}:</strong>{' '}
+                  {t('diamond.specMaterialValue')}
                 </ol>
                 <ol>
-                  <strong>Diamond Concentration:</strong> 100%
+                  <strong>{t('diamond.specConcLabel')}:</strong>{' '}
+                  {t('diamond.specConcValue')}
                 </ol>
                 <ol>
-                  <strong>Tolerance:</strong> ±0.1 mm
+                  <strong>{t('diamond.specToleranceLabel')}:</strong>{' '}
+                  {t('diamond.specToleranceValue')}
                 </ol>
               </p>
               <div className="mt-10">
-                <PriceBlock price="$84.99" note="Set of 4 stones included" />
+                <PriceBlock
+                  price={t('diamond.price')}
+                  note={t('diamond.priceNote')} // 🚀 Локалізація note
+                />
               </div>
             </div>
           </div>
 
           {/* Right Block (Image + Details + Price) */}
           <div className="lg:w-2/5 flex flex-col items-start mb-6 lg:mb-0 order-1 lg:order-2">
-            {/* --- Лише фото в рамці --- */}
             <div className="bg-white aspect-square flex items-center justify-center overflow-hidden w-full rounded-lg border border-gray-200 shadow-sm">
               <img
                 src="/images/diamondstones.jpg"
-                alt="MadEdge Diamond Stones Set"
+                alt={t('diamond.imageAlt')}
                 className="w-full h-full object-cover"
               />
             </div>
 
-            {/* --- Текст під фото, без рамки --- */}
             <div className="mt-8 space-y-3">
               <div className="flex items-start">
                 <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3"></div>
-                <span className="text-gray-700">
-                  Ultra-durable diamond coating
-                </span>
+                <span className="text-gray-700">{t('diamond.feature1')}</span>
               </div>
               <div className="flex items-start">
                 <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3"></div>
-                <span className="text-gray-700">
-                  Suitable for carbide and hardened steel
-                </span>
+                <span className="text-gray-700">{t('diamond.feature2')}</span>
               </div>
               <div className="flex items-start">
                 <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3"></div>
-                <span className="text-gray-700">
-                  Ideal for industrial and precision use
-                </span>
+                <span className="text-gray-700">{t('diamond.feature3')}</span>
               </div>
             </div>
           </div>
@@ -111,140 +112,166 @@ export default function GrindingStonesPage() {
           {/* Left Content */}
           <div className="lg:w-3/5 space-y-8 order-2 lg:order-1">
             <div className="inline-block bg-black text-white text-xs font-bold px-3 py-1 rounded mb-3">
-              TRADITIONAL
+              {t('oxide.tag')}
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-black pl-3">
-              Aluminum Oxide Sharpening Stones
+              {t('oxide.title')}
             </h2>
 
             <p className="text-gray-700 text-lg leading-relaxed">
-              Premium aluminum oxide stones designed for versatile sharpening
-              applications. Four different grit levels provide everything from
-              initial shaping to fine polishing.
+              {t('oxide.description')}
             </p>
 
             {/* Technical Details */}
             <div>
               <h3 className="text-xl font-semibold text-gray-800 mb-3">
-                Technical Specifications
+                {t('oxide.specsTitle')}
               </h3>
               <p className="space-y-2 text-md text-gray-600 list-disc list-inside ">
                 <ol>
-                  <strong>Size:</strong> 160mm × 25mm × 6mm
+                  <strong>{t('oxide.specSizeLabel')}:</strong>{' '}
+                  {t('oxide.specSizeValue')}
                 </ol>
                 <ol>
-                  <strong>Material:</strong> Aluminum oxide
+                  <strong>{t('oxide.specMaterialLabel')}:</strong>{' '}
+                  {t('oxide.specMaterialValue')}
                 </ol>
                 <ol>
-                  <strong>Grit Options:</strong> 200 / 400 / 800 / 1500
+                  <strong>{t('oxide.specGritLabel')}:</strong>{' '}
+                  {t('oxide.specGritValue')}
                 </ol>
                 <ol>
-                  <strong>Shape:</strong> Rectangular bar
+                  <strong>{t('oxide.specShapeLabel')}:</strong>{' '}
+                  {t('oxide.specShapeValue')}
                 </ol>
               </p>
               <div className="mt-10">
-                <PriceBlock price="$36.99" note="Set of 4 stones included" />
+                <PriceBlock
+                  price={t('oxide.price')}
+                  note={t('oxide.priceNote')} // 🚀 Локалізація note
+                />
               </div>
             </div>
           </div>
 
           {/* Right Block (Image + Details + Price) */}
           <div className="lg:w-2/5 flex flex-col items-start mb-6 lg:mb-0 order-1 lg:order-2">
-            {/* --- Лише фото в рамці --- */}
             <div className="bg-white aspect-square flex items-center justify-center overflow-hidden w-full rounded-lg border border-gray-200 shadow-sm">
               <img
                 src="/images/sharpstones-1.jpg"
-                alt="MadEdge Aluminum Oxide Sharpening Stones"
+                alt={t('oxide.imageAlt')}
                 className="w-full h-full object-cover"
               />
             </div>
 
-            {/* --- Текст під фото --- */}
             <div className="mt-6 space-y-3">
               <div className="flex items-start">
                 <div className="w-2 h-2 bg-black rounded-full mt-2 mr-3"></div>
-                <span className="text-gray-700">
-                  Four grit levels: 200 / 400 / 800 / 1500
-                </span>
+                <span className="text-gray-700">{t('oxide.feature1')}</span>
               </div>
               <div className="flex items-start">
                 <div className="w-2 h-2 bg-black rounded-full mt-2 mr-3"></div>
-                <span className="text-gray-700">
-                  Water-based sharpening (soak before use)
-                </span>
+                <span className="text-gray-700">{t('oxide.feature2')}</span>
               </div>
               <div className="flex items-start">
                 <div className="w-2 h-2 bg-black rounded-full mt-2 mr-3"></div>
-                <span className="text-gray-700">
-                  Ideal for kitchen knives and woodworking tools
-                </span>
+                <span className="text-gray-700">{t('oxide.feature3')}</span>
               </div>
             </div>
           </div>
         </div>
       </section>
       <hr className="my-16 border-gray-200" />
-      {/* --- Comparison Table (залишаємо без змін) --- */}
-      <section className="mb-20">
+      {/* --- Comparison Table --- */}
+      <section id="comparison" className="mb-20 scroll-mt-24">
         <h2 className="text-4xl font-bold text-gray-900 mb-8 text-center mt-12">
-          Stone Comparison
+          {t('comparison.title')}
         </h2>
         <div className="flex justify-center">
           <div className="overflow-x-auto">
             <table className="min-w-[800px] border-1 border-gray-500 mx-auto text-center">
               <thead className="bg-black text-white">
                 <tr>
-                  <th className="p-4 text-left w-1/3">Feature</th>
-                  <th className="p-4 text-center w-1/3">Diamond Stones</th>
-                  <th className="p-4 text-center w-1/3">Aluminum Oxide</th>
+                  <th className="p-4 text-left w-1/3">{t_comp('feature')}</th>
+                  <th className="p-4 text-center w-1/3">
+                    {t_comp('diamondStonesTitle')}
+                  </th>
+                  <th className="p-4 text-center w-1/3">
+                    {t_comp('aluminumOxideTitle')}
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white">
                 <tr className="border-b-1 border-gray-500">
-                  <td className="p-4 font-semibold text-left">Material</td>
-                  <td className="p-4 text-center">Diamond + Copper-tin bond</td>
-                  <td className="p-4 text-center">Aluminum oxide</td>
+                  <td className="p-4 font-semibold text-left">
+                    {t_comp('material')}
+                  </td>
+                  <td className="p-4 text-center">
+                    {t_comp('materialDiamond')}
+                  </td>
+                  <td className="p-4 text-center">{t_comp('materialOxide')}</td>
                 </tr>
                 <tr className="border-b-1 border-gray-500">
-                  <td className="p-4 font-semibold text-left">Size (mm)</td>
+                  <td className="p-4 font-semibold text-left">
+                    {t_comp('size')}
+                  </td>
                   <td className="p-4 text-center">150 × 25 × 3</td>
                   <td className="p-4 text-center">160 × 25 × 6</td>
                 </tr>
                 <tr className="border-b-1 border-gray-500">
-                  <td className="p-4 font-semibold text-left">Grit Range</td>
-                  <td className="p-4 text-center">Various (4 stones)</td>
-                  <td className="p-4 text-center">200 / 400 / 800 / 1500</td>
-                </tr>
-                <tr className="border-b-1 border-gray-500">
-                  <td className="p-4 font-semibold text-left">Durability</td>
-                  <td className="p-4 text-center text-blue-600 font-bold">
-                    Extreme
+                  <td className="p-4 font-semibold text-left">
+                    {t_comp('gritRange')}
                   </td>
-                  <td className="p-4 text-center">High</td>
+                  <td className="p-4 text-center">
+                    {t_comp('gritRangeDiamond')}
+                  </td>
+                  <td className="p-4 text-center">
+                    {t_comp('gritRangeOxide')}
+                  </td>
                 </tr>
                 <tr className="border-b-1 border-gray-500">
-                  <td className="p-4 font-semibold text-left">Best For</td>
-                  <td className="p-4 text-center">Industrial, carbide</td>
-                  <td className="p-4 text-center">General purpose</td>
+                  <td className="p-4 font-semibold text-left">
+                    {t_comp('durability')}
+                  </td>
+                  <td className="p-4 text-center text-blue-600 font-bold">
+                    {t_comp('durabilityDiamond')}
+                  </td>
+                  <td className="p-4 text-center">
+                    {t_comp('durabilityOxide')}
+                  </td>
+                </tr>
+                <tr className="border-b-1 border-gray-500">
+                  <td className="p-4 font-semibold text-left">
+                    {t_comp('bestFor')}
+                  </td>
+                  <td className="p-4 text-center">
+                    {t_comp('bestForDiamond')}
+                  </td>
+                  <td className="p-4 text-center">{t_comp('bestForOxide')}</td>
                 </tr>
                 <tr>
-                  <td className="p-4 font-semibold text-left">Price</td>
-                  <td className="p-4 text-center font-bold">$84.99</td>
-                  <td className="p-4 text-center font-bold">$36.99</td>
+                  <td className="p-4 font-semibold text-left">
+                    {t_comp('price')}
+                  </td>
+                  <td className="p-4 text-center font-bold">
+                    {t('diamond.price')}
+                  </td>
+                  <td className="p-4 text-center font-bold">
+                    {t('oxide.price')}
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
       </section>
-      <hr className="my-16 border-gray-200" />
-      {/* --- Usage Guide (БЕЗ ЗМІН) --- */}
+      <hr className="my-16 border-gray-200" /> {/* --- Usage Guide --- */}
       <section
         id="usage-guide"
         className="mb-20 scroll-mt-24 bg-gradient-to-br from-blue-50 to-white rounded-xl p-8 border border-blue-100 shadow-md"
       >
         <h2 className="text-3xl font-bold text-gray-900 mb-8 ">
-          How to Use Sharpening Stones
+          {t('usageGuide.title')}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Step 1-3 */}
@@ -257,18 +284,10 @@ export default function GrindingStonesPage() {
                 {step}
               </div>
               <h3 className="font-bold text-lg text-gray-900 mb-1">
-                {step === 1
-                  ? 'Prepare the Stone'
-                  : step === 2
-                  ? 'Set the Angle'
-                  : 'Start with Coarse Grit'}
+                {t(`usageGuide.step${step}.heading`)}
               </h3>
               <p className="text-gray-700 text-sm">
-                {step === 1
-                  ? 'For aluminum oxide stones, soak in water for 10 minutes. Diamond stones can be used dry or with light oil.'
-                  : step === 2
-                  ? 'Maintain consistent angle: 15-20° for knives, 25-30° for tools.'
-                  : 'Begin with 200-400 grit to establish the edge.'}
+                {t(`usageGuide.step${step}.text`)}
               </p>
             </div>
           ))}
@@ -284,18 +303,10 @@ export default function GrindingStonesPage() {
                 {step}
               </div>
               <h3 className="font-bold text-lg text-gray-900 mb-1">
-                {step === 4
-                  ? 'Progress Through Grits'
-                  : step === 5
-                  ? 'Use Smooth Strokes'
-                  : 'Clean & Store'}
+                {t(`usageGuide.step${step}.heading`)}
               </h3>
               <p className="text-gray-700 text-sm">
-                {step === 4
-                  ? 'Move to finer grits: 400 → 800 → 1500 for polished edge.'
-                  : step === 5
-                  ? 'Apply even pressure along the entire blade length.'
-                  : 'Rinse aluminum oxide stones, wipe diamond stones clean.'}
+                {t(`usageGuide.step${step}.text`)}
               </p>
             </div>
           ))}
@@ -305,31 +316,32 @@ export default function GrindingStonesPage() {
       <section id="care-instructions" className="mb-20 scroll-mt-24">
         <div className="bg-white border border-gray-300 p-8 rounded-xl shadow-lg">
           <h2 className="text-3xl font-bold text-gray-900 mb-6">
-            Stone Care & Maintenance
+            {t('care.title')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 divide-x divide-gray-200">
             {/* Diamond Stones Care */}
             <div className="pr-4">
               <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <span className="text-blue-600">◇</span> Diamond Stones
+                <span className="text-blue-600">◇</span>{' '}
+                {t('care.diamondTitle')}
               </h3>
               <ul className="space-y-3 text-gray-700 list-disc list-inside ml-4">
-                <li>Can be used dry or with light oil</li>
-                <li>Clean with soft brush and water</li>
-                <li>Do not require flattening</li>
-                <li>Store in protective case when not in use</li>
+                <li>{t('care.diamond1')}</li>
+                <li>{t('care.diamond2')}</li>
+                <li>{t('care.diamond3')}</li>
+                <li>{t('care.diamond4')}</li>
               </ul>
             </div>
             {/* Aluminum Oxide Stones Care */}
             <div className="pl-4">
               <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <span className="text-gray-900">◇</span> Aluminum Oxide Stones
+                <span className="text-gray-900">◇</span> {t('care.oxideTitle')}
               </h3>
               <ul className="space-y-3 text-gray-700 list-disc list-inside ml-4">
-                <li>Soak in water before use (10 minutes)</li>
-                <li>Clean with water only, no soap</li>
-                <li>Flatten surface periodically with flattening stone</li>
-                <li>Dry completely before storing</li>
+                <li>{t('care.oxide1')}</li>
+                <li>{t('care.oxide2')}</li>
+                <li>{t('care.oxide3')}</li>
+                <li>{t('care.oxide4')}</li>
               </ul>
             </div>
           </div>

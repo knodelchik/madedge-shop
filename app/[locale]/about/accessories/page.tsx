@@ -1,121 +1,27 @@
+'use client';
+
 import React from 'react';
 import { ShieldCheck } from 'lucide-react';
+import { useTranslations } from 'next-intl'; // 👈 Додаємо імпорт
 
-// Data for all accessories, including a documentation-style description.
-const accessoriesData = [
-  {
-    id: 'rotary-mechanism',
-    name: 'MadEdge Rotary Mechanism Model 1',
-    price: 80,
-    imageSrc: '/images/rotarymechanism-1.jpg',
-    features: [
-      'Dual symmetrical fixed rotary positions for consistent setup.',
-      'Easy rotation despite a powerful spring, eliminating the need to pull the mechanism.',
-      'Adjusting nut to modify spring compression force.',
-      'All rubbing parts are **hardened steel** for maximum service life.',
-      'Wear-resistant polymer coating (similar to car wheels).',
-    ],
-    details: [
-      'Rotary frame length: 200 mm.',
-      'Clamping jaws are **heat-treated steel** with an 8-degree slant per side.',
-      'Supports sharpening angles up to 12 degrees per side.',
-      'Spherical nut in clamps compensates for screw misalignment with thin knives.',
-      'Minimum blade length for two clamps: ~80 mm.',
-    ],
-  },
-  {
-    id: 'table-mount',
-    name: 'Table Mount',
-    price: 16,
-    imageSrc: '/images/tablemount-1.jpg',
-    features: [
-      'Provides a **stable and secure** base for the sharpening system.',
-      'Designed to firmly clamp the MadEdge system to any horizontal surface.',
-    ],
-    details: [
-      'Ensures maximum rigidity and minimizes vibration during operation.',
-    ],
-  },
-  {
-    id: 'hinge-rest-hook',
-    name: 'Hinge with Rest Hook',
-    price: 10,
-    imageSrc: '/images/hinge-1.jpg',
-    features: [
-      'Hole diameter: 8 mm.',
-      'Features a **pressed-in sleeve** made of anti-friction bronze.',
-    ],
-    details: [
-      'The bronze sleeve guarantees **increased smoothness** of movement, crucial for angle consistency.',
-    ],
-  },
-  {
-    id: 'clamp-full-flat',
-    name: 'MadEdge Clamp for Full Flat',
-    price: 23, // Price per piece
-    imageSrc: '/images/adapterclamps-1.jpg',
-    features: [
-      'Made of **heat-treated spring steel** for optimal strength and retention.',
-      'Specifically designed for securely fixing knives with a **full flat grind**.',
-    ],
-    details: [
-      'Ensures even pressure and prevents blade damage.',
-      'Price listed is for 1 pc. A pair of clamps costs $46.',
-    ],
-  },
-  {
-    id: 'adapter-flat-chisels',
-    name: 'Adapter for Sharpening Flat Chisels',
-    price: 13,
-    imageSrc: '/images/adaptersharp-1.jpg',
-    features: [
-      'Expands the MadEdge system capability to include flat chisels.',
-      'Provides the necessary **rigid and straight fixation** for chiseled edges.',
-    ],
-    details: ['Allows non-knife tools to be sharpened with high precision.'],
-  },
-  {
-    id: 'adapter-for-clamps',
-    name: 'Center Clamp Adapter',
-    price: 10,
-    imageSrc: '/images/clamp-2.jpg',
-    features: [
-      'Enables closer positioning of clamps for **sharpening short blades**.',
-      'Ensures a rigid fixing position even at minimal clamp spacing.',
-    ],
-    details: ['Note: Adapter is sold without clamps.'],
-  },
-  {
-    id: 'hinge-convex',
-    name: 'Hinge for Convex',
-    price: 9,
-    imageSrc: '/images/hingeconvex-1.jpg',
-    features: [
-      'Specialized hinge for sharpening knives with a **convex (lenticular) edge**.',
-      'Allows for the controlled movement necessary to achieve a perfect convex profile.',
-    ],
-    details: ['All parts are constructed from durable steel.'],
-  },
-  {
-    id: 'fine-turning-adapter',
-    name: 'Fine-Tuning Adapter',
-    price: 4,
-    imageSrc: '/images/fineadapter-1.jpg',
-    features: [
-      'Simple tool for **precisely adjusting and maintaining** the sharpening angle.',
-      'Hole diameter: 8 mm.',
-    ],
-    details: [
-      'A crucial element for achieving micro-bevels and final sharpening accuracy.',
-    ],
-  },
-];
+// --- Types and Constants ---
 
-interface AccessoryItemProps {
-  accessory: (typeof accessoriesData)[0];
+// Визначаємо інтерфейс для даних аксесуарів, які будуть взяті з перекладів
+interface Accessory {
+  id: string;
+  name: string;
+  price: number;
+  imageSrc: string;
+  features: string[];
+  details: string[];
 }
 
-const AccessoryItem: React.FC<AccessoryItemProps> = ({ accessory }) => (
+interface AccessoryItemProps {
+  accessory: Accessory;
+  t: (key: string) => string; // 👈 Додаємо функцію перекладу
+}
+
+const AccessoryItem: React.FC<AccessoryItemProps> = ({ accessory, t }) => (
   <div id={accessory.id} className="scroll-mt-24">
     <h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-gray-900 pl-3">
       {accessory.name}
@@ -132,7 +38,7 @@ const AccessoryItem: React.FC<AccessoryItemProps> = ({ accessory }) => (
           />
           <div className="p-4 border-t border-gray-200 bg-gray-50">
             <p className="text-xl font-semibold text-gray-900 mb-1">
-              Price: ${accessory.price.toFixed(0)}
+              {t('itemPrice')}: ${accessory.price.toFixed(0)}
             </p>
           </div>
         </div>
@@ -143,11 +49,11 @@ const AccessoryItem: React.FC<AccessoryItemProps> = ({ accessory }) => (
         {/* Key Features */}
         <div>
           <h3 className="text-xl font-semibold text-gray-800 mb-3 border-l-4 border-blue-600 pl-3">
-            Key Features
+            {t('itemFeaturesTitle')}
           </h3>
           <ul className="space-y-2 text-lg text-gray-700 list-disc list-inside">
             {accessory.features.map((feature, i) => (
-              <li key={i}>{feature}</li>
+              <li key={i} dangerouslySetInnerHTML={{ __html: feature }} />
             ))}
           </ul>
         </div>
@@ -155,11 +61,11 @@ const AccessoryItem: React.FC<AccessoryItemProps> = ({ accessory }) => (
         {/* Technical Details */}
         <div>
           <h3 className="text-xl font-semibold text-gray-800 mb-3 border-l-4 border-blue-600 pl-3">
-            Technical Specifications & Notes
+            {t('itemDetailsTitle')}
           </h3>
           <ul className="space-y-2 text-md text-gray-600 list-disc list-inside ml-4">
             {accessory.details.map((detail, i) => (
-              <li key={i}>{detail}</li>
+              <li key={i} dangerouslySetInnerHTML={{ __html: detail }} />
             ))}
           </ul>
         </div>
@@ -169,21 +75,28 @@ const AccessoryItem: React.FC<AccessoryItemProps> = ({ accessory }) => (
 );
 
 const AccessoriesPage: React.FC = () => {
+  const t = useTranslations('AccessoriesPage');
+
+  // Отримуємо дані про аксесуари з об'єкта перекладів.
+  // Припускаємо, що JSON-масив аксесуарів зберігається під ключем 'accessoriesData'
+  const accessoriesData = t.raw('accessoriesData') as unknown as Accessory[];
+
   return (
     <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-4">
-        Accessories
+        {t('heroTitle')}
       </h1>
       <p className="mt-4 text-xl text-gray-500 mb-16 border-b pb-6 border-gray-200">
-        Explore the detailed specifications and features of our professional
-        accessories, designed to extend the versatility, precision, and
-        performance of your MadEdge sharpening system.
+        {t('heroSubtitle')}
       </p>
 
       <div className="space-y-16">
-        {accessoriesData.map((accessory, index) => (
+        {accessoriesData.map((accessory: Accessory, index: number) => (
           <React.Fragment key={accessory.id}>
-            <AccessoryItem accessory={accessory} />
+            <AccessoryItem
+              accessory={accessory}
+              t={t} // Передаємо функцію перекладу в компонент
+            />
             {/* Horizontal line separator */}
             {index < accessoriesData.length - 1 && (
               <hr className="my-16 border-gray-200" />
@@ -199,18 +112,13 @@ const AccessoriesPage: React.FC = () => {
       >
         <h2 className="text-3xl font-bold text-gray-900 mb-4 flex items-center">
           <ShieldCheck className="w-8 h-8 mr-3" />
-          Commitment to Authenticity
+          {t('authenticity.title')}
         </h2>
         <p className="text-lg text-gray-900">
-          At <strong>MadEdge</strong>, we guarantee that all products and
-          accessories listed here are{' '}
-          <strong>100% original, proprietary designs</strong>. We are committed
-          to manufacturing tools of the highest quality using our exclusive
-          materials and engineering processes. When you choose MadEdge, you are
-          investing in an{' '}
-          <strong>authentic, precision sharpening system</strong> built for
-          reliability and performance. We do not sell copies or third-party
-          imitations.
+          {t.rich('authenticity.text', {
+            // Використовуємо t.rich для форматування жирним шрифтом
+            strong: (children) => <strong>{children}</strong>,
+          })}
         </p>
       </div>
     </div>
