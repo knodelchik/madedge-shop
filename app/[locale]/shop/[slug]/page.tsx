@@ -98,7 +98,7 @@ export default function ProductPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-8 dark:bg-black">
       <div className="max-w-6xl mx-auto px-4">
         {/* Кнопка назад */}
         <Link
@@ -108,11 +108,11 @@ export default function ProductPage() {
           {t('backToShopButton')}
         </Link>
 
-        <div className="bg-white rounded-2xl shadow-lg p-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="bg-white rounded-2xl shadow-lg p-8 dark:bg-neutral-800 ">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 ">
             {/* Слайдер фото */}
             <div className="space-y-4">
-              <div className="relative w-full flex items-center justify-center bg-gray-100 rounded-2xl p-4">
+              <div className="relative w-full flex items-center justify-center bg-gray-100 rounded-2xl p-4 dark:bg-white">
                 <motion.img
                   key={product.images[currentImage]}
                   src={product.images[currentImage]}
@@ -128,13 +128,13 @@ export default function ProductPage() {
                   <>
                     <button
                       onClick={prevImage}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-3 shadow-lg transition-all"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white dark:text-neutral-800 dark:bg-neutral-400/70 dark:hover:text-white dark:hover:bg-neutral-400  rounded-full p-3 shadow-lg transition-all"
                     >
                       ‹
                     </button>
                     <button
                       onClick={nextImage}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-3 shadow-lg transition-all"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white dark:text-neutral-800 dark:bg-neutral-400/70 dark:hover:text-white dark:hover:bg-neutral-400 rounded-full p-3 shadow-lg transition-all"
                     >
                       ›
                     </button>
@@ -169,12 +169,12 @@ export default function ProductPage() {
             </div>
 
             {/* Інформація про товар */}
-            <div className="space-y-6">
+            <div className="space-y-6 dark:bg-neutral-800 ">
               <div>
-                <h1 className="text-3xl font-bold text-gray-800 mb-4">
+                <h1 className="text-3xl font-bold text-gray-800 mb-4 dark:text-white">
                   {product.title}
                 </h1>
-                <p className="text-2xl font-semibold text-gray-700">
+                <p className="text-2xl font-semibold text-gray-700 dark:text-neutral-200">
                   {product.price} $
                 </p>
               </div>
@@ -182,7 +182,7 @@ export default function ProductPage() {
               {product.description && (
                 <div className="prose max-w-none">
                   <div
-                    className="text-gray-600 leading-relaxed"
+                    className="text-gray-600 leading-relaxed dark:text-neutral-400"
                     dangerouslySetInnerHTML={{ __html: product.description }}
                   />
                 </div>
@@ -192,7 +192,7 @@ export default function ProductPage() {
               <div className="space-y-4 pt-4">
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-gray-700">
+                    <span className="text-sm font-medium text-gray-700 dark:text-neutral-200">
                       {t('quantityLabel')}
                     </span>
                     <QuantityCounter
@@ -206,25 +206,29 @@ export default function ProductPage() {
                 <div className="flex gap-3">
                   <button
                     onClick={handleAddToCart}
-                    className="flex-1 bg-black text-white px-8 py-3 rounded-xl font-semibold hover:bg-gray-800 transition-colors"
+                    className="flex-1 bg-black text-white px-8 py-3 rounded-xl font-semibold hover:bg-gray-800 dark:text-white dark:bg-neutral-500 dark:hover:text-black dark:hover:bg-neutral-100  transition-colors"
                   >
                     {t('addToCart')}
                   </button>
 
                   {/* Додаткова кнопка Wishlist для мобільних пристроїв */}
-                  <div className="md:hidden">
+                  <div className="md:hidden ">
                     <WishlistButton
                       productId={product.id}
                       size="md"
-                      className="border-2 border-gray-300 hover:border-red-300"
+                      className="border-2 border-gray-300 hover:border-red-300 "
                     />
                   </div>
                 </div>
 
                 {/* Альтернативний варіант Wishlist кнопки для десктопу */}
-                <div className="hidden md:flex items-center gap-2 pt-2">
-                  <WishlistButton productId={product.id} size="sm" />
-                  <span className="text-sm text-gray-600">
+                <div className="hidden md:flex items-center gap-2 pt-2 ">
+                  <WishlistButton
+                    productId={product.id}
+                    size="sm"
+                    className=" dark:text-neutral-200 dark:border-neutral-200 dark:bg-neutral-900  dark:hover:border-red-500 dark:hover:text-red-500"
+                  />
+                  <span className="text-sm text-gray-600 dark:text-neutral-300">
                     {t('addToWishlist')}
                   </span>
                 </div>
@@ -232,8 +236,8 @@ export default function ProductPage() {
 
               {/* Категорія */}
               {product.category && (
-                <div className="pt-4 border-t border-gray-200">
-                  <span className="text-sm text-gray-500">
+                <div className="pt-4 border-t border-gray-200 dark:border-neutral-500 ">
+                  <span className="text-sm text-gray-500 dark:text-neutral-200">
                     {t('categoryLabel')} {product.category}
                   </span>
                 </div>

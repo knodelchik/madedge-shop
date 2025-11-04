@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-// 1. Використовуємо функцію для отримання перекладів на клієнті
 import { useTranslations } from 'next-intl';
 import { Lightbulb, Info, Plane, Headphones } from 'lucide-react';
 
@@ -23,9 +22,7 @@ const SpotlightCard: React.FC<SpotlightCardProps> = ({
   const [isVisible, setIsVisible] = React.useState(false);
 
   React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsVisible(true);
-    }, delay);
+    const timer = setTimeout(() => setIsVisible(true), delay);
     return () => clearTimeout(timer);
   }, [delay]);
 
@@ -37,15 +34,18 @@ const SpotlightCard: React.FC<SpotlightCardProps> = ({
     });
   };
 
-  const cardBg = isWhite ? 'bg-white' : 'bg-black';
-  const borderColor = isWhite ? 'border-gray-800' : 'border-gray-800';
-  const hoverBorderColor = isWhite
-    ? 'hover:border-gray-600'
-    : 'hover:border-gray-700';
+  const baseBg = isWhite
+    ? 'bg-white dark:bg-gray-200'
+    : 'bg-black dark:bg-[#111111]';
+  const baseText = isWhite
+    ? 'text-gray-800 dark:text-white'
+    : 'text-white dark:text-white';
+  const border = 'border border-gray-800 dark:border-neutral-600';
+  const hoverBorder = 'hover:border-gray-600 dark:border-neutral-700';
 
   return (
     <div
-      className={`relative group cursor-pointer overflow-hidden ${cardBg} border ${borderColor} rounded-xl transition-all duration-500 ${hoverBorderColor} transform ${
+      className={`relative group cursor-pointer overflow-hidden ${baseBg} ${border} ${hoverBorder} rounded-xl transition-all duration-500 transform ${
         isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
       } ${className}`}
       onMouseMove={handleMouseMove}
@@ -53,31 +53,27 @@ const SpotlightCard: React.FC<SpotlightCardProps> = ({
       onMouseLeave={() => setIsHovered(false)}
       {...props}
     >
+      {/* Світлова пляма при наведенні */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 blur-[35px]"
         style={{
           background: isHovered
-            ? `radial-gradient(600px circle at ${mousePosition.x}px ${
+            ? `radial-gradient(280px circle at ${mousePosition.x}px ${
                 mousePosition.y
               }px, ${
-                isWhite ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.1)'
-              }, transparent 40%)`
+                isWhite
+                  ? // Для білих карток — легка тінь
+                    'rgba(0,0,0,0.18)'
+                  : // Для темних — "об’ємне" світіння з теплим відтінком
+                    'rgba(255,255,255,0.18)'
+              }, ${
+                isWhite ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.04)'
+              } 50%, transparent 90%)`
             : 'none',
         }}
       />
-      <div
-        className="pointer-events-none absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-        style={{
-          background: isHovered
-            ? `radial-gradient(300px circle at ${mousePosition.x}px ${
-                mousePosition.y
-              }px, ${
-                isWhite ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.05)'
-              }, transparent 40%)`
-            : 'none',
-        }}
-      />
-      <div className="relative z-10">{children}</div>
+
+      <div className="relative z-10 text-center p-8">{children}</div>
     </div>
   );
 };
@@ -89,9 +85,7 @@ type Feature = {
   isSpecial?: boolean;
 };
 
-// 3. InfoSection тепер Client Component
 const InfoSection = () => {
-  // ✅ Викликаємо useTranslations на клієнті
   const t = useTranslations('Info');
 
   const features: Feature[] = [
@@ -119,53 +113,53 @@ const InfoSection = () => {
   ];
 
   return (
-    <section className="w-full bg-white py-20">
+    <section className="w-full bg-white dark:bg-black py-20 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4">
+        {/* Заголовок */}
         <div className="mb-16 text-center">
-          <h1 className="text-4xl lg:text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
             {t('infoTitle')}{' '}
-            <span className="text-gray-600 font-normal lg:text-2xl ">
+            <span className="text-gray-600 dark:text-[#888888] font-normal lg:text-2xl">
               {t('sectionWhatIs')}
             </span>
           </h1>
         </div>
 
+        {/* Картки */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, idx) => (
             <SpotlightCard
               key={idx}
               delay={idx * 100}
               isWhite={feature.isSpecial}
-              className="transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl"
+              className="transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl dark:shadow-gray-800/40"
             >
-              <div className="flex flex-col items-center justify-start p-8 h-full text-center min-h-[320px]">
+              <div className="flex flex-col items-center justify-start h-full min-h-[320px]">
                 <div
                   className={`flex items-center justify-center w-16 h-16 rounded-full mb-6 transition-colors duration-300 ${
                     feature.isSpecial
-                      ? 'bg-black group-hover:bg-gray-800'
-                      : 'bg-white group-hover:bg-gray-100'
+                      ? 'bg-black text-white dark:bg-neutral-800 dark:text-[#fafafa]'
+                      : 'bg-white text-black dark:bg-[#fafafa] dark:text-[#111111]'
                   }`}
                 >
-                  <div
-                    className={feature.isSpecial ? 'text-white' : 'text-black'}
-                  >
-                    {feature.icon}
-                  </div>
+                  {feature.icon}
                 </div>
+
                 <h3
                   className={`text-xl font-semibold mb-4 transition-colors duration-300 ${
                     feature.isSpecial
-                      ? 'text-black group-hover:text-gray-800'
-                      : 'text-white group-hover:text-gray-100'
+                      ? 'text-black dark:text-black'
+                      : 'text-white dark:text-white'
                   }`}
                 >
                   {feature.title}
                 </h3>
+
                 <p
                   className={`text-base leading-relaxed transition-colors duration-300 flex-grow flex items-center ${
                     feature.isSpecial
-                      ? 'text-gray-700 group-hover:text-gray-600'
-                      : 'text-gray-300 group-hover:text-gray-200'
+                      ? 'text-gray-700 dark:text-gray-700'
+                      : 'text-gray-300 dark:text-[#888888]'
                   }`}
                 >
                   {feature.description}

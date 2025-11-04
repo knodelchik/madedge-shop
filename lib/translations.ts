@@ -961,6 +961,39 @@ export const translations = {
         text: 'У <strong >MadEdge</strong> ми гарантуємо, що всі продукти та аксесуари, перераховані тут, є <strong >100% оригінальними, власними розробками</strong>. Ми прагнемо виготовляти інструменти найвищої якості, використовуючи наші ексклюзивні матеріали та інженерні процеси. Обираючи MadEdge, ви інвестуєте в <strong >автентичну, високоточну систему заточування</strong>, створену для надійності та продуктивності. Ми не продаємо копії або імітації від третіх сторін.',
       },
     },
+    AuthForm: {
+      title: {
+        signup: 'Створити обліковий запис',
+        signin: 'Увійти',
+      },
+
+      labels: {
+        fullName: "Повне ім'я",
+        email: 'Email',
+        password: 'Пароль',
+      },
+
+      placeholders: {
+        fullName: "Введіть своє повне ім'я",
+        email: 'Введіть вашу електронну адресу',
+        password: 'Введіть пароль',
+      },
+
+      buttons: {
+        create: 'Створити акаунт',
+        signin: 'Увійти',
+        loading: 'Завантаження...',
+      },
+
+      toggle: {
+        haveAccount: 'Вже маєте акаунт? Увійти',
+        noAccount: 'Немає акаунта? Зареєструватись',
+      },
+
+      errors: {
+        unexpected: 'Сталася непередбачувана помилка. Спробуйте пізніше.',
+      },
+    },
   },
   en: {
     Main: {
@@ -1922,6 +1955,39 @@ export const translations = {
       authenticity: {
         title: 'Commitment to Authenticity',
         text: 'At <strong>MadEdge</strong>, we guarantee that all products and accessories listed here are <strong>100% original, proprietary designs</strong>. We are committed to manufacturing tools of the highest quality using our exclusive materials and engineering processes. When you choose MadEdge, you are investing in an <strong>authentic, precision sharpening system</strong> built for reliability and performance. We do not sell copies or third-party imitations.',
+      },
+    },
+    AuthForm: {
+      title: {
+        signup: 'Create Account',
+        signin: 'Sign In',
+      },
+
+      labels: {
+        fullName: 'Full Name',
+        email: 'Email',
+        password: 'Password',
+      },
+
+      placeholders: {
+        fullName: 'Enter your full name',
+        email: 'Enter your email address',
+        password: 'Enter your password',
+      },
+
+      buttons: {
+        create: 'Create Account',
+        signin: 'Sign In',
+        loading: 'Loading...',
+      },
+
+      toggle: {
+        haveAccount: 'Already have an account? Sign In',
+        noAccount: 'Don’t have an account? Sign Up',
+      },
+
+      errors: {
+        unexpected: 'An unexpected error occurred. Please try again later.',
       },
     },
   },

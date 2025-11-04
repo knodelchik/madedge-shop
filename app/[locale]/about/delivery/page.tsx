@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
 import {
   Truck,
@@ -11,11 +11,11 @@ import {
   Loader,
   Globe,
 } from 'lucide-react';
-import { Country, ICountry, State, IState } from 'country-state-city';
-import { useTranslations } from 'next-intl'; // 👈 Додаємо імпорт
+import { Country, State } from 'country-state-city';
+import { useTranslations } from 'next-intl';
+import { useTheme } from 'next-themes';
 
-// --- Types and Constants (unchanged) ---
-
+// --- Types ---
 interface SelectOption {
   value: string;
   label: string;
@@ -32,7 +32,129 @@ interface DeliveryCost {
   [key: string]: DeliveryOption[];
 }
 
-// Дані про доставку (Використовуємо ISO-коди як ключі)
+function getCustomStyles(themeMode: 'light' | 'dark') {
+  const isDark = themeMode === 'dark';
+
+  const controlBg = isDark ? '#111111' : '#fff';
+  const controlBorder = isDark ? '#262626' : '#d1d5db';
+  const controlBorderFocus = isDark ? '#737373' : '#3b82f6';
+  const textColor = isDark ? '#ffffff' : '#0f172a';
+  const menuBg = isDark ? '#171717' : '#fff';
+  const optionHoverBg = isDark ? '#333333' : '#f3f4f6';
+  const optionActiveBg = isDark ? '#111111' : '#e6eef8';
+  const placeholderColor = isDark ? '#9ca3af' : '#6b7280';
+  const dropdownIndicatorColor = isDark ? '#a1a1aa' : '#6b7280';
+  const menuBorder = isDark ? '#262626' : '#e5e7eb';
+
+  return {
+    control: (provided: any, state: any) => ({
+      ...provided,
+      minHeight: '48px',
+      background: controlBg,
+      borderColor: state.isFocused ? controlBorderFocus : controlBorder,
+      boxShadow: state.isFocused ? `0 0 0 4px ${controlBorderFocus}22` : 'none',
+      '&:hover': {
+        borderColor: state.isFocused ? controlBorderFocus : controlBorder,
+      },
+      color: textColor,
+      outline: 'none',
+      userSelect: 'none',
+      WebkitTapHighlightColor: 'transparent', // key for mobile tap highlight
+    }),
+
+    valueContainer: (provided: any) => ({
+      ...provided,
+      padding: '0 8px',
+      color: textColor,
+      userSelect: 'none',
+    }),
+
+    singleValue: (provided: any) => ({
+      ...provided,
+      color: textColor,
+      userSelect: 'none',
+    }),
+
+    input: (provided: any) => ({
+      ...provided,
+      color: textColor,
+    }),
+
+    placeholder: (provided: any) => ({
+      ...provided,
+      color: placeholderColor,
+    }),
+
+    indicatorsContainer: (provided: any) => ({
+      ...provided,
+      color: dropdownIndicatorColor,
+    }),
+
+    dropdownIndicator: (provided: any) => ({
+      ...provided,
+      color: dropdownIndicatorColor,
+      '&:hover': { color: dropdownIndicatorColor },
+    }),
+
+    menu: (provided: any) => ({
+      ...provided,
+      zIndex: 9999,
+      background: menuBg,
+      border: `1px solid ${menuBorder}`,
+      boxShadow: isDark
+        ? '0 8px 24px rgba(0,0,0,0.6)'
+        : '0 8px 24px rgba(15,23,42,0.08)',
+      outline: 'none',
+      WebkitTapHighlightColor: 'transparent',
+    }),
+
+    menuList: (provided: any) => ({
+      ...provided,
+      padding: 0,
+      color: textColor,
+      maxHeight: '320px',
+      WebkitTapHighlightColor: 'transparent',
+    }),
+
+    option: (provided: any, state: any) => ({
+      ...provided,
+      background: state.isSelected
+        ? optionActiveBg
+        : state.isFocused
+        ? optionHoverBg
+        : 'transparent',
+      color: textColor,
+      padding: '10px 12px',
+      cursor: 'pointer',
+      userSelect: 'none',
+      outline: 'none',
+      WebkitTapHighlightColor: 'transparent',
+      // Вбудований псевдоклас для активного натискання (перекриває синій default)
+      ':active': {
+        background: state.isSelected ? optionActiveBg : optionHoverBg,
+      },
+    }),
+
+    noOptionsMessage: (provided: any) => ({
+      ...provided,
+      color: placeholderColor,
+      padding: '8px 12px',
+    }),
+
+    clearIndicator: (provided: any) => ({
+      ...provided,
+      color: dropdownIndicatorColor,
+      '&:hover': { color: dropdownIndicatorColor },
+    }),
+
+    menuPortal: (provided: any) => ({
+      ...provided,
+      zIndex: 9999,
+    }),
+  };
+}
+
+// Delivery data (unchanged, small RU message kept)
 const DELIVERY_DATA: DeliveryCost = {
   UA: [
     {
@@ -154,7 +276,6 @@ const DELIVERY_DATA: DeliveryCost = {
   ],
 };
 
-// Перекладемо ці значення в messages
 const SERVICE_OPTIONS: SelectOption[] = [
   { label: 'Standard', value: 'Standard' },
   { label: 'Express', value: 'Express' },
@@ -176,7 +297,7 @@ export default function DeliveryPage() {
     allCountriesOptions.find((c) => c.value === 'US') || allCountriesOptions[0];
   const initialServiceOption = SERVICE_OPTIONS[0];
 
-  // --- State Hooks ---
+  // state
   const [selectedCountryOption, setSelectedCountryOption] =
     useState<SelectOption>(initialCountryOption);
   const [selectedServiceOption, setSelectedServiceOption] =
@@ -193,33 +314,36 @@ export default function DeliveryPage() {
     SelectOption[]
   >([]);
 
-  // --- Derived Values ---
   const selectedCountryCode = selectedCountryOption.value;
   const selectedCountryName = selectedCountryOption.label;
   const selectedServiceName = selectedServiceOption.value;
   const selectedStateName = selectedStateOption
     ? selectedStateOption.label
     : '';
+  const { theme, systemTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
-  // --- Effects ---
+  const resolvedTheme = theme === 'system' ? systemTheme : theme;
+  const themeMode = mounted
+    ? (resolvedTheme as string) === 'dark'
+      ? 'dark'
+      : 'light'
+    : 'dark';
+
   useEffect(() => {
-    // Оновлення доступних штатів при зміні країни
     const states = State.getStatesOfCountry(selectedCountryCode).map((s) => ({
       value: s.name,
       label: s.name,
     }));
     setAvailableStatesOptions(states);
-    setSelectedStateOption(null); // Скидаємо вибраний штат
+    setSelectedStateOption(null);
 
-    // Запускаємо початковий розрахунок
-    handleCalculate(
-      selectedCountryCode,
-      selectedServiceName,
-      selectedStateName
-    );
+    handleCalculate(selectedCountryCode, selectedServiceName, '');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCountryCode, selectedServiceName]);
-
-  // --- Handlers ---
+  useEffect(() => {
+    setMounted(true); // після mount ми знаємо реальну тему
+  }, []);
 
   const getEmoji = (
     price: number | 'Free' | 'N/A',
@@ -253,8 +377,7 @@ export default function DeliveryPage() {
       const deliveryKey = DELIVERY_DATA[countryCode] ? countryCode : 'ROW';
       const countryData = DELIVERY_DATA[deliveryKey];
 
-      let filteredOptions: DeliveryOption[];
-
+      let filteredOptions: DeliveryOption[] = [];
       if (countryCode === 'RU') {
         filteredOptions = countryData;
       } else {
@@ -265,11 +388,10 @@ export default function DeliveryPage() {
 
       let finalSurcharge = false;
 
-      let finalOptions: DeliveryOption[] = filteredOptions.map((opt) => {
+      const finalOptions = filteredOptions.map((opt) => {
         let finalPrice = opt.price;
         let finalService = opt.service;
 
-        // ЛОГІКА БЕЗКОШТОВНОЇ ДОСТАВКИ ДЛЯ УКРАЇНИ
         if (countryCode === 'UA') {
           finalPrice = opt.service.includes('Standard')
             ? 'Free'
@@ -278,7 +400,7 @@ export default function DeliveryPage() {
           return { ...opt, price: finalPrice, service: finalService };
         }
 
-        // Перевірка на віддалену зону
+        // remote detection
         const remoteKeywords = [
           'remote',
           'island',
@@ -298,19 +420,13 @@ export default function DeliveryPage() {
           finalPrice !== 0 &&
           countryCode !== 'RU' &&
           isRemote;
-
         if (canApplySurcharge) {
           finalPrice = (finalPrice as number) + 20;
-          // Тут використовуємо статичний текст, оскільки він має бути доданий до service
           finalService = `${opt.service} (+ Remote Surcharge)`;
           finalSurcharge = true;
         }
 
-        return {
-          ...opt,
-          price: finalPrice,
-          service: finalService,
-        };
+        return { ...opt, price: finalPrice, service: finalService };
       });
 
       setSurchargeApplied(finalSurcharge);
@@ -321,7 +437,6 @@ export default function DeliveryPage() {
     }, 800);
   };
 
-  // Обробник зміни країни (react-select)
   const handleCountryChange = (option: SelectOption | null) => {
     if (option) {
       setSelectedCountryOption(option);
@@ -330,15 +445,12 @@ export default function DeliveryPage() {
     }
   };
 
-  // Обробник зміни штату/міста (react-select)
   const handleStateChange = (option: SelectOption | null) => {
     setSelectedStateOption(option);
     const stateValue = option ? option.value : '';
-    // Перераховуємо одразу після вибору
     handleCalculate(selectedCountryCode, selectedServiceName, stateValue);
   };
 
-  // Обробник зміни служби доставки (react-select)
   const handleServiceChange = (option: SelectOption | null) => {
     if (option) {
       setSelectedServiceOption(option);
@@ -346,304 +458,312 @@ export default function DeliveryPage() {
     }
   };
 
-  // Кастомізація стилів для react-select, щоб виглядати як Tailwind-input
+  // react-select styles — singleValue uses 'inherit' so color is taken from container (.text-... dark:text-...)
   const customStyles = {
     control: (provided: any, state: any) => ({
       ...provided,
-      minHeight: '48px', // Відповідає py-3
+      minHeight: '48px',
       borderColor: state.isFocused ? '#3b82f6' : '#d1d5db',
       boxShadow: state.isFocused ? '0 0 0 1px #3b82f6' : 'none',
+      background: 'transparent',
       '&:hover': {
         borderColor: state.isFocused ? '#3b82f6' : '#d1d5db',
       },
     }),
-    valueContainer: (provided: any) => ({
-      ...provided,
-      padding: '0 8px',
-    }),
-    singleValue: (provided: any) => ({
-      ...provided,
-      color: '#1f2937',
-    }),
-    menu: (provided: any) => ({
-      ...provided,
-      zIndex: 10,
-    }),
+    valueContainer: (provided: any) => ({ ...provided, padding: '0 8px' }),
+    singleValue: (provided: any) => ({ ...provided, color: 'inherit' }),
+    menu: (provided: any) => ({ ...provided, zIndex: 50 }),
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-      {/* Hero Section */}
-      <div className="mb-16">
-        <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-4">
-          {t('hero.title')}
-        </h1>
-        <p className="mt-4 text-xl text-gray-500 border-b pb-6 border-gray-200">
-          {t('hero.subtitle')}
-        </p>
-      </div>
-
-      {/* --- Delivery Policy --- */}
-      <section id="policy" className="mb-20 scroll-mt-24">
-        <h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-gray-900 pl-3">
-          {t('policy.title')}
-        </h2>
-        <p className="text-gray-700 mb-6 text-lg">{t('policy.intro')}</p>
-        <div className="bg-blue-50 p-6 rounded-xl border border-blue-200">
-          <h3 className="font-bold text-gray-900 mb-3 flex items-center">
-            <Truck className="w-5 h-5 mr-3 text-blue-600" />{' '}
-            {t('policy.keyTitle')}
-          </h3>
-          <ul className="space-y-2 text-gray-700 list-disc list-inside ml-4">
-            <li>
-              <strong>{t('policy.key1Strong')}:</strong> {t('policy.key1Text')}
-            </li>
-            <li>
-              <strong>{t('policy.key2Strong')}:</strong> {t('policy.key2Text')}
-            </li>
-            <li>
-              <strong>{t('policy.key3Strong')}:</strong> {t('policy.key3Text')}
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <hr className="my-16 border-gray-200" />
-
-      {/* --- Shipping Calculator --- */}
-      <section
-        id="calculator"
-        className="mb-20 scroll-mt-24 bg-gray-50 p-8 rounded-xl border border-gray-200 shadow-lg"
-      >
-        <h2 className="text-3xl font-bold text-gray-900 mb-6 ">
-          {t_calc('title')}
-        </h2>
-        <p className="text-gray-700 mb-6">{t_calc('intro')}</p>
-
-        {/* --- Form / Inputs --- */}
-        <div className="flex flex-col md:flex-row gap-4 mb-8">
-          {/* Country Selection (REACT-SELECT) */}
-          <div className="flex-1">
-            <label
-              htmlFor="country"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              {t_calc('labelCountry')}
-            </label>
-            <Select
-              id="country"
-              options={allCountriesOptions}
-              value={selectedCountryOption}
-              onChange={handleCountryChange}
-              placeholder={t_calc('placeholderCountry')}
-              styles={customStyles}
-            />
-          </div>
-
-          {/* State/Province (REACT-SELECT) */}
-          <div className="flex-1">
-            <label
-              htmlFor="state"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              {t_calc('labelState')}
-            </label>
-            <Select
-              id="state"
-              options={availableStatesOptions}
-              value={selectedStateOption}
-              onChange={handleStateChange}
-              placeholder={
-                selectedCountryCode === 'UA'
-                  ? t_calc('placeholderStateUA')
-                  : t_calc('placeholderStateDefault')
-              }
-              isDisabled={selectedCountryCode === 'UA'}
-              styles={customStyles}
-            />
-          </div>
-
-          {/* Service Selection (REACT-SELECT) */}
-          <div className="flex-1">
-            <label
-              htmlFor="service"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              {t_calc('labelService')}
-            </label>
-            <Select
-              id="service"
-              options={SERVICE_OPTIONS}
-              value={selectedServiceOption}
-              onChange={handleServiceChange}
-              styles={customStyles}
-            />
-          </div>
+    <div className="min-h-screen bg-white dark:bg-black transition-colors">
+      <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        {/* Hero */}
+        <div className="mb-16">
+          <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-4 dark:text-neutral-100">
+            {t('hero.title')}
+          </h1>
+          <p className="mt-4 text-xl text-gray-500 border-b pb-6 border-gray-200 dark:text-neutral-300 dark:border-neutral-800">
+            {t('hero.subtitle')}
+          </p>
         </div>
 
-        {/* --- Remote Surcharge Message --- */}
-        {surchargeApplied && (
-          <div className="mb-4 p-3 text-sm font-medium text-orange-800 bg-orange-100 rounded-lg border border-orange-300">
-            <span className="font-bold">{t_calc('surchargeNoteStrong')}:</span>{' '}
-            {t_calc('surchargeNoteText')}
+        {/* Policy */}
+        <section id="policy" className="mb-20 scroll-mt-24">
+          <h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-gray-900 pl-3 dark:text-neutral-100 dark:border-neutral-300">
+            {t('policy.title')}
+          </h2>
+          <p className="text-gray-700 mb-6 text-lg dark:text-neutral-300">
+            {t('policy.intro')}
+          </p>
+
+          <div className="bg-blue-50 p-6 rounded-xl border border-blue-200 dark:bg-neutral-900 dark:border-neutral-800">
+            <h3 className="font-bold text-gray-900 mb-3 flex items-center dark:text-neutral-100">
+              <Truck className="w-5 h-5 mr-3 text-blue-600 dark:text-blue-300" />{' '}
+              {t('policy.keyTitle')}
+            </h3>
+            <ul className="space-y-2 text-gray-700 list-disc list-inside ml-4 dark:text-neutral-300">
+              <li>
+                <strong>{t('policy.key1Strong')}:</strong>{' '}
+                {t('policy.key1Text')}
+              </li>
+              <li>
+                <strong>{t('policy.key2Strong')}:</strong>{' '}
+                {t('policy.key2Text')}
+              </li>
+              <li>
+                <strong>{t('policy.key3Strong')}:</strong>{' '}
+                {t('policy.key3Text')}
+              </li>
+            </ul>
           </div>
-        )}
+        </section>
 
-        {/* --- Results --- */}
-        <div className="mt-8 pt-6 border-t border-gray-300">
-          <h3 className="text-xl font-bold text-gray-900 mb-4">
-            {t_calc('resultsTitle', { country: selectedCountryName })}
-          </h3>
+        <hr className="my-16 border-gray-200 dark:border-neutral-800" />
 
-          {isCalculating ? (
-            <div className="flex items-center justify-center p-8 bg-white rounded-lg">
-              <Loader className="w-6 h-6 animate-spin mr-3 text-blue-600" />
-              <span className="text-lg text-blue-600">
-                {t_calc('resultsLoading')}
-              </span>
+        {/* Calculator */}
+        <section
+          id="calculator"
+          className="mb-20 scroll-mt-24 bg-gray-50 p-8 rounded-xl border border-gray-200 shadow-lg dark:bg-neutral-900 dark:border-neutral-800"
+        >
+          <h2 className="text-3xl font-bold text-gray-900 mb-6 dark:text-neutral-100">
+            {t_calc('title')}
+          </h2>
+          <p className="text-gray-700 mb-6 dark:text-neutral-300">
+            {t_calc('intro')}
+          </p>
+
+          <div className="flex flex-col md:flex-row gap-4 mb-8">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-neutral-200">
+                {t_calc('labelCountry')}
+              </label>
+              <div className="text-gray-900 dark:text-neutral-100">
+                <Select
+                  options={allCountriesOptions}
+                  value={selectedCountryOption}
+                  onChange={handleCountryChange}
+                  placeholder={t_calc('placeholderCountry')}
+                  styles={getCustomStyles(themeMode)}
+                  menuPortalTarget={
+                    typeof document !== 'undefined' ? document.body : undefined
+                  }
+                  menuPosition="fixed"
+                />
+              </div>
             </div>
-          ) : (
-            <div className="space-y-4">
-              {shippingOptions.map((option, index) => (
-                <div
-                  key={index}
-                  className={`flex items-center p-5 rounded-xl transition shadow-md 
-                    ${
-                      selectedCountryCode === 'RU'
-                        ? 'bg-red-50 border-red-300'
-                        : option.price === 'Free'
-                        ? 'bg-green-50 border-green-300'
-                        : 'bg-white border-gray-200'
-                    }`}
-                >
-                  <div className="flex-shrink-0 mr-4">
-                    {getEmoji(
-                      option.price,
-                      selectedCountryCode,
-                      option.price !== 'N/A'
-                    )}
-                  </div>
 
-                  <div className="flex-1">
-                    <p className="font-semibold text-gray-900">
-                      {option.service}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      {t_calc('resultsTime')}: {option.time}
-                    </p>
-                  </div>
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-neutral-200">
+                {t_calc('labelState')}
+              </label>
+              <div className="text-gray-900 dark:text-neutral-100">
+                <Select
+                  options={availableStatesOptions}
+                  value={selectedStateOption}
+                  onChange={handleStateChange}
+                  placeholder={
+                    selectedCountryCode === 'UA'
+                      ? t_calc('placeholderStateUA')
+                      : t_calc('placeholderStateDefault')
+                  }
+                  isDisabled={selectedCountryCode === 'UA'}
+                  styles={getCustomStyles(themeMode)}
+                  menuPortalTarget={
+                    typeof document !== 'undefined' ? document.body : undefined
+                  }
+                  menuPosition="fixed"
+                />
+              </div>
+            </div>
 
-                  <div className="flex-shrink-0 text-right">
-                    <p
-                      className={`text-xl font-bold 
-                      ${
-                        option.price === 'Free'
-                          ? 'text-green-600'
-                          : option.price === 'N/A'
-                          ? 'text-red-600'
-                          : 'text-gray-900'
-                      }`}
-                    >
-                      {option.price === 'Free'
-                        ? t_calc('resultsFree')
-                        : option.price === 'N/A'
-                        ? t_calc('resultsNA')
-                        : `$${(option.price as number).toFixed(2)}`}
-                    </p>
-                    {option.price !== 'N/A' && (
-                      <p className="text-xs text-gray-500">
-                        {t_calc('resultsApproxPrice')}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-neutral-200">
+                {t_calc('labelService')}
+              </label>
+              <div className="text-gray-900 dark:text-neutral-100">
+                <Select
+                  options={SERVICE_OPTIONS}
+                  value={selectedServiceOption}
+                  onChange={handleServiceChange}
+                  styles={getCustomStyles(themeMode)}
+                  menuPortalTarget={
+                    typeof document !== 'undefined' ? document.body : undefined
+                  }
+                  menuPosition="fixed"
+                />
+              </div>
+            </div>
+          </div>
 
-              {shippingOptions.length === 0 && (
-                <div className="p-5 bg-yellow-50 rounded-lg text-yellow-800">
-                  <p>{t_calc('resultsNoOptions')}</p>
-                </div>
-              )}
+          {surchargeApplied && (
+            <div className="mb-4 p-3 text-sm font-medium text-orange-800 bg-orange-100 rounded-lg border border-orange-300 dark:bg-orange-900/20 dark:text-orange-200 dark:border-orange-700">
+              <span className="font-bold">
+                {t_calc('surchargeNoteStrong')}:
+              </span>{' '}
+              {t_calc('surchargeNoteText')}
             </div>
           )}
-        </div>
-      </section>
 
-      <hr className="my-16 border-gray-200" />
-
-      {/* --- Returns & Warranty Policy --- */}
-      <section id="returns-warranty" className="mb-20 scroll-mt-24">
-        <h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-gray-900 pl-3">
-          {t_returns('title')}
-        </h2>
-
-        <p className="text-gray-700 mb-8 text-lg">{t_returns('intro')}</p>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Column 1: Returns */}
-          <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-md">
-            <h3 className="font-bold text-xl text-gray-900 mb-3 flex items-center">
-              <svg
-                className="w-5 h-5 mr-2 text-blue-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                ></path>
-              </svg>
-              {t_returns('returnTitle')}
+          <div className="mt-8 pt-6 border-t border-gray-300 dark:border-neutral-800">
+            <h3 className="text-xl font-bold text-gray-900 mb-4 dark:text-neutral-100">
+              {t_calc('resultsTitle', { country: selectedCountryName })}
             </h3>
-            <p className="text-gray-700 text-sm">{t_returns('returnText')}</p>
-          </div>
 
-          {/* Column 2: Warranty */}
-          <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-md">
-            <h3 className="font-bold text-xl text-gray-900 mb-3 flex items-center">
-              <svg
-                className="w-5 h-5 mr-2 text-blue-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M9 12l2 2 4-4m5.618-4.018A9.955 9.955 0 0112 5.053 10.038 10.038 0 003.055 7.5c-.714 2.21-1.077 4.603-1.055 7.417C2.023 18.913 5.483 22 10 22h4c4.517 0 7.977-3.087 7.977-7.03c.022-2.814-.341-5.207-1.055-7.417z"
-                ></path>
-              </svg>
-              {t_returns('warrantyTitle')}
-            </h3>
-            <p className="text-gray-700 text-sm">{t_returns('warrantyText')}</p>
-          </div>
+            {isCalculating ? (
+              <div className="flex items-center justify-center p-8 bg-white rounded-lg dark:bg-neutral-800">
+                <Loader className="w-6 h-6 animate-spin mr-3 text-blue-600 dark:text-blue-300" />
+                <span className="text-lg text-blue-600 dark:text-neutral-300">
+                  {t_calc('resultsLoading')}
+                </span>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {shippingOptions.map((option, index) => (
+                  <div
+                    key={index}
+                    className={`flex items-center p-5 rounded-xl transition shadow-md border
+                      ${
+                        selectedCountryCode === 'RU'
+                          ? 'bg-red-50 border-red-300 dark:bg-red-900/20 dark:border-red-700'
+                          : option.price === 'Free'
+                          ? 'bg-green-50 border-green-300 dark:bg-green-900/20 dark:border-green-700'
+                          : 'bg-white border-gray-200 dark:bg-neutral-800 dark:border-neutral-700'
+                      }`}
+                  >
+                    <div className="flex-shrink-0 mr-4">
+                      {getEmoji(
+                        option.price,
+                        selectedCountryCode,
+                        option.price !== 'N/A'
+                      )}
+                    </div>
 
-          {/* Column 3: Lost Shipments */}
-          <div className="bg-orange-50 p-5 rounded-xl border border-orange-200 shadow-md">
-            <h3 className="font-bold text-xl text-gray-900 mb-3 flex items-center">
-              <svg
-                className="w-5 h-5 mr-2 text-red-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.3 16c-.77 1.333.192 3 1.732 3z"
-                ></path>
-              </svg>
-              {t_returns('lostTitle')}
-            </h3>
-            <p className="text-gray-700 text-sm">{t_returns('lostText')}</p>
+                    <div className="flex-1">
+                      <p className="font-semibold text-gray-900 dark:text-neutral-100">
+                        {option.service}
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-neutral-300">
+                        {t_calc('resultsTime')}: {option.time}
+                      </p>
+                    </div>
+
+                    <div className="flex-shrink-0 text-right">
+                      <p
+                        className={`text-xl font-bold ${
+                          option.price === 'Free'
+                            ? 'text-green-600 dark:text-green-400'
+                            : option.price === 'N/A'
+                            ? 'text-red-600 dark:text-red-400'
+                            : 'text-gray-900 dark:text-neutral-100'
+                        }`}
+                      >
+                        {option.price === 'Free'
+                          ? t_calc('resultsFree')
+                          : option.price === 'N/A'
+                          ? t_calc('resultsNA')
+                          : `$${(option.price as number).toFixed(2)}`}
+                      </p>
+                      {option.price !== 'N/A' && (
+                        <p className="text-xs text-gray-500 dark:text-neutral-400">
+                          {t_calc('resultsApproxPrice')}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+
+                {shippingOptions.length === 0 && (
+                  <div className="p-5 bg-yellow-50 rounded-lg text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200">
+                    <p>{t_calc('resultsNoOptions')}</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
-        </div>
-      </section>
+        </section>
+
+        <hr className="my-16 border-gray-200 dark:border-neutral-800" />
+
+        {/* Returns & Warranty */}
+        <section id="returns-warranty" className="mb-20 scroll-mt-24">
+          <h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-gray-900 pl-3 dark:text-neutral-100 dark:border-neutral-300">
+            {t_returns('title')}
+          </h2>
+
+          <p className="text-gray-700 mb-8 text-lg dark:text-neutral-300">
+            {t_returns('intro')}
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-md dark:bg-neutral-900 dark:border-neutral-700">
+              <h3 className="font-bold text-xl text-gray-900 mb-3 flex items-center dark:text-neutral-100">
+                <svg
+                  className="w-5 h-5 mr-2 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                  ></path>
+                </svg>
+                {t_returns('returnTitle')}
+              </h3>
+              <p className="text-gray-700 text-sm dark:text-neutral-300">
+                {t_returns('returnText')}
+              </p>
+            </div>
+
+            <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-md dark:bg-neutral-900 dark:border-neutral-700">
+              <h3 className="font-bold text-xl text-gray-900 mb-3 flex items-center dark:text-neutral-100">
+                <svg
+                  className="w-5 h-5 mr-2 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M9 12l2 2 4-4m5.618-4.018A9.955 9.955 0 0112 5.053 10.038 10.038 0 003.055 7.5c-.714 2.21-1.077 4.603-1.055 7.417C2.023 18.913 5.483 22 10 22h4c4.517 0 7.977-3.087 7.977-7.03c.022-2.814-.341-5.207-1.055-7.417z"
+                  ></path>
+                </svg>
+                {t_returns('warrantyTitle')}
+              </h3>
+              <p className="text-gray-700 text-sm dark:text-neutral-300">
+                {t_returns('warrantyText')}
+              </p>
+            </div>
+
+            <div className="bg-orange-50 p-5 rounded-xl border border-orange-200 shadow-md dark:bg-orange-900/10 dark:border-neutral-700">
+              <h3 className="font-bold text-xl text-gray-900 mb-3 flex items-center dark:text-neutral-100">
+                <svg
+                  className="w-5 h-5 mr-2 text-red-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.3 16c-.77 1.333.192 3 1.732 3z"
+                  ></path>
+                </svg>
+                {t_returns('lostTitle')}
+              </h3>
+              <p className="text-gray-700 text-sm dark:text-neutral-300">
+                {t_returns('lostText')}
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

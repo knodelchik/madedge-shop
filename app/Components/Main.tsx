@@ -11,7 +11,7 @@ import { useTranslations } from 'next-intl';
 const Threads = dynamic(() => import('../../components/Threads'), {
   ssr: false, // !!! Найважливіше для виправлення гідратації !!!
   loading: () => (
-    <div className="w-full h-full bg-gray-100 dark:bg-gray-900 animate-pulse" />
+    <div className="w-full h-full bg-gray-100 dark:bg-black animate-pulse" />
   ),
 });
 
@@ -32,20 +32,20 @@ export default function Main() {
         </div>
 
         {/* Текст (залишається на передньому плані) */}
-        <h1 className="text-6xl font-extrabold text-gray-900 dark:text-white mb-6 z-10">
+        <h1 className="text-6xl font-extrabold text-gray-900 dark:text-white mb-6 z-10 transition-colors duration-300">
           {t('heroTitle')}
         </h1>
-        <p className="text-2xl text-gray-700 dark:text-gray-300 max-w-2xl mb-10 z-10">
+        <p className="text-2xl text-gray-700 dark:text-neutral-300 max-w-2xl mb-10 z-10 transition-colors duration-300">
           {t('heroSubtitle')}
         </p>
 
-        <div className="flex justify-center gap-6 py-16 z-10">
+        <div className="flex justify-center gap-5 py-16 z-10 mr-3">
           {/* Посилання на Shop */}
           <Link href="/shop" passHref>
             <Button
               asChild
               size="lg"
-              className="px-8 py-4 rounded-2xl border border-black dark:border-white shadow-md cursor-pointer hover:bg-gray-300/30 dark:hover:bg-gray-700/30 hover:text-black dark:hover:text-white transition duration-200"
+              className="px-8 py-4 rounded-2xl border border-gray-400/10 dark:border-neutral-300 shadow-md cursor-pointer hover:bg-gray-300/30 dark:hover:bg-neutral-700/30 dark:hover:border-neutral-400 hover:text-black dark:hover:text-white transition duration-200"
             >
               <span>{t('shop')}</span>
             </Button>
@@ -57,7 +57,7 @@ export default function Main() {
               asChild
               size="lg"
               variant="secondary"
-              className="px-8 py-4 rounded-2xl shadow-md cursor-pointer bg-gray-300/30 dark:bg-gray-700/30 border border-gray-400/10 text-gray-900 dark:text-white hover:text-black/80 dark:hover:text-white/80 transition duration-200"
+              className="px-10 py-4 rounded-2xl shadow-md cursor-pointer bg-gray-300/30 dark:bg-neutral-700/30 border border-gray-400/10 text-gray-900 dark:text-white hover:text-black/80 dark:hover:text-white/80 dark:hover:bg-neutral-900 dark:border-neutral-900 dark:hover:border-neutral-800 transition duration-200"
             >
               <span>{t('about')}</span>
             </Button>

@@ -7,17 +7,14 @@ import { Autoplay } from 'swiper/modules';
 import { motion } from 'framer-motion';
 import { JSX } from 'react';
 import Link from 'next/link';
-// ПРИПУЩЕННЯ: використовується хук useTranslations з бібліотеки перекладу, наприклад, next-intl
 import { useTranslations } from 'next-intl';
 
 interface Slide {
-  // Додаємо translationKey, щоб легше було брати переклад
   translationKey: 'GrindingStones' | 'Sharpeners' | 'Accessories';
   img: string;
   category: 'sharpeners' | 'stones' | 'accessories';
 }
 
-// Оновлюємо слайди, використовуючи translationKey
 const slides: Slide[] = [
   {
     translationKey: 'GrindingStones',
@@ -37,11 +34,10 @@ const slides: Slide[] = [
 ];
 
 export default function CardCarousel(): JSX.Element {
-  // Отримуємо функцію перекладу для секції 'CardCarousel'
   const t = useTranslations('CardCarousel');
 
   return (
-    <section className="relative w-full h-[60vh] flex items-center justify-center text-white overflow-hidden mb-30">
+    <section className="relative w-full h-[60vh] flex items-center justify-center text-white overflow-hidden">
       <Swiper
         modules={[Autoplay]}
         autoplay={{ delay: 4000, disableOnInteraction: true }}
@@ -51,11 +47,9 @@ export default function CardCarousel(): JSX.Element {
         className="w-full h-[60vh] flex items-center justify-center"
       >
         {slides.map((slide, index) => {
-          // Динамічні ключі для перекладу
           const titleKey = `title${slide.translationKey}` as const;
           const descKey = `desc${slide.translationKey}` as const;
 
-          // Отримуємо переклади
           const title = t(titleKey);
           const desc = t(descKey);
 
@@ -70,26 +64,40 @@ export default function CardCarousel(): JSX.Element {
                   backgroundPosition: 'center',
                 }}
               >
-                <div className="absolute inset-0 bg-gray-900/10" />
+                <div className="absolute inset-0 bg-gray-900/10 dark:bg-black/30" />
+
                 <motion.div
                   initial={{ opacity: 0, y: 40 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6 }}
-                  className="relative z-10 text-center bg-gray-200/60 backdrop-blur-sm p-8 rounded-2xl shadow-[0_4px_30px_-4px_rgba(0,0,0,0.3)] max-w-xl flex flex-col items-center justify-center"
+                  className="
+                    relative z-10 text-center 
+                    bg-gray-100/60 dark:bg-neutral-900/50 
+                    backdrop-blur-md 
+                    p-8 rounded-2xl 
+                    shadow-[0_4px_30px_-4px_rgba(0,0,0,0.4)] 
+                    max-w-xl flex flex-col items-center justify-center
+                    border border-gray-200/30 dark:border-neutral-700/30
+                  "
                 >
-                  <h1 className="text-4xl text-black/90 font-bold mb-3 tracking-tight">
-                    {/* Використовуємо перекладений заголовок */}
+                  <h1 className="text-4xl font-bold mb-3 tracking-tight text-black/90 dark:text-white">
                     {title}
                   </h1>
-                  <p className="text-black/90 text-lg mb-4 text-center max-w-md">
-                    {/* Використовуємо перекладений опис */}
+
+                  <p className="text-black/80 dark:text-neutral-300/70 text-lg mb-4 text-center max-w-md">
                     {desc}
                   </p>
+
                   <Link
                     href={`/shop?category=${slide.category}`}
-                    className="px-5 py-2 bg-gray-300/30 text-black font-semibold rounded-full hover:bg-gray-200 transition border border-gray-400/10 hover:border-gray-600/25"
+                    className="
+                      px-5 py-2 rounded-full font-semibold transition
+                      bg-gray-200/40  dark:bg-neutral-800
+                      text-black dark:text-white
+                      border border-gray-400/10 
+                      hover:bg-gray-300/60 dark:hover:bg-neutral-700
+                    "
                   >
-                    {/* Використовуємо шаблонний рядок для динамічного тексту кнопки */}
                     {t('viewCategory', { title: title })}
                   </Link>
                 </motion.div>

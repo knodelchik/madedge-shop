@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { authService } from '../[locale]/services/authService';
 import { AuthFormData } from '../types/users';
 import { useCartStore } from '../[locale]/store/cartStore';
+import { useTranslations } from 'next-intl';
 
 interface AuthFormProps {
   type: 'signin' | 'signup';
@@ -16,6 +17,8 @@ export default function AuthForm({
   onSuccess,
   onToggleType,
 }: AuthFormProps) {
+  const t = useTranslations('AuthForm');
+
   const [formData, setFormData] = useState<AuthFormData>({
     email: '',
     password: '',
@@ -37,19 +40,19 @@ export default function AuthForm({
       } else {
         result = await authService.signIn(formData);
       }
-      if (result.user) {
+      if (result?.user) {
         // Синхронізуємо корзину після входу
         await useCartStore.getState().syncCartWithDatabase(result.user.id);
         onSuccess?.();
       }
 
-      if (result.error) {
+      if (result?.error) {
         setError(result.error);
       } else {
         onSuccess?.();
       }
     } catch {
-      setError('An unexpected error occurred');
+      setError(t('errors.unexpected'));
     } finally {
       setLoading(false);
     }
@@ -63,13 +66,13 @@ export default function AuthForm({
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white rounded-2xl shadow-lg p-8">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-        {type === 'signup' ? 'Create Account' : 'Sign In'}
+    <div className="max-w-md mx-auto bg-white dark:bg-neutral-800 rounded-2xl shadow-lg p-8 border border-gray-100 dark:border-neutral-800 transition-colors">
+      <h2 className="text-2xl font-bold text-gray-800 dark:text-neutral-100 mb-6 text-center">
+        {type === 'signup' ? t('title.signup') : t('title.signin')}
       </h2>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+        <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-200 px-4 py-3 rounded-lg mb-4">
           {error}
         </div>
       )}
@@ -79,9 +82,9 @@ export default function AuthForm({
           <div>
             <label
               htmlFor="full_name"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1"
             >
-              Full Name
+              {t('labels.fullName')}
             </label>
             <input
               type="text"
@@ -90,8 +93,8 @@ export default function AuthForm({
               value={formData.full_name}
               onChange={handleChange}
               required={type === 'signup'}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-              placeholder="Enter your full name"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-neutral-300 transition-colors"
+              placeholder={t('placeholders.fullName')}
             />
           </div>
         )}
@@ -99,9 +102,9 @@ export default function AuthForm({
         <div>
           <label
             htmlFor="email"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1"
           >
-            Email
+            {t('labels.email')}
           </label>
           <input
             type="email"
@@ -110,17 +113,17 @@ export default function AuthForm({
             value={formData.email}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-            placeholder="Enter your email"
+            className="w-full px-4 py-2 border border-gray-300 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-neutral-300 transition-colors"
+            placeholder={t('placeholders.email')}
           />
         </div>
 
         <div>
           <label
             htmlFor="password"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1"
           >
-            Password
+            {t('labels.password')}
           </label>
           <input
             type="password"
@@ -130,21 +133,21 @@ export default function AuthForm({
             onChange={handleChange}
             required
             minLength={6}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-            placeholder="Enter your password"
+            className="w-full px-4 py-2 border border-gray-300 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-neutral-300 transition-colors"
+            placeholder={t('placeholders.password')}
           />
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading
-            ? 'Loading...'
+            ? t('buttons.loading')
             : type === 'signup'
-            ? 'Create Account'
-            : 'Sign In'}
+            ? t('buttons.create')
+            : t('buttons.signin')}
         </button>
       </form>
 
@@ -152,11 +155,9 @@ export default function AuthForm({
         <button
           type="button"
           onClick={onToggleType}
-          className="text-gray-600 hover:text-black transition-colors"
+          className="text-gray-600 dark:text-neutral-300 hover:text-black dark:hover:text-white transition-colors"
         >
-          {type === 'signup'
-            ? 'Already have an account? Sign In'
-            : "Don't have an account? Sign Up"}
+          {type === 'signup' ? t('toggle.haveAccount') : t('toggle.noAccount')}
         </button>
       </div>
     </div>

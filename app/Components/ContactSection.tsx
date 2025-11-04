@@ -35,38 +35,38 @@ export default function ContactSection() {
   };
 
   return (
-    <div className="min-h-screen bg-white py-12">
+    <div className="min-h-screen bg-white dark:bg-black py-12 transition-colors">
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-neutral-100 mb-4">
             {tContacts('contactTitle')}
           </h1>
-          <div className="w-24 h-1 bg-gradient-to-r from-[#475fd8] to-[#35297e] mx-auto rounded-full"></div>
+          <div className="w-24 h-1 bg-gradient-to-r from-[#475fd8] to-[#35297e] mx-auto rounded-full" />
         </div>
 
         <div className="grid lg:grid-cols-8 gap-10">
           {/* Contact Info */}
           <div className="lg:col-span-3 mt-12">
-            <div className="bg-white rounded-2xl shadow-2xl p-6 border border-gray-200">
-              <h2 className="text-2xl font-bold mb-3 text-gray-900">
+            <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl p-6 border border-gray-200 dark:border-neutral-800 transition-colors">
+              <h2 className="text-2xl font-bold mb-3 text-gray-900 dark:text-neutral-100">
                 {tContacts('connectTitle')}
               </h2>
-              <p className="text-gray-600 mb-6 text-sm">
+              <p className="text-gray-600 dark:text-neutral-300 mb-6 text-sm">
                 {tContacts('connectDesc')}
               </p>
 
               <div className="space-y-6 mb-6">
                 {/* Phone */}
                 <div className="flex items-start space-x-3">
-                  <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gray-200 transition-all duration-300">
-                    <Phone className="w-4 h-4 text-gray-700" />
+                  <div className="w-10 h-10 bg-gray-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all duration-300">
+                    <Phone className="w-4 h-4 text-gray-700 dark:text-neutral-100" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-1 text-sm">
+                    <h3 className="font-semibold text-gray-900 dark:text-neutral-100 mb-1 text-sm">
                       {tContacts('phoneTitle')}
                     </h3>
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-gray-600 dark:text-neutral-300 text-sm">
                       {tContacts('phoneValue')}
                     </p>
                   </div>
@@ -74,14 +74,14 @@ export default function ContactSection() {
 
                 {/* Email */}
                 <div className="flex items-start space-x-3">
-                  <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gray-200 transition-all duration-300">
-                    <Mail className="w-4 h-4 text-gray-700" />
+                  <div className="w-10 h-10 bg-gray-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all duration-300">
+                    <Mail className="w-4 h-4 text-gray-700 dark:text-neutral-100" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-1 text-sm">
+                    <h3 className="font-semibold text-gray-900 dark:text-neutral-100 mb-1 text-sm">
                       {tContacts('emailTitle')}
                     </h3>
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-gray-600 dark:text-neutral-300 text-sm">
                       {tContacts('emailValue')}
                     </p>
                   </div>
@@ -89,20 +89,20 @@ export default function ContactSection() {
 
                 {/* Business Hours */}
                 <div className="flex items-start space-x-3">
-                  <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gray-200 transition-all duration-300">
-                    <Clock className="w-4 h-4 text-gray-700" />
+                  <div className="w-10 h-10 bg-gray-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all duration-300">
+                    <Clock className="w-4 h-4 text-gray-700 dark:text-neutral-100" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-1 text-sm">
+                    <h3 className="font-semibold text-gray-900 dark:text-neutral-100 mb-1 text-sm">
                       {tContacts('hoursTitle')}
                     </h3>
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-gray-600 dark:text-neutral-300 text-sm">
                       {tContacts('hoursMonFri')}
                     </p>
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-gray-600 dark:text-neutral-300 text-sm">
                       {tContacts('hoursSat')}
                     </p>
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-gray-600 dark:text-neutral-300 text-sm">
                       {tContacts('hoursSun')}
                     </p>
                   </div>
@@ -110,11 +110,11 @@ export default function ContactSection() {
               </div>
 
               {/* Social */}
-              <div className="border-t border-gray-200 pt-6">
-                <h3 className="text-lg font-bold mb-3 text-gray-900">
+              <div className="border-t border-gray-200 dark:border-neutral-800 pt-6">
+                <h3 className="text-lg font-bold mb-3 text-gray-900 dark:text-neutral-100">
                   {tContacts('followUsTitle')}
                 </h3>
-                <p className="text-gray-600 mb-4 text-sm">
+                <p className="text-gray-600 dark:text-neutral-300 mb-4 text-sm">
                   {tContacts('followUsDesc')}
                 </p>
                 <div className="grid grid-cols-4 gap-2">
@@ -123,9 +123,9 @@ export default function ContactSection() {
                       <a
                         key={idx}
                         href="#"
-                        className="w-full aspect-square bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gradient-to-r from-[#475fd8] to-[#35297e] hover:scale-110 transition-all duration-300 group"
+                        className="w-full aspect-square bg-gray-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center hover:bg-gradient-to-r from-[#475fd8] to-[#35297e] hover:scale-110 transition-all duration-300 group"
                       >
-                        <Icon className="w-8 h-8 text-gray-700 group-hover:text-white transition-colors" />
+                        <Icon className="w-8 h-8 text-gray-700 dark:text-neutral-100 group-hover:text-white transition-colors" />
                       </a>
                     )
                   )}
@@ -136,18 +136,20 @@ export default function ContactSection() {
 
           {/* Contact Form */}
           <div className="lg:col-span-5">
-            <div className="bg-white rounded-2xl shadow-2xl p-8 border border-gray-100">
-              <h2 className="text-3xl font-bold text-black mb-2">
+            <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl p-8 border border-gray-100 dark:border-neutral-800 transition-colors">
+              <h2 className="text-3xl font-bold text-black dark:text-neutral-100 mb-2">
                 {tContacts('formTitle')}
               </h2>
-              <p className="text-gray-600 mb-8">{tContacts('formSubtitle')}</p>
+              <p className="text-gray-600 dark:text-neutral-300 mb-8">
+                {tContacts('formSubtitle')}
+              </p>
 
               <div className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <label
                       htmlFor="name"
-                      className="block text-sm font-medium text-black mb-2"
+                      className="block text-sm font-medium text-black dark:text-neutral-100 mb-2"
                     >
                       {tContacts('formNameLabel')}
                     </label>
@@ -158,13 +160,13 @@ export default function ContactSection() {
                       value={formData.name}
                       onChange={handleInputChange}
                       placeholder={tContacts('formNamePlaceholder')}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent focus:bg-white transition-all duration-200"
+                      className="w-full px-4 py-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-gray-900 dark:focus:ring-neutral-300 focus:border-transparent focus:bg-white dark:focus:bg-neutral-700 transition-all duration-200 text-gray-900 dark:text-neutral-100"
                     />
                   </div>
                   <div>
                     <label
                       htmlFor="email"
-                      className="block text-sm font-medium text-black mb-2"
+                      className="block text-sm font-medium text-black dark:text-neutral-100 mb-2"
                     >
                       {tContacts('formEmailLabel')}
                     </label>
@@ -175,7 +177,7 @@ export default function ContactSection() {
                       value={formData.email}
                       onChange={handleInputChange}
                       placeholder={tContacts('formEmailPlaceholder')}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent focus:bg-white transition-all duration-200"
+                      className="w-full px-4 py-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-gray-900 dark:focus:ring-neutral-300 focus:border-transparent focus:bg-white dark:focus:bg-neutral-700 transition-all duration-200 text-gray-900 dark:text-neutral-100"
                     />
                   </div>
                 </div>
@@ -183,7 +185,7 @@ export default function ContactSection() {
                 <div>
                   <label
                     htmlFor="subject"
-                    className="block text-sm font-medium text-black mb-2"
+                    className="block text-sm font-medium text-black dark:text-neutral-100 mb-2"
                   >
                     {tContacts('formSubjectLabel')}
                   </label>
@@ -194,14 +196,14 @@ export default function ContactSection() {
                     value={formData.subject}
                     onChange={handleInputChange}
                     placeholder={tContacts('formSubjectPlaceholder')}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent focus:bg-white transition-all duration-200"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-gray-900 dark:focus:ring-neutral-300 focus:border-transparent focus:bg-white dark:focus:bg-neutral-700 transition-all duration-200 text-gray-900 dark:text-neutral-100"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="message"
-                    className="block text-sm font-medium text-black mb-2"
+                    className="block text-sm font-medium text-black dark:text-neutral-100 mb-2"
                   >
                     {tContacts('formMessageLabel')}
                   </label>
@@ -212,17 +214,17 @@ export default function ContactSection() {
                     value={formData.message}
                     onChange={handleInputChange}
                     placeholder={tContacts('formMessagePlaceholder')}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent focus:bg-white transition-all duration-200 resize-none"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-gray-900 dark:focus:ring-neutral-300 focus:border-transparent focus:bg-white dark:focus:bg-neutral-700 transition-all duration-200 resize-none text-gray-900 dark:text-neutral-100"
                   />
                 </div>
 
                 <button
                   type="button"
                   onClick={handleSubmit}
-                  className="w-full bg-black text-white py-4 px-6 rounded-xl font-semibold hover:bg-gray-800 transform hover:scale-[1.02] transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
+                  className="w-full bg-black dark:bg-white text-white dark:text-black py-4 px-6 rounded-xl font-semibold hover:bg-neutral-800 dark:hover:bg-neutral-200 transform hover:scale-[1.02] transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
                 >
                   <span>{tContacts('formSubmit')}</span>
-                  <Send className="w-5 h-5" />
+                  <Send className="w-5 h-5 text-white dark:text-black" />
                 </button>
               </div>
             </div>

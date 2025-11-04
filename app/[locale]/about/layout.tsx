@@ -182,7 +182,7 @@ export default function AboutLayout({
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col ">
+    <div className="min-h-screen bg-white flex flex-col dark:bg-black">
       <div className="flex flex-1">
         {/* Sidebar left */}
         <aside className="w-64 border-gray-200 p-6 sticky top-[80px] self-start h-[calc(100vh-80px)] overflow-y-auto">
@@ -191,10 +191,10 @@ export default function AboutLayout({
             <div className="flex items-center gap-3 p-3 rounded-lg mb-4">
               <Factory className="w-5 h-5 text-blue-600" />
               <div>
-                <div className="font-semibold text-sm text-gray-900">
+                <div className="font-semibold text-sm text-gray-900 dark:text-neutral-100">
                   MadEdge
                 </div>
-                <div className="text-xs text-gray-600">
+                <div className="text-xs text-gray-600 dark:text-neutral-500">
                   {t('sidebar.premiumSharpeners')} {/* 🚀 Переклад */}
                 </div>
               </div>
@@ -204,10 +204,12 @@ export default function AboutLayout({
             <div className="flex items-center gap-3 p-3  rounded-lg">
               <Target className="w-5 h-5 text-gray-600" />
               <div>
-                <div className="font-semibold text-sm text-gray-900">
+                <div className="font-semibold text-sm text-gray-900 dark:text-neutral-100">
                   {t('sidebar.latestProduct')} {/* 🚀 Переклад */}
                 </div>
-                <div className="text-xs text-gray-600">ProEdge X1</div>
+                <div className="text-xs text-gray-600 dark:text-neutral-500">
+                  ProEdge X1
+                </div>
               </div>
             </div>
           </div>
@@ -216,13 +218,11 @@ export default function AboutLayout({
             {menuData.map((menu) => (
               <Link
                 key={menu.id}
-                // Тут Link повинен вести на шлях, що включає локаль.
-                // Оскільки 'next-intl' автоматично додає локаль, ми використовуємо чистий href.
                 href={menu.href}
                 className={`flex items-center justify-between w-full p-2 rounded-lg transition-colors ${
                   cleanPathname === menu.href // 💡 Перевіряємо активність за cleanPathname
                     ? ' text-blue-600'
-                    : 'text-gray-700 hover:bg-gray-50'
+                    : 'text-gray-700 hover:bg-gray-50 dark:text-neutral-500 dark:hover:bg-neutral-900'
                 }`}
               >
                 <span className="flex items-center gap-2 font-normal">
@@ -239,7 +239,7 @@ export default function AboutLayout({
 
         {/* Sidebar right */}
         <aside className="w-64 p-6 sticky top-[80px] h-[calc(100vh-80px)] overflow-y-auto hidden xl:block self-start">
-          <h3 className="text-sm font-semibold text-gray-900 mb-4">
+          <h3 className="text-sm font-semibold text-gray-900 mb-4 dark:text-neutral-100">
             {t('sidebar.onThisPage')} {/* 🚀 Переклад */}
           </h3>
           <nav className="space-y-2">
@@ -247,7 +247,7 @@ export default function AboutLayout({
               <a
                 key={section.id}
                 href={`#${section.id}`}
-                className="block text-sm text-gray-600 hover:text-blue-600"
+                className="block text-sm text-gray-600 hover:text-blue-600 dark:text-neutral-500 dark:hover:text-blue-600"
               >
                 {section.title}
               </a>
@@ -257,12 +257,12 @@ export default function AboutLayout({
       </div>
 
       {/* Навігація Previous/Next */}
-      <div className="border-t border-gray-200 py-6 px-6 md:px-12">
-        <div className="max-w-4xl mx-auto flex justify-between items-center">
+      <div className=" py-6 px-6 md:px-12">
+        <div className="max-w-4xl mx-auto flex justify-between items-center ">
           {previousPage ? (
             <Link
               href={previousPage.href}
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition"
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-neutral-100 dark:hover:text-neutral-400 transition"
             >
               <svg
                 className="w-5 h-5"
@@ -278,7 +278,7 @@ export default function AboutLayout({
                 />
               </svg>
               <div className="text-left">
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-gray-500 dark:text-neutral-400  ">
                   {t('nav.previous')} {/* 🚀 Переклад */}
                 </div>
                 <div className="font-semibold">{previousPage.title}</div>
@@ -291,10 +291,10 @@ export default function AboutLayout({
           {nextPage ? (
             <Link
               href={nextPage.href}
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition"
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-neutral-100 dark:hover:text-neutral-400 transition"
             >
               <div className="text-right">
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-gray-500 dark:text-neutral-400">
                   {t('nav.next')} {/* 🚀 Переклад */}
                 </div>
                 <div className="font-semibold">{nextPage.title}</div>
@@ -320,11 +320,11 @@ export default function AboutLayout({
       </div>
 
       {/* Форма відгуку */}
-      <div className="border-gray-200 px-2 py-2">
+      <div className="border-gray-200 px-2 py-2 mb-10">
         <div className="flex justify-center">
           <motion.div
             layout
-            className="bg-white border border-gray-200 shadow-sm"
+            className="bg-white border border-gray-200 shadow-sm dark:bg-black dark:border-neutral-800"
             animate={{
               borderRadius: selectedRating !== null ? '0.5rem' : '1.5rem',
               width: selectedRating !== null ? '42rem' : 'auto',
@@ -338,7 +338,7 @@ export default function AboutLayout({
             {/* Смайлики та початкові відступи */}
             <div className="px-8 py-3">
               <div className="flex items-center justify-center gap-2">
-                <span className="text-gray-700 font-medium whitespace-nowrap">
+                <span className="text-gray-700 font-sm whitespace-nowrap dark:text-neutral-400">
                   {t('feedback.title')} {/* 🚀 Переклад */}
                 </span>
 
@@ -347,7 +347,7 @@ export default function AboutLayout({
                   className={`rounded-full transition flex-shrink-0 cursor-pointer ${
                     selectedRating === 1
                       ? 'bg-blue-100 text-blue-600'
-                      : 'text-gray-400 hover:text-blue-500'
+                      : 'text-gray-400 hover:text-blue-500 dark:text-neutral-400 dark:hover:text-blue-500'
                   }`}
                 >
                   <CryingIcon className="h-7 w-7" />

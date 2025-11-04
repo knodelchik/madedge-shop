@@ -2,14 +2,11 @@
 
 import { motion } from 'framer-motion';
 import { Zap, ClipboardList, Target, Wrench } from 'lucide-react';
-// ✅ Замість useLanguage та translations
 import { useTranslations } from 'next-intl';
 
 export default function VideoSection() {
-  // ✅ Використовуємо useTranslations, вказуючи простір імен 'Assembly'
   const t = useTranslations('Assembly');
 
-  // Отримуємо масив кроків, використовуючи t.raw() та приводячи його до типу
   const assemblySteps = t.raw('assemblySteps') as {
     title: string;
     desc: string;
@@ -23,25 +20,22 @@ export default function VideoSection() {
     'text-gray-600',
   ];
 
-  // Функція-замінник для alert
   const handleButtonClick = (action: string) => {
     console.log(`Action requested: ${action}`);
-    // Тут у реальному застосунку можна відкрити модальне вікно або перейти за посиланням
   };
 
   return (
-    <section className="w-full bg-white py-20">
+    <section className="w-full bg-white dark:bg-black py-20 transition-colors duration-500">
       <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-12 items-center">
         {/* Left side – Video */}
         <motion.div
-          className="w-full aspect-video rounded-xl overflow-hidden shadow-lg"
+          className="w-full aspect-video rounded-xl overflow-hidden shadow-lg dark:shadow-neutral-800"
           initial={{ opacity: 0, x: -60 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.7 }}
           viewport={{ once: true }}
         >
           <iframe
-            // ✅ Використовуємо t()
             src="https://www.youtube.com/embed/WXdFfbQfzBs"
             title={t('assemblyTitle')}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -59,31 +53,32 @@ export default function VideoSection() {
           className="flex flex-col"
         >
           <div className="mb-6">
-            <h2 className="text-3xl font-bold mb-3 text-gray-900 flex items-center gap-2">
+            <h2 className="text-3xl font-bold mb-3 text-gray-900 dark:text-white flex items-center gap-2">
               {t('assemblyTitle')}
             </h2>
-            <p className="text-lg text-gray-600 leading-relaxed">
+            <p className="text-lg text-gray-600 dark:text-[#888888] leading-relaxed">
               {t('assemblyText')}
             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4 mb-6">
-            {/* ✅ Проходимо по масиву, отриманому через t.raw() */}
             {assemblySteps.map((step, idx) => {
               const Icon = icons[idx];
               return (
                 <motion.div
                   key={idx}
-                  className={`bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors border border-gray-100 flex items-start gap-3`}
+                  className="bg-gray-50 dark:bg-[#111111] rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-[#1f1f1f] transition-colors border border-gray-100 dark:border-neutral-800 flex items-start gap-3"
                   whileHover={{ scale: 1.02 }}
                   transition={{ duration: 0.2 }}
                 >
                   <Icon className={`w-5 h-5 ${colors[idx]}`} />
                   <div>
-                    <div className="font-semibold text-gray-900 text-sm">
+                    <div className="font-semibold text-gray-900 dark:text-white text-sm">
                       {step.title}
                     </div>
-                    <div className="text-xs text-gray-500">{step.desc}</div>
+                    <div className="text-xs text-gray-500 dark:text-[#888888]">
+                      {step.desc}
+                    </div>
                   </div>
                 </motion.div>
               );
@@ -93,13 +88,13 @@ export default function VideoSection() {
           <div className="flex gap-3">
             <button
               onClick={() => handleButtonClick(t('assemblyButtonText'))}
-              className="flex-1 px-5 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition font-semibold"
+              className="flex-1 px-5 py-3 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-neutral-800 dark:hover:bg-neutral-300 transition font-semibold"
             >
               {t('assemblyButtonText')}
             </button>
             <button
               onClick={() => handleButtonClick(t('assemblyPdfText'))}
-              className="px-5 py-3 border border-gray-300 text-gray-700 rounded-lg hover:border-gray-400 transition font-semibold"
+              className="px-5 py-3 border border-gray-300 dark:border-neutral-800 dark:bg-neutral-900 text-gray-700 dark:text-white rounded-lg hover:border-gray-500 dark:hover:border-neutral-700 transition font-semibold"
             >
               {t('assemblyPdfText')}
             </button>

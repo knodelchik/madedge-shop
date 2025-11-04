@@ -98,7 +98,7 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white/70 dark:bg-gray-900/70 backdrop-blur-lg shadow-md px-6 py-4 grid grid-cols-3 items-center">
+    <header className="sticky top-0 z-50 w-full bg-white/70 dark:bg-black border-b border-gray-200 dark:border-neutral-500 backdrop-blur-lg shadow-md px-6 py-4 grid grid-cols-3 items-center">
       {/* Ліва частина */}
       <div
         className="text-2xl font-bold text-gray-800 dark:text-white cursor-pointer justify-self-start"
@@ -113,7 +113,7 @@ export default function Header() {
       </div>
 
       {/* Права частина */}
-      <div className="hidden md:flex items-center gap-4 text-gray-700 dark:text-gray-200 justify-self-end">
+      <div className="hidden md:flex items-center gap-4 text-gray-700 dark:text-neutral-300 justify-self-end">
         <SettingsDropdown />
         <UserDropdown user={user} onSignOut={handleSignOut} />
         <WishlistDropdown user={user} />

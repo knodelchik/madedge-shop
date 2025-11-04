@@ -8,12 +8,12 @@ export default function Navigation() {
   const t = useTranslations('Footer'); // Припускаю, що ключі 'home', 'shop', 'about', 'contact' є у Footer, або Main. Я обрав Footer як більш імовірно
 
   return (
-    <nav className="flex items-center gap-10 text-gray-700 dark:text-gray-300 font-medium">
+    <nav className="flex items-center gap-10 mr-5 text-gray-700 dark:text-neutral-300 font-medium">
       <Link
         href="/"
         className="hover:text-gray-900 dark:hover:text-white transition-colors"
       >
-        {t('footerHome')} {/* Використовуємо ключі з Footer */}
+        {t('footerHome')}
       </Link>
 
       <Link

@@ -89,11 +89,13 @@ export default function ShopPage() {
 
         <div className="relative z-10 text-center text-black">
           {/* 🚀 Замінено "MadEdge Shop" */}
-          <h1 className="text-5xl font-extrabold mb-6 drop-shadow-lg">
+          <h1 className="text-5xl font-extrabold mb-6 drop-shadow-lg dark:text-white">
             {t('heroTitle')}
           </h1>
           {/* 🚀 Замінено "Choose your ideal sharpener, stone or accessory" */}
-          <p className="text-lg mb-8 text-black-600">{t('heroSubtitle')}</p>
+          <p className="text-lg mb-8 text-black-600 dark:text-neutral-300">
+            {t('heroSubtitle')}
+          </p>
 
           {/* 🎛️ Кнопки фільтрації */}
           <div className="relative w-full flex flex-col items-center gap-4">
@@ -103,8 +105,8 @@ export default function ShopPage() {
                 onClick={() => setActiveCategory('stones')}
                 className={`px-6 py-3 rounded-xl font-semibold transition shadow-lg ${
                   activeCategory === 'stones'
-                    ? 'bg-black text-white'
-                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                    ? 'bg-black text-white dark:bg-white dark:text-black'
+                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-neutral-100'
                 }`}
               >
                 {/* 🚀 Замінено "Grinding Stones" */}
@@ -116,8 +118,8 @@ export default function ShopPage() {
                 onClick={() => setActiveCategory('sharpeners')}
                 className={`absolute left-1/2 -translate-x-[calc(50%+200px)] px-6 py-3 rounded-xl font-semibold transition shadow-lg ${
                   activeCategory === 'sharpeners'
-                    ? 'bg-black text-white'
-                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                    ? 'bg-black text-white dark:bg-white dark:text-black'
+                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-neutral-100'
                 }`}
               >
                 {/* 🚀 Замінено "Knife Sharpeners" */}
@@ -129,8 +131,8 @@ export default function ShopPage() {
                 onClick={() => setActiveCategory('accessories')}
                 className={`absolute right-1/2 translate-x-[calc(50%+180px)] px-6 py-3 rounded-xl font-semibold transition shadow-lg ${
                   activeCategory === 'accessories'
-                    ? 'bg-black text-white'
-                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                    ? 'bg-black text-white dark:bg-white dark:text-black'
+                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-neutral-100'
                 }`}
               >
                 {/* 🚀 Замінено "Accessories" */}
@@ -143,8 +145,8 @@ export default function ShopPage() {
               onClick={() => setActiveCategory('all')}
               className={`px-4 py-2 rounded-lg font-medium transition text-sm ${
                 activeCategory === 'all'
-                  ? 'bg-gray-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  ? 'bg-black text-white dark:bg-white dark:text-black'
+                  : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-neutral-100'
               }`}
             >
               {/* 🚀 Замінено "All Products" */}
@@ -202,7 +204,7 @@ function ProductCard({ product }: { product: Product }) {
     >
       {/* ... (WishlistButton залишається незмінним) ... */}
       <div
-        className={`absolute top-2 right-2 z-20 transition-all duration-300 ${
+        className={`absolute top-1 right-3.5 z-20 transition-all duration-300 ${
           isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
         }`}
       >
@@ -234,10 +236,10 @@ function ProductCard({ product }: { product: Product }) {
             }}
           />
           <div className="flex justify-between items-center mt-3 w-full px-2">
-            <h3 className="text-lg font-bold text-gray-800 line-clamp-2">
+            <h3 className="text-lg font-bold text-gray-800 line-clamp-2 dark:text-neutral-200">
               {product.title}
             </h3>
-            <p className="text-sm font-semibold text-gray-600 whitespace-nowrap ml-2">
+            <p className="text-sm font-semibold text-gray-600 whitespace-nowrap ml-2 dark:text-neutral-400">
               {/* 🚀 Використано переклад для одиниці валюти */}
               {product.price} {t('priceUnit')}
             </p>

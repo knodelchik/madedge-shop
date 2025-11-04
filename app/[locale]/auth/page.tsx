@@ -17,13 +17,15 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-gray-50 dark:bg-black py-12 transition-colors duration-300">
       <div className="container mx-auto px-4">
-        <AuthForm
-          type={authType}
-          onSuccess={handleSuccess}
-          onToggleType={toggleAuthType}
-        />
+        <div className="max-w-md mx-auto bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-2xl shadow-lg dark:shadow-xl p-8 transition-colors duration-300">
+          <AuthForm
+            type={authType}
+            onSuccess={handleSuccess}
+            onToggleType={toggleAuthType}
+          />
+        </div>
       </div>
     </div>
   );

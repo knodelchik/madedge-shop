@@ -97,7 +97,7 @@ export default function WishlistButton({
         ${
           isInWishlist
             ? 'bg-red-500 border-red-500 text-white'
-            : 'bg-white border-gray-300 text-gray-400 hover:border-red-300 hover:text-red-400'
+            : 'bg-white border-gray-300 text-gray-400 hover:border-red-300 hover:text-red-400 dark:bg-neutral-800 dark:border-neutral-400 dark:hover:border-red-500'
         }
         ${className}
       `}

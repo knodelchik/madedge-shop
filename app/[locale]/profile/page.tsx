@@ -4,11 +4,10 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { authService } from '../services/authService';
 import { User } from '../../types/users';
-import { useTranslations } from 'next-intl'; // 👈 Додаємо імпорт
+import { useTranslations } from 'next-intl';
 
 export default function ProfilePage() {
-  const t = useTranslations('Profile'); // 👈 Ініціалізуємо переклади
-
+  const t = useTranslations('Profile');
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -44,48 +43,51 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        {/* 🚀 Використовуємо переклад */}
-        <div className="text-xl">{t('loading')}</div>
+      <div className="min-h-screen bg-gray-50 dark:bg-black flex items-center justify-center transition-colors duration-300">
+        <div className="text-xl text-gray-800 dark:text-neutral-200">
+          {t('loading')}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-gray-50 dark:bg-black py-12 transition-colors duration-300">
       <div className="container mx-auto px-4">
-        <div className="max-w-md mx-auto bg-white rounded-2xl shadow-lg p-6">
-          {/* 🚀 Використовуємо переклад */}
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">
+        <div className="max-w-md mx-auto bg-white dark:bg-neutral-900 rounded-2xl shadow-lg dark:shadow-xl border border-gray-100 dark:border-neutral-800 p-6 transition-colors duration-300">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-neutral-100 mb-6">
             {t('title')}
           </h2>
 
           <div className="space-y-4">
             <div>
-              {/* 🚀 Використовуємо переклад */}
-              <label className="text-sm font-medium text-gray-600">
+              <label className="text-sm font-medium text-gray-600 dark:text-neutral-400">
                 {t('emailLabel')}
               </label>
-              <p className="text-gray-800">{user?.email}</p>
+              <p className="text-gray-800 dark:text-neutral-200">
+                {user?.email}
+              </p>
             </div>
 
             {user?.full_name && (
               <div>
-                {/* 🚀 Використовуємо переклад */}
-                <label className="text-sm font-medium text-gray-600">
+                <label className="text-sm font-medium text-gray-600 dark:text-neutral-400">
                   {t('fullNameLabel')}
                 </label>
-                <p className="text-gray-800">{user.full_name}</p>
+                <p className="text-gray-800 dark:text-neutral-200">
+                  {user.full_name}
+                </p>
               </div>
             )}
 
             {user?.phone && (
               <div>
-                {/* 🚀 Використовуємо переклад */}
-                <label className="text-sm font-medium text-gray-600">
+                <label className="text-sm font-medium text-gray-600 dark:text-neutral-400">
                   {t('phoneLabel')}
                 </label>
-                <p className="text-gray-800">{user.phone}</p>
+                <p className="text-gray-800 dark:text-neutral-200">
+                  {user.phone}
+                </p>
               </div>
             )}
           </div>

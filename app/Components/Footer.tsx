@@ -22,7 +22,7 @@ export default function Footer() {
   if (!mounted) return null;
 
   return (
-    <footer className="border-t border-gray-200 dark:border-gray-700 mt-18">
+    <footer className="border-t border-gray-200 dark:border-neutral-700 bg-white dark:bg-black transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-6 py-5">
         {/* Основний контент футера */}
         <div className="flex flex-wrap justify-between text-base">
@@ -33,14 +33,14 @@ export default function Footer() {
 
           {/* Головна */}
           <div className="w-1/2 md:w-auto mb-6 mt-6 md:mb-0">
-            <h3 className="font-medium mb-4 text-gray-900 dark:text-white text-base">
+            <h3 className="font-medium mb-4 text-gray-900 dark:text-white text-base transition-colors duration-300">
               {tFooter('footerHome')}
             </h3>
-            <ul className="space-y-3 text-gray-500 dark:text-gray-400">
+            <ul className="space-y-3 text-gray-500 dark:text-neutral-400/80 transition-colors duration-300">
               <li>
                 <a
                   href="#"
-                  className="hover:text-gray-900 dark:hover:text-white text-sm"
+                  className="hover:text-neutral-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerOurProducts')}
                 </a>
@@ -85,7 +85,7 @@ export default function Footer() {
             <h3 className="font-medium mb-4 text-gray-900 dark:text-white text-base">
               {tFooter('footerShop')}
             </h3>
-            <ul className="space-y-3 text-gray-500 dark:text-gray-400">
+            <ul className="space-y-3 text-gray-500 dark:text-neutral-400/80 ">
               <li>
                 <a
                   href="#"
@@ -118,7 +118,7 @@ export default function Footer() {
             <h3 className="font-medium mb-4 text-gray-900 dark:text-white text-base">
               {tFooter('footerAboutUs')}
             </h3>
-            <ul className="space-y-3 text-gray-500 dark:text-gray-400">
+            <ul className="space-y-3 text-gray-500 dark:text-neutral-400/80 ">
               <li>
                 <a
                   href="#"
@@ -183,7 +183,7 @@ export default function Footer() {
             <h3 className="font-medium mb-4 text-gray-900 dark:text-white text-base">
               {tFooter('footerContacts')}
             </h3>
-            <ul className="space-y-3 text-gray-500 dark:text-gray-400">
+            <ul className="space-y-3 text-gray-500 dark:text-neutral-400/80 ">
               <li>
                 <a
                   href="#"
@@ -205,10 +205,10 @@ export default function Footer() {
 
           {/* Newsletter */}
           <div className="w-full md:w-80 md:mt-0">
-            <h3 className="font-medium mb-3 mt-6 text-gray-900 dark:text-white text-base">
+            <h3 className="font-medium mb-3 mt-6 text-gray-900 dark:text-white text-base transition-colors duration-300">
               {tFooter('footerNewsletterTitle')}
             </h3>
-            <p className="text-gray-500 dark:text-gray-400 mb-4 text-sm">
+            <p className="text-gray-500 dark:text-neutral-400/80  mb-4 text-sm transition-colors duration-300">
               {tFooter('footerNewsletterDesc')}
             </p>
 
@@ -220,11 +220,11 @@ export default function Footer() {
                 id="ft-email"
                 type="email"
                 placeholder={tContacts('formEmailPlaceholder')}
-                className="w-full pl-4 pr-24 py-3 text-sm rounded-md bg-gray-100 dark:border-gray-600 dark:bg-gray-800 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-400"
+                className="w-full pl-4 pr-24 py-3 text-sm rounded-md bg-gray-100 dark:bg-neutral-800 dark:border-neutral-700 text-gray-900 dark:text-gray-200 placeholder-gray-500 dark:placeholder-neutral-400/80 focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-neutral-600 transition-colors duration-300"
               />
               <button
                 type="submit"
-                className="absolute right-2 top-2 bottom-2 px-3 text-sm bg-white border dark:bg-black text-gray-600 dark:text-white rounded hover:opacity-90 cursor-pointer transition-opacity"
+                className="absolute right-2 top-2 bottom-2 px-3 text-sm bg-white border border-gray-300 dark:bg-neutral-900 dark:border-neutral-700 text-gray-600 dark:text-neutral-400/80 rounded hover:bg-gray-50 dark:hover:bg-black dark:hover:text-white cursor-pointer transition-colors duration-200"
               >
                 {tFooter('footerSubscribeButton')}
               </button>
@@ -234,11 +234,11 @@ export default function Footer() {
       </div>
 
       {/* Copyright + Theme controls */}
-      <div>
+      <div className="transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col sm:flex-row sm:items-center">
             <div className="mb-4 sm:mb-0">
-              <div className="text-gray-500 dark:text-gray-400 text-sm">
+              <div className="text-gray-500 dark:text-neutral-400/80 text-sm transition-colors duration-300">
                 © {new Date().getFullYear()} MadEdge, Inc.
               </div>
 
@@ -247,23 +247,23 @@ export default function Footer() {
                 <a
                   href="#"
                   aria-label="Telegram"
-                  className="text-gray-500 hover:text-gray-900 dark:hover:text-white"
+                  className="text-gray-500 hover:text-gray-900 dark:text-neutral-400/80  dark:hover:text-white"
                 >
                   <TelegramIcon className="h-4 w-4 mb-5 ml-1" />
                 </a>
-                <div className="w-px h-4 bg-gray-300 dark:bg-gray-600 mb-5"></div>
+                <div className="w-px h-4 bg-gray-300 dark:bg-neutral-800 mb-5"></div>
                 <a
                   href="#"
                   aria-label="YouTube"
-                  className="text-gray-500 hover:text-gray-900 dark:hover:text-white"
+                  className="text-gray-500 hover:text-gray-900 dark:text-neutral-400/80  dark:hover:text-white"
                 >
                   <YouTubeIcon className="h-4 w-4 mb-5 ml-1" />
                 </a>
-                <div className="w-px h-4 bg-gray-300 dark:bg-gray-600 mb-5"></div>
+                <div className="w-px h-4 bg-gray-300 dark:bg-neutral-800 mb-5"></div>
                 <a
                   href="#"
                   aria-label="Instagram"
-                  className="text-gray-500 hover:text-gray-900 dark:hover:text-white"
+                  className="text-gray-500 hover:text-gray-900 dark:text-neutral-400/80  dark:hover:text-white"
                 >
                   <InstagramIcon className="h-4 w-4 mb-5 ml-1" />
                 </a>
@@ -272,14 +272,14 @@ export default function Footer() {
           </div>
 
           {/* Theme controls */}
-          <div className="flex items-center border rounded-full mt-4 sm:mt-0">
+          <div className="flex items-center border border-neutral-300 dark:border-neutral-700  rounded-full mt-4 sm:mt-0">
             <button
               aria-label={tTheme('themeLight')}
               onClick={() => setTheme('light')}
               className={`p-3 rounded-full transition-colors ${
                 theme === 'light'
-                  ? 'bg-gray-200 dark:bg-gray-700'
-                  : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                  ? 'bg-gray-200  dark:bg-neutral-800'
+                  : 'hover:bg-gray-100 dark:hover:bg-neutral-800'
               }`}
             >
               <Sun className="h-4 w-4" />
@@ -290,8 +290,8 @@ export default function Footer() {
               onClick={() => setTheme('system')}
               className={`p-3 rounded-full transition-colors ${
                 theme === 'system'
-                  ? 'bg-gray-200 dark:bg-gray-700'
-                  : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                  ? 'bg-gray-200  dark:bg-neutral-800'
+                  : 'hover:bg-gray-100 dark:hover:bg-neutral-800'
               }`}
             >
               <Monitor className="h-4 w-4" />
@@ -302,8 +302,8 @@ export default function Footer() {
               onClick={() => setTheme('dark')}
               className={`p-3 rounded-full transition-colors ${
                 theme === 'dark'
-                  ? 'bg-gray-200 dark:bg-gray-700'
-                  : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                  ? 'bg-gray-200 dark:bg-neutral-800'
+                  : 'hover:bg-gray-100 dark:hover:bg-neutral-800'
               }`}
             >
               <Moon className="h-4 w-4" />
