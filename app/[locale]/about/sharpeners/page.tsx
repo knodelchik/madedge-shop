@@ -78,7 +78,7 @@ export default function SharpenersPage() {
           <div className="lg:flex lg:space-x-12">
             {/* Left: Description */}
             <div className="lg:w-3/5 order-2 lg:order-1">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-blue-600 pl-3 dark:text-neutral-100 dark:border-blue-400">
+              <h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-blue-600 pl-3 dark:text-neutral-100 dark:border-neutral-400">
                 {t('digital.title')}
               </h2>
               <p
@@ -101,19 +101,19 @@ export default function SharpenersPage() {
 
               <ul className="space-y-3 mb-4">
                 <li className="flex items-start">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3 dark:bg-blue-300"></div>
+                  <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3 dark:bg-neutral-300"></div>
                   <span className="text-gray-700 dark:text-neutral-300">
                     {t('digital.feature1')}
                   </span>
                 </li>
                 <li className="flex items-start">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3 dark:bg-blue-300"></div>
+                  <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3 dark:bg-neutral-300"></div>
                   <span className="text-gray-700 dark:text-neutral-300">
                     {t('digital.feature2')}
                   </span>
                 </li>
                 <li className="flex items-start">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3 dark:bg-blue-300"></div>
+                  <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3 dark:bg-neutral-300"></div>
                   <span className="text-gray-700 dark:text-neutral-300">
                     {t('digital.feature3')}
                   </span>

@@ -41,7 +41,10 @@ const ProductComparison: React.FC = () => {
   };
 
   return (
-    <section className="py-16 bg-white dark:bg-black transition-colors duration-500">
+    <section
+      id="product-comparison"
+      className="py-16 bg-white dark:bg-black transition-colors duration-500"
+    >
       <div className="max-w-7xl mx-auto px-6">
         {/* Заголовок */}
         <h2 className="text-3xl font-bold text-center mb-10 text-gray-900 dark:text-white">

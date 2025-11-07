@@ -112,7 +112,7 @@ const AccessoriesPage: React.FC = () => {
           id="authenticity"
           className="scroll-mt-24 bg-blue-50 p-8 rounded-xl border border-blue-200 shadow-lg dark:bg-neutral-900 dark:border-neutral-800"
         >
-          <h2 className="text-3xl font-bold text-gray-900 mb-4 flex items-center dark:text-neutral-100">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center dark:text-neutral-100">
             <ShieldCheck className="w-8 h-8 mr-3 text-blue-600 dark:text-blue-300" />
             {t('authenticity.title')}
           </h2>

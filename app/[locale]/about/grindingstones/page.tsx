@@ -325,7 +325,7 @@ export default function GrindingStonesPage() {
         {/* --- Usage Guide --- */}
         <section
           id="usage-guide"
-          className="mb-20 scroll-mt-24 bg-gradient-to-br from-blue-50 to-white rounded-xl p-8 border border-blue-100 shadow-md dark:from-blue-900/20 dark:to-blue-800/10 dark:border-blue-800/30 dark:bg-gradient-to-br"
+          className="mb-20 scroll-mt-24 bg-gradient-to-br from-blue-50 to-white rounded-xl p-8 border border-blue-100 shadow-md dark:from-neutral-900/90 dark:to-neutral-800/10 dark:border-neutral-800/30 dark:bg-gradient-to-br"
         >
           <h2 className="text-3xl font-bold text-gray-900 mb-8 dark:text-neutral-100">
             {t('usageGuide.title')}
@@ -335,9 +335,9 @@ export default function GrindingStonesPage() {
             {[1, 2, 3].map((step) => (
               <div
                 key={step}
-                className="flex flex-col items-start p-4 bg-white rounded-lg border border-gray-200 shadow-sm transition hover:shadow-md dark:bg-gray-900 dark:border-neutral-800"
+                className="flex flex-col items-start p-4 bg-white rounded-lg border border-gray-200 shadow-sm transition hover:shadow-md dark:bg-gray-900 dark:border-neutral-900"
               >
-                <div className="flex-shrink-0 w-10 h-10 bg-blue-600 dark:bg-neutral-600 text-white rounded-full flex items-center justify-center font-bold text-xl mb-3">
+                <div className="flex-shrink-0 w-10 h-10 bg-blue-600 dark:bg-neutral-800 text-white rounded-full flex items-center justify-center font-bold text-xl mb-3">
                   {step}
                 </div>
                 <h3 className="font-bold text-lg text-gray-900 mb-1 dark:text-neutral-100">

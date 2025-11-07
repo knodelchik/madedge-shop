@@ -25,7 +25,10 @@ export default function VideoSection() {
   };
 
   return (
-    <section className="w-full bg-white dark:bg-black py-20 transition-colors duration-500">
+    <section
+      id="video-section"
+      className="w-full bg-white dark:bg-black py-20 transition-colors duration-500"
+    >
       <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-12 items-center">
         {/* Left side – Video */}
         <motion.div

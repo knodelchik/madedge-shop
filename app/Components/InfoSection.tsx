@@ -113,7 +113,10 @@ const InfoSection = () => {
   ];
 
   return (
-    <section className="w-full bg-white dark:bg-black py-20 transition-colors duration-300">
+    <section
+      id="info-section"
+      className="w-full bg-white dark:bg-black py-20 transition-colors duration-300"
+    >
       <div className="max-w-7xl mx-auto px-4">
         {/* Заголовок */}
         <div className="mb-16 text-center">

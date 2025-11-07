@@ -26,6 +26,8 @@ interface DeliveryOption {
   price: number | 'Free' | 'N/A';
   time: string;
   emoji: React.ReactNode;
+  serviceKey?: string;
+  timeKey?: string;
 }
 
 interface DeliveryCost {
@@ -159,132 +161,205 @@ const DELIVERY_DATA: DeliveryCost = {
   UA: [
     {
       service: 'Standard (UkrPoshta)',
+      serviceKey: 'options.uaStandard.name',
       price: 'Free',
       time: '3-5 days',
+      timeKey: 'options.uaStandard.time',
       emoji: '🇺🇦',
     },
     {
       service: 'Express (Nova Poshta)',
+      serviceKey: 'options.uaExpress.name',
       price: 'Free',
       time: '1-2 days',
+      timeKey: 'options.uaExpress.time',
       emoji: '🚀',
     },
   ],
   DE: [
     {
       service: 'Standard (DHL/DPD)',
+      serviceKey: 'options.deStandard.name',
       price: 15,
       time: '7-14 days',
+      timeKey: 'options.deStandard.time',
       emoji: '💶',
     },
-    { service: 'Express (FedEx)', price: 35, time: '3-5 days', emoji: '🚀' },
+    {
+      service: 'Express (FedEx)',
+      serviceKey: 'options.deExpress.name',
+      price: 35,
+      time: '3-5 days',
+      timeKey: 'options.deExpress.time',
+      emoji: '🚀',
+    },
   ],
   FR: [
     {
       service: 'Standard (La Poste)',
+      serviceKey: 'options.frStandard.name',
       price: 18,
       time: '8-15 days',
+      timeKey: 'options.frStandard.time',
       emoji: '🇫🇷',
     },
-    { service: 'Express (DHL)', price: 40, time: '3-5 days', emoji: '🚀' },
+    {
+      service: 'Express (DHL)',
+      serviceKey: 'options.frExpress.name',
+      price: 40,
+      time: '3-5 days',
+      timeKey: 'options.frExpress.time',
+      emoji: '🚀',
+    },
   ],
   US: [
-    { service: 'Standard (USPS)', price: 20, time: '7-14 days', emoji: '💵' },
-    { service: 'Express (UPS)', price: 45, time: '3-5 days', emoji: '🚀' },
+    {
+      service: 'Standard (USPS)',
+      serviceKey: 'options.uspsStandard.name',
+      price: 20,
+      time: '7-14 days',
+      timeKey: 'options.uspsStandard.time',
+      emoji: '💵',
+    },
+    {
+      service: 'Express (UPS)',
+      serviceKey: 'options.usExpress.name',
+      price: 45,
+      time: '3-5 days',
+      timeKey: 'options.usExpress.time',
+      emoji: '🚀',
+    },
   ],
   CA: [
     {
       service: 'Standard (Canada Post)',
+      serviceKey: 'options.caStandard.name',
       price: 25,
       time: '10-18 days',
+      timeKey: 'options.caStandard.time',
       emoji: '🇨🇦',
     },
-    { service: 'Express (FedEx)', price: 50, time: '4-7 days', emoji: '🚀' },
+    {
+      service: 'Express (FedEx)',
+      serviceKey: 'options.caExpress.name',
+      price: 50,
+      time: '4-7 days',
+      timeKey: 'options.caExpress.time',
+      emoji: '🚀',
+    },
   ],
   JP: [
     {
       service: 'International Standard',
+      serviceKey: 'options.jpStandard.name',
       price: 30,
       time: '10-20 days',
+      timeKey: 'options.jpStandard.time',
       emoji: '🇯🇵',
     },
     {
       service: 'International Express',
+      serviceKey: 'options.jpExpress.name',
       price: 60,
       time: '5-8 days',
+      timeKey: 'options.jpExpress.time',
       emoji: '✈️',
     },
   ],
   BR: [
     {
       service: 'International Standard',
+      serviceKey: 'options.brStandard.name',
       price: 35,
       time: '15-30 days',
+      timeKey: 'options.brStandard.time',
       emoji: '🇧🇷',
     },
     {
       service: 'International Express',
+      serviceKey: 'options.brExpress.name',
       price: 75,
       time: '7-12 days',
+      timeKey: 'options.brExpress.time',
       emoji: '✈️',
     },
   ],
   NZ: [
     {
       service: 'International Standard',
+      serviceKey: 'options.nzStandard.name',
       price: 65,
       time: '14-25 days',
+      timeKey: 'options.nzStandard.time',
       emoji: '🇳🇿',
     },
     {
       service: 'International Express',
+      serviceKey: 'options.nzExpress.name',
       price: 90,
       time: '7-10 days',
+      timeKey: 'options.nzExpress.time',
       emoji: '✈️',
     },
   ],
   AU: [
     {
       service: 'International Standard',
+      serviceKey: 'options.auStandard.name',
       price: 70,
       time: '14-25 days',
+      timeKey: 'options.auStandard.time',
       emoji: '🇦🇺',
     },
     {
       service: 'International Express',
+      serviceKey: 'options.auExpress.name',
       price: 100,
       time: '7-10 days',
+      timeKey: 'options.auExpress.time',
       emoji: '✈️',
     },
   ],
   ROW: [
     {
       service: 'Global Standard',
+      serviceKey: 'options.globalStandard.name',
       price: 40,
       time: '10-30 days',
+      timeKey: 'options.globalStandard.time',
       emoji: <Globe className="w-5 h-5 text-gray-500" />,
     },
-    { service: 'Global Express', price: 85, time: '5-15 days', emoji: '✈️' },
+    {
+      service: 'Global Express',
+      serviceKey: 'options.globalExpress.name',
+      price: 85,
+      time: '5-15 days',
+      timeKey: 'options.globalExpress.time',
+      emoji: '✈️',
+    },
   ],
   RU: [
     {
-      service: 'We are sorry. Putin is not dead yet',
+      service: 'Unavailable',
+      serviceKey: 'options.ruUnavailable.name',
       price: 'N/A',
       time: 'N/A',
+      timeKey: 'options.ruUnavailable.time',
       emoji: <Skull className="w-5 h-5" />,
     },
   ],
 };
 
-const SERVICE_OPTIONS: SelectOption[] = [
-  { label: 'Standard', value: 'Standard' },
-  { label: 'Express', value: 'Express' },
-];
-
 export default function DeliveryPage() {
   const t = useTranslations('DeliveryPage');
   const t_calc = useTranslations('DeliveryPage.calculator');
   const t_returns = useTranslations('DeliveryPage.returns');
+  const t_service = useTranslations('DeliveryPage.service');
+
+  const SERVICE_OPTIONS: SelectOption[] = [
+    { label: t_service('standard'), value: 'Standard' },
+    { label: t_service('express'), value: 'Express' },
+  ];
 
   const allCountriesOptions: SelectOption[] = Country.getAllCountries().map(
     (c) => ({
@@ -641,10 +716,13 @@ export default function DeliveryPage() {
 
                     <div className="flex-1">
                       <p className="font-semibold text-gray-900 dark:text-neutral-100">
-                        {option.service}
+                        {option.serviceKey
+                          ? t(option.serviceKey)
+                          : option.service}
                       </p>
                       <p className="text-sm text-gray-600 dark:text-neutral-300">
-                        {t_calc('resultsTime')}: {option.time}
+                        {t_calc('resultsTime')}:{' '}
+                        {option.timeKey ? t(option.timeKey) : option.time}
                       </p>
                     </div>
 

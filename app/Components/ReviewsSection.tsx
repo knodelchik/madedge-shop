@@ -48,7 +48,10 @@ const ReviewsSection: React.FC = () => {
   const visibleReviews = showAll ? reviewers : reviewers.slice(0, 3);
 
   return (
-    <section className="py-12 pb-0 bg-white dark:bg-black transition-colors duration-500">
+    <section
+      id="reviews-section"
+      className="py-12 pb-0 bg-white dark:bg-black transition-colors duration-500"
+    >
       <div className="max-w-6xl mx-auto px-4 pb-12">
         {/* Заголовок */}
         <div className="text-center mb-8">

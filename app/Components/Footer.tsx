@@ -39,7 +39,7 @@ export default function Footer() {
             <ul className="space-y-3 text-gray-500 dark:text-neutral-400/80 transition-colors duration-300">
               <li>
                 <a
-                  href="#"
+                  href="#our-products"
                   className="hover:text-neutral-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerOurProducts')}
@@ -47,7 +47,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="#info-section"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tInfo('infoTitle')}
@@ -55,7 +55,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="#product-comparison"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerComparison')}
@@ -63,7 +63,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="#video-section"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerAssembly')}
@@ -71,7 +71,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="#reviews-section"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerReviews')}
@@ -88,7 +88,7 @@ export default function Footer() {
             <ul className="space-y-3 text-gray-500 dark:text-neutral-400/80 ">
               <li>
                 <a
-                  href="#"
+                  href="/shop?category=sharpeners"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerKnifeSharpeners')}
@@ -96,7 +96,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="/shop?category=stones"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerWhetstones')}
@@ -104,7 +104,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="/shop?category=accessories"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerAccessories')}
@@ -121,7 +121,7 @@ export default function Footer() {
             <ul className="space-y-3 text-gray-500 dark:text-neutral-400/80 ">
               <li>
                 <a
-                  href="#"
+                  href="/about#our-background"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerOurBackground')}
@@ -129,7 +129,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="/about#manufacturing"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerManufacturing')}
@@ -137,7 +137,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="/about/sharpeners"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerSharperensKnowledge')}
@@ -145,7 +145,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="/about/grindingstones"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerStonesKnowledge')}
@@ -153,7 +153,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="/about/accessories"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerAccessoriessKnowledge')}
@@ -161,7 +161,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="/about/delivery#calculator"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerDeliveryCostCalculator')}
@@ -169,7 +169,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="/about/delivery#returns-warranty"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerDeliveryPolicy')}
@@ -186,7 +186,7 @@ export default function Footer() {
             <ul className="space-y-3 text-gray-500 dark:text-neutral-400/80 ">
               <li>
                 <a
-                  href="#"
+                  href="/contact"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerWriteUs')}
@@ -194,7 +194,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="/contact"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerSocialNetworks')}

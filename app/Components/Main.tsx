@@ -39,7 +39,10 @@ export default function Main() {
           {t('heroSubtitle')}
         </p>
 
-        <div className="flex justify-center gap-5 py-16 z-10 mr-3">
+        <div
+          id="our-products"
+          className="flex justify-center gap-5 py-16 z-10 mr-3"
+        >
           {/* Посилання на Shop */}
           <Link href="/shop" passHref>
             <Button

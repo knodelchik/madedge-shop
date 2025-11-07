@@ -380,7 +380,7 @@ export const translations = {
         'Заснована у **2010** році, MadEdge виникла з простого спостереження: художники, ремісники та професіонали заслуговують на кращі інструменти для обслуговування свого обладнання. Те, що починалося як невелика майстерня в Портленді, перетворилося на провідного виробника преміальних рішень для заточування, які використовуються професіоналами по всьому світу.',
       journeySubtitle: 'Подорож',
       journeyText:
-        'Наш засновник, **Маркус Девідсон**, колишній промисловий дизайнер, помітив розчарування, з яким стикалися митці, використовуючи звичайні точилки. Він витратив три роки на дослідження металургії, геометрії лез та ергономіки, щоб створити перший прототип MadEdge. Цей прототип перетворився на нашу флагманську серію ProEdge, якій зараз довіряють понад **100 000 професіоналів** у всьому світі.',
+        'Наш засновник, **Серг Некрасов**, не колишній промисловий і не дизайнер, помітив розчарування, з яким стикалися митці, використовуючи звичайні точилки. Він витратив три роки на дослідження металургії, геометрії лез та ергономіки, щоб створити перший прототип MadEdge. Цей прототип перетворився на нашу флагманську серію ProEdge, якій зараз довіряють понад **100 000 професіоналів** у всьому світі.',
       milestonesSubtitle: 'Ключові етапи',
       milestone2010: 'Компанія заснована в Портленді, Орегон',
       milestone2013: 'Випущено першу модель ProEdge',
@@ -820,6 +820,43 @@ export const translations = {
         resultsApproxPrice: 'Прибл. ціна',
         resultsNoOptions:
           'Немає конкретних варіантів доставки для обраних критеріїв. За замовчуванням відображаються варіанти "Інші країни світу".',
+      },
+      options: {
+        uaStandard: { name: 'Стандарт (УкрПошта)', time: '3–5 днів' },
+        uaExpress: { name: 'Експрес (Нова Пошта)', time: '1–2 дні' },
+
+        deStandard: { name: 'Стандарт (DHL/DPD)', time: '7–14 днів' },
+        deExpress: { name: 'Експрес (FedEx)', time: '3–5 днів' },
+
+        frStandard: { name: 'Стандарт (La Poste)', time: '8–15 днів' },
+        frExpress: { name: 'Експрес (DHL)', time: '3–5 днів' },
+
+        uspsStandard: { name: 'Стандарт (USPS)', time: '7–14 днів' },
+        usExpress: { name: 'Експрес (UPS)', time: '3–5 днів' },
+
+        caStandard: { name: 'Стандарт (Canada Post)', time: '10–18 днів' },
+        caExpress: { name: 'Експрес (FedEx)', time: '4–7 днів' },
+
+        jpStandard: { name: 'Міжнародний стандарт', time: '10–20 днів' },
+        jpExpress: { name: 'Міжнародний експрес', time: '5–8 днів' },
+
+        brStandard: { name: 'Міжнародний стандарт', time: '15–30 днів' },
+        brExpress: { name: 'Міжнародний експрес', time: '7–12 днів' },
+
+        nzStandard: { name: 'Міжнародний стандарт', time: '14–25 днів' },
+        nzExpress: { name: 'Міжнародний експрес', time: '7–10 днів' },
+
+        auStandard: { name: 'Міжнародний стандарт', time: '14–25 днів' },
+        auExpress: { name: 'Міжнародний експрес', time: '7–10 днів' },
+
+        globalStandard: { name: 'Глобальний стандарт', time: '10–30 днів' },
+        globalExpress: { name: 'Глобальний експрес', time: '5–15 днів' },
+
+        ruUnavailable: { name: 'Послуга недоступна', time: 'Н/Д' },
+      },
+      service: {
+        standard: 'Стандарт',
+        express: 'Експрес',
       },
       returns: {
         title: 'Повернення, обмін та гарантія',
@@ -1814,6 +1851,43 @@ export const translations = {
         resultsApproxPrice: 'Approx. price',
         resultsNoOptions:
           'No specific shipping options are available for the selected criteria. Showing Rest of World options by default.',
+      },
+      options: {
+        uaStandard: { name: 'Standard (UkrPoshta)', time: '3-5 days' },
+        uaExpress: { name: 'Express (Nova Poshta)', time: '1-2 days' },
+
+        deStandard: { name: 'Standard (DHL/DPD)', time: '7-14 days' },
+        deExpress: { name: 'Express (FedEx)', time: '3-5 days' },
+
+        frStandard: { name: 'Standard (La Poste)', time: '8-15 days' },
+        frExpress: { name: 'Express (DHL)', time: '3-5 days' },
+
+        uspsStandard: { name: 'Standard (USPS)', time: '7-14 days' },
+        usExpress: { name: 'Express (UPS)', time: '3-5 days' },
+
+        caStandard: { name: 'Standard (Canada Post)', time: '10-18 days' },
+        caExpress: { name: 'Express (FedEx)', time: '4-7 days' },
+
+        jpStandard: { name: 'International Standard', time: '10-20 days' },
+        jpExpress: { name: 'International Express', time: '5-8 days' },
+
+        brStandard: { name: 'International Standard', time: '15-30 days' },
+        brExpress: { name: 'International Express', time: '7-12 days' },
+
+        nzStandard: { name: 'International Standard', time: '14-25 days' },
+        nzExpress: { name: 'International Express', time: '7-10 days' },
+
+        auStandard: { name: 'International Standard', time: '14-25 days' },
+        auExpress: { name: 'International Express', time: '7-10 days' },
+
+        globalStandard: { name: 'Global Standard', time: '10-30 days' },
+        globalExpress: { name: 'Global Express', time: '5-15 days' },
+
+        ruUnavailable: { name: 'Service unavailable', time: 'N/A' },
+      },
+      service: {
+        standard: 'Standard',
+        express: 'Express',
       },
       returns: {
         title: 'Returns, Exchanges, and Warranty',

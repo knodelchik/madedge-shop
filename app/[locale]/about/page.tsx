@@ -244,7 +244,7 @@ export default function AboutPage() {
             {t('howToUseSubtitle')}
           </h3>
 
-          <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-8 rounded-xl mb-8 border border-blue-200 shadow-lg dark:from-blue-900/30 dark:to-blue-800/20 dark:border-blue-800/40 dark:bg-gradient-to-r">
+          <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-8 rounded-xl mb-8 border border-blue-200 shadow-lg dark:from-neutral-900/90 dark:to-neutral-800/30 dark:border-neutral-800/40 dark:bg-gradient-to-r">
             <h4 className="font-bold text-gray-900 mb-4 text-xl dark:text-neutral-100">
               {t('instructionsTitle')}
             </h4>
