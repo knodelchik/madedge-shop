@@ -129,15 +129,15 @@ export default function Header() {
             <Image
               src="/logo.jpeg"
               alt="Логотип"
-              width={64}
-              height={64}
+              width={58}
+              height={58}
               className="object-contain rounded-full"
             />
           </motion.div>
         </div>
 
         {/* ===== Навігація зліва ===== */}
-        <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2 -ml-[149px]">
+        <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2 -ml-[140px]">
           <Link
             href="/"
             className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium"
@@ -153,7 +153,7 @@ export default function Header() {
         </div>
 
         {/* ===== Навігація справа ===== */}
-        <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2 ml-[153px]">
+        <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2 ml-[148px]">
           <Link
             href="/about"
             className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium"

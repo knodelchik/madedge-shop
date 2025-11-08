@@ -73,33 +73,37 @@ export default function Main() {
             {t('heroSubtitle')}
           </motion.p>
 
+          {/* ===== ЗМІНЕНО ТУТ ===== */}
           <motion.div
             id="our-products"
-            className="flex justify-center gap-5 py-16 mr-3"
+            /* Використовуємо grid, задаємо gap-5 і обмежуємо ширину */
+            className="grid grid-cols-2 gap-5 py-16 w-full max-w-sm mr-1" // Можете погратися з max-w-xs (320px) або max-w-sm (384px)
             variants={itemVariants}
           >
-            {/* Посилання на Shop */}
-            <Link href="/shop" passHref>
-              <Button
-                asChild
-                size="lg"
-                className="px-8 py-4 rounded-2xl border border-gray-400/10 dark:border-neutral-300 shadow-md cursor-pointer hover:bg-gray-300/30 dark:hover:bg-neutral-700/30 dark:hover:border-neutral-400 hover:text-black dark:hover:text-white transition duration-200"
-              >
-                <span>{t('shop')}</span>
-              </Button>
-            </Link>
+            <div className="flex justify-end">
+              <Link href="/shop" passHref>
+                <Button
+                  asChild
+                  size="lg"
+                  className="px-8 py-4 rounded-2xl border border-gray-400/10 dark:border-neutral-300 shadow-md cursor-pointer hover:bg-gray-300/30 dark:hover:bg-neutral-700/30 dark:hover:border-neutral-400 hover:text-black dark:hover:text-white transition duration-200"
+                >
+                  <span>{t('shop')}</span>
+                </Button>
+              </Link>
+            </div>
 
-            {/* Посилання на About */}
-            <Link href="/about" passHref>
-              <Button
-                asChild
-                size="lg"
-                variant="secondary"
-                className="px-10 py-4 rounded-2xl shadow-md cursor-pointer bg-gray-300/30 dark:bg-neutral-700/30 border border-gray-400/10 text-gray-900 dark:text-white hover:text-black/80 dark:hover:text-white/80 dark:hover:bg-neutral-900 dark:border-neutral-900 dark:hover:border-neutral-800 transition duration-200"
-              >
-                <span>{t('about')}</span>
-              </Button>
-            </Link>
+            <div className="flex justify-start">
+              <Link href="/about" passHref>
+                <Button
+                  asChild
+                  size="lg"
+                  variant="secondary"
+                  className="px-8 py-4 rounded-2xl shadow-md cursor-pointer bg-gray-300/30 dark:bg-neutral-700/30 border border-gray-400/10 text-gray-900 dark:text-white hover:text-black/80 dark:hover:text-white/80 dark:hover:bg-neutral-900 dark:border-neutral-900 dark:hover:border-neutral-800 transition duration-200"
+                >
+                  <span>{t('about')}</span>
+                </Button>
+              </Link>
+            </div>
           </motion.div>
         </motion.div>
       </section>
