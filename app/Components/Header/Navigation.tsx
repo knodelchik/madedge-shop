@@ -25,7 +25,7 @@ export default function Navigation() {
 
       <div className="w-14 h-14 flex items-center justify-center">
         <Image
-          src="/logo.jpg"
+          src="/logo.jpeg"
           alt="Логотип"
           width={56}
           height={56}

@@ -183,7 +183,7 @@ function EmptyWishlist() {
   const t = useTranslations('Wishlist');
 
   return (
-    <div className="px-2 py-4 text-center text-gray-500">
+    <div className="px-2 py-4 text-center text-gray-500 dark:text-neutral-500">
       <Heart className="w-8 h-8 mx-auto mb-2 opacity-50" />
       <p>{t('empty')}</p>
       <p className="text-sm mt-1">{t('emptyDescription')}</p>

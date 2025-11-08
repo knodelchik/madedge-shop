@@ -329,8 +329,13 @@ export const translations = {
       totalLabel: 'Разом:',
       paymentMethodLabel: 'Спосіб оплати:',
       payButton: 'Оплатити',
-      paymentError: 'Помилка при створенні платежу',
-      priceUnit: '$',
+      paymentError: 'Помилка створення платежу',
+      priceUnit: '₴',
+      orderSummary: 'Підсумок замовлення',
+      subtotal: 'Підсумок',
+      shipping: 'Доставка',
+      freeShipping: 'Безкоштовно',
+      securePayment: 'Безпечна оплата',
     },
     CartSheet: {
       title: 'Ваш кошик',
@@ -367,6 +372,7 @@ export const translations = {
       formMessageLabel: 'Повідомлення',
       formMessagePlaceholder: 'Розкажіть нам більше про ваш запит...',
       formSubmit: 'Відправити повідомлення',
+      formSubmitting: 'Відправка...',
     },
     AboutPage: {
       // Hero
@@ -1363,6 +1369,11 @@ export const translations = {
       payButton: 'Pay',
       paymentError: 'Error creating payment',
       priceUnit: '$',
+      orderSummary: 'Order Summary',
+      subtotal: 'Subtotal',
+      shipping: 'Shipping',
+      freeShipping: 'Free',
+      securePayment: 'Secure payment',
     },
     CartSheet: {
       title: 'Your Cart',
@@ -1399,6 +1410,7 @@ export const translations = {
       formMessageLabel: 'Message',
       formMessagePlaceholder: 'Tell us more about your inquiry...',
       formSubmit: 'Send Message',
+      formSubmitting: 'Sending...',
     },
     AboutPage: {
       // Hero

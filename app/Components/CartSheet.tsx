@@ -13,6 +13,7 @@ import QuantityCounter from './QuantityCounter';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import { useState } from 'react';
 
 interface CartItem {
   id: number;
@@ -25,6 +26,7 @@ interface CartItem {
 export default function CartSheet() {
   const t = useTranslations('CartSheet');
   const { cartItems, increaseQuantity, decreaseQuantity } = useCartStore();
+  const [open, setOpen] = useState(false);
 
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = cartItems.reduce(
@@ -42,10 +44,14 @@ export default function CartSheet() {
     return item.images[0];
   };
 
+  const handleCheckout = () => {
+    setOpen(false);
+  };
+
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <button className="relative p-2 rounded-lg dark:hover:bg-white dark:hover:text-black  ">
+        <button className="relative p-2 rounded-lg dark:hover:bg-white dark:hover:text-black">
           <ShoppingCart className="w-6 h-6" />
           {totalItems > 0 && (
             <span className="absolute -top-1 -right-2 bg-red-600 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
@@ -75,6 +81,7 @@ export default function CartSheet() {
             </p>
             <Link
               href="/shop"
+              onClick={() => setOpen(false)}
               className="bg-black hover:bg-gray-800 dark:bg-white dark:hover:bg-neutral-200 
                          text-white dark:text-black py-2 px-6 rounded-lg font-medium transition"
             >
@@ -134,6 +141,7 @@ export default function CartSheet() {
 
               <Link
                 href="/order"
+                onClick={handleCheckout}
                 className="w-full text-center bg-black hover:bg-gray-800 
                            dark:bg-white dark:hover:bg-neutral-200 
                            text-white dark:text-black py-3 rounded-lg font-medium transition block"

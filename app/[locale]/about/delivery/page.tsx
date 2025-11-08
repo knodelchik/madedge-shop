@@ -14,6 +14,7 @@ import {
 import { Country, State } from 'country-state-city';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // --- Types ---
 interface SelectOption {
@@ -61,7 +62,7 @@ function getCustomStyles(themeMode: 'light' | 'dark') {
       color: textColor,
       outline: 'none',
       userSelect: 'none',
-      WebkitTapHighlightColor: 'transparent', // key for mobile tap highlight
+      WebkitTapHighlightColor: 'transparent',
     }),
 
     valueContainer: (provided: any) => ({
@@ -131,7 +132,6 @@ function getCustomStyles(themeMode: 'light' | 'dark') {
       userSelect: 'none',
       outline: 'none',
       WebkitTapHighlightColor: 'transparent',
-      // Вбудований псевдоклас для активного натискання (перекриває синій default)
       ':active': {
         background: state.isSelected ? optionActiveBg : optionHoverBg,
       },
@@ -156,7 +156,7 @@ function getCustomStyles(themeMode: 'light' | 'dark') {
   };
 }
 
-// Delivery data (unchanged, small RU message kept)
+// Delivery data
 const DELIVERY_DATA: DeliveryCost = {
   UA: [
     {
@@ -372,7 +372,6 @@ export default function DeliveryPage() {
     allCountriesOptions.find((c) => c.value === 'US') || allCountriesOptions[0];
   const initialServiceOption = SERVICE_OPTIONS[0];
 
-  // state
   const [selectedCountryOption, setSelectedCountryOption] =
     useState<SelectOption>(initialCountryOption);
   const [selectedServiceOption, setSelectedServiceOption] =
@@ -416,8 +415,9 @@ export default function DeliveryPage() {
     handleCalculate(selectedCountryCode, selectedServiceName, '');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCountryCode, selectedServiceName]);
+
   useEffect(() => {
-    setMounted(true); // після mount ми знаємо реальну тему
+    setMounted(true);
   }, []);
 
   const getEmoji = (
@@ -475,7 +475,6 @@ export default function DeliveryPage() {
           return { ...opt, price: finalPrice, service: finalService };
         }
 
-        // remote detection
         const remoteKeywords = [
           'remote',
           'island',
@@ -533,38 +532,38 @@ export default function DeliveryPage() {
     }
   };
 
-  // react-select styles — singleValue uses 'inherit' so color is taken from container (.text-... dark:text-...)
-  const customStyles = {
-    control: (provided: any, state: any) => ({
-      ...provided,
-      minHeight: '48px',
-      borderColor: state.isFocused ? '#3b82f6' : '#d1d5db',
-      boxShadow: state.isFocused ? '0 0 0 1px #3b82f6' : 'none',
-      background: 'transparent',
-      '&:hover': {
-        borderColor: state.isFocused ? '#3b82f6' : '#d1d5db',
-      },
-    }),
-    valueContainer: (provided: any) => ({ ...provided, padding: '0 8px' }),
-    singleValue: (provided: any) => ({ ...provided, color: 'inherit' }),
-    menu: (provided: any) => ({ ...provided, zIndex: 50 }),
-  };
-
   return (
     <div className="min-h-screen bg-white dark:bg-black transition-colors">
       <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {/* Hero */}
-        <div className="mb-16">
+        <motion.div
+          className="mb-16"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+        >
           <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-4 dark:text-neutral-100">
             {t('hero.title')}
           </h1>
-          <p className="mt-4 text-xl text-gray-500 border-b pb-6 border-gray-200 dark:text-neutral-300 dark:border-neutral-800">
+          <motion.p
+            className="mt-4 text-xl text-gray-500 border-b pb-6 border-gray-200 dark:text-neutral-300 dark:border-neutral-800"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.7 }}
+          >
             {t('hero.subtitle')}
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
         {/* Policy */}
-        <section id="policy" className="mb-20 scroll-mt-24">
+        <motion.section
+          id="policy"
+          className="mb-20 scroll-mt-24"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
           <h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-gray-900 pl-3 dark:text-neutral-100 dark:border-neutral-300">
             {t('policy.title')}
           </h2>
@@ -572,9 +571,20 @@ export default function DeliveryPage() {
             {t('policy.intro')}
           </p>
 
-          <div className="bg-blue-50 p-6 rounded-xl border border-blue-200 dark:bg-neutral-900 dark:border-neutral-800">
+          <motion.div
+            className="bg-blue-50 p-6 rounded-xl border border-blue-200 dark:bg-neutral-900 dark:border-neutral-800"
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+          >
             <h3 className="font-bold text-gray-900 mb-3 flex items-center dark:text-neutral-100">
-              <Truck className="w-5 h-5 mr-3 text-blue-600 dark:text-blue-300" />{' '}
+              <motion.div
+                animate={{ x: [0, 5, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              >
+                <Truck className="w-5 h-5 mr-3 text-blue-600 dark:text-blue-300" />
+              </motion.div>
               {t('policy.keyTitle')}
             </h3>
             <ul className="space-y-2 text-gray-700 list-disc list-inside ml-4 dark:text-neutral-300">
@@ -591,15 +601,25 @@ export default function DeliveryPage() {
                 {t('policy.key3Text')}
               </li>
             </ul>
-          </div>
-        </section>
+          </motion.div>
+        </motion.section>
 
-        <hr className="my-16 border-gray-200 dark:border-neutral-800" />
+        <motion.hr
+          className="my-16 border-gray-200 dark:border-neutral-800"
+          initial={{ scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        />
 
         {/* Calculator */}
-        <section
+        <motion.section
           id="calculator"
           className="mb-20 scroll-mt-24 bg-gray-50 p-8 rounded-xl border border-gray-200 shadow-lg dark:bg-neutral-900 dark:border-neutral-800"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
         >
           <h2 className="text-3xl font-bold text-gray-900 mb-6 dark:text-neutral-100">
             {t_calc('title')}
@@ -608,7 +628,13 @@ export default function DeliveryPage() {
             {t_calc('intro')}
           </p>
 
-          <div className="flex flex-col md:flex-row gap-4 mb-8">
+          <motion.div
+            className="flex flex-col md:flex-row gap-4 mb-8"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+          >
             <div className="flex-1">
               <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-neutral-200">
                 {t_calc('labelCountry')}
@@ -669,102 +695,148 @@ export default function DeliveryPage() {
                 />
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          {surchargeApplied && (
-            <div className="mb-4 p-3 text-sm font-medium text-orange-800 bg-orange-100 rounded-lg border border-orange-300 dark:bg-orange-900/20 dark:text-orange-200 dark:border-orange-700">
-              <span className="font-bold">
-                {t_calc('surchargeNoteStrong')}:
-              </span>{' '}
-              {t_calc('surchargeNoteText')}
-            </div>
-          )}
+          <AnimatePresence>
+            {surchargeApplied && (
+              <motion.div
+                className="mb-4 p-3 text-sm font-medium text-orange-800 bg-orange-100 rounded-lg border border-orange-300 dark:bg-orange-900/20 dark:text-orange-200 dark:border-orange-700"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <span className="font-bold">
+                  {t_calc('surchargeNoteStrong')}:
+                </span>{' '}
+                {t_calc('surchargeNoteText')}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <div className="mt-8 pt-6 border-t border-gray-300 dark:border-neutral-800">
             <h3 className="text-xl font-bold text-gray-900 mb-4 dark:text-neutral-100">
               {t_calc('resultsTitle', { country: selectedCountryName })}
             </h3>
 
-            {isCalculating ? (
-              <div className="flex items-center justify-center p-8 bg-white rounded-lg dark:bg-neutral-800">
-                <Loader className="w-6 h-6 animate-spin mr-3 text-blue-600 dark:text-blue-300" />
-                <span className="text-lg text-blue-600 dark:text-neutral-300">
-                  {t_calc('resultsLoading')}
-                </span>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {shippingOptions.map((option, index) => (
-                  <div
-                    key={index}
-                    className={`flex items-center p-5 rounded-xl transition shadow-md border
-                      ${
-                        selectedCountryCode === 'RU'
-                          ? 'bg-red-50 border-red-300 dark:bg-red-900/20 dark:border-red-700'
-                          : option.price === 'Free'
-                          ? 'bg-green-50 border-green-300 dark:bg-green-900/20 dark:border-green-700'
-                          : 'bg-white border-gray-200 dark:bg-neutral-800 dark:border-neutral-700'
-                      }`}
-                  >
-                    <div className="flex-shrink-0 mr-4">
-                      {getEmoji(
-                        option.price,
-                        selectedCountryCode,
-                        option.price !== 'N/A'
-                      )}
-                    </div>
-
-                    <div className="flex-1">
-                      <p className="font-semibold text-gray-900 dark:text-neutral-100">
-                        {option.serviceKey
-                          ? t(option.serviceKey)
-                          : option.service}
-                      </p>
-                      <p className="text-sm text-gray-600 dark:text-neutral-300">
-                        {t_calc('resultsTime')}:{' '}
-                        {option.timeKey ? t(option.timeKey) : option.time}
-                      </p>
-                    </div>
-
-                    <div className="flex-shrink-0 text-right">
-                      <p
-                        className={`text-xl font-bold ${
-                          option.price === 'Free'
-                            ? 'text-green-600 dark:text-green-400'
-                            : option.price === 'N/A'
-                            ? 'text-red-600 dark:text-red-400'
-                            : 'text-gray-900 dark:text-neutral-100'
+            <AnimatePresence mode="wait">
+              {isCalculating ? (
+                <motion.div
+                  key="loading"
+                  className="flex items-center justify-center p-8 bg-white rounded-lg dark:bg-neutral-800"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <Loader className="w-6 h-6 animate-spin mr-3 text-blue-600 dark:text-blue-300" />
+                  <span className="text-lg text-blue-600 dark:text-neutral-300">
+                    {t_calc('resultsLoading')}
+                  </span>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="results"
+                  className="space-y-4"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  {shippingOptions.map((option, index) => (
+                    <motion.div
+                      key={index}
+                      className={`flex items-center p-5 rounded-xl transition shadow-md border
+                        ${
+                          selectedCountryCode === 'RU'
+                            ? 'bg-red-50 border-red-300 dark:bg-red-900/20 dark:border-red-700'
+                            : option.price === 'Free'
+                            ? 'bg-green-50 border-green-300 dark:bg-green-900/20 dark:border-green-700'
+                            : 'bg-white border-gray-200 dark:bg-neutral-800 dark:border-neutral-700'
                         }`}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                    >
+                      <motion.div
+                        className="flex-shrink-0 mr-4"
+                        whileHover={{ scale: 1.2, rotate: 10 }}
+                        transition={{ type: 'spring', stiffness: 300 }}
                       >
-                        {option.price === 'Free'
-                          ? t_calc('resultsFree')
-                          : option.price === 'N/A'
-                          ? t_calc('resultsNA')
-                          : `$${(option.price as number).toFixed(2)}`}
-                      </p>
-                      {option.price !== 'N/A' && (
-                        <p className="text-xs text-gray-500 dark:text-neutral-400">
-                          {t_calc('resultsApproxPrice')}
+                        {getEmoji(
+                          option.price,
+                          selectedCountryCode,
+                          option.price !== 'N/A'
+                        )}
+                      </motion.div>
+
+                      <div className="flex-1">
+                        <p className="font-semibold text-gray-900 dark:text-neutral-100">
+                          {option.serviceKey
+                            ? t(option.serviceKey)
+                            : option.service}
                         </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
+                        <p className="text-sm text-gray-600 dark:text-neutral-300">
+                          {t_calc('resultsTime')}:{' '}
+                          {option.timeKey ? t(option.timeKey) : option.time}
+                        </p>
+                      </div>
 
-                {shippingOptions.length === 0 && (
-                  <div className="p-5 bg-yellow-50 rounded-lg text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200">
-                    <p>{t_calc('resultsNoOptions')}</p>
-                  </div>
-                )}
-              </div>
-            )}
+                      <div className="flex-shrink-0 text-right">
+                        <p
+                          className={`text-xl font-bold ${
+                            option.price === 'Free'
+                              ? 'text-green-600 dark:text-green-400'
+                              : option.price === 'N/A'
+                              ? 'text-red-600 dark:text-red-400'
+                              : 'text-gray-900 dark:text-neutral-100'
+                          }`}
+                        >
+                          {option.price === 'Free'
+                            ? t_calc('resultsFree')
+                            : option.price === 'N/A'
+                            ? t_calc('resultsNA')
+                            : `${(option.price as number).toFixed(2)}`}
+                        </p>
+                        {option.price !== 'N/A' && (
+                          <p className="text-xs text-gray-500 dark:text-neutral-400">
+                            {t_calc('resultsApproxPrice')}
+                          </p>
+                        )}
+                      </div>
+                    </motion.div>
+                  ))}
+
+                  {shippingOptions.length === 0 && (
+                    <motion.div
+                      className="p-5 bg-yellow-50 rounded-lg text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                    >
+                      <p>{t_calc('resultsNoOptions')}</p>
+                    </motion.div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-        </section>
+        </motion.section>
 
-        <hr className="my-16 border-gray-200 dark:border-neutral-800" />
+        <motion.hr
+          className="my-16 border-gray-200 dark:border-neutral-800"
+          initial={{ scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        />
 
         {/* Returns & Warranty */}
-        <section id="returns-warranty" className="mb-20 scroll-mt-24">
+        <motion.section
+          id="returns-warranty"
+          className="mb-20 scroll-mt-24"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
           <h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-gray-900 pl-3 dark:text-neutral-100 dark:border-neutral-300">
             {t_returns('title')}
           </h2>
@@ -773,14 +845,33 @@ export default function DeliveryPage() {
             {t_returns('intro')}
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-md dark:bg-neutral-900 dark:border-neutral-700">
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-3 gap-6"
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+            variants={{
+              animate: {
+                transition: {
+                  staggerChildren: 0.15,
+                },
+              },
+            }}
+          >
+            <motion.div
+              className="bg-white p-5 rounded-xl border border-gray-200 shadow-md dark:bg-neutral-900 dark:border-neutral-700"
+              variants={{
+                initial: { opacity: 0, y: 20 },
+                animate: { opacity: 1, y: 0 },
+              }}
+            >
               <h3 className="font-bold text-xl text-gray-900 mb-3 flex items-center dark:text-neutral-100">
-                <svg
+                <motion.svg
                   className="w-5 h-5 mr-2 text-blue-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
+                  whileHover={{ scale: 1.2, rotate: 10 }}
                 >
                   <path
                     strokeLinecap="round"
@@ -788,21 +879,28 @@ export default function DeliveryPage() {
                     strokeWidth="2"
                     d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
                   ></path>
-                </svg>
+                </motion.svg>
                 {t_returns('returnTitle')}
               </h3>
               <p className="text-gray-700 text-sm dark:text-neutral-300">
                 {t_returns('returnText')}
               </p>
-            </div>
+            </motion.div>
 
-            <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-md dark:bg-neutral-900 dark:border-neutral-700">
+            <motion.div
+              className="bg-white p-5 rounded-xl border border-gray-200 shadow-md dark:bg-neutral-900 dark:border-neutral-700"
+              variants={{
+                initial: { opacity: 0, y: 20 },
+                animate: { opacity: 1, y: 0 },
+              }}
+            >
               <h3 className="font-bold text-xl text-gray-900 mb-3 flex items-center dark:text-neutral-100">
-                <svg
+                <motion.svg
                   className="w-5 h-5 mr-2 text-blue-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
+                  whileHover={{ scale: 1.2 }}
                 >
                   <path
                     strokeLinecap="round"
@@ -810,21 +908,28 @@ export default function DeliveryPage() {
                     strokeWidth="2"
                     d="M9 12l2 2 4-4m5.618-4.018A9.955 9.955 0 0112 5.053 10.038 10.038 0 003.055 7.5c-.714 2.21-1.077 4.603-1.055 7.417C2.023 18.913 5.483 22 10 22h4c4.517 0 7.977-3.087 7.977-7.03c.022-2.814-.341-5.207-1.055-7.417z"
                   ></path>
-                </svg>
+                </motion.svg>
                 {t_returns('warrantyTitle')}
               </h3>
               <p className="text-gray-700 text-sm dark:text-neutral-300">
                 {t_returns('warrantyText')}
               </p>
-            </div>
+            </motion.div>
 
-            <div className="bg-orange-50 p-5 rounded-xl border border-orange-200 shadow-md dark:bg-orange-900/10 dark:border-neutral-700">
+            <motion.div
+              className="bg-orange-50 p-5 rounded-xl border border-orange-200 shadow-md dark:bg-orange-900/10 dark:border-neutral-700"
+              variants={{
+                initial: { opacity: 0, y: 20 },
+                animate: { opacity: 1, y: 0 },
+              }}
+            >
               <h3 className="font-bold text-xl text-gray-900 mb-3 flex items-center dark:text-neutral-100">
-                <svg
+                <motion.svg
                   className="w-5 h-5 mr-2 text-red-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
+                  whileHover={{ scale: 1.2, rotate: 10 }}
                 >
                   <path
                     strokeLinecap="round"
@@ -832,15 +937,15 @@ export default function DeliveryPage() {
                     strokeWidth="2"
                     d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.3 16c-.77 1.333.192 3 1.732 3z"
                   ></path>
-                </svg>
+                </motion.svg>
                 {t_returns('lostTitle')}
               </h3>
               <p className="text-gray-700 text-sm dark:text-neutral-300">
                 {t_returns('lostText')}
               </p>
-            </div>
-          </div>
-        </section>
+            </motion.div>
+          </motion.div>
+        </motion.section>
       </div>
     </div>
   );

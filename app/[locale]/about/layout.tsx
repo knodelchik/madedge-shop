@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl'; // 👈 Додано імпорт
@@ -19,7 +19,7 @@ import {
   HappyIcon,
   StarEyesIcon,
 } from '../../Components/icons/SocialIcons';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 
 // --- Інтерфейси ---
 interface MenuItem {
@@ -42,6 +42,12 @@ export default function AboutLayout({
   const pathname = usePathname();
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
   const [feedback, setFeedback] = useState('');
+
+  // Для підсвічування секцій
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const observedRef = useRef<Record<string, IntersectionObserverEntry | null>>(
+    {}
+  );
 
   // 1. ВИПРАВЛЕННЯ: Видаляємо префікс локалі для коректної роботи навігації
   const cleanPathname = pathname.replace(/^\/[a-z]{2}/, '');
@@ -181,6 +187,55 @@ export default function AboutLayout({
     setSelectedRating(null);
   };
 
+  // ----- EFFECT: спостерігач за прокруткою для підсвічування розділів -----
+  useEffect(() => {
+    if (!currentSections || currentSections.length === 0) return;
+
+    const options: IntersectionObserverInit = {
+      root: null,
+      rootMargin: '-20% 0px -40% 0px', // тригер трохи вище середини
+      threshold: [0, 0.15, 0.35, 0.6],
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      // Визначаємо найвидимішу секцію серед тих, що інтерсекнуться
+      const visible = entries
+        .filter((e) => e.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+
+      if (visible.length > 0) {
+        setActiveSection(visible[0].target.id);
+        // кешуємо останній запис
+        observedRef.current[visible[0].target.id] = visible[0];
+      } else {
+        // Якщо нічого не видно — залишаємо попередній (або null)
+        // не скидаємо миттєво, щоб уникнути мерехтіння
+      }
+    }, options);
+
+    // Підключаємо секції по id
+    const elements: HTMLElement[] = currentSections
+      .map((s) => document.getElementById(s.id))
+      .filter(Boolean) as HTMLElement[];
+
+    elements.forEach((el) => observer.observe(el));
+
+    return () => {
+      elements.forEach((el) => observer.unobserve(el));
+      observer.disconnect();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cleanPathname, JSON.stringify(currentSections)]);
+
+  // Скрол до секції зі зсувом для sticky header
+  const handleOnPageLinkClick = (id: string) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const yOffset = -72; // якщо є sticky header висотою ~72px
+    const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+    window.scrollTo({ top: y, behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-white flex flex-col dark:bg-black">
       <div className="flex flex-1">
@@ -189,7 +244,7 @@ export default function AboutLayout({
           <div className="mb-8">
             {/* Статичний логотип */}
             <div className="flex items-center gap-3 p-3 rounded-lg mb-4">
-              <Factory className="w-5 h-5 text-blue-600" />
+              <Factory className="w-5 h-5 text-blue-400" />
               <div>
                 <div className="font-semibold text-sm text-gray-900 dark:text-neutral-100">
                   MadEdge
@@ -221,8 +276,8 @@ export default function AboutLayout({
                 href={menu.href}
                 className={`flex items-center justify-between w-full p-2 rounded-lg transition-colors ${
                   cleanPathname === menu.href // 💡 Перевіряємо активність за cleanPathname
-                    ? ' text-blue-600'
-                    : 'text-gray-700 hover:bg-gray-50 dark:text-neutral-500 dark:hover:bg-neutral-900'
+                    ? ' text-blue-600 dark:text-blue-400'
+                    : 'text-gray-700 hover:bg-gray-100 dark:text-neutral-500 dark:hover:bg-neutral-900'
                 }`}
               >
                 <span className="flex items-center gap-2 font-normal">
@@ -242,16 +297,47 @@ export default function AboutLayout({
           <h3 className="text-sm font-semibold text-gray-900 mb-4 dark:text-neutral-100">
             {t('sidebar.onThisPage')} {/* 🚀 Переклад */}
           </h3>
-          <nav className="space-y-2">
-            {currentSections.map((section) => (
-              <a
-                key={section.id}
-                href={`#${section.id}`}
-                className="block text-sm text-gray-600 hover:text-blue-600 dark:text-neutral-500 dark:hover:text-blue-600"
-              >
-                {section.title}
-              </a>
-            ))}
+
+          <nav className="relative">
+            <div className="space-y-2">
+              {currentSections.map((section) => {
+                const isActive = activeSection === section.id;
+                return (
+                  <button
+                    key={section.id}
+                    onClick={() => handleOnPageLinkClick(section.id)}
+                    className={`relative w-full text-left text-sm px-3 py-1 rounded-md transition-all flex items-center gap-3 focus:outline-none ${
+                      isActive
+                        ? 'text-blue-600 dark:text-blue-400'
+                        : 'text-gray-600 hover:text-black dark:text-neutral-500 dark:hover:text-neutral-200'
+                    }`}
+                  >
+                    <AnimatePresence>
+                      {isActive ? (
+                        <motion.span
+                          layoutId="onpage-indicator"
+                          initial={{ opacity: 0, y: -6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -6 }}
+                          transition={{
+                            type: 'spring',
+                            stiffness: 500,
+                            damping: 30,
+                          }}
+                          className="h-6 w-1 rounded-full bg-blue-500 flex-shrink-0"
+                        />
+                      ) : (
+                        <span className="h-6 w-1 flex-shrink-0" aria-hidden />
+                      )}
+                    </AnimatePresence>
+
+                    <span className="flex-1 overflow-hidden text-ellipsis">
+                      {section.title}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </nav>
         </aside>
       </div>
@@ -412,14 +498,14 @@ export default function AboutLayout({
                   />
 
                   <div className="flex justify-between items-center mt-2">
-                    <div className="text-xs text-gray-400">
+                    <div className="text-xs text-neutral-400">
                       <span className="font-mono">M↓</span>{' '}
                       {t('feedback.supported')} {/* 🚀 Переклад */}
                     </div>
 
                     <button
                       onClick={handleSubmit}
-                      className="bg-gray-900 text-white px-8 py-3 rounded-lg font-medium hover:bg-gray-800 transition"
+                      className="bg-black text-white px-8 py-3 rounded-lg font-medium hover:bg-neutral-800 dark:hover:bg-neutral-700 dark:bg-neutral-800 transition cursor-pointer"
                     >
                       {t('feedback.send')}
                     </button>

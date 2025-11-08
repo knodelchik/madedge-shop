@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Phone, Mail, Clock, Send } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { motion } from 'framer-motion';
 import {
   TelegramIcon,
   YouTubeIcon,
@@ -19,6 +20,8 @@ export default function ContactSection() {
     message: '',
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -26,29 +29,87 @@ export default function ContactSection() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+
+    // Симуляція відправки
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     console.log('Form submitted:', formData);
     console.log(
       `[SUCCESS] Notification placeholder: ${tContacts('formSubmit')}`
     );
+
+    setIsSubmitting(false);
     // Optionally reset form: setFormData({ name: '', email: '', subject: '', message: '' });
+  };
+
+  // Варіанти анімацій
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+    },
+  };
+
+  const contactInfoVariants = {
+    hidden: { opacity: 0, x: -30 },
+    visible: {
+      opacity: 1,
+      x: 0,
+    },
+  };
+
+  const formVariants = {
+    hidden: { opacity: 0, x: 30 },
+    visible: {
+      opacity: 1,
+      x: 0,
+    },
   };
 
   return (
     <div className="min-h-screen bg-white dark:bg-black py-12 transition-colors">
       <div className="max-w-7xl mx-auto px-4">
-        {/* Header */}
-        <div className="text-center mb-12">
+        {/* Header з анімацією */}
+        <motion.div
+          className="text-center mb-12"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
           <h1 className="text-4xl font-bold text-gray-900 dark:text-neutral-100 mb-4">
             {tContacts('contactTitle')}
           </h1>
-          <div className="w-24 h-1 bg-gradient-to-r from-[#475fd8] to-[#35297e] mx-auto rounded-full" />
-        </div>
+          <motion.div
+            className="w-24 h-1 bg-gradient-to-r from-[#475fd8] to-[#35297e] mx-auto rounded-full"
+            initial={{ width: 0 }}
+            animate={{ width: 96 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+          />
+        </motion.div>
 
         <div className="grid lg:grid-cols-8 gap-10">
-          {/* Contact Info */}
-          <div className="lg:col-span-3 mt-12">
-            <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl p-6 border border-gray-200 dark:border-neutral-800 transition-colors">
+          {/* Contact Info з анімацією зліва */}
+          <motion.div
+            className="lg:col-span-3 mt-12"
+            variants={contactInfoVariants}
+            initial="hidden"
+            animate="visible"
+            transition={{ duration: 0.6 }}
+          >
+            <motion.div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl p-6 border border-gray-200 dark:border-neutral-800 transition-colors">
               <h2 className="text-2xl font-bold mb-3 text-gray-900 dark:text-neutral-100">
                 {tContacts('connectTitle')}
               </h2>
@@ -56,12 +117,24 @@ export default function ContactSection() {
                 {tContacts('connectDesc')}
               </p>
 
-              <div className="space-y-6 mb-6">
+              <motion.div
+                className="space-y-6 mb-6"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+              >
                 {/* Phone */}
-                <div className="flex items-start space-x-3">
-                  <div className="w-10 h-10 bg-gray-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all duration-300">
+                <motion.div
+                  className="flex items-start space-x-3"
+                  variants={itemVariants}
+                  whileHover={{ x: 5 }}
+                >
+                  <motion.div
+                    className="w-10 h-10 bg-gray-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all duration-300"
+                    whileHover={{ scale: 1.1, rotate: 5 }}
+                  >
                     <Phone className="w-4 h-4 text-gray-700 dark:text-neutral-100" />
-                  </div>
+                  </motion.div>
                   <div>
                     <h3 className="font-semibold text-gray-900 dark:text-neutral-100 mb-1 text-sm">
                       {tContacts('phoneTitle')}
@@ -70,13 +143,20 @@ export default function ContactSection() {
                       {tContacts('phoneValue')}
                     </p>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Email */}
-                <div className="flex items-start space-x-3">
-                  <div className="w-10 h-10 bg-gray-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all duration-300">
+                <motion.div
+                  className="flex items-start space-x-3"
+                  variants={itemVariants}
+                  whileHover={{ x: 5 }}
+                >
+                  <motion.div
+                    className="w-10 h-10 bg-gray-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all duration-300"
+                    whileHover={{ scale: 1.1, rotate: 5 }}
+                  >
                     <Mail className="w-4 h-4 text-gray-700 dark:text-neutral-100" />
-                  </div>
+                  </motion.div>
                   <div>
                     <h3 className="font-semibold text-gray-900 dark:text-neutral-100 mb-1 text-sm">
                       {tContacts('emailTitle')}
@@ -85,13 +165,20 @@ export default function ContactSection() {
                       {tContacts('emailValue')}
                     </p>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Business Hours */}
-                <div className="flex items-start space-x-3">
-                  <div className="w-10 h-10 bg-gray-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all duration-300">
+                <motion.div
+                  className="flex items-start space-x-3"
+                  variants={itemVariants}
+                  whileHover={{ x: 5 }}
+                >
+                  <motion.div
+                    className="w-10 h-10 bg-gray-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all duration-300"
+                    whileHover={{ scale: 1.1, rotate: 5 }}
+                  >
                     <Clock className="w-4 h-4 text-gray-700 dark:text-neutral-100" />
-                  </div>
+                  </motion.div>
                   <div>
                     <h3 className="font-semibold text-gray-900 dark:text-neutral-100 mb-1 text-sm">
                       {tContacts('hoursTitle')}
@@ -106,37 +193,50 @@ export default function ContactSection() {
                       {tContacts('hoursSun')}
                     </p>
                   </div>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
 
               {/* Social */}
-              <div className="border-t border-gray-200 dark:border-neutral-800 pt-6">
+              <motion.div
+                className="border-t border-gray-200 dark:border-neutral-800 pt-6"
+                variants={itemVariants}
+              >
                 <h3 className="text-lg font-bold mb-3 text-gray-900 dark:text-neutral-100">
                   {tContacts('followUsTitle')}
                 </h3>
                 <p className="text-gray-600 dark:text-neutral-300 mb-4 text-sm">
                   {tContacts('followUsDesc')}
                 </p>
-                <div className="grid grid-cols-4 gap-2">
+                <motion.div
+                  className="grid grid-cols-4 gap-2"
+                  variants={containerVariants}
+                >
                   {[TelegramIcon, YouTubeIcon, FacebookIcon, InstagramIcon].map(
                     (Icon, idx) => (
-                      <a
+                      <motion.a
                         key={idx}
                         href="#"
-                        className="w-full aspect-square bg-gray-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center hover:bg-gradient-to-r from-[#475fd8] to-[#35297e] hover:scale-110 transition-all duration-300 group"
+                        className="w-full aspect-square bg-gray-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center hover:bg-gradient-to-r from-[#475fd8] to-[#35297e] transition-all duration-300 group"
+                        variants={itemVariants}
                       >
                         <Icon className="w-8 h-8 text-gray-700 dark:text-neutral-100 group-hover:text-white transition-colors" />
-                      </a>
+                      </motion.a>
                     )
                   )}
-                </div>
-              </div>
-            </div>
-          </div>
+                </motion.div>
+              </motion.div>
+            </motion.div>
+          </motion.div>
 
-          {/* Contact Form */}
-          <div className="lg:col-span-5">
-            <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl p-8 border border-gray-100 dark:border-neutral-800 transition-colors">
+          {/* Contact Form з анімацією справа */}
+          <motion.div
+            className="lg:col-span-5"
+            variants={formVariants}
+            initial="hidden"
+            animate="visible"
+            transition={{ duration: 0.6 }}
+          >
+            <motion.div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl p-8 border border-gray-100 dark:border-neutral-800 transition-colors">
               <h2 className="text-3xl font-bold text-black dark:text-neutral-100 mb-2">
                 {tContacts('formTitle')}
               </h2>
@@ -144,9 +244,17 @@ export default function ContactSection() {
                 {tContacts('formSubtitle')}
               </p>
 
-              <div className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
+              <motion.div
+                className="space-y-6"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+              >
+                <motion.div
+                  className="grid md:grid-cols-2 gap-4"
+                  variants={itemVariants}
+                >
+                  <motion.div whileFocus={{ scale: 1.02 }}>
                     <label
                       htmlFor="name"
                       className="block text-sm font-medium text-black dark:text-neutral-100 mb-2"
@@ -162,8 +270,8 @@ export default function ContactSection() {
                       placeholder={tContacts('formNamePlaceholder')}
                       className="w-full px-4 py-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-gray-900 dark:focus:ring-neutral-300 focus:border-transparent focus:bg-white dark:focus:bg-neutral-700 transition-all duration-200 text-gray-900 dark:text-neutral-100"
                     />
-                  </div>
-                  <div>
+                  </motion.div>
+                  <motion.div whileFocus={{ scale: 1.02 }}>
                     <label
                       htmlFor="email"
                       className="block text-sm font-medium text-black dark:text-neutral-100 mb-2"
@@ -179,10 +287,13 @@ export default function ContactSection() {
                       placeholder={tContacts('formEmailPlaceholder')}
                       className="w-full px-4 py-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-gray-900 dark:focus:ring-neutral-300 focus:border-transparent focus:bg-white dark:focus:bg-neutral-700 transition-all duration-200 text-gray-900 dark:text-neutral-100"
                     />
-                  </div>
-                </div>
+                  </motion.div>
+                </motion.div>
 
-                <div>
+                <motion.div
+                  variants={itemVariants}
+                  whileFocus={{ scale: 1.02 }}
+                >
                   <label
                     htmlFor="subject"
                     className="block text-sm font-medium text-black dark:text-neutral-100 mb-2"
@@ -198,9 +309,12 @@ export default function ContactSection() {
                     placeholder={tContacts('formSubjectPlaceholder')}
                     className="w-full px-4 py-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-gray-900 dark:focus:ring-neutral-300 focus:border-transparent focus:bg-white dark:focus:bg-neutral-700 transition-all duration-200 text-gray-900 dark:text-neutral-100"
                   />
-                </div>
+                </motion.div>
 
-                <div>
+                <motion.div
+                  variants={itemVariants}
+                  whileFocus={{ scale: 1.02 }}
+                >
                   <label
                     htmlFor="message"
                     className="block text-sm font-medium text-black dark:text-neutral-100 mb-2"
@@ -216,19 +330,49 @@ export default function ContactSection() {
                     placeholder={tContacts('formMessagePlaceholder')}
                     className="w-full px-4 py-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-gray-900 dark:focus:ring-neutral-300 focus:border-transparent focus:bg-white dark:focus:bg-neutral-700 transition-all duration-200 resize-none text-gray-900 dark:text-neutral-100"
                   />
-                </div>
+                </motion.div>
 
-                <button
+                <motion.button
                   type="button"
                   onClick={handleSubmit}
-                  className="w-full bg-black dark:bg-white text-white dark:text-black py-4 px-6 rounded-xl font-semibold hover:bg-neutral-800 dark:hover:bg-neutral-200 transform hover:scale-[1.02] transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
+                  disabled={isSubmitting}
+                  className="w-full bg-black dark:bg-white text-white dark:text-black py-4 px-6 rounded-xl font-semibold hover:bg-neutral-800 dark:hover:bg-neutral-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  variants={itemVariants}
+                  whileHover={!isSubmitting ? { scale: 1.02 } : {}}
+                  whileTap={!isSubmitting ? { scale: 0.98 } : {}}
                 >
-                  <span>{tContacts('formSubmit')}</span>
-                  <Send className="w-5 h-5 text-white dark:text-black" />
-                </button>
-              </div>
-            </div>
-          </div>
+                  {isSubmitting ? (
+                    <>
+                      <motion.div
+                        className="w-5 h-5 border-2 border-white dark:border-black border-t-transparent rounded-full"
+                        animate={{ rotate: 360 }}
+                        transition={{
+                          duration: 1,
+                          repeat: Infinity,
+                          ease: 'linear',
+                        }}
+                      />
+                      <span>{tContacts('formSubmitting')}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>{tContacts('formSubmit')}</span>
+                      <motion.div
+                        animate={{ x: [0, 5, 0] }}
+                        transition={{
+                          duration: 1.5,
+                          repeat: Infinity,
+                          ease: 'easeInOut',
+                        }}
+                      >
+                        <Send className="w-5 h-5 text-white dark:text-black" />
+                      </motion.div>
+                    </>
+                  )}
+                </motion.button>
+              </motion.div>
+            </motion.div>
+          </motion.div>
         </div>
       </div>
     </div>

@@ -2,42 +2,100 @@
 
 import React from 'react';
 import { useTranslations } from 'next-intl';
+import { motion } from 'framer-motion';
 
 // Компонент ціни (локалізуємо note, додаємо dark класи)
 const PriceBlock = ({ price, note }: { price: string; note: string }) => (
-  <div className="mt-2">
+  <motion.div
+    className="mt-2"
+    initial={{ opacity: 0, scale: 0.9 }}
+    whileInView={{ opacity: 1, scale: 1 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.4, type: 'spring' }}
+  >
     <p className="text-3xl font-bold text-gray-900 dark:text-neutral-100">
       {price}
     </p>
     <p className="text-sm text-gray-500 dark:text-neutral-400">{note}</p>
-  </div>
+  </motion.div>
 );
 
 export default function GrindingStonesPage() {
   const t = useTranslations('GrindingStonesPage');
   const t_comp = useTranslations('GrindingStonesPage.comparison');
 
+  const fadeInUp = {
+    initial: { opacity: 0, y: 30 },
+    whileInView: { opacity: 1, y: 0 },
+    viewport: { once: true },
+    transition: { duration: 0.6 },
+  };
+
+  const fadeInLeft = {
+    initial: { opacity: 0, x: -30 },
+    whileInView: { opacity: 1, x: 0 },
+    viewport: { once: true },
+    transition: { duration: 0.6 },
+  };
+
+  const fadeInRight = {
+    initial: { opacity: 0, x: 30 },
+    whileInView: { opacity: 1, x: 0 },
+    viewport: { once: true },
+    transition: { duration: 0.6 },
+  };
+
+  const staggerContainer = {
+    animate: {
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const listItemVariant = {
+    initial: { opacity: 0, x: -20 },
+    animate: { opacity: 1, x: 0 },
+  };
+
   return (
     <div className="min-h-screen bg-white dark:bg-black transition-colors">
       <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {/* Hero Section */}
-        <div className="mb-16">
+        <motion.div
+          className="mb-16"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+        >
           <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-4 dark:text-neutral-100">
             {t('hero.title')}
           </h1>
-          <p className="mt-4 text-xl text-gray-500 border-b pb-6 border-gray-200 dark:text-neutral-300 dark:border-neutral-800">
+          <motion.p
+            className="mt-4 text-xl text-gray-500 border-b pb-6 border-gray-200 dark:text-neutral-300 dark:border-neutral-800"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.7 }}
+          >
             {t('hero.subtitle')}
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
         {/* --- Diamond Stones --- */}
-        <section id="diamond-stone" className="mb-20 scroll-mt-24">
+        <section id="professional-stone" className="mb-20 scroll-mt-24">
           <div className="lg:flex lg:space-x-12">
             {/* Left Content */}
-            <div className="lg:w-3/5 space-y-8 order-2 lg:order-1">
-              <div className="inline-block bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded mb-3">
+            <motion.div
+              className="lg:w-3/5 space-y-8 order-2 lg:order-1"
+              {...fadeInLeft}
+            >
+              <motion.div
+                className="inline-block bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded mb-3"
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: 'spring', stiffness: 300 }}
+              >
                 {t('diamond.tag')}
-              </div>
+              </motion.div>
 
               <h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-blue-600 pl-2 dark:text-neutral-100 dark:border-blue-400">
                 {t('diamond.title')}
@@ -48,42 +106,33 @@ export default function GrindingStonesPage() {
               </p>
 
               {/* Technical Details */}
-              <div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
+              >
                 <h3 className="text-xl font-semibold text-gray-800 mb-3 dark:text-neutral-100">
                   {t('diamond.specsTitle')}
                 </h3>
-                <div className="space-y-2 text-md text-gray-600 dark:text-neutral-400">
-                  <div>
-                    <strong className="mr-1 dark:text-neutral-100">
-                      {t('diamond.specTypeLabel')}:
-                    </strong>
-                    <span>{t('diamond.specTypeValue')}</span>
-                  </div>
-                  <div>
-                    <strong className="mr-1 dark:text-neutral-100">
-                      {t('diamond.specSizeLabel')}:
-                    </strong>
-                    <span>{t('diamond.specSizeValue')}</span>
-                  </div>
-                  <div>
-                    <strong className="mr-1 dark:text-neutral-100">
-                      {t('diamond.specMaterialLabel')}:
-                    </strong>
-                    <span>{t('diamond.specMaterialValue')}</span>
-                  </div>
-                  <div>
-                    <strong className="mr-1 dark:text-neutral-100">
-                      {t('diamond.specConcLabel')}:
-                    </strong>
-                    <span>{t('diamond.specConcValue')}</span>
-                  </div>
-                  <div>
-                    <strong className="mr-1 dark:text-neutral-100">
-                      {t('diamond.specToleranceLabel')}:
-                    </strong>
-                    <span>{t('diamond.specToleranceValue')}</span>
-                  </div>
-                </div>
+                <motion.div
+                  className="space-y-2 text-md text-gray-600 dark:text-neutral-400"
+                  variants={staggerContainer}
+                  initial="initial"
+                  whileInView="animate"
+                  viewport={{ once: true }}
+                >
+                  {['Type', 'Size', 'Material', 'Conc', 'Tolerance'].map(
+                    (spec) => (
+                      <motion.div key={spec} variants={listItemVariant}>
+                        <strong className="mr-1 dark:text-neutral-100">
+                          {t(`diamond.spec${spec}Label`)}:
+                        </strong>
+                        <span>{t(`diamond.spec${spec}Value`)}</span>
+                      </motion.div>
+                    )
+                  )}
+                </motion.div>
 
                 <div className="mt-10">
                   <PriceBlock
@@ -91,52 +140,70 @@ export default function GrindingStonesPage() {
                     note={t('diamond.priceNote')}
                   />
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
             {/* Right Block (Image + Details + Price) */}
-            <div className="lg:w-2/5 flex flex-col items-start mb-6 lg:mb-0 order-1 lg:order-2">
-              <div className="bg-white aspect-square flex items-center justify-center overflow-hidden w-full rounded-lg border border-gray-200 shadow-sm dark:bg-gray-900 dark:border-neutral-800">
+            <motion.div
+              className="lg:w-2/5 flex flex-col items-start mb-6 lg:mb-0 order-1 lg:order-2"
+              {...fadeInRight}
+            >
+              <motion.div className="bg-white aspect-square flex items-center justify-center overflow-hidden w-full rounded-lg border border-gray-200 shadow-sm dark:bg-gray-900 dark:border-neutral-800">
                 <img
                   src="/images/diamondstones.jpg"
                   alt={t('diamond.imageAlt')}
                   className="w-full h-full object-cover"
                 />
-              </div>
+              </motion.div>
 
-              <div className="mt-8 space-y-3">
-                <div className="flex items-start">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3 dark:bg-blue-300"></div>
-                  <span className="text-gray-700 dark:text-neutral-300">
-                    {t('diamond.feature1')}
-                  </span>
-                </div>
-                <div className="flex items-start">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3 dark:bg-blue-300"></div>
-                  <span className="text-gray-700 dark:text-neutral-300">
-                    {t('diamond.feature2')}
-                  </span>
-                </div>
-                <div className="flex items-start">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3 dark:bg-blue-300"></div>
-                  <span className="text-gray-700 dark:text-neutral-300">
-                    {t('diamond.feature3')}
-                  </span>
-                </div>
-              </div>
-            </div>
+              <motion.div
+                className="mt-8 space-y-3"
+                variants={staggerContainer}
+                initial="initial"
+                whileInView="animate"
+                viewport={{ once: true }}
+              >
+                {[1, 2, 3].map((num) => (
+                  <motion.div
+                    key={num}
+                    className="flex items-start"
+                    variants={listItemVariant}
+                    whileHover={{ x: 5 }}
+                    transition={{ type: 'spring', stiffness: 300 }}
+                  >
+                    <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3 dark:bg-blue-300"></div>
+                    <span className="text-gray-700 dark:text-neutral-300">
+                      {t(`diamond.feature${num}`)}
+                    </span>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </motion.div>
           </div>
         </section>
 
-        <hr className="my-16 border-gray-200 dark:border-neutral-800" />
+        <motion.hr
+          className="my-16 border-gray-200 dark:border-neutral-800"
+          initial={{ scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        />
 
         {/* --- Aluminum Oxide Stones --- */}
-        <section id="aluminum-stone" className="mb-20 scroll-mt-24">
+        <section id="premium-stone" className="mb-20 scroll-mt-24">
           <div className="lg:flex lg:space-x-12">
-            <div className="lg:w-3/5 space-y-8 order-2 lg:order-1">
-              <div className="inline-block bg-black text-white text-xs font-bold px-3 py-1 rounded mb-3 dark:bg-neutral-200 dark:text-black">
+            <motion.div
+              className="lg:w-3/5 space-y-8 order-2 lg:order-1"
+              {...fadeInLeft}
+            >
+              <motion.div
+                className="inline-block bg-black text-white text-xs font-bold px-3 py-1 rounded mb-3 dark:bg-neutral-200 dark:text-black"
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: 'spring', stiffness: 300 }}
+              >
                 {t('oxide.tag')}
-              </div>
+              </motion.div>
 
               <h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-black pl-3 dark:text-neutral-100 dark:border-neutral-300">
                 {t('oxide.title')}
@@ -146,36 +213,31 @@ export default function GrindingStonesPage() {
                 {t('oxide.description')}
               </p>
 
-              <div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
+              >
                 <h3 className="text-xl font-semibold text-gray-800 mb-3 dark:text-neutral-100">
                   {t('oxide.specsTitle')}
                 </h3>
-                <div className="space-y-2 text-md text-gray-600 dark:text-neutral-400">
-                  <div>
-                    <strong className="mr-1 dark:text-neutral-100">
-                      {t('oxide.specSizeLabel')}:
-                    </strong>
-                    <span>{t('oxide.specSizeValue')}</span>
-                  </div>
-                  <div>
-                    <strong className="mr-1 dark:text-neutral-100">
-                      {t('oxide.specMaterialLabel')}:
-                    </strong>
-                    <span>{t('oxide.specMaterialValue')}</span>
-                  </div>
-                  <div>
-                    <strong className="mr-1 dark:text-neutral-100">
-                      {t('oxide.specGritLabel')}:
-                    </strong>
-                    <span>{t('oxide.specGritValue')}</span>
-                  </div>
-                  <div>
-                    <strong className="mr-1 dark:text-neutral-100">
-                      {t('oxide.specShapeLabel')}:
-                    </strong>
-                    <span>{t('oxide.specShapeValue')}</span>
-                  </div>
-                </div>
+                <motion.div
+                  className="space-y-2 text-md text-gray-600 dark:text-neutral-400"
+                  variants={staggerContainer}
+                  initial="initial"
+                  whileInView="animate"
+                  viewport={{ once: true }}
+                >
+                  {['Size', 'Material', 'Grit', 'Shape'].map((spec) => (
+                    <motion.div key={spec} variants={listItemVariant}>
+                      <strong className="mr-1 dark:text-neutral-100">
+                        {t(`oxide.spec${spec}Label`)}:
+                      </strong>
+                      <span>{t(`oxide.spec${spec}Value`)}</span>
+                    </motion.div>
+                  ))}
+                </motion.div>
 
                 <div className="mt-10">
                   <PriceBlock
@@ -183,52 +245,73 @@ export default function GrindingStonesPage() {
                     note={t('oxide.priceNote')}
                   />
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
-            <div className="lg:w-2/5 flex flex-col items-start mb-6 lg:mb-0 order-1 lg:order-2">
-              <div className="bg-white aspect-square flex items-center justify-center overflow-hidden w-full rounded-lg border border-gray-200 shadow-sm dark:bg-gray-900 dark:border-neutral-800">
+            <motion.div
+              className="lg:w-2/5 flex flex-col items-start mb-6 lg:mb-0 order-1 lg:order-2"
+              {...fadeInRight}
+            >
+              <motion.div className="bg-white aspect-square flex items-center justify-center overflow-hidden w-full rounded-lg border border-gray-200 shadow-sm dark:bg-gray-900 dark:border-neutral-800">
                 <img
                   src="/images/sharpstones-1.jpg"
                   alt={t('oxide.imageAlt')}
                   className="w-full h-full object-cover"
                 />
-              </div>
+              </motion.div>
 
-              <div className="mt-6 space-y-3">
-                <div className="flex items-start">
-                  <div className="w-2 h-2 bg-black rounded-full mt-2 mr-3 dark:bg-neutral-200"></div>
-                  <span className="text-gray-700 dark:text-neutral-300">
-                    {t('oxide.feature1')}
-                  </span>
-                </div>
-                <div className="flex items-start">
-                  <div className="w-2 h-2 bg-black rounded-full mt-2 mr-3 dark:bg-neutral-200"></div>
-                  <span className="text-gray-700 dark:text-neutral-300">
-                    {t('oxide.feature2')}
-                  </span>
-                </div>
-                <div className="flex items-start">
-                  <div className="w-2 h-2 bg-black rounded-full mt-2 mr-3 dark:bg-neutral-200"></div>
-                  <span className="text-gray-700 dark:text-neutral-300">
-                    {t('oxide.feature3')}
-                  </span>
-                </div>
-              </div>
-            </div>
+              <motion.div
+                className="mt-6 space-y-3"
+                variants={staggerContainer}
+                initial="initial"
+                whileInView="animate"
+                viewport={{ once: true }}
+              >
+                {[1, 2, 3].map((num) => (
+                  <motion.div
+                    key={num}
+                    className="flex items-start"
+                    variants={listItemVariant}
+                    whileHover={{ x: 5 }}
+                    transition={{ type: 'spring', stiffness: 300 }}
+                  >
+                    <div className="w-2 h-2 bg-black rounded-full mt-2 mr-3 dark:bg-neutral-200"></div>
+                    <span className="text-gray-700 dark:text-neutral-300">
+                      {t(`oxide.feature${num}`)}
+                    </span>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </motion.div>
           </div>
         </section>
 
-        <hr className="my-16 border-gray-200 dark:border-neutral-800" />
+        <motion.hr
+          className="my-16 border-gray-200 dark:border-neutral-800"
+          initial={{ scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        />
 
         {/* --- Comparison Table --- */}
-        <section id="comparison" className="mb-20 scroll-mt-24">
+        <motion.section
+          id="comparison"
+          className="mb-20 scroll-mt-24"
+          {...fadeInUp}
+        >
           <h2 className="text-4xl font-bold text-gray-900 mb-8 text-center mt-12 dark:text-neutral-100">
             {t('comparison.title')}
           </h2>
 
           <div className="flex justify-center">
-            <div className="overflow-x-auto">
+            <motion.div
+              className="overflow-x-auto"
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
               <table className="min-w-[800px] border-collapse mx-auto text-center">
                 <thead className="bg-gray-900 text-white dark:bg-neutral-800 dark:text-white">
                   <tr>
@@ -242,173 +325,255 @@ export default function GrindingStonesPage() {
                   </tr>
                 </thead>
 
-                <tbody className="bg-white dark:bg-neutral-900">
-                  <tr className="border-t border-gray-200 dark:border-neutral-800">
-                    <td className="p-4 font-semibold text-left text-gray-800 dark:text-neutral-100">
-                      {t_comp('material')}
-                    </td>
-                    <td className="p-4 text-center text-gray-700 dark:text-neutral-300">
-                      {t_comp('materialDiamond')}
-                    </td>
-                    <td className="p-4 text-center text-gray-700 dark:text-neutral-300">
-                      {t_comp('materialOxide')}
-                    </td>
-                  </tr>
-
-                  <tr className="border-t border-gray-200 dark:border-neutral-800">
-                    <td className="p-4 font-semibold text-left text-gray-800 dark:text-neutral-100">
-                      {t_comp('size')}
-                    </td>
-                    <td className="p-4 text-center text-gray-700 dark:text-neutral-300">
-                      150 × 25 × 3
-                    </td>
-                    <td className="p-4 text-center text-gray-700 dark:text-neutral-300">
-                      160 × 25 × 6
-                    </td>
-                  </tr>
-
-                  <tr className="border-t border-gray-200 dark:border-neutral-800">
-                    <td className="p-4 font-semibold text-left text-gray-800 dark:text-neutral-100">
-                      {t_comp('gritRange')}
-                    </td>
-                    <td className="p-4 text-center text-gray-700 dark:text-neutral-300">
-                      {t_comp('gritRangeDiamond')}
-                    </td>
-                    <td className="p-4 text-center text-gray-700 dark:text-neutral-300">
-                      {t_comp('gritRangeOxide')}
-                    </td>
-                  </tr>
-
-                  <tr className="border-t border-gray-200 dark:border-neutral-800">
-                    <td className="p-4 font-semibold text-left text-gray-800 dark:text-neutral-100">
-                      {t_comp('durability')}
-                    </td>
-                    <td className="p-4 text-center text-blue-600 font-bold dark:text-blue-300">
-                      {t_comp('durabilityDiamond')}
-                    </td>
-                    <td className="p-4 text-center text-gray-700 dark:text-neutral-300">
-                      {t_comp('durabilityOxide')}
-                    </td>
-                  </tr>
-
-                  <tr className="border-t border-gray-200 dark:border-neutral-800">
-                    <td className="p-4 font-semibold text-left text-gray-800 dark:text-neutral-100">
-                      {t_comp('bestFor')}
-                    </td>
-                    <td className="p-4 text-center text-gray-700 dark:text-neutral-300">
-                      {t_comp('bestForDiamond')}
-                    </td>
-                    <td className="p-4 text-center text-gray-700 dark:text-neutral-300">
-                      {t_comp('bestForOxide')}
-                    </td>
-                  </tr>
-
-                  <tr className="border-t border-gray-200 dark:border-neutral-800">
-                    <td className="p-4 font-semibold text-left text-gray-800 dark:text-neutral-100">
-                      {t_comp('price')}
-                    </td>
-                    <td className="p-4 text-center font-bold text-gray-900 dark:text-neutral-100">
-                      {t('diamond.price')}
-                    </td>
-                    <td className="p-4 text-center font-bold text-gray-900 dark:text-neutral-100">
-                      {t('oxide.price')}
-                    </td>
-                  </tr>
-                </tbody>
+                <motion.tbody
+                  className="bg-white dark:bg-neutral-900"
+                  variants={staggerContainer}
+                  initial="initial"
+                  whileInView="animate"
+                  viewport={{ once: true }}
+                >
+                  {[
+                    'material',
+                    'size',
+                    'gritRange',
+                    'durability',
+                    'bestFor',
+                    'price',
+                  ].map((row, index) => (
+                    <motion.tr
+                      key={row}
+                      className="border-t border-gray-200 dark:border-neutral-800"
+                      variants={listItemVariant}
+                      whileHover={{
+                        backgroundColor: 'rgb(30, 30, 30)',
+                      }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <td className="p-4 font-semibold text-left text-gray-800 dark:text-neutral-100">
+                        {t_comp(row)}
+                      </td>
+                      <td
+                        className={`p-4 text-center ${
+                          row === 'durability'
+                            ? 'text-blue-600 font-bold dark:text-blue-300'
+                            : 'text-gray-700 dark:text-neutral-300'
+                        } ${
+                          row === 'price'
+                            ? 'font-bold text-gray-900 dark:text-neutral-100'
+                            : ''
+                        }`}
+                      >
+                        {row === 'material'
+                          ? t_comp('materialDiamond')
+                          : row === 'size'
+                          ? '150 × 25 × 3'
+                          : row === 'gritRange'
+                          ? t_comp('gritRangeDiamond')
+                          : row === 'durability'
+                          ? t_comp('durabilityDiamond')
+                          : row === 'bestFor'
+                          ? t_comp('bestForDiamond')
+                          : t('diamond.price')}
+                      </td>
+                      <td
+                        className={`p-4 text-center ${
+                          row === 'price'
+                            ? 'font-bold text-gray-900 dark:text-neutral-100'
+                            : 'text-gray-700 dark:text-neutral-300'
+                        }`}
+                      >
+                        {row === 'material'
+                          ? t_comp('materialOxide')
+                          : row === 'size'
+                          ? '160 × 25 × 6'
+                          : row === 'gritRange'
+                          ? t_comp('gritRangeOxide')
+                          : row === 'durability'
+                          ? t_comp('durabilityOxide')
+                          : row === 'bestFor'
+                          ? t_comp('bestForOxide')
+                          : t('oxide.price')}
+                      </td>
+                    </motion.tr>
+                  ))}
+                </motion.tbody>
               </table>
-            </div>
+            </motion.div>
           </div>
-        </section>
+        </motion.section>
 
-        <hr className="my-16 border-gray-200 dark:border-neutral-800" />
+        <motion.hr
+          className="my-16 border-gray-200 dark:border-neutral-800"
+          initial={{ scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        />
 
         {/* --- Usage Guide --- */}
-        <section
+        <motion.section
           id="usage-guide"
           className="mb-20 scroll-mt-24 bg-gradient-to-br from-blue-50 to-white rounded-xl p-8 border border-blue-100 shadow-md dark:from-neutral-900/90 dark:to-neutral-800/10 dark:border-neutral-800/30 dark:bg-gradient-to-br"
+          {...fadeInUp}
         >
           <h2 className="text-3xl font-bold text-gray-900 mb-8 dark:text-neutral-100">
             {t('usageGuide.title')}
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+            variants={staggerContainer}
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+          >
             {[1, 2, 3].map((step) => (
-              <div
+              <motion.div
                 key={step}
                 className="flex flex-col items-start p-4 bg-white rounded-lg border border-gray-200 shadow-sm transition hover:shadow-md dark:bg-gray-900 dark:border-neutral-900"
+                variants={listItemVariant}
+                whileHover={{ scale: 1.03, y: -5 }}
+                transition={{ type: 'spring', stiffness: 300 }}
               >
-                <div className="flex-shrink-0 w-10 h-10 bg-blue-600 dark:bg-neutral-800 text-white rounded-full flex items-center justify-center font-bold text-xl mb-3">
+                <motion.div
+                  className="flex-shrink-0 w-10 h-10 bg-blue-600 dark:bg-neutral-800 text-white rounded-full flex items-center justify-center font-bold text-xl mb-3"
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.5 }}
+                >
                   {step}
-                </div>
+                </motion.div>
                 <h3 className="font-bold text-lg text-gray-900 mb-1 dark:text-neutral-100">
                   {t(`usageGuide.step${step}.heading`)}
                 </h3>
                 <p className="text-gray-700 text-sm dark:text-neutral-300">
                   {t(`usageGuide.step${step}.text`)}
                 </p>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8"
+            variants={staggerContainer}
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+          >
             {[4, 5, 6].map((step) => (
-              <div
+              <motion.div
                 key={step}
                 className="flex flex-col items-start p-4 bg-white rounded-lg border border-gray-200 shadow-sm transition hover:shadow-md dark:bg-gray-900 dark:border-neutral-800"
+                variants={listItemVariant}
+                whileHover={{ scale: 1.03, y: -5 }}
+                transition={{ type: 'spring', stiffness: 300 }}
               >
-                <div className="flex-shrink-0 w-10 h-10 bg-gray-900 text-white rounded-full flex items-center justify-center font-bold text-xl mb-3 dark:bg-neutral-300 dark:text-black">
+                <motion.div
+                  className="flex-shrink-0 w-10 h-10 bg-gray-900 text-white rounded-full flex items-center justify-center font-bold text-xl mb-3 dark:bg-neutral-300 dark:text-black"
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.5 }}
+                >
                   {step}
-                </div>
+                </motion.div>
                 <h3 className="font-bold text-lg text-gray-900 mb-1 dark:text-neutral-100">
                   {t(`usageGuide.step${step}.heading`)}
                 </h3>
                 <p className="text-gray-700 text-sm dark:text-neutral-300">
                   {t(`usageGuide.step${step}.text`)}
                 </p>
-              </div>
+              </motion.div>
             ))}
-          </div>
-        </section>
+          </motion.div>
+        </motion.section>
 
-        <hr className="my-16 border-gray-200 dark:border-neutral-800" />
+        <motion.hr
+          className="my-16 border-gray-200 dark:border-neutral-800"
+          initial={{ scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        />
 
         {/* --- Care Instructions --- */}
-        <section id="care-instructions" className="mb-20 scroll-mt-24">
-          <div className="bg-white border border-gray-300 p-8 rounded-xl shadow-lg dark:bg-neutral-900 dark:border-neutral-800">
+        <motion.section
+          id="care-instructions"
+          className="mb-20 scroll-mt-24"
+          {...fadeInUp}
+        >
+          <motion.div
+            className="bg-white border border-gray-300 p-8 rounded-xl shadow-lg dark:bg-neutral-900 dark:border-neutral-800"
+            whileHover={{ scale: 1.01 }}
+            transition={{ type: 'spring', stiffness: 300 }}
+          >
             <h2 className="text-3xl font-bold text-gray-900 mb-6 dark:text-neutral-100">
               {t('care.title')}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 divide-x divide-gray-200 dark:divide-neutral-800">
               {/* Diamond Stones Care */}
-              <div className="pr-4">
+              <motion.div
+                className="pr-4"
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
+              >
                 <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2 dark:text-neutral-100">
                   <span className="text-blue-600">◇</span>{' '}
                   {t('care.diamondTitle')}
                 </h3>
-                <ul className="space-y-3 text-gray-700 list-disc list-inside ml-4 dark:text-neutral-300">
-                  <li>{t('care.diamond1')}</li>
-                  <li>{t('care.diamond2')}</li>
-                  <li>{t('care.diamond3')}</li>
-                  <li>{t('care.diamond4')}</li>
-                </ul>
-              </div>
+                <motion.ul
+                  className="space-y-3 text-gray-700 list-disc list-inside ml-4 dark:text-neutral-300"
+                  variants={staggerContainer}
+                  initial="initial"
+                  whileInView="animate"
+                  viewport={{ once: true }}
+                >
+                  {[1, 2, 3, 4].map((num) => (
+                    <motion.li
+                      key={num}
+                      variants={listItemVariant}
+                      whileHover={{ x: 5 }}
+                      transition={{ type: 'spring', stiffness: 300 }}
+                    >
+                      {t(`care.diamond${num}`)}
+                    </motion.li>
+                  ))}
+                </motion.ul>
+              </motion.div>
 
               {/* Aluminum Oxide Stones Care */}
-              <div className="pl-4">
+              <motion.div
+                className="pl-4"
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
+              >
                 <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2 dark:text-neutral-100">
                   <span className="text-gray-900 dark:text-neutral-200">◇</span>{' '}
                   {t('care.oxideTitle')}
                 </h3>
-                <ul className="space-y-3 text-gray-700 list-disc list-inside ml-4 dark:text-neutral-300">
-                  <li>{t('care.oxide1')}</li>
-                  <li>{t('care.oxide2')}</li>
-                  <li>{t('care.oxide3')}</li>
-                  <li>{t('care.oxide4')}</li>
-                </ul>
-              </div>
+                <motion.ul
+                  className="space-y-3 text-gray-700 list-disc list-inside ml-4 dark:text-neutral-300"
+                  variants={staggerContainer}
+                  initial="initial"
+                  whileInView="animate"
+                  viewport={{ once: true }}
+                >
+                  {[1, 2, 3, 4].map((num) => (
+                    <motion.li
+                      key={num}
+                      variants={listItemVariant}
+                      whileHover={{ x: 5 }}
+                      transition={{ type: 'spring', stiffness: 300 }}
+                    >
+                      {t(`care.oxide${num}`)}
+                    </motion.li>
+                  ))}
+                </motion.ul>
+              </motion.div>
             </div>
-          </div>
-        </section>
+          </motion.div>
+        </motion.section>
       </div>
     </div>
   );

@@ -3,18 +3,18 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-// ПРИПУЩЕННЯ: імпорт useTranslations
 import { useTranslations } from 'next-intl';
+import { motion } from 'framer-motion';
+import Image from 'next/image';
 import MagnetLines from '../../../components/MagnetLines';
 import { productsService } from '../services/productService';
 import { Product } from '../../types/products';
 import WishlistButton from '../../Components/WishlistButton';
-import Image from 'next/image';
 
 type Category = 'all' | 'sharpeners' | 'stones' | 'accessories';
 
 export default function ShopPage() {
-  const t = useTranslations('Shop'); // 👈 Використовуємо ключ 'Shop'
+  const t = useTranslations('Shop');
 
   const searchParams = useSearchParams();
   const urlCategory = searchParams.get('category') as Category | null;
@@ -26,8 +26,6 @@ export default function ShopPage() {
   );
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // ... (логіка useEffect залишається незмінною) ...
 
   // Оновлюємо активну категорію при зміні URL параметра
   useEffect(() => {
@@ -62,11 +60,11 @@ export default function ShopPage() {
       ? products
       : products.filter((p) => p.category === activeCategory);
 
+  // 🎨 Анімація завантаження з логотипом
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        {/* 🚀 Замінено "Loading products..." */}
-        <div className="text-xl">{t('loadingProducts')}</div>
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
+        <LogoLoadingAnimation />
       </div>
     );
   }
@@ -88,11 +86,9 @@ export default function ShopPage() {
         />
 
         <div className="relative z-10 text-center text-black">
-          {/* 🚀 Замінено "MadEdge Shop" */}
           <h1 className="text-5xl font-extrabold mb-6 drop-shadow-lg dark:text-white">
             {t('heroTitle')}
           </h1>
-          {/* 🚀 Замінено "Choose your ideal sharpener, stone or accessory" */}
           <p className="text-lg mb-8 text-black-600 dark:text-neutral-300">
             {t('heroSubtitle')}
           </p>
@@ -109,7 +105,6 @@ export default function ShopPage() {
                     : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-neutral-100'
                 }`}
               >
-                {/* 🚀 Замінено "Grinding Stones" */}
                 {t('grindingStones')}
               </button>
 
@@ -122,7 +117,6 @@ export default function ShopPage() {
                     : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-neutral-100'
                 }`}
               >
-                {/* 🚀 Замінено "Knife Sharpeners" */}
                 {t('knifeSharpeners')}
               </button>
 
@@ -135,7 +129,6 @@ export default function ShopPage() {
                     : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-neutral-100'
                 }`}
               >
-                {/* 🚀 Замінено "Accessories" */}
                 {t('accessories')}
               </button>
             </div>
@@ -149,7 +142,6 @@ export default function ShopPage() {
                   : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-neutral-100'
               }`}
             >
-              {/* 🚀 Замінено "All Products" */}
               {t('allProducts')}
             </button>
           </div>
@@ -167,13 +159,11 @@ export default function ShopPage() {
 
           {filteredProducts.length === 0 && (
             <div className="text-center py-12">
-              {/* 🚀 Замінено "No products found in this category" */}
               <p className="text-gray-500 text-lg">{t('noProductsFound')}</p>
               <button
                 onClick={() => setActiveCategory('all')}
                 className="mt-4 px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition"
               >
-                {/* 🚀 Замінено "View All Products" */}
                 {t('viewAllProducts')}
               </button>
             </div>
@@ -184,13 +174,130 @@ export default function ShopPage() {
   );
 }
 
+// 🎨 Компонент анімації логотипу при завантаженні
+function LogoLoadingAnimation() {
+  const t = useTranslations('Shop');
+
+  return (
+    <div className="flex flex-col items-center gap-8">
+      {/* Контейнер з анімацією */}
+      <div className="relative">
+        {/* Зовнішнє пульсуюче кільце */}
+        <motion.div
+          className="absolute inset-0 w-40 h-40 -m-4"
+          animate={{
+            scale: [1, 1.15, 1],
+            opacity: [0.3, 0.6, 0.3],
+          }}
+          transition={{
+            duration: 2.5,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        >
+          <div className="w-full h-full border-4 border-black/20 dark:border-white/20 rounded-full" />
+        </motion.div>
+
+        {/* Логотип з обертанням та shimmer */}
+        <motion.div
+          className="relative w-32 h-32 overflow-hidden rounded-full"
+          animate={{
+            rotate: [0, 360],
+          }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: 'linear',
+          }}
+        >
+          <Image
+            src="/logo2.png"
+            alt="MadEdge Logo"
+            width={128}
+            height={128}
+            className="w-full h-full object-contain rounded-full"
+            priority
+          />
+
+          {/* Shimmer effect поверх логотипу */}
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+            style={{
+              backgroundSize: '200% 100%',
+            }}
+            animate={{
+              x: ['-200%', '200%'],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: 'linear',
+            }}
+          />
+        </motion.div>
+
+        {/* Додаткове обертове кільце */}
+        <motion.div
+          className="absolute inset-0 w-32 h-32"
+          animate={{
+            rotate: [0, -360],
+          }}
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+            ease: 'linear',
+          }}
+        >
+          <div className="w-full h-full border-2 border-transparent border-t-black dark:border-t-white rounded-full" />
+        </motion.div>
+      </div>
+
+      {/* Текст з пульсацією */}
+      <motion.div
+        className="text-center"
+        animate={{
+          opacity: [0.5, 1, 0.5],
+        }}
+        transition={{
+          duration: 2,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
+      >
+        <p className="text-xl font-bold text-gray-800 dark:text-white">
+          {t('loadingProducts')}
+        </p>
+      </motion.div>
+
+      {/* Анімовані точки */}
+      <div className="flex gap-2">
+        {[0, 1, 2].map((i) => (
+          <motion.div
+            key={i}
+            className="w-3 h-3 bg-black dark:bg-white rounded-full"
+            animate={{
+              y: [0, -12, 0],
+              scale: [1, 1.2, 1],
+            }}
+            transition={{
+              duration: 0.8,
+              repeat: Infinity,
+              ease: 'easeInOut',
+              delay: i * 0.2,
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // Компонент карточки товару з плавною анімацією
 function ProductCard({ product }: { product: Product }) {
-  const t = useTranslations('Shop'); // 👈 Використовуємо ключ 'Shop'
+  const t = useTranslations('Shop');
 
   const [isHovered, setIsHovered] = useState(false);
 
-  // ... (логіка зображень залишається незмінною) ...
   const mainImage =
     product.images && product.images.length > 0
       ? product.images[0]
@@ -202,7 +309,6 @@ function ProductCard({ product }: { product: Product }) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* ... (WishlistButton залишається незмінним) ... */}
       <div
         className={`absolute top-1 right-3.5 z-20 transition-all duration-300 ${
           isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
@@ -230,7 +336,6 @@ function ProductCard({ product }: { product: Product }) {
             width={300}
             height={256}
             className="w-full h-64 rounded-2xl shadow-lg object-contain group-hover:opacity-90 transition"
-            // 🚀 Додано переклад для alt запасного зображення (хоча alt часто залишають без перекладу)
             onError={(e) => {
               e.currentTarget.src = '/images/placeholder.jpg';
             }}
@@ -240,7 +345,6 @@ function ProductCard({ product }: { product: Product }) {
               {product.title}
             </h3>
             <p className="text-sm font-semibold text-gray-600 whitespace-nowrap ml-2 dark:text-neutral-400">
-              {/* 🚀 Використано переклад для одиниці валюти */}
               {product.price} {t('priceUnit')}
             </p>
           </div>

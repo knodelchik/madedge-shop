@@ -73,10 +73,11 @@ export default function ProductPage() {
     );
   };
 
+  // 🎨 Анімація завантаження з логотипом
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">{t('loading')}</div>
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
+        <LogoLoadingAnimation />
       </div>
     );
   }
@@ -245,6 +246,124 @@ export default function ProductPage() {
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// 🎨 Компонент анімації логотипу при завантаженні
+function LogoLoadingAnimation() {
+  const t = useTranslations('ProductPage');
+
+  return (
+    <div className="flex flex-col items-center gap-8">
+      {/* Контейнер з анімацією */}
+      <div className="relative">
+        {/* Зовнішнє пульсуюче кільце */}
+        <motion.div
+          className="absolute inset-0 w-40 h-40 -m-4"
+          animate={{
+            scale: [1, 1.15, 1],
+            opacity: [0.3, 0.6, 0.3],
+          }}
+          transition={{
+            duration: 2.5,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        >
+          <div className="w-full h-full border-4 border-black/20 dark:border-white/20 rounded-full" />
+        </motion.div>
+
+        {/* Логотип з обертанням та shimmer */}
+        <motion.div
+          className="relative w-32 h-32 overflow-hidden rounded-full"
+          animate={{
+            rotate: [0, 360],
+          }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: 'linear',
+          }}
+        >
+          <Image
+            src="/logo2.png"
+            alt="MadEdge Logo"
+            width={128}
+            height={128}
+            className="w-full h-full object-contain"
+            priority
+          />
+
+          {/* Shimmer effect поверх логотипу */}
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+            style={{
+              backgroundSize: '200% 100%',
+            }}
+            animate={{
+              x: ['-200%', '200%'],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: 'linear',
+            }}
+          />
+        </motion.div>
+
+        {/* Додаткове обертове кільце */}
+        <motion.div
+          className="absolute inset-0 w-32 h-32"
+          animate={{
+            rotate: [0, -360],
+          }}
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+            ease: 'linear',
+          }}
+        >
+          <div className="w-full h-full border-2 border-transparent border-t-black dark:border-t-white rounded-full" />
+        </motion.div>
+      </div>
+
+      {/* Текст з пульсацією */}
+      <motion.div
+        className="text-center"
+        animate={{
+          opacity: [0.5, 1, 0.5],
+        }}
+        transition={{
+          duration: 2,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
+      >
+        <p className="text-xl font-bold text-gray-800 dark:text-white">
+          {t('loading')}
+        </p>
+      </motion.div>
+
+      {/* Анімовані точки */}
+      <div className="flex gap-2">
+        {[0, 1, 2].map((i) => (
+          <motion.div
+            key={i}
+            className="w-3 h-3 bg-black dark:bg-white rounded-full"
+            animate={{
+              y: [0, -12, 0],
+              scale: [1, 1.2, 1],
+            }}
+            transition={{
+              duration: 0.8,
+              repeat: Infinity,
+              ease: 'easeInOut',
+              delay: i * 0.2,
+            }}
+          />
+        ))}
       </div>
     </div>
   );
