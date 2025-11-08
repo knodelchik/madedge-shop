@@ -3,12 +3,15 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import { motion, useAnimation } from 'framer-motion';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/navigation';
 import { useCartStore } from '../../[locale]/store/cartStore';
 import { useWishlistStore } from '../../[locale]/store/wishlistStore';
 import { authService } from '../../[locale]/services/authService';
 import { User } from '../../types/users';
 import HeaderSkeleton from './HeaderSkeleton';
-import Navigation from './Navigation';
 import SettingsDropdown from './SettingsDropdown';
 import UserDropdown from './UserDropdown';
 import WishlistDropdown from './WishlistDropdown';
@@ -18,9 +21,11 @@ import BurgerMenu from './BurgerMenu';
 export default function Header() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const t = useTranslations('Footer');
 
   const { loadWishlist, clearWishlist } = useWishlistStore();
   const router = useRouter();
+  const controls = useAnimation(); // 🔹 Контролер анімації
 
   const handleAuthChange = useCallback(
     async (event: string, session: any) => {
@@ -91,38 +96,90 @@ export default function Header() {
     };
   }, [handleAuthChange, loadWishlist, clearWishlist]);
 
-  // ✅ Завжди рендеримо однаковий контент (скелетон або header)
-  // Це гарантує однаковий HTML на сервері та клієнті
   if (loading) {
     return <HeaderSkeleton />;
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white/70 dark:bg-black border-b border-gray-200 dark:border-neutral-500 backdrop-blur-lg shadow-md px-6 py-4 grid grid-cols-3 items-center">
-      {/* Ліва частина */}
-      <div
-        className="text-2xl font-bold text-gray-800 dark:text-white cursor-pointer justify-self-start"
-        onClick={() => router.push('/')}
-      >
-        MadEdge
-      </div>
+    <header className="sticky top-0 z-50 w-full bg-white/70 dark:bg-black border-b border-gray-200 dark:border-neutral-500 backdrop-blur-lg shadow-md px-6 py-4">
+      <div className="relative flex items-center justify-between max-w-screen-2xl mx-auto">
+        {/* ===== ЛІВА ЧАСТИНА - Назва MadEdge ===== */}
+        <div className="flex-shrink-0">
+          <div
+            className="text-2xl font-bold text-gray-800 dark:text-white cursor-pointer"
+            onClick={() => router.push('/')}
+          >
+            MadEdge
+          </div>
+        </div>
 
-      {/* Центр */}
-      <div className="justify-self-center hidden md:block">
-        <Navigation />
-      </div>
+        {/* ===== ЦЕНТР - Логотип (з анімацією обертання) ===== */}
+        <div className="hidden md:block absolute left-1/2 -translate-x-1/2">
+          <motion.div
+            className="w-16 h-16 flex items-center justify-center cursor-pointer"
+            animate={controls}
+            onClick={async () => {
+              await controls.start({
+                rotate: 360,
+                transition: { duration: 0.8, ease: 'easeInOut' },
+              });
+              controls.set({ rotate: 0 }); // Повертаємо назад, щоб можна було знову обертати
+            }}
+          >
+            <Image
+              src="/logo.jpeg"
+              alt="Логотип"
+              width={64}
+              height={64}
+              className="object-contain rounded-full"
+            />
+          </motion.div>
+        </div>
 
-      {/* Права частина */}
-      <div className="hidden md:flex items-center gap-4 text-gray-700 dark:text-neutral-300 justify-self-end">
-        <SettingsDropdown />
-        <UserDropdown user={user} onSignOut={handleSignOut} />
-        <WishlistDropdown user={user} />
-        <CartSheet />
-      </div>
+        {/* ===== Навігація зліва ===== */}
+        <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2 -ml-[149px]">
+          <Link
+            href="/"
+            className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium"
+          >
+            {t('footerHome')}
+          </Link>
+          <Link
+            href="/shop"
+            className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium"
+          >
+            {t('footerShop')}
+          </Link>
+        </div>
 
-      {/* Мобільне меню */}
-      <div className="md:hidden">
-        <BurgerMenu user={user} onSignOut={handleSignOut} />
+        {/* ===== Навігація справа ===== */}
+        <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2 ml-[153px]">
+          <Link
+            href="/about"
+            className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium"
+          >
+            {t('footerAboutUs')}
+          </Link>
+          <Link
+            href="/contact"
+            className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium"
+          >
+            {t('footerContacts')}
+          </Link>
+        </div>
+
+        {/* ===== ПРАВА ЧАСТИНА - Іконки ===== */}
+        <div className="hidden md:flex items-center gap-4 text-gray-700 dark:text-neutral-300">
+          <SettingsDropdown />
+          <UserDropdown user={user} onSignOut={handleSignOut} />
+          <WishlistDropdown user={user} />
+          <CartSheet />
+        </div>
+
+        {/* ===== МОБІЛЬНЕ МЕНЮ ===== */}
+        <div className="md:hidden">
+          <BurgerMenu user={user} onSignOut={handleSignOut} />
+        </div>
       </div>
     </header>
   );
