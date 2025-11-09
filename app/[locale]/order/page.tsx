@@ -214,7 +214,7 @@ export default function OrderPage() {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className={`px-4 py-3 rounded-xl border-2 font-medium transition-all duration-200 ${
+                    className={`px-4 py-3 rounded-xl border-2 font-medium transition-all duration-200 cursor-pointer ${
                       paymentMethod === 'fondy'
                         ? 'bg-gradient-to-r from-neutral-400 to-neutral-500 border-neutral-400 dark:bg-gradient-to-r dark:from-neutral-400 dark:to-neutral-600 dark:border-neutral-600 text-white shadow-lg'
                         : 'bg-gray-50 dark:bg-neutral-900 border-gray-200 dark:border-neutral-700 text-gray-900 dark:text-neutral-100 '
@@ -226,7 +226,7 @@ export default function OrderPage() {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className={`px-4 py-3 rounded-xl border-2 font-medium transition-all duration-200 ${
+                    className={`px-4 py-3 rounded-xl border-2 font-medium transition-all duration-200 cursor-pointer ${
                       paymentMethod === 'paypal'
                         ? 'bg-gradient-to-r from-neutral-400 to-neutral-500 border-neutral-400 dark:bg-gradient-to-r dark:from-neutral-500 dark:to-neutral-700 dark:border-neutral-600 text-white shadow-lg'
                         : 'bg-gray-50 dark:bg-neutral-900 border-gray-200 dark:border-neutral-700 text-gray-900 dark:text-neutral-100'
@@ -245,7 +245,7 @@ export default function OrderPage() {
                 transition={{ delay: 1 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handlePayment}
-                className="w-full bg-gradient-to-r from-gray-900 to-gray-800 dark:from-white dark:to-neutral-100 text-white dark:text-black py-4 rounded-xl font-bold hover:shadow-2xl transition-all duration-200 shadow-lg relative z-10 overflow-hidden group"
+                className="w-full bg-gradient-to-r from-gray-900 to-gray-800 dark:from-white dark:to-neutral-100 text-white dark:text-black py-4 rounded-xl font-bold hover:shadow-2xl transition-all duration-200 shadow-lg relative z-10 overflow-hidden group cursor-pointer"
               >
                 <motion.div
                   className="absolute inset-0 bg-gradient-to-r from-neutral-400 to-neutral-500 opacity-0 group-hover:opacity-20 transition-opacity duration-300"

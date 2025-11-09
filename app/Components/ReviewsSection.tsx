@@ -214,7 +214,7 @@ const ReviewsSection: React.FC = () => {
         >
           <motion.button
             onClick={() => setShowAll(!showAll)}
-            className="px-6 py-3 rounded-full bg-gray-900 dark:bg-white text-white dark:text-black font-medium hover:bg-gray-800 dark:hover:bg-neutral-300 transition-colors duration-300"
+            className="px-6 py-3 rounded-full bg-gray-900 dark:bg-white text-white dark:text-black font-medium hover:bg-gray-800 dark:hover:bg-neutral-300 transition-colors duration-300 cursor-pointer"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >

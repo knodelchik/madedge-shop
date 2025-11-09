@@ -119,12 +119,12 @@ const ProductComparison: React.FC = () => {
         {/* Селектори продуктів */}
         <motion.div
           variants={selectorsVariants}
-          className="flex justify-center gap-6 mb-10"
+          className="flex justify-center gap-6 mb-10 "
         >
           <motion.select
             value={firstId}
             onChange={(e) => setFirstId(Number(e.target.value))}
-            className="border border-gray-300 dark:border-neutral-800 bg-white dark:bg-[#111111] text-gray-800 dark:text-white rounded-lg px-4 py-2 transition-colors duration-300"
+            className="border border-gray-300 dark:border-neutral-800 bg-white dark:bg-[#111111] text-gray-800 dark:text-white rounded-lg px-4 py-2 transition-colors duration-300 cursor-pointer"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
@@ -138,7 +138,7 @@ const ProductComparison: React.FC = () => {
           <motion.select
             value={secondId}
             onChange={(e) => setSecondId(Number(e.target.value))}
-            className="border border-gray-300 dark:border-neutral-800 bg-white dark:bg-[#111111] text-gray-800 dark:text-gray-200 rounded-lg px-4 py-2 transition-colors duration-300"
+            className="border border-gray-300 dark:border-neutral-800 bg-white dark:bg-[#111111] text-gray-800 dark:text-gray-200 rounded-lg px-4 py-2 transition-colors duration-300 cursor-pointer"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
@@ -193,10 +193,10 @@ const ProductComparison: React.FC = () => {
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true }}
-                  className="flex items-center py-4 text-center text-gray-700 dark:text-[#888888]"
+                  className="flex items-center py-4 text-center text-gray-700 dark:text-[#888888] "
                 >
                   <motion.div
-                    className="w-1/3 text-sm"
+                    className="w-1/3 text-sm cursor-pointer"
                     whileHover={{ scale: 1.05, color: '#ffffff' }}
                   >
                     {f.value}
@@ -219,7 +219,7 @@ const ProductComparison: React.FC = () => {
                   </div>
 
                   <motion.div
-                    className="w-1/3 text-sm"
+                    className="w-1/3 text-sm cursor-pointer"
                     whileHover={{ scale: 1.05, color: '#ffffff' }}
                   >
                     {product2.features[idx].value}

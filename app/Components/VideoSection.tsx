@@ -91,13 +91,13 @@ export default function VideoSection() {
           <div className="flex gap-3">
             <button
               onClick={() => handleButtonClick(t('assemblyButtonText'))}
-              className="flex-1 px-5 py-3 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-neutral-800 dark:hover:bg-neutral-300 transition font-semibold"
+              className="flex-1 px-5 py-3 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-neutral-800 dark:hover:bg-neutral-300 transition font-semibold cursor-pointer"
             >
               {t('assemblyButtonText')}
             </button>
             <button
               onClick={() => handleButtonClick(t('assemblyPdfText'))}
-              className="px-5 py-3 border border-gray-300 dark:border-neutral-800 dark:bg-neutral-900 text-gray-700 dark:text-white rounded-lg hover:border-gray-500 dark:hover:border-neutral-700 transition font-semibold"
+              className="px-5 py-3 border border-gray-300 dark:border-neutral-800 dark:bg-neutral-900 text-gray-700 dark:text-white rounded-lg hover:border-gray-500 dark:hover:border-neutral-700 transition font-semibold cursor-pointer"
             >
               {t('assemblyPdfText')}
             </button>

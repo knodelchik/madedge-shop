@@ -28,15 +28,11 @@ export default function WishlistButton({
     isInLocalWishlist,
   } = useWishlistStore();
 
-  // Перевіряємо поточного користувача
   useEffect(() => {
     const checkUser = async () => {
       const { user } = await authService.getCurrentUser();
-      if (user) {
-        setUser({ id: user.id });
-      } else {
-        setUser(null);
-      }
+      if (user) setUser({ id: user.id });
+      else setUser(null);
     };
 
     checkUser();
@@ -44,17 +40,13 @@ export default function WishlistButton({
     const {
       data: { subscription },
     } = authService.supabase.auth.onAuthStateChange((event, session) => {
-      if (session?.user) {
-        setUser({ id: session.user.id });
-      } else {
-        setUser(null);
-      }
+      if (session?.user) setUser({ id: session.user.id });
+      else setUser(null);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  // Визначаємо чи товар в wishlist
   const isInWishlist = user
     ? wishlistItems.some(
         (item) => item.product_id === productId && item.user_id === user.id
@@ -62,10 +54,7 @@ export default function WishlistButton({
     : isInLocalWishlist(productId);
 
   const handleClick = async (e: React.MouseEvent) => {
-    if (onClick) {
-      onClick(e);
-    }
-
+    if (onClick) onClick(e);
     setLoading(true);
     try {
       if (isInWishlist) {
@@ -86,10 +75,51 @@ export default function WishlistButton({
     lg: 'w-12 h-12',
   };
 
+  // 💖 курсор — додати в обране
+  const addCursorSVG = `data:image/svg+xml;base64,${btoa(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" opacity="0.9">
+      <defs>
+        <linearGradient id="heartGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:rgb(252,165,165);stop-opacity:1"/>
+          <stop offset="100%" style="stop-color:rgb(239,68,68);stop-opacity:1"/>
+        </linearGradient>
+      </defs>
+      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
+        2 5.42 4.42 3 7.5 3
+        c1.74 0 3.41.81 4.5 2.09
+        C13.09 3.81 14.76 3 16.5 3
+        19.58 3 22 5.42 22 8.5
+        c0 3.78-3.4 6.86-8.55 11.54
+        L12 21.35z"
+        fill="url(#heartGrad)" stroke="white" stroke-width="1.3"/>
+    </svg>`
+  )}`;
+
+  // 💔 курсор — видалити з обраного (контрастний, хрестик усередині)
+  const removeCursorSVG = `data:image/svg+xml;base64,${btoa(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none">
+    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
+      2 5.42 4.42 3 7.5 3
+      c1.74 0 3.41.81 4.5 2.09
+      C13.09 3.81 14.76 3 16.5 3
+      19.58 3 22 5.42 22 8.5
+      c0 3.78-3.4 6.86-8.55 11.54
+      L12 21.35z"
+      fill="white" stroke="red" stroke-width="2" filter="drop-shadow(0 0 2px rgba(0,0,0,0.3))"/>
+    <line x1="8" y1="9" x2="16" y2="17" stroke="red" stroke-width="2.2" stroke-linecap="round"/>
+    <line x1="16" y1="9" x2="8" y2="17" stroke="red" stroke-width="2.2" stroke-linecap="round"/>
+  </svg>`
+  )}`;
+
   return (
     <button
       onClick={handleClick}
       disabled={loading}
+      style={{
+        cursor: isInWishlist
+          ? `url("${removeCursorSVG}") 2 2, pointer`
+          : `url("${addCursorSVG}") 2 2, pointer`,
+      }}
       className={`
         ${sizeClasses[size]} 
         flex items-center justify-center 

@@ -294,7 +294,7 @@ export default function AboutLayout({
 
         {/* Sidebar right */}
         <aside className="w-64 p-6 sticky top-[80px] h-[calc(100vh-80px)] overflow-y-auto hidden xl:block self-start">
-          <h3 className="text-sm font-semibold text-gray-900 mb-4 dark:text-neutral-100">
+          <h3 className="text-sm font-semibold text-gray-900 mb-4 dark:text-neutral-100 ">
             {t('sidebar.onThisPage')} {/* 🚀 Переклад */}
           </h3>
 
@@ -306,7 +306,7 @@ export default function AboutLayout({
                   <button
                     key={section.id}
                     onClick={() => handleOnPageLinkClick(section.id)}
-                    className={`relative w-full text-left text-sm px-3 py-1 rounded-md transition-all flex items-center gap-3 focus:outline-none ${
+                    className={`relative w-full text-left text-sm px-3 py-1 rounded-md transition-all flex items-center gap-3 focus:outline-none cursor-pointer ${
                       isActive
                         ? 'text-blue-600 dark:text-blue-400'
                         : 'text-gray-600 hover:text-black dark:text-neutral-500 dark:hover:text-neutral-200'

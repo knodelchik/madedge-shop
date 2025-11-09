@@ -276,7 +276,7 @@ export default function Footer() {
             <button
               aria-label={tTheme('themeLight')}
               onClick={() => setTheme('light')}
-              className={`p-3 rounded-full transition-colors ${
+              className={`p-3 rounded-full transition-colors cursor-pointer ${
                 theme === 'light'
                   ? 'bg-gray-200  dark:bg-neutral-800'
                   : 'hover:bg-gray-100 dark:hover:bg-neutral-800'
@@ -288,7 +288,7 @@ export default function Footer() {
             <button
               aria-label={tTheme('themeSystem')}
               onClick={() => setTheme('system')}
-              className={`p-3 rounded-full transition-colors ${
+              className={`p-3 rounded-full transition-colors cursor-pointer ${
                 theme === 'system'
                   ? 'bg-gray-200  dark:bg-neutral-800'
                   : 'hover:bg-gray-100 dark:hover:bg-neutral-800'
@@ -300,7 +300,7 @@ export default function Footer() {
             <button
               aria-label={tTheme('themeDark')}
               onClick={() => setTheme('dark')}
-              className={`p-3 rounded-full transition-colors ${
+              className={`p-3 rounded-full transition-colors cursor-pointer ${
                 theme === 'dark'
                   ? 'bg-gray-200 dark:bg-neutral-800'
                   : 'hover:bg-gray-100 dark:hover:bg-neutral-800'

@@ -121,7 +121,7 @@ export default function WishlistDropdown({ user }: WishlistDropdownProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="relative flex items-center gap-2 hover:text-gray-600 transition-colors p-2 rounded-lg hover:bg-gray-100"
+          className="relative flex items-center gap-2 hover:text-gray-600 transition-colors p-2 rounded-lg hover:bg-gray-100 cursor-pointer"
           aria-label="Wishlist"
         >
           <Heart className="w-6 h-6" />
@@ -217,7 +217,7 @@ function WishlistItems({
               <p className="font-medium text-sm truncate">
                 {item.products.title}
               </p>
-              <p className="text-green-600 font-semibold text-sm">
+              <p className="text-green-600 font-semibold text-sm ">
                 ${item.products.price}
               </p>
             </div>
@@ -226,14 +226,14 @@ function WishlistItems({
               <button
                 onClick={() => onMoveToCart(item.product_id)}
                 disabled={movingItem === item.product_id}
-                className="p-1 text-green-600 hover:bg-green-50 rounded transition disabled:opacity-50"
+                className="p-1 text-green-600 hover:bg-green-50 rounded transition disabled:opacity-50 cursor-pointer"
                 title={t('addToCart')}
               >
                 <ShoppingCart className="w-4 h-4" />
               </button>
               <button
                 onClick={() => onRemove(item.product_id)}
-                className="p-1 text-red-600 hover:bg-red-50 rounded transition"
+                className="p-1 text-red-600 hover:bg-red-50 rounded transition cursor-pointer"
                 title={t('remove')}
               >
                 <Trash2 className="w-4 h-4" />

@@ -140,13 +140,13 @@ export default function Header() {
         <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2 -ml-[140px]">
           <Link
             href="/"
-            className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium"
+            className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium cursor-pointer"
           >
             {t('footerHome')}
           </Link>
           <Link
             href="/shop"
-            className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium"
+            className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium cursor-pointer"
           >
             {t('footerShop')}
           </Link>
@@ -156,13 +156,13 @@ export default function Header() {
         <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2 ml-[148px]">
           <Link
             href="/about"
-            className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium"
+            className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium cursor-pointer"
           >
             {t('footerAboutUs')}
           </Link>
           <Link
             href="/contact"
-            className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium"
+            className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium cursor-pointer"
           >
             {t('footerContacts')}
           </Link>

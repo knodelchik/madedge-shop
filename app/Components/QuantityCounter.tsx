@@ -28,7 +28,7 @@ export default function QuantityCounter({
     <div className="flex items-center gap-2">
       <button
         onClick={onDecrease}
-        className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 transition disabled:opacity-50 disabled:cursor-not-allowed dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-200 dark:hover:text-white"
+        className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 transition disabled:opacity-50 disabled:cursor-not-allowed dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-200 dark:hover:text-white cursor-pointer"
       >
         −
       </button>
@@ -46,7 +46,7 @@ export default function QuantityCounter({
 
       <button
         onClick={onIncrease}
-        className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 transition disabled:opacity-50 disabled:cursor-not-allowed dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-200 dark:hover:text-white"
+        className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 transition disabled:opacity-50 disabled:cursor-not-allowed dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-200 dark:hover:text-white cursor-pointer"
       >
         +
       </button>

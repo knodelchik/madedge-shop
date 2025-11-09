@@ -118,7 +118,7 @@ export default function ProductPage() {
                   key={product.images[currentImage]}
                   src={product.images[currentImage]}
                   alt={`${t('imageAltPrefix')} ${currentImage + 1}`}
-                  className="w-full h-80 object-contain rounded-lg"
+                  className="w-full h-80 object-contain rounded-lg "
                   initial={{ opacity: 0.5, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.3 }}
@@ -129,13 +129,13 @@ export default function ProductPage() {
                   <>
                     <button
                       onClick={prevImage}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white dark:text-neutral-800 dark:bg-neutral-400/70 dark:hover:text-white dark:hover:bg-neutral-400  rounded-full p-3 shadow-lg transition-all"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white dark:text-neutral-800 dark:bg-neutral-400/70 dark:hover:text-white dark:hover:bg-neutral-400  rounded-full p-3 shadow-lg transition-all cursor-pointer"
                     >
                       ‹
                     </button>
                     <button
                       onClick={nextImage}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white dark:text-neutral-800 dark:bg-neutral-400/70 dark:hover:text-white dark:hover:bg-neutral-400 rounded-full p-3 shadow-lg transition-all"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white dark:text-neutral-800 dark:bg-neutral-400/70 dark:hover:text-white dark:hover:bg-neutral-400 rounded-full p-3 shadow-lg transition-all cursor-pointer"
                     >
                       ›
                     </button>
@@ -150,10 +150,10 @@ export default function ProductPage() {
                     <button
                       key={index}
                       onClick={() => setCurrentImage(index)}
-                      className={`border-2 rounded-lg overflow-hidden transition-all ${
+                      className={`border-2 rounded-lg overflow-hidden transition-all cursor-pointer ${
                         currentImage === index
-                          ? 'border-black ring-2 ring-black'
-                          : 'border-gray-200 hover:border-gray-400'
+                          ? 'border-black dark:border-black'
+                          : 'border-neutral-200 hover:border-neutral-500 dark:border-neutral-400 dark:hover:border-neutral-900'
                       }`}
                     >
                       <Image
@@ -207,7 +207,7 @@ export default function ProductPage() {
                 <div className="flex gap-3">
                   <button
                     onClick={handleAddToCart}
-                    className="flex-1 bg-black text-white px-8 py-3 rounded-xl font-semibold hover:bg-gray-800 dark:text-white dark:bg-neutral-500 dark:hover:text-black dark:hover:bg-neutral-100  transition-colors"
+                    className="flex-1 bg-black text-white px-8 py-3 rounded-xl font-semibold hover:bg-neutral-800 dark:text-white dark:bg-neutral-500 dark:hover:text-black dark:hover:bg-neutral-100  transition-colors cursor-pointer"
                   >
                     {t('addToCart')}
                   </button>

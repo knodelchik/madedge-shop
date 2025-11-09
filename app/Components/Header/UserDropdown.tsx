@@ -22,7 +22,7 @@ export default function UserDropdown({ user, onSignOut }: UserDropdownProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-2 hover:text-gray-600 transition-colors p-2 rounded-lg hover:bg-gray-100">
+        <button className="flex items-center gap-2 hover:text-gray-600 transition-colors p-2 rounded-lg hover:bg-gray-100 cursor-pointer">
           <User className="w-6 h-6" />
         </button>
       </DropdownMenuTrigger>

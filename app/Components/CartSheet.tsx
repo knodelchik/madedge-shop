@@ -51,7 +51,7 @@ export default function CartSheet() {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <button className="relative p-2 rounded-lg dark:hover:bg-white dark:hover:text-black">
+        <button className="relative p-2 rounded-lg dark:hover:bg-white dark:hover:text-black cursor-pointer">
           <ShoppingCart className="w-6 h-6" />
           {totalItems > 0 && (
             <span className="absolute -top-1 -right-2 bg-red-600 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
@@ -64,10 +64,10 @@ export default function CartSheet() {
       <SheetContent
         side="right"
         className="w-[400px] sm:w-[500px] p-0 flex flex-col h-full 
-                   bg-white dark:bg-neutral-900 text-gray-900 dark:text-neutral-100"
+                   bg-white dark:bg-neutral-900 text-gray-900 dark:text-neutral-100 "
       >
         {/* Header */}
-        <SheetHeader className="p-6 border-b border-gray-200 dark:border-neutral-700 shrink-0">
+        <SheetHeader className="p-6 border-b border-gray-200 dark:border-neutral-700 shrink-0 ">
           <SheetTitle className="text-xl font-bold text-gray-900 dark:text-neutral-100">
             {t('title')}
           </SheetTitle>

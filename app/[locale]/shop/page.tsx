@@ -99,7 +99,7 @@ export default function ShopPage() {
               {/* Центральна кнопка — Grinding Stones */}
               <button
                 onClick={() => setActiveCategory('stones')}
-                className={`px-6 py-3 rounded-xl font-semibold transition shadow-lg ${
+                className={`px-6 py-3 rounded-xl font-semibold transition shadow-lg cursor-pointer ${
                   activeCategory === 'stones'
                     ? 'bg-black text-white dark:bg-white dark:text-black'
                     : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-neutral-100'
@@ -111,7 +111,7 @@ export default function ShopPage() {
               {/* Ліва кнопка — Knife Sharpeners */}
               <button
                 onClick={() => setActiveCategory('sharpeners')}
-                className={`absolute left-1/2 -translate-x-[calc(50%+200px)] px-6 py-3 rounded-xl font-semibold transition shadow-lg ${
+                className={`absolute left-1/2 -translate-x-[calc(50%+200px)] px-6 py-3 rounded-xl font-semibold transition shadow-lg cursor-pointer ${
                   activeCategory === 'sharpeners'
                     ? 'bg-black text-white dark:bg-white dark:text-black'
                     : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-neutral-100'
@@ -123,7 +123,7 @@ export default function ShopPage() {
               {/* Права кнопка — Accessories */}
               <button
                 onClick={() => setActiveCategory('accessories')}
-                className={`absolute right-1/2 translate-x-[calc(50%+180px)] px-6 py-3 rounded-xl font-semibold transition shadow-lg ${
+                className={`absolute right-1/2 translate-x-[calc(50%+180px)] px-6 py-3 rounded-xl font-semibold transition shadow-lg cursor-pointer ${
                   activeCategory === 'accessories'
                     ? 'bg-black text-white dark:bg-white dark:text-black'
                     : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-neutral-100'
@@ -136,7 +136,7 @@ export default function ShopPage() {
             {/* Кнопка "All Products" під центром */}
             <button
               onClick={() => setActiveCategory('all')}
-              className={`px-4 py-2 rounded-lg font-medium transition text-sm ${
+              className={`px-4 py-2 rounded-lg font-medium transition text-sm cursor-pointer ${
                 activeCategory === 'all'
                   ? 'bg-black text-white dark:bg-white dark:text-black'
                   : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-neutral-100'
@@ -329,13 +329,13 @@ function ProductCard({ product }: { product: Product }) {
         href={`/shop/${product.title.replace(/\s+/g, '-').toLowerCase()}`}
         className="w-full"
       >
-        <div className="cursor-pointer flex flex-col items-center w-full">
+        <div className="flex flex-col items-center w-full">
           <Image
             src={mainImage}
             alt={product.title}
             width={300}
             height={256}
-            className="w-full h-64 rounded-2xl shadow-lg object-contain group-hover:opacity-90 transition"
+            className="w-full h-64 rounded-2xl shadow-lg object-contain group-hover:opacity-90 transition cursor-pointer"
             onError={(e) => {
               e.currentTarget.src = '/images/placeholder.jpg';
             }}

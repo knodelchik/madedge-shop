@@ -141,7 +141,7 @@ export default function AuthForm({
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           {loading
             ? t('buttons.loading')
@@ -155,7 +155,7 @@ export default function AuthForm({
         <button
           type="button"
           onClick={onToggleType}
-          className="text-gray-600 dark:text-neutral-300 hover:text-black dark:hover:text-white transition-colors"
+          className="text-gray-600 dark:text-neutral-300 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
         >
           {type === 'signup' ? t('toggle.haveAccount') : t('toggle.noAccount')}
         </button>

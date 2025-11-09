@@ -141,7 +141,7 @@ export default function AboutPage() {
           </h2>
 
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8"
+            className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 "
             variants={staggerContainer}
             initial="initial"
             animate="animate"
@@ -551,7 +551,7 @@ export default function AboutPage() {
               {t('stayUpdatedText')}
             </p>
             <motion.button
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 dark:bg-neutral-600 dark:hover:bg-neutral-700 transition-colors"
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 dark:bg-neutral-600 dark:hover:bg-neutral-700 transition-colors cursor-pointer"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >

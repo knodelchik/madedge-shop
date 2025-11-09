@@ -46,7 +46,7 @@ export default function SettingsDropdown() {
       <DropdownMenuTrigger asChild>
         <button
           aria-label={tSettings.ariaLabelSettings}
-          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white dark:hover:text-black transition-colors"
+          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white dark:hover:text-black transition-colors cursor-pointer"
         >
           <Settings className="w-6 h-6" />
         </button>
