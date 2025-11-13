@@ -87,7 +87,9 @@ export default function GrindingStonesPage() {
             {/* Left Content */}
             <motion.div
               className="lg:w-3/5 space-y-8 order-2 lg:order-1"
-              {...fadeInLeft}
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
             >
               <motion.div
                 className="inline-block bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded mb-3"
@@ -108,9 +110,8 @@ export default function GrindingStonesPage() {
               {/* Technical Details */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.6 }}
               >
                 <h3 className="text-xl font-semibold text-gray-800 mb-3 dark:text-neutral-100">
                   {t('diamond.specsTitle')}
@@ -119,8 +120,7 @@ export default function GrindingStonesPage() {
                   className="space-y-2 text-md text-gray-600 dark:text-neutral-400"
                   variants={staggerContainer}
                   initial="initial"
-                  whileInView="animate"
-                  viewport={{ once: true }}
+                  animate="animate"
                 >
                   {['Type', 'Size', 'Material', 'Conc', 'Tolerance'].map(
                     (spec) => (
@@ -146,9 +146,11 @@ export default function GrindingStonesPage() {
             {/* Right Block (Image + Details + Price) */}
             <motion.div
               className="lg:w-2/5 flex flex-col items-start mb-6 lg:mb-0 order-1 lg:order-2"
-              {...fadeInRight}
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
             >
-              <motion.div className="bg-white aspect-square flex items-center justify-center overflow-hidden w-full rounded-lg border border-gray-200 shadow-sm dark:bg-gray-900 dark:border-neutral-800">
+              <motion.div className="bg-gray-100 aspect-square flex items-center justify-center overflow-hidden w-full rounded-lg border border-gray-200 shadow-sm dark:bg-gray-900 dark:border-neutral-800">
                 <img
                   src="/images/diamondstones.jpg"
                   alt={t('diamond.imageAlt')}
@@ -160,8 +162,7 @@ export default function GrindingStonesPage() {
                 className="mt-8 space-y-3"
                 variants={staggerContainer}
                 initial="initial"
-                whileInView="animate"
-                viewport={{ once: true }}
+                animate="animate"
               >
                 {[1, 2, 3].map((num) => (
                   <motion.div
@@ -171,7 +172,7 @@ export default function GrindingStonesPage() {
                     whileHover={{ x: 5 }}
                     transition={{ type: 'spring', stiffness: 300 }}
                   >
-                    <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3 dark:bg-blue-300"></div>
+                    <div className="w-2 h-2 shrink-0 bg-blue-600 rounded-full mt-2 mr-3 dark:bg-blue-300"></div>
                     <span className="text-gray-700 dark:text-neutral-300">
                       {t(`diamond.feature${num}`)}
                     </span>
@@ -252,7 +253,7 @@ export default function GrindingStonesPage() {
               className="lg:w-2/5 flex flex-col items-start mb-6 lg:mb-0 order-1 lg:order-2"
               {...fadeInRight}
             >
-              <motion.div className="bg-white aspect-square flex items-center justify-center overflow-hidden w-full rounded-lg border border-gray-200 shadow-sm dark:bg-gray-900 dark:border-neutral-800">
+              <motion.div className="bg-gray-100 aspect-square flex items-center justify-center overflow-hidden w-full rounded-lg border border-gray-200 shadow-sm dark:bg-gray-900 dark:border-neutral-800">
                 <img
                   src="/images/sharpstones-1.jpg"
                   alt={t('oxide.imageAlt')}
@@ -275,7 +276,7 @@ export default function GrindingStonesPage() {
                     whileHover={{ x: 5 }}
                     transition={{ type: 'spring', stiffness: 300 }}
                   >
-                    <div className="w-2 h-2 bg-black rounded-full mt-2 mr-3 dark:bg-neutral-200"></div>
+                    <div className="w-2 h-2 shrink-0 bg-black rounded-full mt-2 mr-3 dark:bg-neutral-200"></div>
                     <span className="text-gray-700 dark:text-neutral-300">
                       {t(`oxide.feature${num}`)}
                     </span>
@@ -313,7 +314,7 @@ export default function GrindingStonesPage() {
               transition={{ duration: 0.5 }}
             >
               <table className="min-w-[800px] border-collapse mx-auto text-center">
-                <thead className="bg-gray-900 text-white dark:bg-neutral-800 dark:text-white">
+                <thead className="bg-neutral-900 text-white dark:bg-neutral-800 dark:text-white">
                   <tr>
                     <th className="p-4 text-left w-1/3">{t_comp('feature')}</th>
                     <th className="p-4 text-center w-1/3">
@@ -326,7 +327,7 @@ export default function GrindingStonesPage() {
                 </thead>
 
                 <motion.tbody
-                  className="bg-white dark:bg-neutral-900"
+                  className="bg-neutral-100 dark:bg-neutral-900"
                   variants={staggerContainer}
                   initial="initial"
                   whileInView="animate"
@@ -344,10 +345,6 @@ export default function GrindingStonesPage() {
                       key={row}
                       className="border-t border-gray-200 dark:border-neutral-800"
                       variants={listItemVariant}
-                      whileHover={{
-                        backgroundColor: 'rgb(30, 30, 30)',
-                      }}
-                      transition={{ duration: 0.2 }}
                     >
                       <td className="p-4 font-semibold text-left text-gray-800 dark:text-neutral-100">
                         {t_comp(row)}

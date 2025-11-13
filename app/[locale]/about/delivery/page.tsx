@@ -348,6 +348,16 @@ const DELIVERY_DATA: DeliveryCost = {
       emoji: <Skull className="w-5 h-5" />,
     },
   ],
+  BY: [
+    {
+      service: 'Unavailable',
+      serviceKey: 'options.ruUnavailable.name',
+      price: 'N/A',
+      time: 'N/A',
+      timeKey: 'options.ruUnavailable.time',
+      emoji: <Skull className="w-5 h-5" />,
+    },
+  ],
 };
 
 export default function DeliveryPage() {
@@ -425,7 +435,8 @@ export default function DeliveryPage() {
     countryCode: string,
     isServiceAvailable: boolean
   ) => {
-    if (countryCode === 'RU') return <Skull className="w-6 h-6 text-red-600" />;
+    if (['RU', 'BY'].includes(countryCode))
+      return <Skull className="w-6 h-6 text-red-600" />;
     if (countryCode === 'UA' && price === 'Free')
       return <Smile className="w-6 h-6 text-green-600" />;
     if (!isServiceAvailable || price === 'N/A')
@@ -453,7 +464,7 @@ export default function DeliveryPage() {
       const countryData = DELIVERY_DATA[deliveryKey];
 
       let filteredOptions: DeliveryOption[] = [];
-      if (countryCode === 'RU') {
+      if (countryCode === 'RU' || countryCode === 'BY') {
         filteredOptions = countryData;
       } else {
         filteredOptions = countryData.filter((opt) =>
@@ -757,7 +768,7 @@ export default function DeliveryPage() {
                       transition={{ delay: index * 0.1 }}
                     >
                       <motion.div
-                        className="flex-shrink-0 mr-4"
+                        className="shrink-0 mr-4"
                         whileHover={{ scale: 1.2, rotate: 10 }}
                         transition={{ type: 'spring', stiffness: 300 }}
                       >
@@ -867,7 +878,7 @@ export default function DeliveryPage() {
             >
               <h3 className="font-bold text-xl text-gray-900 mb-3 flex items-center dark:text-neutral-100">
                 <motion.svg
-                  className="w-5 h-5 mr-2 text-blue-600"
+                  className="w-6 h-6 mr-2 text-blue-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -925,7 +936,7 @@ export default function DeliveryPage() {
             >
               <h3 className="font-bold text-xl text-gray-900 mb-3 flex items-center dark:text-neutral-100">
                 <motion.svg
-                  className="w-5 h-5 mr-2 text-red-600"
+                  className="w-7 h-7 mr-2 text-red-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

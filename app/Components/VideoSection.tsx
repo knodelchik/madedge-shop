@@ -3,9 +3,11 @@
 import { motion } from 'framer-motion';
 import { Zap, ClipboardList, Target, Wrench } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
 
 export default function VideoSection() {
   const t = useTranslations('Assembly');
+  const router = useRouter();
 
   const assemblySteps = t.raw('assemblySteps') as {
     title: string;
@@ -20,8 +22,19 @@ export default function VideoSection() {
     'text-gray-600',
   ];
 
-  const handleButtonClick = (action: string) => {
-    console.log(`Action requested: ${action}`);
+  const handleButtonClick = () => {
+    router.push('/about#madedge-services');
+  };
+
+  const handlePdfDownload = () => {
+    const pdfUrl = '/pdf/MADEDGE INSTRUCTIONS.pdf';
+
+    const link = document.createElement('a');
+    link.href = pdfUrl;
+    link.download = 'MADEDGE INSTRUCTIONS.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -90,13 +103,13 @@ export default function VideoSection() {
 
           <div className="flex gap-3">
             <button
-              onClick={() => handleButtonClick(t('assemblyButtonText'))}
+              onClick={handleButtonClick}
               className="flex-1 px-5 py-3 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-neutral-800 dark:hover:bg-neutral-300 transition font-semibold cursor-pointer"
             >
               {t('assemblyButtonText')}
             </button>
             <button
-              onClick={() => handleButtonClick(t('assemblyPdfText'))}
+              onClick={handlePdfDownload}
               className="px-5 py-3 border border-gray-300 dark:border-neutral-800 dark:bg-neutral-900 text-gray-700 dark:text-white rounded-lg hover:border-gray-500 dark:hover:border-neutral-700 transition font-semibold cursor-pointer"
             >
               {t('assemblyPdfText')}

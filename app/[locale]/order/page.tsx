@@ -245,7 +245,7 @@ export default function OrderPage() {
                 transition={{ delay: 1 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handlePayment}
-                className="w-full bg-gradient-to-r from-gray-900 to-gray-800 dark:from-white dark:to-neutral-100 text-white dark:text-black py-4 rounded-xl font-bold hover:shadow-2xl transition-all duration-200 shadow-lg relative z-10 overflow-hidden group cursor-pointer"
+                className="w-full bg-gradient-to-r from-neutral-900 to-neutral-800 dark:from-white dark:to-neutral-100 text-white dark:text-black py-4 rounded-xl font-bold hover:shadow-2xl transition-all duration-200 shadow-lg relative z-10 overflow-hidden group cursor-pointer"
               >
                 <motion.div
                   className="absolute inset-0 bg-gradient-to-r from-neutral-400 to-neutral-500 opacity-0 group-hover:opacity-20 transition-opacity duration-300"

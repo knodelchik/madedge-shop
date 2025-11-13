@@ -102,7 +102,7 @@ export default function AboutPage() {
                 initial="initial"
                 animate="animate"
               >
-                {['2010', '2013', '2017', '2021', '2024'].map((year, index) => (
+                {['2016', '2017', '2018', '2021', '2025'].map((year, index) => (
                   <motion.li
                     key={year}
                     className="flex items-start"
@@ -454,89 +454,6 @@ export default function AboutPage() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-gray-900 pl-3 dark:text-neutral-100 dark:border-neutral-300">
-            {t('eventsTitle')}
-          </h2>
-
-          <p className="text-gray-700 mb-6 text-lg dark:text-neutral-300">
-            {t('eventsText')}
-          </p>
-
-          <motion.div
-            className="space-y-6"
-            variants={staggerContainer}
-            initial="initial"
-            whileInView="animate"
-            viewport={{ once: true }}
-          >
-            {[
-              {
-                title: t('expoTitle'),
-                location: t('expoLocation'),
-                desc: t('expoDesc'),
-                date: t('expoDate'),
-                venue: t('expoVenue'),
-              },
-              {
-                title: t('factoryTourTitle'),
-                location: t('factoryTourLocation'),
-                desc: t('factoryTourDesc'),
-                date: t('factoryTourDate'),
-                venue: t('factoryTourVenue'),
-              },
-              {
-                title: t('artistWorkshopTitle'),
-                location: t('artistWorkshopLocation'),
-                desc: t('artistWorkshopDesc'),
-                date: t('artistWorkshopDate'),
-                venue: t('artistWorkshopVenue'),
-              },
-              {
-                title: t('newProductTitle'),
-                location: t('newProductLocation'),
-                desc: t('newProductDesc'),
-                date: t('newProductDate'),
-                venue: t('newProductVenue') || '',
-              },
-            ].map((ev, i) => (
-              <motion.div
-                key={i}
-                className="border border-gray-300 rounded-xl p-6 hover:shadow-lg transition-shadow bg-white dark:bg-gray-900 dark:border-neutral-800"
-                variants={fadeInUp}
-                whileHover={{ scale: 1.02, y: -3 }}
-                transition={{ type: 'spring', stiffness: 300 }}
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-neutral-100">
-                      {ev.title}
-                    </h3>
-                    <p className="text-gray-600 mt-1 dark:text-neutral-300">
-                      {ev.location}
-                    </p>
-                  </div>
-                  <motion.div
-                    animate={{ rotate: [0, -10, 10, -10, 0] }}
-                    transition={{ duration: 0.5, delay: i * 0.2 }}
-                  >
-                    <Calendar className="w-6 h-6 text-blue-600 flex-shrink-0 dark:text-blue-300" />
-                  </motion.div>
-                </div>
-                <p className="text-gray-700 mb-3 dark:text-neutral-300">
-                  {ev.desc}
-                </p>
-                <div className="flex items-center justify-between text-sm pt-2 border-t border-gray-100 dark:border-neutral-800">
-                  <span className="font-bold text-blue-600 dark:text-blue-300">
-                    {ev.date}
-                  </span>
-                  <span className="text-gray-500 dark:text-neutral-400">
-                    {ev.venue}
-                  </span>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-
           <motion.div
             className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6 shadow-md dark:bg-neutral-900 dark:border-neutral-900"
             initial={{ opacity: 0, y: 20 }}

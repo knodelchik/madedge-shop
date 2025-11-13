@@ -39,14 +39,18 @@ const AccessoryItem: React.FC<AccessoryItemProps> = ({
     animate: { opacity: 1, x: 0 },
   };
 
+  // Для першого елемента використовуємо animate замість whileInView
+  const isFirst = index === 0;
+
   return (
     <motion.div
       id={accessory.id}
       className="scroll-mt-24"
       initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6, delay: index * 0.1 }}
+      {...(isFirst
+        ? { animate: { opacity: 1, y: 0 } }
+        : { whileInView: { opacity: 1, y: 0 }, viewport: { once: true } })}
+      transition={{ duration: 0.6, delay: isFirst ? 0 : index * 0.1 }}
     >
       <motion.h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-gray-900 pl-3 dark:text-neutral-100 dark:border-neutral-600">
         {accessory.name}
@@ -57,8 +61,9 @@ const AccessoryItem: React.FC<AccessoryItemProps> = ({
         <motion.div
           className="lg:w-1/3 flex flex-col items-start mb-6 lg:mb-0"
           initial={{ opacity: 0, x: -30 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
+          {...(isFirst
+            ? { animate: { opacity: 1, x: 0 } }
+            : { whileInView: { opacity: 1, x: 0 }, viewport: { once: true } })}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
           <motion.div
@@ -76,15 +81,17 @@ const AccessoryItem: React.FC<AccessoryItemProps> = ({
             <motion.div
               className="p-4 border-t border-gray-200 bg-gray-50 dark:bg-gray-900 dark:border-neutral-800"
               initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
+              {...(isFirst
+                ? { animate: { opacity: 1 } }
+                : { whileInView: { opacity: 1 }, viewport: { once: true } })}
               transition={{ delay: 0.4 }}
             >
               <motion.p
                 className="text-xl font-semibold text-gray-900 dark:text-neutral-100 mb-1"
                 initial={{ scale: 0.9 }}
-                whileInView={{ scale: 1 }}
-                viewport={{ once: true }}
+                {...(isFirst
+                  ? { animate: { scale: 1 } }
+                  : { whileInView: { scale: 1 }, viewport: { once: true } })}
                 transition={{ type: 'spring', delay: 0.5 }}
               >
                 {t('itemPrice')}: ${accessory.price.toFixed(0)}
@@ -97,8 +104,9 @@ const AccessoryItem: React.FC<AccessoryItemProps> = ({
         <motion.div
           className="lg:w-2/3 space-y-8"
           initial={{ opacity: 0, x: 30 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
+          {...(isFirst
+            ? { animate: { opacity: 1, x: 0 } }
+            : { whileInView: { opacity: 1, x: 0 }, viewport: { once: true } })}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
           {/* Key Features */}
@@ -114,15 +122,15 @@ const AccessoryItem: React.FC<AccessoryItemProps> = ({
               className="space-y-2 text-lg text-gray-700 list-disc list-inside dark:text-neutral-300"
               variants={staggerContainer}
               initial="initial"
-              whileInView="animate"
-              viewport={{ once: true }}
+              {...(isFirst
+                ? { animate: 'animate' }
+                : { whileInView: 'animate', viewport: { once: true } })}
             >
               {accessory.features.map((feature, i) => (
                 <motion.li
                   key={i}
                   dangerouslySetInnerHTML={{ __html: feature }}
                   variants={listItemVariant}
-                  whileHover={{ x: 5 }}
                   transition={{ type: 'spring', stiffness: 300 }}
                 />
               ))}
@@ -139,18 +147,18 @@ const AccessoryItem: React.FC<AccessoryItemProps> = ({
               {t('itemDetailsTitle')}
             </motion.h3>
             <motion.ul
-              className="space-y-2 text-md text-gray-600 list-disc list-inside ml-4 dark:text-neutral-300"
+              className="space-y-2 text-lg text-md text-gray-600 list-disc list-inside dark:text-neutral-300"
               variants={staggerContainer}
               initial="initial"
-              whileInView="animate"
-              viewport={{ once: true }}
+              {...(isFirst
+                ? { animate: 'animate' }
+                : { whileInView: 'animate', viewport: { once: true } })}
             >
               {accessory.details.map((detail, i) => (
                 <motion.li
                   key={i}
                   dangerouslySetInnerHTML={{ __html: detail }}
                   variants={listItemVariant}
-                  whileHover={{ x: 5 }}
                   transition={{ type: 'spring', stiffness: 300 }}
                 />
               ))}

@@ -263,7 +263,7 @@ export default function AboutLayout({
                   {t('sidebar.latestProduct')} {/* 🚀 Переклад */}
                 </div>
                 <div className="text-xs text-gray-600 dark:text-neutral-500">
-                  ProEdge X1
+                  MadEdge for convex
                 </div>
               </div>
             </div>

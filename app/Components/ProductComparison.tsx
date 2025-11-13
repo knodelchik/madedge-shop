@@ -193,11 +193,11 @@ const ProductComparison: React.FC = () => {
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true }}
-                  className="flex items-center py-4 text-center text-gray-700 dark:text-[#888888] "
+                  className="flex items-center py-4 text-center "
                 >
                   <motion.div
-                    className="w-1/3 text-sm cursor-pointer"
-                    whileHover={{ scale: 1.05, color: '#ffffff' }}
+                    className="w-1/3 text-sm cursor-pointer text-gray-700 dark:text-[#888888] hover:text-black dark:hover:text-white"
+                    whileHover={{ scale: 1.05 }}
                   >
                     {f.value}
                   </motion.div>
@@ -219,8 +219,8 @@ const ProductComparison: React.FC = () => {
                   </div>
 
                   <motion.div
-                    className="w-1/3 text-sm cursor-pointer"
-                    whileHover={{ scale: 1.05, color: '#ffffff' }}
+                    className="w-1/3 text-sm cursor-pointer text-gray-700 dark:text-[#888888] hover:text-black dark:hover:text-white"
+                    whileHover={{ scale: 1.05 }}
                   >
                     {product2.features[idx].value}
                   </motion.div>

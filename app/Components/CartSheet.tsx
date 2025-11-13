@@ -142,7 +142,7 @@ export default function CartSheet() {
               <Link
                 href="/order"
                 onClick={handleCheckout}
-                className="w-full text-center bg-black hover:bg-gray-800 
+                className="w-full text-center bg-black hover:bg-neutral-800 
                            dark:bg-white dark:hover:bg-neutral-200 
                            text-white dark:text-black py-3 rounded-lg font-medium transition block"
               >

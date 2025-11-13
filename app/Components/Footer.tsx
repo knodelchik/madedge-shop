@@ -39,7 +39,7 @@ export default function Footer() {
             <ul className="space-y-3 text-gray-500 dark:text-neutral-400/80 transition-colors duration-300">
               <li>
                 <a
-                  href="#our-products"
+                  href="/#our-products"
                   className="hover:text-neutral-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerOurProducts')}
@@ -47,7 +47,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="#info-section"
+                  href="/#info-section"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tInfo('infoTitle')}
@@ -63,7 +63,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="#video-section"
+                  href="/#video-section"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerAssembly')}
@@ -71,7 +71,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="#reviews-section"
+                  href="/#reviews-section"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerReviews')}

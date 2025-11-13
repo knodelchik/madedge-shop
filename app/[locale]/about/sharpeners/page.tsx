@@ -7,13 +7,6 @@ import { motion } from 'framer-motion';
 export default function SharpenersPage() {
   const t = useTranslations('SharpenersPage');
 
-  const fadeInUp = {
-    initial: { opacity: 0, y: 30 },
-    whileInView: { opacity: 1, y: 0 },
-    viewport: { once: true },
-    transition: { duration: 0.6 },
-  };
-
   const fadeInLeft = {
     initial: { opacity: 0, x: -30 },
     whileInView: { opacity: 1, x: 0 },
@@ -69,7 +62,12 @@ export default function SharpenersPage() {
         <section id="model-1" className="mb-20 scroll-mt-24">
           <div className="lg:flex lg:space-x-12">
             {/* Left: Description */}
-            <motion.div className="lg:w-3/5 order-2 lg:order-1" {...fadeInLeft}>
+            <motion.div
+              className="lg:w-3/5 order-2 lg:order-1"
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+            >
               <h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-gray-900 pl-3 dark:text-neutral-100 dark:border-neutral-300">
                 {t('model1.title')}
               </h2>
@@ -81,7 +79,9 @@ export default function SharpenersPage() {
             {/* Right: Image + Price + List */}
             <motion.div
               className="lg:w-2/5 order-1 lg:order-2 flex flex-col items-start mb-8 lg:mb-0"
-              {...fadeInRight}
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
             >
               <motion.div
                 className="bg-gray-100 aspect-square flex items-center justify-center overflow-hidden w-full rounded-lg mb-4 dark:bg-neutral-800"
@@ -110,8 +110,8 @@ export default function SharpenersPage() {
                     whileHover={{ x: 5 }}
                     transition={{ type: 'spring', stiffness: 300 }}
                   >
-                    <div className="w-2 h-2 bg-gray-900 rounded-full mt-2 mr-3 dark:bg-neutral-200"></div>
-                    <span className="text-gray-700 dark:text-neutral-300">
+                    <div className="w-2 h-2 shrink-0 bg-gray-900 rounded-full mt-2 mr-4 dark:bg-neutral-200"></div>
+                    <span className="text-gray-700 dark:text-neutral-300 leading-relaxed">
                       {t(`model1.feature${num}`)}
                     </span>
                   </motion.li>
@@ -145,8 +145,7 @@ export default function SharpenersPage() {
             {/* Left: Description */}
             <motion.div className="lg:w-3/5 order-2 lg:order-1" {...fadeInLeft}>
               <motion.h2
-                className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-blue-600 pl-3 dark:text-neutral-100 dark:border-neutral-400"
-                whileHover={{ x: 5 }}
+                className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-gray-900 pl-3 dark:text-neutral-100 dark:border-neutral-400"
                 transition={{ type: 'spring', stiffness: 300 }}
               >
                 {t('digital.title')}
@@ -165,8 +164,8 @@ export default function SharpenersPage() {
               {...fadeInRight}
             >
               <motion.div
-                className="bg-blue-50 aspect-square flex items-center justify-center overflow-hidden w-full rounded-lg mb-4 dark:bg-[linear-gradient(135deg,rgba(10,40,80,0.4),rgba(6,20,40,0.4))]"
-                whileHover={{ scale: 1.03, rotate: 1 }}
+                className="bg-gray-100 aspect-square flex items-center justify-center overflow-hidden w-full rounded-lg mb-4 dark:bg-[linear-gradient(135deg,rgba(10,40,80,0.4),rgba(6,20,40,0.4))]"
+                whileHover={{ scale: 1.03 }}
                 transition={{ type: 'spring', stiffness: 300 }}
               >
                 <img
@@ -191,7 +190,7 @@ export default function SharpenersPage() {
                     whileHover={{ x: 5 }}
                     transition={{ type: 'spring', stiffness: 300 }}
                   >
-                    <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3 dark:bg-neutral-300"></div>
+                    <div className="w-2 h-2 shrink-0 bg-gray-900 rounded-full mt-2 mr-4 dark:bg-neutral-200"></div>
                     <span className="text-gray-700 dark:text-neutral-300">
                       {t(`digital.feature${num}`)}
                     </span>
@@ -263,7 +262,7 @@ export default function SharpenersPage() {
                     whileHover={{ x: 5 }}
                     transition={{ type: 'spring', stiffness: 300 }}
                   >
-                    <div className="w-2 h-2 bg-gray-900 rounded-full mt-2 mr-3 dark:bg-neutral-200"></div>
+                    <div className="w-2 h-2 shrink-0 bg-gray-900 rounded-full mt-2 mr-3 dark:bg-neutral-200"></div>
                     <span className="text-gray-700 dark:text-neutral-300">
                       {t(`model2.feature${num}`)}
                     </span>
@@ -351,7 +350,7 @@ export default function SharpenersPage() {
                     whileHover={{ x: 5 }}
                     transition={{ type: 'spring', stiffness: 300 }}
                   >
-                    <div className="w-2 h-2 bg-gray-900 rounded-full mt-2 mr-3 dark:bg-neutral-200"></div>
+                    <div className="w-2 h-2 shrink-0 bg-gray-900 rounded-full mt-2 mr-3 dark:bg-neutral-200"></div>
                     <span className="text-gray-700 dark:text-neutral-300">
                       {t(`convex.feature${num}`)}
                     </span>

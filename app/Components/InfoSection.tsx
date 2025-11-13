@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useTranslations } from 'next-intl';
-import { Lightbulb, Info, Plane, Headphones } from 'lucide-react';
+import { Lightbulb, Info, Plane, Headphones, ShieldCheck } from 'lucide-react';
 import Link from 'next/link'; // 1. Додано імпорт
 
 interface SpotlightCardProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -99,7 +99,7 @@ const InfoSection = () => {
       href: '/about/delivery#returns-warranty',
     },
     {
-      icon: <Info className="w-8 h-8" />,
+      icon: <ShieldCheck className="w-8 h-8" />,
       title: t('buyerProtectionTitle'),
       description: t('buyerProtectionText'),
 
@@ -153,7 +153,7 @@ const InfoSection = () => {
                   <div
                     className={`flex items-center justify-center w-16 h-16 rounded-full mb-6 transition-colors duration-300 ${
                       feature.isSpecial
-                        ? 'bg-black text-white dark:bg-neutral-800 dark:text-[#fafafa]'
+                        ? 'bg-black text-white dark:bg-black dark:text-[#fafafa]'
                         : 'bg-white text-black dark:bg-[#fafafa] dark:text-[#111111]'
                     }`}
                   >
@@ -173,8 +173,8 @@ const InfoSection = () => {
                   <p
                     className={`text-base leading-relaxed transition-colors duration-300 flex-grow flex items-center ${
                       feature.isSpecial
-                        ? 'text-gray-700 dark:text-gray-700'
-                        : 'text-gray-300 dark:text-[#888888]'
+                        ? 'text-gray-700 dark:text-black'
+                        : 'text-neutral-300 dark:text-[#888888]'
                     }`}
                   >
                     {feature.description}
