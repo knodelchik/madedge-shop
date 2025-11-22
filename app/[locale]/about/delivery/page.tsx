@@ -53,6 +53,8 @@ function getCustomStyles(themeMode: 'light' | 'dark') {
     control: (provided: any, state: any) => ({
       ...provided,
       minHeight: '48px',
+      // Важливо для iOS: 16px запобігає зуму при фокусі
+      fontSize: '16px',
       background: controlBg,
       borderColor: state.isFocused ? controlBorderFocus : controlBorder,
       boxShadow: state.isFocused ? `0 0 0 4px ${controlBorderFocus}22` : 'none',
@@ -121,6 +123,7 @@ function getCustomStyles(themeMode: 'light' | 'dark') {
 
     option: (provided: any, state: any) => ({
       ...provided,
+      fontSize: '16px', // Адаптація шрифту
       background: state.isSelected
         ? optionActiveBg
         : state.isFocused
@@ -156,7 +159,7 @@ function getCustomStyles(themeMode: 'light' | 'dark') {
   };
 }
 
-// Delivery data
+// Delivery data (Без змін)
 const DELIVERY_DATA: DeliveryCost = {
   UA: [
     {
@@ -544,20 +547,21 @@ export default function DeliveryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black transition-colors">
+    <div className="min-h-screen bg-white dark:bg-black transition-colors overflow-x-hidden">
       <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {/* Hero */}
         <motion.div
-          className="mb-16"
+          className="mb-12 lg:mb-16" // Зменшено відступ для мобільного
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
         >
-          <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-4 dark:text-neutral-100">
+          {/* Зменшено шрифт для мобільного (text-3xl) */}
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight mb-4 dark:text-neutral-100">
             {t('hero.title')}
           </h1>
           <motion.p
-            className="mt-4 text-xl text-gray-500 border-b pb-6 border-gray-200 dark:text-neutral-300 dark:border-neutral-800"
+            className="mt-4 text-lg lg:text-xl text-gray-500 border-b pb-6 border-gray-200 dark:text-neutral-300 dark:border-neutral-800"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.7 }}
@@ -569,21 +573,21 @@ export default function DeliveryPage() {
         {/* Policy */}
         <motion.section
           id="policy"
-          className="mb-20 scroll-mt-24"
+          className="mb-12 lg:mb-20 scroll-mt-24" // Адаптивний відступ
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-gray-900 pl-3 dark:text-neutral-100 dark:border-neutral-300">
+          <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-6 border-l-4 border-gray-900 pl-3 dark:text-neutral-100 dark:border-neutral-300">
             {t('policy.title')}
           </h2>
-          <p className="text-gray-700 mb-6 text-lg dark:text-neutral-300">
+          <p className="text-gray-700 mb-6 text-base lg:text-lg dark:text-neutral-300">
             {t('policy.intro')}
           </p>
 
           <motion.div
-            className="bg-blue-50 p-6 rounded-xl border border-blue-200 dark:bg-neutral-900 dark:border-neutral-800"
+            className="bg-blue-50 p-5 lg:p-6 rounded-xl border border-blue-200 dark:bg-neutral-900 dark:border-neutral-800"
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
@@ -598,7 +602,7 @@ export default function DeliveryPage() {
               </motion.div>
               {t('policy.keyTitle')}
             </h3>
-            <ul className="space-y-2 text-gray-700 list-disc list-inside ml-4 dark:text-neutral-300">
+            <ul className="space-y-2 text-gray-700 list-disc list-inside ml-4 dark:text-neutral-300 text-sm sm:text-base">
               <li>
                 <strong>{t('policy.key1Strong')}:</strong>{' '}
                 {t('policy.key1Text')}
@@ -616,7 +620,7 @@ export default function DeliveryPage() {
         </motion.section>
 
         <motion.hr
-          className="my-16 border-gray-200 dark:border-neutral-800"
+          className="my-12 lg:my-16 border-gray-200 dark:border-neutral-800"
           initial={{ scaleX: 0 }}
           whileInView={{ scaleX: 1 }}
           viewport={{ once: true }}
@@ -626,16 +630,17 @@ export default function DeliveryPage() {
         {/* Calculator */}
         <motion.section
           id="calculator"
-          className="mb-20 scroll-mt-24 bg-gray-50 p-8 rounded-xl border border-gray-200 shadow-lg dark:bg-neutral-900 dark:border-neutral-800"
+          // Зменшено padding для мобільного (p-4 sm:p-8)
+          className="mb-12 lg:mb-20 scroll-mt-24 bg-gray-50 p-4 sm:p-8 rounded-xl border border-gray-200 shadow-lg dark:bg-neutral-900 dark:border-neutral-800"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-3xl font-bold text-gray-900 mb-6 dark:text-neutral-100">
+          <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-6 dark:text-neutral-100">
             {t_calc('title')}
           </h2>
-          <p className="text-gray-700 mb-6 dark:text-neutral-300">
+          <p className="text-gray-700 mb-6 dark:text-neutral-300 text-base lg:text-lg">
             {t_calc('intro')}
           </p>
 
@@ -755,7 +760,9 @@ export default function DeliveryPage() {
                   {shippingOptions.map((option, index) => (
                     <motion.div
                       key={index}
-                      className={`flex items-center p-5 rounded-xl transition shadow-md border
+                      // Адаптація: На мобільному flex-col або flex-row з можливістю переносу
+                      // sm:flex-row тримає їх в рядок на планшетах/ПК
+                      className={`flex flex-col sm:flex-row sm:items-center items-start p-4 sm:p-5 rounded-xl transition shadow-md border
                         ${
                           selectedCountryCode === 'RU'
                             ? 'bg-red-50 border-red-300 dark:bg-red-900/20 dark:border-red-700'
@@ -767,31 +774,35 @@ export default function DeliveryPage() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
                     >
-                      <motion.div
-                        className="shrink-0 mr-4"
-                        whileHover={{ scale: 1.2, rotate: 10 }}
-                        transition={{ type: 'spring', stiffness: 300 }}
-                      >
-                        {getEmoji(
-                          option.price,
-                          selectedCountryCode,
-                          option.price !== 'N/A'
-                        )}
-                      </motion.div>
+                      {/* Верхня частина на мобільному (іконка + текст) */}
+                      <div className="flex items-center w-full sm:w-auto mb-2 sm:mb-0">
+                        <motion.div
+                          className="shrink-0 mr-4"
+                          whileHover={{ scale: 1.2, rotate: 10 }}
+                          transition={{ type: 'spring', stiffness: 300 }}
+                        >
+                          {getEmoji(
+                            option.price,
+                            selectedCountryCode,
+                            option.price !== 'N/A'
+                          )}
+                        </motion.div>
 
-                      <div className="flex-1">
-                        <p className="font-semibold text-gray-900 dark:text-neutral-100">
-                          {option.serviceKey
-                            ? t(option.serviceKey)
-                            : option.service}
-                        </p>
-                        <p className="text-sm text-gray-600 dark:text-neutral-300">
-                          {t_calc('resultsTime')}:{' '}
-                          {option.timeKey ? t(option.timeKey) : option.time}
-                        </p>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-gray-900 dark:text-neutral-100 truncate sm:whitespace-normal">
+                            {option.serviceKey
+                              ? t(option.serviceKey)
+                              : option.service}
+                          </p>
+                          <p className="text-sm text-gray-600 dark:text-neutral-300">
+                            {t_calc('resultsTime')}:{' '}
+                            {option.timeKey ? t(option.timeKey) : option.time}
+                          </p>
+                        </div>
                       </div>
 
-                      <div className="flex-shrink-0 text-right">
+                      {/* Ціна (на мобільному може бути окремим рядком або праворуч) */}
+                      <div className="flex-shrink-0 text-left sm:text-right w-full sm:w-auto pl-[40px] sm:pl-0 sm:ml-auto">
                         <p
                           className={`text-xl font-bold ${
                             option.price === 'Free'
@@ -832,7 +843,7 @@ export default function DeliveryPage() {
         </motion.section>
 
         <motion.hr
-          className="my-16 border-gray-200 dark:border-neutral-800"
+          className="my-12 lg:my-16 border-gray-200 dark:border-neutral-800"
           initial={{ scaleX: 0 }}
           whileInView={{ scaleX: 1 }}
           viewport={{ once: true }}
@@ -842,17 +853,17 @@ export default function DeliveryPage() {
         {/* Returns & Warranty */}
         <motion.section
           id="returns-warranty"
-          className="mb-20 scroll-mt-24"
+          className="mb-12 lg:mb-20 scroll-mt-24"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-3xl font-bold text-gray-900 mb-6 border-l-4 border-gray-900 pl-3 dark:text-neutral-100 dark:border-neutral-300">
+          <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-6 border-l-4 border-gray-900 pl-3 dark:text-neutral-100 dark:border-neutral-300">
             {t_returns('title')}
           </h2>
 
-          <p className="text-gray-700 mb-8 text-lg dark:text-neutral-300">
+          <p className="text-gray-700 mb-8 text-base lg:text-lg dark:text-neutral-300">
             {t_returns('intro')}
           </p>
 

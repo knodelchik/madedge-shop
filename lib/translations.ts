@@ -2,9 +2,9 @@
 export const translations = {
   ua: {
     Main: {
-      heroTitle: 'Ласкаво просимо до MadEdge Shop',
+      heroTitle: 'Вітаємо в MadEdge Shop',
       heroSubtitle:
-        'Відкрийте для себе найкращі точилки для ножів. Купуйте зараз та насолоджуйтесь ексклюзивними знижками з гарантією преміум якості!',
+        'Відкрийте для себе системи заточування професійного рівня, створені для перфекціоністів.',
       shop: 'Магазин',
       about: 'Блог',
     },
@@ -180,7 +180,7 @@ export const translations = {
       footerAssembly: 'Збірка',
       footerReviews: 'Відгуки',
       footerShop: 'Магазин',
-      footerKnifeSharpeners: 'Точилки для ножів',
+      footerKnifeSharpeners: 'Точила',
       footerWhetstones: 'Точильні камені',
       footerAccessories: 'Аксесуари',
       footerAboutUs: 'Блог',
@@ -237,9 +237,20 @@ export const translations = {
       addingToCart: 'Додається до корзини...',
       loading: 'Завантаження...',
     },
+    WishlistSheet: {
+      title: 'Список бажань',
+      emptyMessage: 'Ваш список бажань порожній',
+      goToShop: 'Перейти до магазину',
+      addToCart: 'Додати в кошик',
+      totalItems: 'Всього товарів',
+      continueShopping: 'Продовжити шопінг',
+      priceUnit: '₴',
+      placeholderAlt: 'Зображення товару',
+    },
     BurgerMenu: {
       openMenu: 'Відкрити меню',
       closeMenu: 'Закрити меню',
+      menu: 'Меню',
       user: {
         defaultName: 'Користувач',
       },
@@ -295,7 +306,7 @@ export const translations = {
 
       // Кнопки фільтрації
       grindingStones: 'Точильні Камені',
-      knifeSharpeners: 'Точилки для ножів',
+      knifeSharpeners: 'Професійні точила',
       accessories: 'Аксесуари',
       allProducts: 'Всі товари',
 
@@ -315,6 +326,7 @@ export const translations = {
       addToWishlist: 'Додати до списку бажань',
       categoryLabel: 'Категорія:',
       imageAltPrefix: 'Зображення',
+      backToCheckout: '← Повернутись до оформлення замовлення',
     },
     Profile: {
       loading: 'Завантаження...',
@@ -345,6 +357,7 @@ export const translations = {
       checkoutButton: 'Оформити замовлення',
       priceUnit: '$',
       placeholderAlt: 'Запасне зображення товару',
+      continueShopping: 'Продовжити шопінг',
     },
     Contacts: {
       contactTitle: "Зв'яжіться з нами",
@@ -566,7 +579,7 @@ export const translations = {
 
       // Форма відгуку
       feedback: {
-        title: 'Ця інформація була корисною?',
+        title: 'Це Вам допомогло?',
         placeholder: 'Ваш відгук...',
         supported: 'підтримується', // 'M↓ supported'
         send: 'Надіслати',
@@ -1012,7 +1025,7 @@ export const translations = {
     Main: {
       heroTitle: 'Welcome to MadEdge Shop',
       heroSubtitle:
-        'Discover the best knife sharpeners. Shop now and enjoy exclusive discounts with a premium quality guarantee!',
+        'Discover professional-grade sharpening systems designed for perfectionists.',
       shop: 'Shop',
       about: 'Blog',
     },
@@ -1246,9 +1259,20 @@ export const translations = {
       addingToCart: 'Adding to cart...',
       loading: 'Loading...',
     },
+    WishlistSheet: {
+      title: 'Wishlist',
+      emptyMessage: 'Your wishlist is empty',
+      goToShop: 'Go to Shop',
+      addToCart: 'Add to Cart',
+      totalItems: 'Total items',
+      continueShopping: 'Continue shopping',
+      priceUnit: '₴',
+      placeholderAlt: 'Product image',
+    },
     BurgerMenu: {
       openMenu: 'Open menu',
       closeMenu: 'Close menu',
+      menu: 'Menu',
       user: {
         defaultName: 'User',
       },
@@ -1324,6 +1348,7 @@ export const translations = {
       addToWishlist: 'Add to Wishlist',
       categoryLabel: 'Category:',
       imageAltPrefix: 'Image',
+      backToCheckout: '← Back to checkout',
     },
     Profile: {
       loading: 'Loading...',
@@ -1354,6 +1379,7 @@ export const translations = {
       checkoutButton: 'Checkout',
       priceUnit: '$',
       placeholderAlt: 'Placeholder product image',
+      continueShopping: 'Continue shopping',
     },
     Contacts: {
       contactTitle: 'Contact Us',

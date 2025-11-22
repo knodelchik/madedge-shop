@@ -11,10 +11,10 @@ import {
   Heart,
   ShoppingCart,
   User,
-  Settings,
   LogOut,
   Globe,
   DollarSign,
+  ChevronRight,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useTranslations, useLocale } from 'next-intl';
@@ -24,9 +24,22 @@ import { User as UserType } from '../../types/users';
 interface BurgerMenuProps {
   user: UserType | null;
   onSignOut: () => void;
+  onCartOpen?: () => void;
+  onWishlistOpen?: () => void;
+  onOpen?: () => void;
+  cartCount?: number;
+  wishlistCount?: number;
 }
 
-export default function BurgerMenu({ user, onSignOut }: BurgerMenuProps) {
+export default function BurgerMenu({
+  user,
+  onSignOut,
+  onCartOpen,
+  onWishlistOpen,
+  onOpen,
+  cartCount = 0,
+  wishlistCount = 0,
+}: BurgerMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
@@ -46,6 +59,10 @@ export default function BurgerMenu({ user, onSignOut }: BurgerMenuProps) {
   useEffect(() => setMounted(true), []);
 
   const handleNavigation = (path: string) => {
+    // Haptic feedback для мобільних
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate(10);
+    }
     router.push(path);
     setIsOpen(false);
   };
@@ -57,9 +74,21 @@ export default function BurgerMenu({ user, onSignOut }: BurgerMenuProps) {
   };
 
   const handleCartClick = () => {
-    // Інтеграція з кошиком
-    // useCartStore.getState().openCart();
     setIsOpen(false);
+    setTimeout(() => {
+      if (onCartOpen) {
+        onCartOpen();
+      }
+    }, 300);
+  };
+
+  const handleWishlistClick = () => {
+    setIsOpen(false);
+    setTimeout(() => {
+      if (onWishlistOpen) {
+        onWishlistOpen();
+      }
+    }, 300);
   };
 
   useEffect(() => {
@@ -80,8 +109,11 @@ export default function BurgerMenu({ user, onSignOut }: BurgerMenuProps) {
     <div className="lg:hidden">
       {/* Кнопка бургер-меню */}
       <button
-        onClick={() => setIsOpen(true)}
-        className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+        onClick={() => {
+          onOpen?.();
+          setIsOpen(true);
+        }}
+        className="p-2 rounded-lg bg-white dark:bg-black hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors active:scale-95"
         aria-label={t('openMenu')}
       >
         <Menu className="h-6 w-6" />
@@ -89,27 +121,22 @@ export default function BurgerMenu({ user, onSignOut }: BurgerMenuProps) {
 
       {isOpen && (
         <>
-          {/* Бекдроп з блюром */}
+          {/* Бекдроп */}
           <div
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40"
+            className="fixed inset-0 z-40 animate-in fade-in duration-300"
             onClick={() => setIsOpen(false)}
           />
 
-          {/* Бічна панель меню на 70% ширини */}
-          <div className="fixed top-0 right-0 min-h-full min-w-[70vw] max-w-sm bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg shadow-2xl z-50 transform transition-transform duration-300 ease-in-out border-l border-gray-200 dark:border-gray-700">
-            {/* Заголовок з аватаром */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm font-bold">ME</span>
-                </div>
-                <h2 className="text-lg font-bold text-gray-800 dark:text-white">
-                  MadEdge
-                </h2>
-              </div>
+          {/* Бічна панель меню */}
+          <div className="fixed top-0 right-0 h-screen w-[80vw] max-w-sm bg-white dark:bg-neutral-900 shadow-2xl z-[999] border-l border-gray-200 dark:border-neutral-700 flex flex-col">
+            {/* Заголовок */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-neutral-700 flex-shrink-0">
+              <h2 className="text-lg font-bold text-gray-800 dark:text-white">
+                {t('menu')}
+              </h2>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors active:scale-95"
                 aria-label={t('closeMenu')}
               >
                 <X className="h-5 w-5" />
@@ -117,215 +144,224 @@ export default function BurgerMenu({ user, onSignOut }: BurgerMenuProps) {
             </div>
 
             {/* Контент з прокруткою */}
-            <div className="h-full flex flex-col">
-              <div className="flex-1 overflow-y-auto">
-                {/* Інформація про користувача */}
-                {user && (
-                  <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                        <User className="h-5 w-5 text-white" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-gray-800 dark:text-white truncate">
-                          {user.full_name || t('user.defaultName')}
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                          {user.email}
-                        </p>
-                      </div>
+            <div className="flex-1 overflow-y-auto overscroll-contain">
+              {/* Інформація про користувача - КЛІКАБЕЛЬНА */}
+              {user && (
+                <button
+                  onClick={() => handleNavigation(`/${locale}/profile`)}
+                  className="w-full p-4 border-b border-gray-200 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors text-left active:scale-[0.98]"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-gradient-to-br from-neutral-300 to-neutral-500 rounded-full flex items-center justify-center flex-shrink-0">
+                      <User className="h-6 w-6 text-white" />
                     </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-neutral-800 dark:text-white truncate">
+                        {user.full_name || t('user.defaultName')}
+                      </p>
+                      <p className="text-xs text-neutral-500 dark:text-neutral-400 truncate">
+                        {user.email}
+                      </p>
+                    </div>
+                    <ChevronRight className="h-5 w-5 text-gray-400 flex-shrink-0" />
                   </div>
-                )}
+                </button>
+              )}
 
-                {/* Навігація */}
-                <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                  <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3 tracking-wide">
-                    {t('sections.navigation')}
-                  </h3>
-                  <nav className="space-y-1">
-                    {navigationItems.map((item) => (
+              {/* Навігація з активним станом */}
+              <div className="p-4 border-b border-gray-200 dark:border-neutral-700">
+                <h3 className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase mb-3 tracking-wide">
+                  {t('sections.navigation')}
+                </h3>
+                <nav className="space-y-1">
+                  {navigationItems.map((item) => {
+                    const isActive = pathname === item.path;
+                    return (
                       <button
                         key={item.path}
                         onClick={() => handleNavigation(item.path)}
-                        className="w-full flex items-center p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-200 font-medium text-sm"
+                        className={`w-full flex items-center p-3 rounded-lg transition-colors text-sm active:scale-95 ${
+                          isActive
+                            ? 'bg-neutral-200/80 dark:bg-neutral-500/20 text-black-600 dark:text-white font-semibold'
+                            : 'hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-neutral-300 font-medium'
+                        }`}
                       >
                         {item.label}
                       </button>
-                    ))}
-                  </nav>
-                </div>
+                    );
+                  })}
+                </nav>
+              </div>
 
-                {/* Швидкий доступ */}
-                <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                  <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3 tracking-wide">
-                    {t('sections.quickAccess')}
-                  </h3>
-                  <div className="space-y-1">
-                    <button
-                      onClick={() => handleNavigation(`/${locale}/wishlist`)}
-                      className="w-full flex items-center p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-200 text-sm"
-                    >
-                      <Heart className="h-4 w-4 mr-3" />
+              {/* Швидкий доступ з лічильниками */}
+              <div className="p-4 border-b border-gray-200 dark:border-neutral-700">
+                <h3 className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase mb-3 tracking-wide">
+                  {t('sections.quickAccess')}
+                </h3>
+                <div className="space-y-1">
+                  <button
+                    onClick={handleWishlistClick}
+                    className="w-full flex items-center p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors text-black dark:text-white text-sm active:scale-95"
+                  >
+                    <Heart className="h-4 w-4 mr-3 flex-shrink-0" />
+                    <span className="flex-1 text-left">
                       {t('quickAccess.wishlist')}
-                    </button>
-                    <button
-                      onClick={handleCartClick}
-                      className="w-full flex items-center p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-200 text-sm"
-                    >
-                      <ShoppingCart className="h-4 w-4 mr-3" />
+                    </span>
+                    {wishlistCount > 0 && (
+                      <span className="bg-red-500 text-white text-xs rounded-full px-2 py-0.5 font-medium">
+                        {wishlistCount}
+                      </span>
+                    )}
+                  </button>
+                  <button
+                    onClick={handleCartClick}
+                    className="w-full flex items-center p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors text-black dark:text-white text-sm active:scale-95"
+                  >
+                    <ShoppingCart className="h-4 w-4 mr-3 flex-shrink-0" />
+                    <span className="flex-1 text-left">
                       {t('quickAccess.cart')}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Налаштування */}
-                <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                  <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3 tracking-wide flex items-center">
-                    <Settings className="h-3 w-3 mr-2" />
-                    {t('sections.settings')}
-                  </h3>
-
-                  {/* Тема */}
-                  <div className="mb-4">
-                    <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      {t('settings.theme.label')}
-                    </p>
-                    <div className="flex items-center border border-gray-200 dark:border-gray-700 rounded-full overflow-hidden">
-                      {[
-                        {
-                          icon: <Sun className="h-3 w-3" />,
-                          key: 'light',
-                          label: t('settings.theme.light'),
-                        },
-                        {
-                          icon: <Monitor className="h-3 w-3" />,
-                          key: 'system',
-                          label: t('settings.theme.system'),
-                        },
-                        {
-                          icon: <Moon className="h-3 w-3" />,
-                          key: 'dark',
-                          label: t('settings.theme.dark'),
-                        },
-                      ].map((themeOption) => (
-                        <button
-                          key={themeOption.key}
-                          onClick={() => setTheme(themeOption.key)}
-                          className={`flex-1 p-2 text-xs transition-colors flex items-center justify-center space-x-1 ${
-                            theme === themeOption.key
-                              ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
-                              : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400'
-                          }`}
-                          title={themeOption.label}
-                        >
-                          {themeOption.icon}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Мова */}
-                  <div className="mb-4">
-                    <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center">
-                      <Globe className="h-3 w-3 mr-1" />
-                      {t('settings.language.label')}
-                    </p>
-                    <div className="flex items-center border border-gray-200 dark:border-gray-700 rounded-full overflow-hidden">
-                      {[
-                        { label: 'УКР', value: 'ua' },
-                        { label: 'ENG', value: 'en' },
-                      ].map((lang) => (
-                        <button
-                          key={lang.value}
-                          onClick={() => handleLanguageChange(lang.value)}
-                          className={`flex-1 p-2 text-xs font-medium transition-colors ${
-                            locale === lang.value
-                              ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
-                              : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400'
-                          }`}
-                        >
-                          {lang.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Валюта */}
-                  <div>
-                    <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center">
-                      <DollarSign className="h-3 w-3 mr-1" />
-                      {t('settings.currency.label')}
-                    </p>
-                    <div className="flex items-center border border-gray-200 dark:border-gray-700 rounded-full overflow-hidden">
-                      {['UAH', 'USD', 'EUR'].map((cur) => (
-                        <button
-                          key={cur}
-                          onClick={() =>
-                            setCurrency(cur as 'UAH' | 'USD' | 'EUR')
-                          }
-                          className={`flex-1 p-2 text-xs font-medium transition-colors ${
-                            currency === cur
-                              ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
-                              : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400'
-                          }`}
-                        >
-                          {cur}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Акаунт */}
-                <div className="p-4">
-                  <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3 tracking-wide">
-                    {t('sections.account')}
-                  </h3>
-                  {user ? (
-                    <div className="space-y-1">
-                      <button
-                        onClick={() => handleNavigation(`/${locale}/profile`)}
-                        className="w-full flex items-center p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-200 text-sm"
-                      >
-                        <User className="h-4 w-4 mr-3" />
-                        {t('account.profile')}
-                      </button>
-                      <button
-                        onClick={onSignOut}
-                        className="w-full flex items-center p-3 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-red-600 dark:text-red-400 text-sm"
-                      >
-                        <LogOut className="h-4 w-4 mr-3" />
-                        {t('account.signOut')}
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="space-y-1">
-                      <button
-                        onClick={() =>
-                          handleNavigation(`/${locale}/auth/signin`)
-                        }
-                        className="w-full flex items-center p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-200 text-sm"
-                      >
-                        <User className="h-4 w-4 mr-3" />
-                        {t('account.signIn')}
-                      </button>
-                      <button
-                        onClick={() =>
-                          handleNavigation(`/${locale}/auth/signup`)
-                        }
-                        className="w-full flex items-center p-3 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white transition-all text-sm font-medium"
-                      >
-                        {t('account.signUp')}
-                      </button>
-                    </div>
-                  )}
+                    </span>
+                    {cartCount > 0 && (
+                      <span className="bg-blue-600 text-white text-xs rounded-full px-2 py-0.5 font-medium">
+                        {cartCount}
+                      </span>
+                    )}
+                  </button>
                 </div>
               </div>
 
+              {/* Налаштування */}
+              <div className="p-4 border-b border-gray-200 dark:border-neutral-700">
+                <h3 className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase mb-3 tracking-wide">
+                  {t('sections.settings')}
+                </h3>
+
+                {/* Тема */}
+                <div className="mb-4">
+                  <p className="text-xs font-medium text-black dark:text-white mb-2">
+                    {t('settings.theme.label')}
+                  </p>
+                  <div className="flex items-center border border-gray-200 dark:border-neutral-700 rounded-xl overflow-hidden">
+                    {[
+                      {
+                        icon: <Sun className="h-4 w-4" />,
+                        key: 'light',
+                        label: t('settings.theme.light'),
+                      },
+                      {
+                        icon: <Monitor className="h-4 w-4" />,
+                        key: 'system',
+                        label: t('settings.theme.system'),
+                      },
+                      {
+                        icon: <Moon className="h-4 w-4" />,
+                        key: 'dark',
+                        label: t('settings.theme.dark'),
+                      },
+                    ].map((themeOption) => (
+                      <button
+                        key={themeOption.key}
+                        onClick={() => setTheme(themeOption.key)}
+                        className={`flex-1 p-3 text-xs transition-colors flex items-center justify-center space-x-1 active:scale-95 ${
+                          theme === themeOption.key
+                            ? 'bg-neutral-200 dark:dark:bg-neutral-500/20 text-gray-900 dark:text-white font-semibold'
+                            : 'hover:bg-gray-100 dark:hover:bg-neutral-800 text-gray-600 dark:text-neutral-400'
+                        }`}
+                        title={themeOption.label}
+                      >
+                        {themeOption.icon}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Мова */}
+                <div className="mb-4">
+                  <p className="text-xs font-medium text-black dark:text-white mb-2 flex items-center">
+                    <Globe className="h-4 w-4 mr-1" />
+                    {t('settings.language.label')}
+                  </p>
+                  <div className="flex items-center border border-gray-200 dark:border-neutral-700 rounded-xl overflow-hidden">
+                    {[
+                      { label: 'УКР', value: 'ua' },
+                      { label: 'ENG', value: 'en' },
+                    ].map((lang) => (
+                      <button
+                        key={lang.value}
+                        onClick={() => handleLanguageChange(lang.value)}
+                        className={`flex-1 p-3 text-xs transition-colors flex items-center justify-center space-x-1 active:scale-95 ${
+                          locale === lang.value
+                            ? 'bg-neutral-200 dark:bg-neutral-500/20 text-gray-900 dark:text-white font-semibold'
+                            : 'hover:bg-gray-100 dark:hover:bg-neutral-800 text-gray-600 dark:text-neutral-400'
+                        }`}
+                      >
+                        {lang.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Валюта */}
+                <div>
+                  <p className="text-xs font-medium text-black dark:text-white mb-2 flex items-center">
+                    <DollarSign className="h-4 w-4 mr-1" />
+                    {t('settings.currency.label')}
+                  </p>
+                  <div className="flex items-center border border-gray-200 dark:border-neutral-700 rounded-xl overflow-hidden">
+                    {['UAH', 'USD', 'EUR'].map((cur) => (
+                      <button
+                        key={cur}
+                        onClick={() =>
+                          setCurrency(cur as 'UAH' | 'USD' | 'EUR')
+                        }
+                        className={`flex-1 p-3 text-xs transition-colors flex items-center justify-center space-x-1 active:scale-95 ${
+                          currency === cur
+                            ? 'bg-neutral-200 dark:bg-neutral-500/20 text-gray-900 dark:text-white font-semibold'
+                            : 'hover:bg-gray-100 dark:hover:bg-neutral-800 text-gray-600 dark:text-neutral-400'
+                        }`}
+                      >
+                        {cur}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Акаунт */}
+              <div className="p-4 border-b border-gray-200 dark:border-neutral-700">
+                <h3 className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase mb-3 tracking-wide">
+                  {t('sections.account')}
+                </h3>
+                {user ? (
+                  <button
+                    onClick={onSignOut}
+                    className="w-full flex items-center p-3 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-red-600 dark:text-red-400 text-sm active:scale-95"
+                  >
+                    <LogOut className="h-4 w-4 mr-3" />
+                    {t('account.signOut')}
+                  </button>
+                ) : (
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => handleNavigation(`/${locale}/auth/signin`)}
+                      className="w-full flex items-center justify-center p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors text-gray-700 dark:text-neutral-200 text-sm active:scale-95 border border-gray-200 dark:border-neutral-700"
+                    >
+                      <User className="h-4 w-4 mr-2" />
+                      {t('account.signIn')}
+                    </button>
+                    <button
+                      onClick={() => handleNavigation(`/${locale}/auth/signup`)}
+                      className="w-full flex items-center justify-center p-3 rounded-lg bg-gradient-to-r from-neutral-200 to-neutral-300 text-neutral-700 dark:from-neutral-600 dark:to-neutral-800 dark:text-white transition-all text-sm font-medium active:scale-95"
+                    >
+                      {t('account.signUp')}
+                    </button>
+                  </div>
+                )}
+              </div>
+
               {/* Футер */}
-              <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+              <div className="p-4 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-sm">
+                <p className="text-xs text-neutral-500 dark:text-neutral-400 text-center">
                   {t('footer.copyright')}
                 </p>
               </div>

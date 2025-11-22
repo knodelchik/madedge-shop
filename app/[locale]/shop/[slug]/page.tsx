@@ -12,6 +12,7 @@ import { productsService } from '../../services/productService';
 import { Product } from '@/app/types/products';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 
 export default function ProductPage() {
   const { slug } = useParams();
@@ -20,6 +21,8 @@ export default function ProductPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentImage, setCurrentImage] = useState(0);
+  const searchParams = useSearchParams();
+  const from = searchParams.get('from');
 
   const { addToCart, cartItems } = useCartStore();
   const itemInCart = cartItems.find((i) => i.id === product?.id);
@@ -27,7 +30,6 @@ export default function ProductPage() {
     itemInCart ? itemInCart.quantity : 1
   );
 
-  // Завантаження продукту
   useEffect(() => {
     const loadProduct = async () => {
       if (!slug) return;
@@ -73,7 +75,6 @@ export default function ProductPage() {
     );
   };
 
-  // 🎨 Анімація завантаження з логотипом
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
@@ -84,14 +85,14 @@ export default function ProductPage() {
 
   if (!product) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-2xl text-center">
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="text-xl sm:text-2xl text-center">
           <p>{t('notFound')}</p>
           <Link
-            href="/shop"
-            className="text-blue-500 underline mt-4 inline-block"
+            href={from === 'checkout' ? '/checkout' : '/shop'}
+            className="inline-flex items-center text-blue-500 hover:text-blue-700 mb-4 sm:mb-6 text-sm sm:text-base"
           >
-            {t('backToShop')}
+            {from === 'checkout' ? t('backToCheckout') : t('backToShopButton')}
           </Link>
         </div>
       </div>
@@ -99,26 +100,26 @@ export default function ProductPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 dark:bg-black">
+    <div className="min-h-screen bg-gray-50 py-4 sm:py-6 md:py-8 dark:bg-black">
       <div className="max-w-6xl mx-auto px-4">
         {/* Кнопка назад */}
         <Link
-          href="/shop"
-          className="inline-flex items-center text-blue-500 hover:text-blue-700 mb-6"
+          href={from === 'checkout' ? '/order' : '/shop'}
+          className="inline-flex items-center text-blue-500 hover:text-blue-700 mb-4 sm:mb-6 text-sm sm:text-base"
         >
-          {t('backToShopButton')}
+          {from === 'checkout' ? t('backToCheckout') : t('backToShopButton')}
         </Link>
 
-        <div className="bg-white rounded-2xl shadow-lg p-8 dark:bg-neutral-800 ">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 ">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 md:p-8 dark:bg-neutral-800">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
             {/* Слайдер фото */}
-            <div className="space-y-4">
-              <div className="relative w-full flex items-center justify-center bg-gray-100 rounded-2xl p-4 dark:bg-white">
+            <div className="space-y-3 sm:space-y-4">
+              <div className="relative w-full flex items-center justify-center bg-gray-100 rounded-xl sm:rounded-2xl p-3 sm:p-4 dark:bg-white">
                 <motion.img
                   key={product.images[currentImage]}
                   src={product.images[currentImage]}
                   alt={`${t('imageAltPrefix')} ${currentImage + 1}`}
-                  className="w-full h-80 object-contain rounded-lg "
+                  className="w-full h-64 sm:h-72 md:h-80 object-contain rounded-lg"
                   initial={{ opacity: 0.5, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.3 }}
@@ -129,13 +130,13 @@ export default function ProductPage() {
                   <>
                     <button
                       onClick={prevImage}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white dark:text-neutral-800 dark:bg-neutral-400/70 dark:hover:text-white dark:hover:bg-neutral-400  rounded-full p-3 shadow-lg transition-all cursor-pointer"
+                      className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white dark:text-neutral-800 dark:bg-neutral-400/80 dark:hover:text-white dark:hover:bg-neutral-400 rounded-full p-2 sm:p-3 shadow-lg transition-all cursor-pointer active:scale-95 text-xl sm:text-2xl font-bold"
                     >
                       ‹
                     </button>
                     <button
                       onClick={nextImage}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white dark:text-neutral-800 dark:bg-neutral-400/70 dark:hover:text-white dark:hover:bg-neutral-400 rounded-full p-3 shadow-lg transition-all cursor-pointer"
+                      className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white dark:text-neutral-800 dark:bg-neutral-400/80 dark:hover:text-white dark:hover:bg-neutral-400 rounded-full p-2 sm:p-3 shadow-lg transition-all cursor-pointer active:scale-95 text-xl sm:text-2xl font-bold"
                     >
                       ›
                     </button>
@@ -145,7 +146,7 @@ export default function ProductPage() {
 
               {/* Мініатюри */}
               {product.images.length > 1 && (
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                   {product.images.map((image, index) => (
                     <button
                       key={index}
@@ -161,7 +162,7 @@ export default function ProductPage() {
                         alt={`${t('imageAltPrefix')} ${index + 1}`}
                         width={80}
                         height={80}
-                        className="w-full h-20 object-cover"
+                        className="w-full h-16 sm:h-20 object-cover"
                       />
                     </button>
                   ))}
@@ -170,12 +171,12 @@ export default function ProductPage() {
             </div>
 
             {/* Інформація про товар */}
-            <div className="space-y-6 dark:bg-neutral-800 ">
+            <div className="space-y-4 sm:space-y-6 dark:bg-neutral-800">
               <div>
-                <h1 className="text-3xl font-bold text-gray-800 mb-4 dark:text-white">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4 dark:text-white">
                   {product.title}
                 </h1>
-                <p className="text-2xl font-semibold text-gray-700 dark:text-neutral-200">
+                <p className="text-xl sm:text-2xl font-semibold text-gray-700 dark:text-neutral-200">
                   {product.price} $
                 </p>
               </div>
@@ -183,14 +184,14 @@ export default function ProductPage() {
               {product.description && (
                 <div className="prose max-w-none">
                   <div
-                    className="text-gray-600 leading-relaxed dark:text-neutral-400"
+                    className="text-sm sm:text-base text-gray-600 leading-relaxed dark:text-neutral-400"
                     dangerouslySetInnerHTML={{ __html: product.description }}
                   />
                 </div>
               )}
 
               {/* Кількість та кнопки додавання */}
-              <div className="space-y-4 pt-4">
+              <div className="space-y-3 sm:space-y-4 pt-3 sm:pt-4">
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-gray-700 dark:text-neutral-200">
@@ -207,27 +208,27 @@ export default function ProductPage() {
                 <div className="flex gap-3">
                   <button
                     onClick={handleAddToCart}
-                    className="flex-1 bg-black text-white px-8 py-3 rounded-xl font-semibold hover:bg-neutral-800 dark:text-white dark:bg-neutral-500 dark:hover:text-black dark:hover:bg-neutral-100  transition-colors cursor-pointer"
+                    className="flex-1 bg-black text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl font-semibold hover:bg-neutral-800 dark:text-white dark:bg-neutral-500 dark:hover:text-black dark:hover:bg-neutral-100 transition-colors cursor-pointer active:scale-95 text-sm sm:text-base"
                   >
                     {t('addToCart')}
                   </button>
 
-                  {/* Додаткова кнопка Wishlist для мобільних пристроїв */}
-                  <div className="md:hidden ">
+                  {/* Кнопка Wishlist для мобільних */}
+                  <div className="md:hidden">
                     <WishlistButton
                       productId={product.id}
                       size="md"
-                      className="border-2 border-gray-300 hover:border-red-300 "
+                      className="border-2 border-gray-300 hover:border-red-300"
                     />
                   </div>
                 </div>
 
-                {/* Альтернативний варіант Wishlist кнопки для десктопу */}
-                <div className="hidden md:flex items-center gap-2 pt-2 ">
+                {/* Wishlist кнопка для десктопу */}
+                <div className="hidden md:flex items-center gap-2 pt-2">
                   <WishlistButton
                     productId={product.id}
                     size="sm"
-                    className=" dark:text-neutral-200 dark:border-neutral-200 dark:bg-neutral-900  dark:hover:border-red-500 dark:hover:text-red-500"
+                    className="dark:text-neutral-200 dark:border-neutral-200 dark:bg-neutral-900 dark:hover:border-red-500 dark:hover:text-red-500"
                   />
                   <span className="text-sm text-gray-600 dark:text-neutral-300">
                     {t('addToWishlist')}
@@ -237,8 +238,8 @@ export default function ProductPage() {
 
               {/* Категорія */}
               {product.category && (
-                <div className="pt-4 border-t border-gray-200 dark:border-neutral-500 ">
-                  <span className="text-sm text-gray-500 dark:text-neutral-200">
+                <div className="pt-3 sm:pt-4 border-t border-gray-200 dark:border-neutral-500">
+                  <span className="text-xs sm:text-sm text-gray-500 dark:text-neutral-200">
                     {t('categoryLabel')} {product.category}
                   </span>
                 </div>
@@ -251,17 +252,14 @@ export default function ProductPage() {
   );
 }
 
-// 🎨 Компонент анімації логотипу при завантаженні
 function LogoLoadingAnimation() {
   const t = useTranslations('ProductPage');
 
   return (
-    <div className="flex flex-col items-center gap-8">
-      {/* Контейнер з анімацією */}
+    <div className="flex flex-col items-center gap-6 sm:gap-8 px-4">
       <div className="relative">
-        {/* Зовнішнє пульсуюче кільце */}
         <motion.div
-          className="absolute inset-0 w-40 h-40 -m-4"
+          className="absolute inset-0 w-32 h-32 sm:w-40 sm:h-40 -m-3 sm:-m-4"
           animate={{
             scale: [1, 1.15, 1],
             opacity: [0.3, 0.6, 0.3],
@@ -272,12 +270,11 @@ function LogoLoadingAnimation() {
             ease: 'easeInOut',
           }}
         >
-          <div className="w-full h-full border-4 border-black/20 dark:border-white/20 rounded-full" />
+          <div className="w-full h-full border-3 sm:border-4 border-black/20 dark:border-white/20 rounded-full" />
         </motion.div>
 
-        {/* Логотип з обертанням та shimmer */}
         <motion.div
-          className="relative w-32 h-32 overflow-hidden rounded-full"
+          className="relative w-24 h-24 sm:w-32 sm:h-32 overflow-hidden rounded-full"
           animate={{
             rotate: [0, 360],
           }}
@@ -296,7 +293,6 @@ function LogoLoadingAnimation() {
             priority
           />
 
-          {/* Shimmer effect поверх логотипу */}
           <motion.div
             className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
             style={{
@@ -313,9 +309,8 @@ function LogoLoadingAnimation() {
           />
         </motion.div>
 
-        {/* Додаткове обертове кільце */}
         <motion.div
-          className="absolute inset-0 w-32 h-32"
+          className="absolute inset-0 w-24 h-24 sm:w-32 sm:h-32"
           animate={{
             rotate: [0, -360],
           }}
@@ -329,7 +324,6 @@ function LogoLoadingAnimation() {
         </motion.div>
       </div>
 
-      {/* Текст з пульсацією */}
       <motion.div
         className="text-center"
         animate={{
@@ -341,17 +335,16 @@ function LogoLoadingAnimation() {
           ease: 'easeInOut',
         }}
       >
-        <p className="text-xl font-bold text-gray-800 dark:text-white">
+        <p className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white">
           {t('loading')}
         </p>
       </motion.div>
 
-      {/* Анімовані точки */}
       <div className="flex gap-2">
         {[0, 1, 2].map((i) => (
           <motion.div
             key={i}
-            className="w-3 h-3 bg-black dark:bg-white rounded-full"
+            className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-black dark:bg-white rounded-full"
             animate={{
               y: [0, -12, 0],
               scale: [1, 1.2, 1],

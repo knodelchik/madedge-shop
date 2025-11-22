@@ -27,7 +27,6 @@ export default function ShopPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Оновлюємо активну категорію при зміні URL параметра
   useEffect(() => {
     if (
       urlCategory &&
@@ -37,7 +36,6 @@ export default function ShopPage() {
     }
   }, [urlCategory]);
 
-  // Завантаження товарів
   useEffect(() => {
     const loadProducts = async () => {
       setLoading(true);
@@ -54,13 +52,11 @@ export default function ShopPage() {
     loadProducts();
   }, []);
 
-  // Фільтрація товарів
   const filteredProducts =
     activeCategory === 'all'
       ? products
       : products.filter((p) => p.category === activeCategory);
 
-  // 🎨 Анімація завантаження з логотипом
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
@@ -71,8 +67,8 @@ export default function ShopPage() {
 
   return (
     <div>
-      {/* 🎯 HERO секція з кнопками одразу після тексту */}
-      <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
+      {/* HERO секція */}
+      <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] flex items-center justify-center overflow-hidden px-4">
         <MagnetLines
           rows={15}
           columns={15}
@@ -82,76 +78,124 @@ export default function ShopPage() {
           lineHeight="4vmin"
           baseAngle={0}
           style={{ margin: '2rem auto' }}
-          className="absolute inset-0 -z-10 opacity-30"
+          className="absolute inset-0 -z-10 opacity-10 sm:opacity-20 md:opacity-30"
         />
 
-        <div className="relative z-10 text-center text-black">
-          <h1 className="text-5xl font-extrabold mb-6 drop-shadow-lg dark:text-white">
+        <div className="relative z-10 text-center text-black w-full max-w-4xl">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 sm:mb-5 md:mb-6 drop-shadow-lg dark:text-white px-2">
             {t('heroTitle')}
           </h1>
-          <p className="text-lg mb-8 text-black-600 dark:text-neutral-300">
+          <p className="text-base sm:text-lg mb-6 sm:mb-7 md:mb-8 text-black-600 dark:text-neutral-300 px-4">
             {t('heroSubtitle')}
           </p>
 
-          {/* 🎛️ Кнопки фільтрації */}
-          <div className="relative w-full flex flex-col items-center gap-4">
-            <div className="relative w-full flex justify-center">
-              {/* Центральна кнопка — Grinding Stones */}
-              <button
-                onClick={() => setActiveCategory('stones')}
-                className={`px-6 py-3 rounded-xl font-semibold transition shadow-lg cursor-pointer ${
-                  activeCategory === 'stones'
-                    ? 'bg-black text-white dark:bg-white dark:text-black'
-                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-neutral-100'
-                }`}
-              >
-                {t('grindingStones')}
-              </button>
+          {/* Кнопки фільтрації - сітка 2x2 на мобільних */}
+          <div className="relative w-full flex flex-col items-center gap-3 sm:gap-4">
+            {/* Мобільна версія - сітка 2x2 */}
+            <div className="md:hidden w-full max-w-md px-4">
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => setActiveCategory('sharpeners')}
+                  className={`px-4 py-3 rounded-xl font-semibold transition shadow-md cursor-pointer text-sm ${
+                    activeCategory === 'sharpeners'
+                      ? 'bg-black text-white dark:bg-white dark:text-black'
+                      : 'bg-gray-200 text-gray-800 active:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-300 dark:active:bg-neutral-700'
+                  }`}
+                >
+                  {t('knifeSharpeners')}
+                </button>
 
-              {/* Ліва кнопка — Knife Sharpeners */}
-              <button
-                onClick={() => setActiveCategory('sharpeners')}
-                className={`absolute left-1/2 -translate-x-[calc(50%+200px)] px-6 py-3 rounded-xl font-semibold transition shadow-lg cursor-pointer ${
-                  activeCategory === 'sharpeners'
-                    ? 'bg-black text-white dark:bg-white dark:text-black'
-                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-neutral-100'
-                }`}
-              >
-                {t('knifeSharpeners')}
-              </button>
+                <button
+                  onClick={() => setActiveCategory('stones')}
+                  className={`px-4 py-3 rounded-xl font-semibold transition shadow-md cursor-pointer text-sm ${
+                    activeCategory === 'stones'
+                      ? 'bg-black text-white dark:bg-white dark:text-black'
+                      : 'bg-gray-200 text-gray-800 active:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-300 dark:active:bg-neutral-700'
+                  }`}
+                >
+                  {t('grindingStones')}
+                </button>
 
-              {/* Права кнопка — Accessories */}
-              <button
-                onClick={() => setActiveCategory('accessories')}
-                className={`absolute right-1/2 translate-x-[calc(50%+180px)] px-6 py-3 rounded-xl font-semibold transition shadow-lg cursor-pointer ${
-                  activeCategory === 'accessories'
-                    ? 'bg-black text-white dark:bg-white dark:text-black'
-                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-neutral-100'
-                }`}
-              >
-                {t('accessories')}
-              </button>
+                <button
+                  onClick={() => setActiveCategory('accessories')}
+                  className={`px-4 py-3 rounded-xl font-semibold transition shadow-md cursor-pointer text-sm ${
+                    activeCategory === 'accessories'
+                      ? 'bg-black text-white dark:bg-white dark:text-black'
+                      : 'bg-gray-200 text-gray-800 active:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-300 dark:active:bg-neutral-700'
+                  }`}
+                >
+                  {t('accessories')}
+                </button>
+
+                <button
+                  onClick={() => setActiveCategory('all')}
+                  className={`px-4 py-3 rounded-xl font-semibold transition shadow-md cursor-pointer text-sm ${
+                    activeCategory === 'all'
+                      ? 'bg-black text-white dark:bg-white dark:text-black'
+                      : 'bg-gray-200 text-gray-800 active:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-300 dark:active:bg-neutral-700'
+                  }`}
+                >
+                  {t('allProducts')}
+                </button>
+              </div>
             </div>
 
-            {/* Кнопка "All Products" під центром */}
-            <button
-              onClick={() => setActiveCategory('all')}
-              className={`px-4 py-2 rounded-lg font-medium transition text-sm cursor-pointer ${
-                activeCategory === 'all'
-                  ? 'bg-black text-white dark:bg-white dark:text-black'
-                  : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-neutral-100'
-              }`}
-            >
-              {t('allProducts')}
-            </button>
+            {/* Desktop версія - оригінальний layout */}
+            <div className="hidden md:block relative w-full">
+              <div className="relative w-full flex justify-center">
+                <button
+                  onClick={() => setActiveCategory('stones')}
+                  className={`px-6 py-3 rounded-xl font-semibold transition shadow-lg cursor-pointer ${
+                    activeCategory === 'stones'
+                      ? 'bg-black text-white dark:bg-white dark:text-black'
+                      : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-neutral-100'
+                  }`}
+                >
+                  {t('grindingStones')}
+                </button>
+
+                <button
+                  onClick={() => setActiveCategory('sharpeners')}
+                  className={`absolute left-1/2 -translate-x-[calc(50%+200px)] px-6 py-3 rounded-xl font-semibold transition shadow-lg cursor-pointer ${
+                    activeCategory === 'sharpeners'
+                      ? 'bg-black text-white dark:bg-white dark:text-black'
+                      : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-neutral-100'
+                  }`}
+                >
+                  {t('knifeSharpeners')}
+                </button>
+
+                <button
+                  onClick={() => setActiveCategory('accessories')}
+                  className={`absolute right-1/2 translate-x-[calc(50%+180px)] px-6 py-3 rounded-xl font-semibold transition shadow-lg cursor-pointer ${
+                    activeCategory === 'accessories'
+                      ? 'bg-black text-white dark:bg-white dark:text-black'
+                      : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-neutral-100'
+                  }`}
+                >
+                  {t('accessories')}
+                </button>
+              </div>
+
+              <button
+                onClick={() => setActiveCategory('all')}
+                className={`mt-4 px-4 py-2 rounded-lg font-medium transition text-sm cursor-pointer ${
+                  activeCategory === 'all'
+                    ? 'bg-black text-white dark:bg-white dark:text-black'
+                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-neutral-100'
+                }`}
+              >
+                {t('allProducts')}
+              </button>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* 🛒 Секція товарів */}
-      <div className="p-6 max-w-7xl mx-auto">
+      {/* Секція товарів */}
+      <div className="p-4 sm:p-5 md:p-6 max-w-7xl mx-auto">
         <section>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8 md:gap-10">
             {filteredProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
@@ -159,10 +203,12 @@ export default function ShopPage() {
 
           {filteredProducts.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">{t('noProductsFound')}</p>
+              <p className="text-gray-500 text-base sm:text-lg px-4">
+                {t('noProductsFound')}
+              </p>
               <button
                 onClick={() => setActiveCategory('all')}
-                className="mt-4 px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition"
+                className="mt-4 px-5 sm:px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 active:scale-95 transition text-sm sm:text-base"
               >
                 {t('viewAllProducts')}
               </button>
@@ -174,17 +220,14 @@ export default function ShopPage() {
   );
 }
 
-// 🎨 Компонент анімації логотипу при завантаженні
 function LogoLoadingAnimation() {
   const t = useTranslations('Shop');
 
   return (
-    <div className="flex flex-col items-center gap-8">
-      {/* Контейнер з анімацією */}
+    <div className="flex flex-col items-center gap-6 sm:gap-8 px-4">
       <div className="relative">
-        {/* Зовнішнє пульсуюче кільце */}
         <motion.div
-          className="absolute inset-0 w-40 h-40 -m-4"
+          className="absolute inset-0 w-32 h-32 sm:w-40 sm:h-40 -m-3 sm:-m-4"
           animate={{
             scale: [1, 1.15, 1],
             opacity: [0.3, 0.6, 0.3],
@@ -195,12 +238,11 @@ function LogoLoadingAnimation() {
             ease: 'easeInOut',
           }}
         >
-          <div className="w-full h-full border-4 border-black/20 dark:border-white/20 rounded-full" />
+          <div className="w-full h-full border-3 sm:border-4 border-black/20 dark:border-white/20 rounded-full" />
         </motion.div>
 
-        {/* Логотип з обертанням та shimmer */}
         <motion.div
-          className="relative w-32 h-32 overflow-hidden rounded-full"
+          className="relative w-24 h-24 sm:w-32 sm:h-32 overflow-hidden rounded-full"
           animate={{
             rotate: [0, 360],
           }}
@@ -219,7 +261,6 @@ function LogoLoadingAnimation() {
             priority
           />
 
-          {/* Shimmer effect поверх логотипу */}
           <motion.div
             className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
             style={{
@@ -236,9 +277,8 @@ function LogoLoadingAnimation() {
           />
         </motion.div>
 
-        {/* Додаткове обертове кільце */}
         <motion.div
-          className="absolute inset-0 w-32 h-32"
+          className="absolute inset-0 w-24 h-24 sm:w-32 sm:h-32"
           animate={{
             rotate: [0, -360],
           }}
@@ -252,7 +292,6 @@ function LogoLoadingAnimation() {
         </motion.div>
       </div>
 
-      {/* Текст з пульсацією */}
       <motion.div
         className="text-center"
         animate={{
@@ -264,17 +303,16 @@ function LogoLoadingAnimation() {
           ease: 'easeInOut',
         }}
       >
-        <p className="text-xl font-bold text-gray-800 dark:text-white">
+        <p className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white">
           {t('loadingProducts')}
         </p>
       </motion.div>
 
-      {/* Анімовані точки */}
       <div className="flex gap-2">
         {[0, 1, 2].map((i) => (
           <motion.div
             key={i}
-            className="w-3 h-3 bg-black dark:bg-white rounded-full"
+            className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-black dark:bg-white rounded-full"
             animate={{
               y: [0, -12, 0],
               scale: [1, 1.2, 1],
@@ -292,7 +330,6 @@ function LogoLoadingAnimation() {
   );
 }
 
-// Компонент карточки товару з плавною анімацією
 function ProductCard({ product }: { product: Product }) {
   const t = useTranslations('Shop');
 
@@ -305,14 +342,16 @@ function ProductCard({ product }: { product: Product }) {
 
   return (
     <div
-      className="group flex flex-col items-center hover:scale-105 transition-transform duration-300 relative"
+      className="group flex flex-col items-center hover:scale-105 active:scale-100 transition-transform duration-300 relative"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      {/* Wishlist Button - завжди видима на мобільних, з'являється при hover на desktop */}
       <div
-        className={`absolute top-1 right-3.5 z-20 transition-all duration-300 ${
-          isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
-        }`}
+        className={`absolute top-1 right-2 sm:right-3.5 z-20 transition-all duration-300 
+          opacity-100 scale-100 
+          md:opacity-0 md:scale-90 
+          ${isHovered ? 'md:opacity-100 md:scale-100' : ''}`}
       >
         <WishlistButton
           productId={product.id}
@@ -324,7 +363,6 @@ function ProductCard({ product }: { product: Product }) {
         />
       </div>
 
-      {/* Основна частина картки - обгорнута в Link */}
       <Link
         href={`/shop/${product.title.replace(/\s+/g, '-').toLowerCase()}`}
         className="w-full"
@@ -335,16 +373,16 @@ function ProductCard({ product }: { product: Product }) {
             alt={product.title}
             width={300}
             height={256}
-            className="w-full h-64 rounded-2xl shadow-lg object-contain group-hover:opacity-90 transition cursor-pointer"
+            className="w-full h-48 sm:h-56 md:h-64 rounded-xl sm:rounded-2xl shadow-lg object-contain group-hover:opacity-90 transition cursor-pointer"
             onError={(e) => {
               e.currentTarget.src = '/images/placeholder.jpg';
             }}
           />
-          <div className="flex justify-between items-center mt-3 w-full px-2">
-            <h3 className="text-lg font-bold text-gray-800 line-clamp-2 dark:text-neutral-200">
+          <div className="flex justify-between items-center mt-2 sm:mt-3 w-full px-1 sm:px-2">
+            <h3 className="text-base sm:text-lg font-bold text-gray-800 line-clamp-2 dark:text-neutral-200">
               {product.title}
             </h3>
-            <p className="text-sm font-semibold text-gray-600 whitespace-nowrap ml-2 dark:text-neutral-400">
+            <p className="text-xs sm:text-sm font-semibold text-gray-600 whitespace-nowrap ml-2 dark:text-neutral-400">
               {product.price} {t('priceUnit')}
             </p>
           </div>
