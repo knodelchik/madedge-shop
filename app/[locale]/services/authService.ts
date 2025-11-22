@@ -24,7 +24,8 @@ export const authService = {
       return { user: null, error: error.message };
     }
 
-    return { user: data.user as User, error: null };
+    // Приводимо тип через unknown, щоб уникнути помилки TS
+    return { user: data.user as unknown as User, error: null };
   },
 
   // Вхід
@@ -41,7 +42,7 @@ export const authService = {
       return { user: null, error: error.message };
     }
 
-    return { user: data.user as User, error: null };
+    return { user: data.user as unknown as User, error: null };
   },
 
   // Вихід
@@ -61,7 +62,16 @@ export const authService = {
       return { user: null, error: error.message };
     }
 
-    return { user: user as User, error: null };
+    if (user) {
+      const mappedUser: any = {
+        ...user,
+        full_name: user.user_metadata?.full_name || '',
+        phone: user.phone || user.user_metadata?.phone || '',
+      };
+      return { user: mappedUser as User, error: null };
+    }
+
+    return { user: null, error: null };
   },
 
   // Отримати профіль користувача
@@ -72,13 +82,19 @@ export const authService = {
       .from('users')
       .select('*')
       .eq('id', userId)
-      .single();
+      .maybeSingle(); // Використовуємо maybeSingle, щоб не було помилки JSON, якщо профілю немає
 
     if (error) {
+      console.error('Error fetching profile:', error);
       return { profile: null, error: error.message };
     }
 
-    return { profile: data, error: null };
+    // Якщо даних немає, повертаємо null, а не помилку
+    if (!data) {
+      return { profile: null, error: null };
+    }
+
+    return { profile: data as unknown as User, error: null };
   },
 
   // Оновити профіль
@@ -88,15 +104,19 @@ export const authService = {
   ): Promise<{ profile: User | null; error: string | null }> {
     const { data, error } = await supabase
       .from('users')
-      .update(updates)
-      .eq('id', userId)
+      .upsert({ 
+        id: userId, 
+        updated_at: new Date().toISOString(),
+        ...updates 
+      })
       .select()
       .single();
 
     if (error) {
+      console.error('Error updating profile:', error);
       return { profile: null, error: error.message };
     }
 
-    return { profile: data, error: null };
+    return { profile: data as unknown as User, error: null };
   },
 };

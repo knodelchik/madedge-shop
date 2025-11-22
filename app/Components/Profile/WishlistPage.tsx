@@ -1,0 +1,103 @@
+// app/Components/Profile/WishlistPage.tsx
+
+'use client';
+
+import { useTranslations } from 'next-intl';
+import { useWishlistStore } from '@/app/[locale]/store/wishlistStore';
+// 1. (ЗМІНА) Імпортуємо authService, оскільки він потрібен для moveToCart/removeFromWishlist
+import { authService } from '@/app/[locale]/services/authService';
+import { Product } from '@/app/types/products';
+import Image from 'next/image';
+import Link from 'next/link'; // 1. (ЗМІНА) Використовуємо Link з next/link
+import { toast } from 'sonner';
+import { ShoppingCart, Trash2, Heart } from 'lucide-react';
+// 1. (ЗМІНА) Видалено authService, він тут не потрібен, якщо userId передається
+
+// 2. (ЗМІНА) Приймаємо { userId } як пропс
+export default function WishlistPage({ userId }: { userId: string }) {
+  const t = useTranslations('Wishlist');
+  const t_cart = useTranslations('CartSheet');
+  
+  const { wishlistItems, removeFromWishlist, moveToCart } = useWishlistStore();
+
+  // 3. (ЗМІНА) Видалено цей рядок, який спричиняв помилку:
+  // const { user } = authService.supabase.auth.getUser(); 
+
+  const handleMoveToCart = async (product: Product) => {
+    // 3. (ЗМІНА) Використовуємо 'userId' з пропсів
+    if (!userId) return;
+    toast.promise(moveToCart(userId, product.id), {
+      loading: t('addingToCart'),
+      success: `${product.title} додано до кошика`, // TODO: Додати переклад
+      error: 'Помилка',
+    });
+  };
+
+  const handleRemove = (productId: number) => {
+    // 3. (ЗМІНА) Використовуємо 'userId' з пропсів
+    if (!userId) return;
+    removeFromWishlist(userId, productId);
+    toast.error(t('remove')); // TODO: Додати переклад
+  };
+
+  return (
+    <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-lg border border-gray-100 dark:border-neutral-800 p-6">
+      <h2 className="text-2xl font-bold text-gray-800 dark:text-neutral-100 mb-6">
+        {t('title')} ({wishlistItems.length})
+      </h2>
+
+      {wishlistItems.length === 0 ? (
+        <div className="h-48 flex flex-col items-center justify-center bg-gray-50 dark:bg-neutral-800/50 rounded-lg border-2 border-dashed border-gray-300 dark:border-neutral-700">
+           <Heart className="w-12 h-12 mx-auto mb-4 opacity-30 text-gray-500" />
+           <p className="text-gray-500 dark:text-neutral-400">{t('empty')}</p>
+           <p className="text-sm text-gray-400 mt-1">{t('emptyDescription')}</p>
+           <Link href="/shop" className="mt-4 text-sm font-medium text-blue-600 hover:underline">
+            {t('continueShopping')}
+           </Link>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {wishlistItems.map((item) => (
+            <div 
+              key={item.id} 
+              className="flex items-center gap-4 p-3 rounded-lg border bg-white dark:bg-neutral-800 border-gray-200 dark:border-neutral-700"
+            >
+              <Image
+                src={item.products.images?.[0] || '/images/placeholder.jpg'}
+                alt={item.products.title}
+                width={64}
+                height={64}
+                className="w-16 h-16 object-cover rounded-md flex-shrink-0"
+              />
+              <div className="flex-1 min-w-0">
+                {/* 3. (ЗМІНА) Використовуємо Link з /shop/slug, переконайтесь, що у вас є slug сторінка */}
+                <Link href={`/shop/${item.products.title.replace(/\s+/g, '-').toLowerCase()}`} className="font-medium text-sm truncate hover:underline text-gray-800 dark:text-neutral-100">
+                  {item.products.title}
+                </Link>
+                <p className="text-green-600 font-semibold text-sm">
+                  ${item.products.price}
+                </p>
+              </div>
+              <div className="flex flex-col gap-1">
+                <button
+                  onClick={() => handleMoveToCart(item.products)}
+                  className="p-2 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-neutral-700 rounded-md transition"
+                  title={t('addToCart')}
+                >
+                  <ShoppingCart className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => handleRemove(item.product_id)}
+                  className="p-2 text-red-600 hover:bg-red-50 dark:text-red-500 dark:hover:bg-neutral-700 rounded-md transition"
+                  title={t('remove')}
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
