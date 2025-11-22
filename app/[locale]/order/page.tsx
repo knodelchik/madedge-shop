@@ -7,115 +7,34 @@ import { authService } from '../services/authService';
 import { User } from '../../types/users';
 import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  User as UserIcon,
-  MapPin,
-  Heart,
-  Lock,
-  LogOut,
-  History,
-  ShoppingCart,
-  Trash2,
-} from 'lucide-react';
-import { toast } from 'sonner';
-import Image from 'next/image';
 
-// === ІМПОРТИ СТОРІВ ТА СЕРВІСІВ ===
-import { useWishlistStore } from '../store/wishlistStore';
-import { useCartStore } from '../store/cartStore';
+export default function OrderPage() {
+  const t = useTranslations('Order');
 
-// === ВАЖЛИВО: ІМПОРТУЄМО ВАШІ НОВІ КОМПОНЕНТИ ===
-import EditProfileForm from '../../Components/Profile/EditProfileForm';
-import AddressManager from '../../Components/Profile/AddressManager';
+  const { cartItems } = useCartStore();
+  const [paymentMethod, setPaymentMethod] = useState<'fondy' | 'paypal'>(
+    'fondy'
+  );
 
-// Тип для вкладок
-type ProfileTab =
-  | 'profile'
-  | 'orders'
-  | 'addresses'
-  | 'wishlist'
-  | 'security';
+  const totalPrice = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+  const priceUnit = t('priceUnit');
 
-function ProfilePageContent() {
-  const t = useTranslations('Profile');
-  const t_wishlist = useTranslations('Wishlist');
-  const t_user_dropdown = useTranslations('UserDropdown');
-
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const activeTab = (searchParams.get('tab') as ProfileTab) || 'profile';
-
-  // Логіка автентифікації та завантаження даних
-  useEffect(() => {
-    const checkAuth = async () => {
-      setLoading(true);
-      const { user } = await authService.getCurrentUser();
-      if (!user) {
-        router.push('/auth');
-        return;
-      }
-      // Отримуємо свіжі дані з профілю (таблиця users)
-      const { profile } = await authService.getUserProfile(user.id);
-      setUser({ ...user, ...profile } as User);
-      setLoading(false);
-    };
-
-    checkAuth();
-
-    const {
-      data: { subscription },
-    } = authService.supabase.auth.onAuthStateChange((event) => {
-      if (event === 'SIGNED_OUT') {
-        router.push('/auth');
-      }
+  const handlePayment = async () => {
+    const res = await fetch('/api/create-payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: cartItems, method: paymentMethod }),
     });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [router]);
-
-  // Обробник виходу
-  const handleSignOut = async () => {
-    setLoading(true);
-    await authService.signOut();
+    const data = await res.json();
+    if (data.payment_url) {
+      window.location.href = data.payment_url;
+    } else {
+      alert(t('paymentError'));
+    }
   };
-
-  // Навігація по вкладках
-  const handleTabChange = (tab: ProfileTab) => {
-    router.push(`/profile?tab=${tab}`);
-  };
-
-  const tabs = [
-    {
-      id: 'profile',
-      label: t('title'),
-      icon: <UserIcon size={18} />,
-    },
-    {
-      id: 'orders',
-      label: 'Історія замовлень', // TODO: Додати переклад 'tabOrders'
-      icon: <History size={18} />,
-    },
-    {
-      id: 'addresses',
-      label: 'Адреси доставки', // TODO: Додати переклад 'tabAddresses'
-      icon: <MapPin size={18} />,
-    },
-    {
-      id: 'wishlist',
-      label: t_wishlist('title'),
-      icon: <Heart size={18} />,
-    },
-    {
-      id: 'security',
-      label: 'Безпека', // TODO: Додати переклад 'tabSecurity'
-      icon: <Lock size={18} />,
-    },
-  ];
 
   if (loading) {
     return (
@@ -133,224 +52,212 @@ function ProfilePageContent() {
   if (!user) return null;
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="min-h-screen bg-gray-50 dark:bg-black py-12 transition-colors duration-300"
-    >
-      <div className="container mx-auto px-4 max-w-6xl">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* ========================== */}
-          {/* Бічна Навігація          */}
-          {/* ========================== */}
-          <aside className="md:col-span-1">
-            <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-lg border border-gray-100 dark:border-neutral-800 p-4 sticky top-28">
-              <nav className="space-y-1">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => handleTabChange(tab.id as ProfileTab)}
-                    className={`flex items-center space-x-3 w-full p-3 rounded-lg font-medium text-sm transition-colors ${activeTab === tab.id
-                        ? 'bg-gray-100 dark:bg-neutral-800 text-gray-900 dark:text-white'
-                        : 'text-gray-600 dark:text-neutral-400 hover:bg-gray-50 dark:hover:bg-neutral-800/50'
-                      }`}
-                  >
-                    {tab.icon}
-                    <span>{tab.label}</span>
-                  </button>
-                ))}
-                <div className="pt-2 border-t border-gray-100 dark:border-neutral-800">
-                  <button
-                    onClick={handleSignOut}
-                    className="flex items-center space-x-3 w-full p-3 rounded-lg font-medium text-sm transition-colors text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
-                  >
-                    <LogOut size={18} />
-                    <span>{t_user_dropdown('signOut')}</span>
-                  </button>
-                </div>
-              </nav>
-            </div>
-          </aside>
+    <div className="min-h-screen bg-white dark:bg-black py-12 transition-colors">
+      <div className="p-6 max-w-5xl mx-auto space-y-6">
+        {/* Заголовок */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="mb-8"
+        >
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-white dark:via-neutral-200 dark:to-white bg-clip-text text-transparent mb-2">
+            {t('title')}
+          </h1>
+        </motion.div>
 
-          {/* ========================== */}
-          {/* Контент Вкладок          */}
-          {/* ========================== */}
-          <main className="md:col-span-3">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeTab}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-              >
-                {/* ТУТ МИ ВИКОРИСТОВУЄМО ВАШІ НОВІ КОМПОНЕНТИ */}
-                {activeTab === 'profile' && <EditProfileForm user={user} />}
-                {activeTab === 'addresses' && <AddressManager userId={user.id} />}
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Список товарів */}
+          <div className="lg:col-span-2 space-y-4">
+            <AnimatePresence mode="popLayout">
+              {cartItems.map((item, index) => (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, x: -50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 50 }}
+                  transition={{ delay: index * 0.1, duration: 0.4 }}
+                  className="flex items-center gap-4 p-4 rounded-2xl shadow-lg bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 hover:shadow-2xl transition-all duration-300 group relative overflow-hidden"
+                >
+                  {/* Gradient overlay на hover */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-neutral-50 to-neutral-100 dark:from-neutral-700/10 dark:to-neutral-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    initial={false}
+                  />
 
-                {/* Інші компоненти залишаються (поки що) вбудованими нижче */}
-                {activeTab === 'orders' && <OrderHistory userId={user.id} />}
-                {activeTab === 'wishlist' && <WishlistPage userId={user.id} />}
-                {activeTab === 'security' && <ChangePasswordForm />}
-              </motion.div>
+                  <div className="relative w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-neutral-800 dark:to-neutral-700 rounded-xl overflow-hidden flex-shrink-0 shadow-md">
+                    <Image
+                      src={item.images[0]}
+                      alt={item.title}
+                      width={96}
+                      height={96}
+                      className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0 relative z-10">
+                    <p className="font-semibold text-gray-900 dark:text-neutral-100 truncate">
+                      {item.title}
+                    </p>
+                    <p className="text-sm text-gray-500 dark:text-neutral-400 mt-1">
+                      {item.quantity} × {item.price.toFixed(2)} {priceUnit}
+                    </p>
+                  </div>
+                  <motion.p className="font-bold text-lg text-gray-900 dark:text-neutral-100 relative z-10">
+                    {(item.price * item.quantity).toFixed(2)} {priceUnit}
+                  </motion.p>
+                </motion.div>
+              ))}
             </AnimatePresence>
-          </main>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
+          </div>
 
-export default function ProfilePage() {
-  return (
-    <Suspense>
-      <ProfilePageContent />
-    </Suspense>
-  );
-}
-
-// ====================================================================
-// ВБУДОВАНІ КОМПОНЕНТИ (Ті, що ми ще не винесли в окремі файли)
-// ====================================================================
-
-function ChangePasswordForm() {
-  const t = useTranslations('Profile');
-  const [loading, setLoading] = useState(false);
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (newPassword.length < 6) {
-      toast.error('Пароль має бути не менше 6 символів'); // TODO: переклад
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      toast.error('Паролі не співпадають'); // TODO: переклад
-      return;
-    }
-
-    setLoading(true);
-
-    const { error } = await authService.supabase.auth.updateUser({
-      password: newPassword
-    });
-
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success('Пароль успішно оновлено'); // TODO: переклад
-      setNewPassword('');
-      setConfirmPassword('');
-    }
-    setLoading(false);
-  };
-
-  return (
-    <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-lg border border-gray-100 dark:border-neutral-800 p-6">
-      <h2 className="text-2xl font-bold text-gray-800 dark:text-neutral-100 mb-6">
-        Безпека {/* TODO: переклад */}
-      </h2>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1">
-            Новий пароль {/* TODO: переклад */}
-          </label>
-          <input
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-neutral-300 transition-colors"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1">
-            Підтвердіть пароль {/* TODO: переклад */}
-          </label>
-          <input
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-neutral-300 transition-colors"
-          />
-        </div>
-
-        <div className="pt-2">
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 transition-colors disabled:opacity-50"
+          {/* Sidebar з підсумком та оплатою */}
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+            className="lg:col-span-1"
           >
-            {loading ? 'Оновлення...' : 'Змінити пароль'} {/* TODO: переклад */}
-          </button>
-        </div>
-      </form>
-    </div>
-  );
-}
+            <div className="bg-white dark:bg-neutral-900 rounded-3xl shadow-2xl p-6 border border-gray-100 dark:border-neutral-800 sticky top-6 overflow-hidden relative">
+              {/* Decorative gradient */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-yellow-200/20 to-orange-200/20 dark:from-yellow-500/10 dark:to-orange-500/10 rounded-full blur-3xl" />
 
-function WishlistPage({ userId }: { userId: string }) {
-  const t = useTranslations('Wishlist');
-  const { wishlistItems, removeFromWishlist, moveToCart } = useWishlistStore();
-  const { addToCart } = useCartStore();
+              {/* Підсумок замовлення */}
+              <h2 className="text-xl font-bold text-gray-900 dark:text-neutral-100 mb-4 relative z-10">
+                {t('orderSummary') || 'Order Summary'}
+              </h2>
 
-  const handleMoveToCart = async (item: any) => {
-    toast.promise(moveToCart(userId, item.product_id), {
-      loading: t('addingToCart'),
-      success: 'Товар додано до кошика!',
-      error: 'Помилка',
-    });
-  };
+              {/* Деталі */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="space-y-3 mb-4 pb-4 border-b border-gray-200 dark:border-neutral-800 relative z-10"
+              >
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600 dark:text-neutral-400">
+                    {t('subtotal') || 'Subtotal'}
+                  </span>
+                  <motion.span
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.6 }}
+                    className="font-medium text-gray-900 dark:text-neutral-100"
+                  >
+                    {totalPrice.toFixed(2)} {priceUnit}
+                  </motion.span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600 dark:text-neutral-400">
+                    {t('shipping') || 'Shipping'}
+                  </span>
+                  <motion.span
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.7 }}
+                    className="font-medium text-green-600 dark:text-green-400"
+                  >
+                    {t('freeShipping') || 'Free'}
+                  </motion.span>
+                </div>
+              </motion.div>
 
-  const handleRemove = (productId: number) => {
-    removeFromWishlist(userId, productId);
-    toast.success(t('remove'));
-  };
+              {/* Загальна сума */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.8, type: 'spring' }}
+                className="flex justify-between items-center font-bold text-xl mb-6 relative z-10"
+              >
+                <span className="text-gray-900 dark:text-neutral-100">
+                  {t('totalLabel')}
+                </span>
+                <span className="text-transparent bg-clip-text bg-black dark:bg-white">
+                  {totalPrice.toFixed(2)} {priceUnit}
+                </span>
+              </motion.div>
 
-  return (
-    <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-lg border border-gray-100 dark:border-neutral-800 p-6">
-      <h2 className="text-2xl font-bold text-gray-800 dark:text-neutral-100 mb-6">
-        {t('title')} ({wishlistItems.length})
-      </h2>
+              {/* Вибір способу оплати */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.9 }}
+                className="mb-6 relative z-10"
+              >
+                <span className="block font-semibold text-gray-900 dark:text-neutral-100 mb-3">
+                  {t('paymentMethodLabel')}
+                </span>
+                <div className="grid grid-cols-2 gap-3">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`px-4 py-3 rounded-xl border-2 font-medium transition-all duration-200 cursor-pointer ${
+                      paymentMethod === 'fondy'
+                        ? 'bg-gradient-to-r from-neutral-400 to-neutral-500 border-neutral-400 dark:bg-gradient-to-r dark:from-neutral-400 dark:to-neutral-600 dark:border-neutral-600 text-white shadow-lg'
+                        : 'bg-gray-50 dark:bg-neutral-900 border-gray-200 dark:border-neutral-700 text-gray-900 dark:text-neutral-100 '
+                    }`}
+                    onClick={() => setPaymentMethod('fondy')}
+                  >
+                    Fondy
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`px-4 py-3 rounded-xl border-2 font-medium transition-all duration-200 cursor-pointer ${
+                      paymentMethod === 'paypal'
+                        ? 'bg-gradient-to-r from-neutral-400 to-neutral-500 border-neutral-400 dark:bg-gradient-to-r dark:from-neutral-500 dark:to-neutral-700 dark:border-neutral-600 text-white shadow-lg'
+                        : 'bg-gray-50 dark:bg-neutral-900 border-gray-200 dark:border-neutral-700 text-gray-900 dark:text-neutral-100'
+                    }`}
+                    onClick={() => setPaymentMethod('paypal')}
+                  >
+                    PayPal
+                  </motion.button>
+                </div>
+              </motion.div>
 
-      {wishlistItems.length === 0 ? (
-        <div className="h-48 flex flex-col items-center justify-center bg-gray-50 dark:bg-neutral-800/50 rounded-lg border-2 border-dashed border-gray-300 dark:border-neutral-700">
-          <Heart className="w-12 h-12 mx-auto mb-4 opacity-30 text-gray-500" />
-          <p className="text-gray-500 dark:text-neutral-400">{t('empty')}</p>
-          <Link href="/shop" className="mt-4 text-sm font-medium text-blue-600 hover:underline">
-            {t('continueShopping')}
-          </Link>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {wishlistItems.map((item) => (
-            <div key={item.id} className="flex items-center gap-4 p-3 rounded-lg border bg-white dark:bg-neutral-800 border-gray-200 dark:border-neutral-700">
-              <Image
-                src={item.products.images?.[0] || '/images/placeholder.jpg'}
-                alt={item.products.title}
-                width={64}
-                height={64}
-                className="w-16 h-16 object-cover rounded-md flex-shrink-0"
-              />
-              <div className="flex-1 min-w-0">
-                <Link href={`/shop/${item.products.title.replace(/\s+/g, '-').toLowerCase()}`} className="font-medium text-sm truncate hover:underline text-gray-800 dark:text-neutral-100">
-                  {item.products.title}
-                </Link>
-                <p className="text-green-600 font-semibold text-sm">${item.products.price}</p>
-              </div>
-              <div className="flex flex-col gap-1">
-                <button onClick={() => handleMoveToCart(item)} className="p-2 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-neutral-700 rounded-md transition">
-                  <ShoppingCart className="w-5 h-5" />
-                </button>
-                <button onClick={() => handleRemove(item.product_id)} className="p-2 text-red-600 hover:bg-red-50 dark:text-red-500 dark:hover:bg-neutral-700 rounded-md transition">
-                  <Trash2 className="w-5 h-5" />
-                </button>
-              </div>
+              {/* Кнопка оплати */}
+              <motion.button
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handlePayment}
+                className="w-full bg-gradient-to-r from-gray-900 to-gray-800 dark:from-white dark:to-neutral-100 text-white dark:text-black py-4 rounded-xl font-bold hover:shadow-2xl transition-all duration-200 shadow-lg relative z-10 overflow-hidden group cursor-pointer"
+              >
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-neutral-400 to-neutral-500 opacity-0 group-hover:opacity-20 transition-opacity duration-300"
+                  initial={false}
+                />
+                <span className="relative z-10">
+                  {t('payButton')} {totalPrice.toFixed(2)} {priceUnit}
+                </span>
+              </motion.button>
+
+              {/* Безпека */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.1 }}
+                className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-500 dark:text-neutral-400 relative z-10"
+              >
+                <motion.svg
+                  animate={{ rotate: [0, -10, 10, -10, 0] }}
+                  transition={{ delay: 1.5, duration: 0.5 }}
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                  />
+                </motion.svg>
+                <span>{t('securePayment') || 'Secure payment'}</span>
+              </motion.div>
             </div>
-          ))}
+          </motion.div>
         </div>
       )}
     </div>

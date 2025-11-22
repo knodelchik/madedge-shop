@@ -41,7 +41,6 @@ const ProductComparison: React.FC = () => {
     e.currentTarget.src = placeholder;
   };
 
-  // Варіанти анімацій
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -99,10 +98,10 @@ const ProductComparison: React.FC = () => {
   return (
     <section
       id="product-comparison"
-      className="py-16 bg-white dark:bg-black transition-colors duration-500"
+      className="py-12 sm:py-16 bg-white dark:bg-black transition-colors duration-500"
     >
       <motion.div
-        className="max-w-7xl mx-auto px-6"
+        className="max-w-7xl mx-auto px-4 sm:px-6"
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
@@ -111,7 +110,7 @@ const ProductComparison: React.FC = () => {
         {/* Заголовок */}
         <motion.h2
           variants={titleVariants}
-          className="text-3xl font-bold text-center mb-10 text-gray-900 dark:text-white"
+          className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-10 text-gray-900 dark:text-white"
         >
           {t('productComparison')}
         </motion.h2>
@@ -119,12 +118,12 @@ const ProductComparison: React.FC = () => {
         {/* Селектори продуктів */}
         <motion.div
           variants={selectorsVariants}
-          className="flex justify-center gap-6 mb-10 "
+          className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-6 mb-8 sm:mb-10"
         >
           <motion.select
             value={firstId}
             onChange={(e) => setFirstId(Number(e.target.value))}
-            className="border border-gray-300 dark:border-neutral-800 bg-white dark:bg-[#111111] text-gray-800 dark:text-white rounded-lg px-4 py-2 transition-colors duration-300 cursor-pointer"
+            className="border border-gray-300 dark:border-neutral-800 bg-white dark:bg-[#111111] text-gray-800 dark:text-white rounded-lg px-4 py-2.5 transition-colors duration-300 cursor-pointer text-sm sm:text-base"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
@@ -138,7 +137,7 @@ const ProductComparison: React.FC = () => {
           <motion.select
             value={secondId}
             onChange={(e) => setSecondId(Number(e.target.value))}
-            className="border border-gray-300 dark:border-neutral-800 bg-white dark:bg-[#111111] text-gray-800 dark:text-gray-200 rounded-lg px-4 py-2 transition-colors duration-300 cursor-pointer"
+            className="border border-gray-300 dark:border-neutral-800 bg-white dark:bg-[#111111] text-gray-800 dark:text-gray-200 rounded-lg px-4 py-2.5 transition-colors duration-300 cursor-pointer text-sm sm:text-base"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
@@ -150,8 +149,8 @@ const ProductComparison: React.FC = () => {
           </motion.select>
         </motion.div>
 
-        {/* Основна таблиця порівняння */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 items-start text-center">
+        {/* Десктопна версія (md+) */}
+        <div className="hidden md:grid md:grid-cols-3 gap-6 lg:gap-10 items-start text-center">
           {/* Продукт 1 */}
           <AnimatePresence mode="wait">
             <motion.div
@@ -168,11 +167,11 @@ const ProductComparison: React.FC = () => {
                   width={320}
                   height={320}
                   onError={onImgError}
-                  className="mx-auto rounded-xl shadow-lg w-80 h-80 object-cover border border-gray-200 dark:border-neutral-800"
+                  className="mx-auto rounded-xl shadow-lg w-full max-w-[280px] lg:max-w-[320px] aspect-square object-cover border border-gray-200 dark:border-neutral-800"
                 />
               </motion.div>
               <motion.h3
-                className="mt-4 font-semibold text-lg text-gray-900 dark:text-white"
+                className="mt-4 font-semibold text-base lg:text-lg text-gray-900 dark:text-white"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
@@ -193,23 +192,23 @@ const ProductComparison: React.FC = () => {
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true }}
-                  className="flex items-center py-4 text-center text-gray-700 dark:text-[#888888] "
+                  className="flex items-center py-3 lg:py-4 text-center"
                 >
                   <motion.div
-                    className="w-1/3 text-sm cursor-pointer"
-                    whileHover={{ scale: 1.05, color: '#ffffff' }}
+                    className="w-1/3 text-xs lg:text-sm cursor-pointer text-gray-700 dark:text-[#888888] hover:text-black dark:hover:text-white px-2"
+                    whileHover={{ scale: 1.05 }}
                   >
                     {f.value}
                   </motion.div>
 
                   <div className="w-1/3 flex flex-col items-center">
-                    <motion.div className="bg-gray-100 dark:bg-[#111111] text-gray-800 dark:text-white px-3 py-1 rounded-full text-sm font-medium border border-gray-200 dark:border-neutral-800 transition-colors duration-300">
+                    <motion.div className="bg-gray-100 dark:bg-[#111111] text-gray-800 dark:text-white px-2 lg:px-3 py-1 rounded-full text-xs lg:text-sm font-medium border border-gray-200 dark:border-neutral-800 transition-colors duration-300">
                       {f.name}
                     </motion.div>
 
                     {idx !== product1.features.length - 1 && (
                       <motion.div
-                        className="h-8 border-l-2 border-gray-200 dark:border-neutral-800 mt-2"
+                        className="h-6 lg:h-8 border-l-2 border-gray-200 dark:border-neutral-800 mt-2"
                         style={{ transform: 'translateY(4px)' }}
                         initial={{ scaleY: 0 }}
                         animate={{ scaleY: 1 }}
@@ -219,8 +218,8 @@ const ProductComparison: React.FC = () => {
                   </div>
 
                   <motion.div
-                    className="w-1/3 text-sm cursor-pointer"
-                    whileHover={{ scale: 1.05, color: '#ffffff' }}
+                    className="w-1/3 text-xs lg:text-sm cursor-pointer text-gray-700 dark:text-[#888888] hover:text-black dark:hover:text-white px-2"
+                    whileHover={{ scale: 1.05 }}
                   >
                     {product2.features[idx].value}
                   </motion.div>
@@ -245,17 +244,111 @@ const ProductComparison: React.FC = () => {
                   width={320}
                   height={320}
                   onError={onImgError}
-                  className="mx-auto rounded-xl shadow-lg w-80 h-80 object-cover border border-gray-200 dark:border-neutral-800"
+                  className="mx-auto rounded-xl shadow-lg w-full max-w-[280px] lg:max-w-[320px] aspect-square object-cover border border-gray-200 dark:border-neutral-800"
                 />
               </motion.div>
               <motion.h3
-                className="mt-4 font-semibold text-lg text-gray-900 dark:text-white"
+                className="mt-4 font-semibold text-base lg:text-lg text-gray-900 dark:text-white"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
               >
                 {product2.name}
               </motion.h3>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Мобільна та планшетна версія (до md) */}
+        <div className="md:hidden space-y-8">
+          {/* Продукт 1 */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`mobile-product1-${firstId}`}
+              variants={productVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="bg-white dark:bg-[#0a0a0a] rounded-2xl p-4 sm:p-6 border border-neutral-200 dark:border-neutral-800"
+            >
+              <Image
+                src={`/images/madedgemodel${product1.id}-1.jpg`}
+                alt={product1.name}
+                width={400}
+                height={400}
+                onError={onImgError}
+                className="mx-auto rounded-xl shadow-lg w-full max-w-[300px] sm:max-w-[350px] aspect-square object-cover border border-neutral-200 dark:border-neutral-800"
+              />
+              <h3 className="mt-4 font-semibold text-lg text-center text-gray-900 dark:text-white">
+                {product1.name}
+              </h3>
+
+              <div className="mt-6 space-y-3">
+                {product1.features.map((f, idx) => (
+                  <motion.div
+                    key={idx}
+                    custom={idx}
+                    variants={featureVariants}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    className="flex items-center justify-between py-2 border-b border-neutral-200 dark:border-neutral-800 last:border-0"
+                  >
+                    <span className="text-sm text-neutral-600 dark:text-neutral-500">
+                      {f.name}
+                    </span>
+                    <span className="text-sm font-medium text-neutral-900 dark:text-white">
+                      {f.value}
+                    </span>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Продукт 2 */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`mobile-product2-${secondId}`}
+              variants={productVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="bg-white dark:bg-[#0a0a0a] rounded-2xl p-4 sm:p-6 border border-neutral-200 dark:border-neutral-800"
+            >
+              <Image
+                src={`/images/madedgemodel${product2.id}-1.jpg`}
+                alt={product2.name}
+                width={400}
+                height={400}
+                onError={onImgError}
+                className="mx-auto rounded-xl shadow-lg w-full max-w-[300px] sm:max-w-[350px] aspect-square object-cover border border-neutral-200 dark:border-neutral-800"
+              />
+              <h3 className="mt-4 font-semibold text-lg text-center text-neutral-900 dark:text-white">
+                {product2.name}
+              </h3>
+
+              <div className="mt-6 space-y-3">
+                {product2.features.map((f, idx) => (
+                  <motion.div
+                    key={idx}
+                    custom={idx}
+                    variants={featureVariants}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    className="flex items-start justify-between py-2 border-b border-neutral-200 dark:border-neutral-800 last:border-0 gap-4"
+                  >
+                    <span className="text-sm text-neutral-600 dark:text-neutral-500">
+                      {f.name}
+                    </span>
+
+                    <span className="text-sm font-medium text-neutral-900 dark:text-white text-right whitespace-normal break-words">
+                      {f.value}
+                    </span>
+                  </motion.div>
+                ))}
+              </div>
             </motion.div>
           </AnimatePresence>
         </div>

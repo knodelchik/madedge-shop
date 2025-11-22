@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useTranslations } from 'next-intl'; // 👈 Додано імпорт
+import { useTranslations } from 'next-intl';
 import {
   Factory,
   Target,
@@ -12,6 +12,8 @@ import {
   Gem,
   Blocks,
   Truck,
+  Menu,
+  X,
 } from 'lucide-react';
 import {
   CryingIcon,
@@ -42,6 +44,8 @@ export default function AboutLayout({
   const pathname = usePathname();
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
   const [feedback, setFeedback] = useState('');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMenuExpanded, setIsMenuExpanded] = useState(false);
 
   // Для підсвічування секцій
   const [activeSection, setActiveSection] = useState<string | null>(null);
@@ -193,27 +197,21 @@ export default function AboutLayout({
 
     const options: IntersectionObserverInit = {
       root: null,
-      rootMargin: '-20% 0px -40% 0px', // тригер трохи вище середини
+      rootMargin: '-20% 0px -40% 0px',
       threshold: [0, 0.15, 0.35, 0.6],
     };
 
     const observer = new IntersectionObserver((entries) => {
-      // Визначаємо найвидимішу секцію серед тих, що інтерсекнуться
       const visible = entries
         .filter((e) => e.isIntersecting)
         .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
 
       if (visible.length > 0) {
         setActiveSection(visible[0].target.id);
-        // кешуємо останній запис
         observedRef.current[visible[0].target.id] = visible[0];
-      } else {
-        // Якщо нічого не видно — залишаємо попередній (або null)
-        // не скидаємо миттєво, щоб уникнути мерехтіння
       }
     }, options);
 
-    // Підключаємо секції по id
     const elements: HTMLElement[] = currentSections
       .map((s) => document.getElementById(s.id))
       .filter(Boolean) as HTMLElement[];
@@ -224,25 +222,101 @@ export default function AboutLayout({
       elements.forEach((el) => observer.unobserve(el));
       observer.disconnect();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cleanPathname, JSON.stringify(currentSections)]);
 
   // Скрол до секції зі зсувом для sticky header
   const handleOnPageLinkClick = (id: string) => {
     const el = document.getElementById(id);
     if (!el) return;
-    const yOffset = -72; // якщо є sticky header висотою ~72px
+    const yOffset = -72;
     const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
     window.scrollTo({ top: y, behavior: 'smooth' });
   };
 
   return (
     <div className="min-h-screen bg-white flex flex-col dark:bg-black">
+      {/* Мобільна кнопка меню + акордеон (як на скріншоті) */}
+      <div className="md:hidden border-b border-gray-200 dark:border-neutral-500 sticky top-[72px] z-30 bg-white dark:bg-neutral-900">
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="w-full px-6 py-4 flex items-center justify-between text-gray-800 dark:text-white dark:bg-black transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <span className="font-medium text-lg">Menu</span>
+          </div>
+          <motion.div
+            animate={{ scaleY: isMobileMenuOpen ? -1 : 1 }}
+            transition={{ duration: 0.25, ease: 'easeInOut' }}
+            style={{ display: 'inline-block' }}
+          >
+            <svg
+              className="w-5 h-5 mr-2.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </motion.div>
+        </button>
+
+        {/* Акордеон-вміст */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ height: 0 }}
+              animate={{ height: 'auto' }}
+              exit={{ height: 0 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              className="overflow-hidden "
+            >
+              <div className="px-4 py-4 space-y-1 bg-white dark:bg-black">
+                {/* Копіюємо той самий вміст, що й у десктопному сайдбарі */}
+                <div className="mb-6">
+                  <div className="flex items-center gap-3 p-3 rounded-lg">
+                    <Target className="w-5 h-5 text-gray-600" />
+                    <div>
+                      <div className="font-semibold text-sm">
+                        {t('sidebar.latestProduct')}
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-neutral-500">
+                        MadEdge for convex
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <nav className="space-y-1">
+                  {menuData.map((menu) => (
+                    <Link
+                      key={menu.id}
+                      href={menu.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={`flex items-center gap-3 w-full px-4 py-3 rounded-lg transition-colors ${
+                        cleanPathname === menu.href
+                          ? 'text-blue-600 dark:text-blue-400 font-medium'
+                          : 'text-gray-700 hover:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-800'
+                      }`}
+                    >
+                      {menu.icon}
+                      <span className="text-base">{menu.title}</span>
+                    </Link>
+                  ))}
+                </nav>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
       <div className="flex flex-1">
-        {/* Sidebar left */}
-        <aside className="w-64 border-gray-200 p-6 sticky top-[80px] self-start h-[calc(100vh-80px)] overflow-y-auto">
+        {/* Sidebar left - hidden on mobile, visible on md+ */}
+        <aside className="hidden md:block w-64 border-gray-200 p-6 sticky top-[80px] self-start h-[calc(100vh-80px)] overflow-y-auto">
           <div className="mb-8">
-            {/* Статичний логотип */}
             <div className="flex items-center gap-3 p-3 rounded-lg mb-4">
               <Factory className="w-5 h-5 text-blue-400" />
               <div>
@@ -250,20 +324,19 @@ export default function AboutLayout({
                   MadEdge
                 </div>
                 <div className="text-xs text-gray-600 dark:text-neutral-500">
-                  {t('sidebar.premiumSharpeners')} {/* 🚀 Переклад */}
+                  {t('sidebar.premiumSharpeners')}
                 </div>
               </div>
             </div>
 
-            {/* Статичний блок останнього продукту */}
-            <div className="flex items-center gap-3 p-3  rounded-lg">
+            <div className="flex items-center gap-3 p-3 rounded-lg">
               <Target className="w-5 h-5 text-gray-600" />
               <div>
                 <div className="font-semibold text-sm text-gray-900 dark:text-neutral-100">
-                  {t('sidebar.latestProduct')} {/* 🚀 Переклад */}
+                  {t('sidebar.latestProduct')}
                 </div>
                 <div className="text-xs text-gray-600 dark:text-neutral-500">
-                  ProEdge X1
+                  MadEdge for convex
                 </div>
               </div>
             </div>
@@ -275,8 +348,8 @@ export default function AboutLayout({
                 key={menu.id}
                 href={menu.href}
                 className={`flex items-center justify-between w-full p-2 rounded-lg transition-colors ${
-                  cleanPathname === menu.href // 💡 Перевіряємо активність за cleanPathname
-                    ? ' text-blue-600 dark:text-blue-400'
+                  cleanPathname === menu.href
+                    ? 'text-blue-600 dark:text-blue-400'
                     : 'text-gray-700 hover:bg-gray-100 dark:text-neutral-500 dark:hover:bg-neutral-900'
                 }`}
               >
@@ -289,13 +362,15 @@ export default function AboutLayout({
           </nav>
         </aside>
 
-        {/* Main Content */}
-        <main className="flex-1 px-12 py-20">{children}</main>
+        {/* Main Content - адаптивні відступи */}
+        <main className="flex-1 px-4 md:px-8 xl:px-12 py-8 md:py-12 xl:py-20">
+          {children}
+        </main>
 
-        {/* Sidebar right */}
+        {/* Sidebar right - hidden on md, visible on xl+ */}
         <aside className="w-64 p-6 sticky top-[80px] h-[calc(100vh-80px)] overflow-y-auto hidden xl:block self-start">
-          <h3 className="text-sm font-semibold text-gray-900 mb-4 dark:text-neutral-100 ">
-            {t('sidebar.onThisPage')} {/* 🚀 Переклад */}
+          <h3 className="text-sm font-semibold text-gray-900 mb-4 dark:text-neutral-100">
+            {t('sidebar.onThisPage')}
           </h3>
 
           <nav className="relative">
@@ -342,16 +417,16 @@ export default function AboutLayout({
         </aside>
       </div>
 
-      {/* Навігація Previous/Next */}
-      <div className=" py-6 px-6 md:px-12">
-        <div className="max-w-4xl mx-auto flex justify-between items-center ">
+      {/* Навігація Previous/Next - ВИПРАВЛЕНО */}
+      <div className="py-4 md:py-6 px-4 md:px-6 xl:px-12">
+        <div className="max-w-4xl mx-auto flex flex-row justify-between items-center gap-4">
           {previousPage ? (
             <Link
               href={previousPage.href}
               className="flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-neutral-100 dark:hover:text-neutral-400 transition"
             >
               <svg
-                className="w-5 h-5"
+                className="w-5 h-5 flex-shrink-0"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -364,29 +439,34 @@ export default function AboutLayout({
                 />
               </svg>
               <div className="text-left">
-                <div className="text-sm text-gray-500 dark:text-neutral-400  ">
-                  {t('nav.previous')} {/* 🚀 Переклад */}
+                <div className="text-sm text-gray-500 dark:text-neutral-400">
+                  {t('nav.previous')}
                 </div>
-                <div className="font-semibold">{previousPage.title}</div>
+                <div className="font-semibold leading-tight">
+                  {previousPage.title}
+                </div>
               </div>
             </Link>
           ) : (
-            <div />
+            <div className="w-10" /> /* Порожній блок для збереження структури */
           )}
 
           {nextPage ? (
             <Link
               href={nextPage.href}
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-neutral-100 dark:hover:text-neutral-400 transition"
+              /* Видалено sm:ml-auto, додано ml-auto, щоб завжди притискалося вправо */
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-neutral-100 dark:hover:text-neutral-400 transition ml-auto"
             >
               <div className="text-right">
                 <div className="text-sm text-gray-500 dark:text-neutral-400">
-                  {t('nav.next')} {/* 🚀 Переклад */}
+                  {t('nav.next')}
                 </div>
-                <div className="font-semibold">{nextPage.title}</div>
+                <div className="font-semibold leading-tight">
+                  {nextPage.title}
+                </div>
               </div>
               <svg
-                className="w-5 h-5"
+                className="w-5 h-5 flex-shrink-0"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -400,13 +480,13 @@ export default function AboutLayout({
               </svg>
             </Link>
           ) : (
-            <div />
+            <div className="w-10" />
           )}
         </div>
       </div>
 
       {/* Форма відгуку */}
-      <div className="border-gray-200 px-2 py-2 mb-10">
+      <div className="border-gray-200 px-2 py-2 mb-10 mt-10">
         <div className="flex justify-center">
           <motion.div
             layout

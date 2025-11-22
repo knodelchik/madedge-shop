@@ -17,15 +17,19 @@ import UserDropdown from './UserDropdown';
 import WishlistDropdown from './WishlistDropdown';
 import CartSheet from '../CartSheet';
 import BurgerMenu from './BurgerMenu';
+import MobileCartSheet from '../MobileCartSeet';
+import MobileWishlistSheet from '../MobileWishlistSheet';
 
 export default function Header() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isMobileCartOpen, setIsMobileCartOpen] = useState(false);
+  const [isMobileWishlistOpen, setIsMobileWishlistOpen] = useState(false);
   const t = useTranslations('Footer');
 
   const { loadWishlist, clearWishlist } = useWishlistStore();
   const router = useRouter();
-  const controls = useAnimation(); // 🔹 Контролер анімації
+  const controls = useAnimation();
 
   const handleAuthChange = useCallback(
     async (event: string, session: any) => {
@@ -101,86 +105,115 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white/70 dark:bg-black border-b border-gray-200 dark:border-neutral-500 backdrop-blur-lg shadow-md px-6 py-4">
-      <div className="relative flex items-center justify-between max-w-screen-2xl mx-auto">
-        {/* ===== ЛІВА ЧАСТИНА - Назва MadEdge ===== */}
-        <div className="flex-shrink-0">
-          <div
-            className="text-2xl font-bold text-gray-800 dark:text-white cursor-pointer"
-            onClick={() => router.push('/')}
-          >
-            MadEdge
+    <>
+      <header className="sticky top-0 z-50 w-full bg-white dark:bg-black md:bg-white/85 md:dark:bg-black border-b border-gray-200 dark:border-neutral-500 px-6 py-4">
+        <div className="relative flex items-center justify-between max-w-screen-2xl mx-auto">
+          {/* ===== ЛІВА ЧАСТИНА - Назва MadEdge ===== */}
+          <div className="flex-shrink-0">
+            <div
+              className="text-2xl font-bold text-gray-800 dark:text-white cursor-pointer"
+              onClick={() => router.push('/')}
+            >
+              MadEdge
+            </div>
+          </div>
+
+          {/* ===== ЦЕНТР - Логотип (з анімацією обертання) ===== */}
+          <div className="hidden md:block absolute left-1/2 -translate-x-1/2">
+            <motion.div
+              className="w-16 h-16 flex items-center justify-center cursor-pointer"
+              animate={controls}
+              onClick={async () => {
+                await controls.start({
+                  rotate: 360,
+                  transition: { duration: 0.8, ease: 'easeInOut' },
+                });
+                controls.set({ rotate: 0 });
+              }}
+            >
+              <Image
+                src="/logo.jpeg"
+                alt="Логотип"
+                width={58}
+                height={58}
+                className="object-contain rounded-full"
+              />
+            </motion.div>
+          </div>
+
+          {/* ===== Навігація зліва ===== */}
+          <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2 -ml-[140px]">
+            <Link
+              href="/"
+              className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium cursor-pointer"
+            >
+              {t('footerHome')}
+            </Link>
+            <Link
+              href="/shop"
+              className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium cursor-pointer"
+            >
+              {t('footerShop')}
+            </Link>
+          </div>
+
+          {/* ===== Навігація справа ===== */}
+          <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2 ml-[148px]">
+            <Link
+              href="/about"
+              className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium cursor-pointer"
+            >
+              {t('footerAboutUs')}
+            </Link>
+            <Link
+              href="/contact"
+              className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium cursor-pointer"
+            >
+              {t('footerContacts')}
+            </Link>
+          </div>
+
+          {/* ===== ПРАВА ЧАСТИНА - Іконки ===== */}
+          <div className="hidden md:flex items-center gap-4 text-gray-700 dark:text-neutral-300">
+            <SettingsDropdown />
+            <UserDropdown user={user} onSignOut={handleSignOut} />
+            <WishlistDropdown user={user} />
+            <CartSheet />
+          </div>
+
+          {/* ===== МОБІЛЬНЕ МЕНЮ ===== */}
+          <div className="md:hidden">
+            <BurgerMenu
+              user={user}
+              onSignOut={handleSignOut}
+              onOpen={() => {
+                setIsMobileCartOpen(false);
+                setIsMobileWishlistOpen(false);
+              }}
+              onCartOpen={() => {
+                setIsMobileWishlistOpen(false);
+                setIsMobileCartOpen(true);
+              }}
+              onWishlistOpen={() => {
+                setIsMobileCartOpen(false);
+                setIsMobileWishlistOpen(true);
+              }}
+            />
           </div>
         </div>
+      </header>
 
-        {/* ===== ЦЕНТР - Логотип (з анімацією обертання) ===== */}
-        <div className="hidden md:block absolute left-1/2 -translate-x-1/2">
-          <motion.div
-            className="w-16 h-16 flex items-center justify-center cursor-pointer"
-            animate={controls}
-            onClick={async () => {
-              await controls.start({
-                rotate: 360,
-                transition: { duration: 0.8, ease: 'easeInOut' },
-              });
-              controls.set({ rotate: 0 }); // Повертаємо назад, щоб можна було знову обертати
-            }}
-          >
-            <Image
-              src="/logo.jpeg"
-              alt="Логотип"
-              width={58}
-              height={58}
-              className="object-contain rounded-full"
-            />
-          </motion.div>
-        </div>
+      {/* ===== MOBILE CART SHEET ===== */}
+      <MobileCartSheet
+        isOpen={isMobileCartOpen}
+        onClose={() => setIsMobileCartOpen(false)}
+      />
 
-        {/* ===== Навігація зліва ===== */}
-        <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2 -ml-[140px]">
-          <Link
-            href="/"
-            className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium cursor-pointer"
-          >
-            {t('footerHome')}
-          </Link>
-          <Link
-            href="/shop"
-            className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium cursor-pointer"
-          >
-            {t('footerShop')}
-          </Link>
-        </div>
-
-        {/* ===== Навігація справа ===== */}
-        <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2 ml-[148px]">
-          <Link
-            href="/about"
-            className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium cursor-pointer"
-          >
-            {t('footerAboutUs')}
-          </Link>
-          <Link
-            href="/contact"
-            className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium cursor-pointer"
-          >
-            {t('footerContacts')}
-          </Link>
-        </div>
-
-        {/* ===== ПРАВА ЧАСТИНА - Іконки ===== */}
-        <div className="hidden md:flex items-center gap-4 text-gray-700 dark:text-neutral-300">
-          <SettingsDropdown />
-          <UserDropdown user={user} onSignOut={handleSignOut} />
-          <WishlistDropdown user={user} />
-          <CartSheet />
-        </div>
-
-        {/* ===== МОБІЛЬНЕ МЕНЮ ===== */}
-        <div className="md:hidden">
-          <BurgerMenu user={user} onSignOut={handleSignOut} />
-        </div>
-      </div>
-    </header>
+      {/* ===== MOBILE WISHLIST SHEET ===== */}
+      <MobileWishlistSheet
+        isOpen={isMobileWishlistOpen}
+        onClose={() => setIsMobileWishlistOpen(false)}
+      />
+    </>
   );
 }

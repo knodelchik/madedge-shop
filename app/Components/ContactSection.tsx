@@ -32,7 +32,6 @@ export default function ContactSection() {
   const handleSubmit = async () => {
     setIsSubmitting(true);
 
-    // Симуляція відправки
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     console.log('Form submitted:', formData);
@@ -41,10 +40,8 @@ export default function ContactSection() {
     );
 
     setIsSubmitting(false);
-    // Optionally reset form: setFormData({ name: '', email: '', subject: '', message: '' });
   };
 
-  // Варіанти анімацій
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -80,45 +77,45 @@ export default function ContactSection() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black py-12 transition-colors">
+    <div className="min-h-screen bg-white dark:bg-black py-8 sm:py-10 md:py-12 transition-colors">
       <div className="max-w-7xl mx-auto px-4">
-        {/* Header з анімацією */}
+        {/* Header */}
         <motion.div
-          className="text-center mb-12"
+          className="text-center mb-8 sm:mb-10 md:mb-12"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-neutral-100 mb-4">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-neutral-100 mb-3 sm:mb-4 px-2">
             {tContacts('contactTitle')}
           </h1>
           <motion.div
-            className="w-24 h-1 bg-gradient-to-r from-[#475fd8] to-[#35297e] mx-auto rounded-full"
+            className="w-20 sm:w-24 h-1 bg-gradient-to-r from-[#475fd8] to-[#35297e] mx-auto rounded-full"
             initial={{ width: 0 }}
-            animate={{ width: 96 }}
+            animate={{ width: '5rem' }}
             transition={{ duration: 0.8, delay: 0.3 }}
           />
         </motion.div>
 
-        <div className="grid lg:grid-cols-8 gap-10">
-          {/* Contact Info з анімацією зліва */}
+        <div className="grid lg:grid-cols-8 gap-6 sm:gap-8 md:gap-10">
+          {/* Contact Info */}
           <motion.div
-            className="lg:col-span-3 mt-12"
+            className="lg:col-span-3 lg:mt-12"
             variants={contactInfoVariants}
             initial="hidden"
             animate="visible"
             transition={{ duration: 0.6 }}
           >
-            <motion.div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl p-6 border border-gray-200 dark:border-neutral-800 transition-colors">
-              <h2 className="text-2xl font-bold mb-3 text-gray-900 dark:text-neutral-100">
+            <motion.div className="bg-white dark:bg-neutral-900 rounded-xl sm:rounded-2xl shadow-xl sm:shadow-2xl p-5 sm:p-6 border border-gray-200 dark:border-neutral-800 transition-colors">
+              <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-gray-900 dark:text-neutral-100">
                 {tContacts('connectTitle')}
               </h2>
-              <p className="text-gray-600 dark:text-neutral-300 mb-6 text-sm">
+              <p className="text-gray-600 dark:text-neutral-300 mb-5 sm:mb-6 text-sm">
                 {tContacts('connectDesc')}
               </p>
 
               <motion.div
-                className="space-y-6 mb-6"
+                className="space-y-5 sm:space-y-6 mb-5 sm:mb-6"
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
@@ -130,7 +127,7 @@ export default function ContactSection() {
                   whileHover={{ x: 5 }}
                 >
                   <motion.div
-                    className="w-10 h-10 bg-gray-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all duration-300"
+                    className="w-9 h-9 sm:w-10 sm:h-10 bg-gray-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all duration-300 flex-shrink-0"
                     whileHover={{ scale: 1.1, rotate: 5 }}
                   >
                     <Phone className="w-4 h-4 text-gray-700 dark:text-neutral-100" />
@@ -152,7 +149,7 @@ export default function ContactSection() {
                   whileHover={{ x: 5 }}
                 >
                   <motion.div
-                    className="w-10 h-10 bg-gray-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all duration-300"
+                    className="w-9 h-9 sm:w-10 sm:h-10 bg-gray-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all duration-300 flex-shrink-0"
                     whileHover={{ scale: 1.1, rotate: 5 }}
                   >
                     <Mail className="w-4 h-4 text-gray-700 dark:text-neutral-100" />
@@ -161,7 +158,7 @@ export default function ContactSection() {
                     <h3 className="font-semibold text-gray-900 dark:text-neutral-100 mb-1 text-sm">
                       {tContacts('emailTitle')}
                     </h3>
-                    <p className="text-gray-600 dark:text-neutral-300 text-sm">
+                    <p className="text-gray-600 dark:text-neutral-300 text-sm break-all">
                       {tContacts('emailValue')}
                     </p>
                   </div>
@@ -174,7 +171,7 @@ export default function ContactSection() {
                   whileHover={{ x: 5 }}
                 >
                   <motion.div
-                    className="w-10 h-10 bg-gray-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all duration-300"
+                    className="w-9 h-9 sm:w-10 sm:h-10 bg-gray-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all duration-300 flex-shrink-0"
                     whileHover={{ scale: 1.1, rotate: 5 }}
                   >
                     <Clock className="w-4 h-4 text-gray-700 dark:text-neutral-100" />
@@ -198,13 +195,13 @@ export default function ContactSection() {
 
               {/* Social */}
               <motion.div
-                className="border-t border-gray-200 dark:border-neutral-800 pt-6"
+                className="border-t border-gray-200 dark:border-neutral-800 pt-5 sm:pt-6"
                 variants={itemVariants}
               >
-                <h3 className="text-lg font-bold mb-3 text-gray-900 dark:text-neutral-100">
+                <h3 className="text-base sm:text-lg font-bold mb-2 sm:mb-3 text-gray-900 dark:text-neutral-100">
                   {tContacts('followUsTitle')}
                 </h3>
-                <p className="text-gray-600 dark:text-neutral-300 mb-4 text-sm">
+                <p className="text-gray-600 dark:text-neutral-300 mb-3 sm:mb-4 text-sm">
                   {tContacts('followUsDesc')}
                 </p>
                 <motion.div
@@ -216,10 +213,10 @@ export default function ContactSection() {
                       <motion.a
                         key={idx}
                         href="#"
-                        className="w-full aspect-square bg-gray-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center hover:bg-gradient-to-r from-[#475fd8] to-[#35297e] transition-all duration-300 group"
+                        className="w-full aspect-square bg-gray-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center hover:bg-gradient-to-r from-[#475fd8] to-[#35297e] transition-all duration-300 group active:scale-95"
                         variants={itemVariants}
                       >
-                        <Icon className="w-8 h-8 text-gray-700 dark:text-neutral-100 group-hover:text-white transition-colors" />
+                        <Icon className="w-7 h-7 sm:w-8 sm:h-8 text-gray-700 dark:text-neutral-100 group-hover:text-white transition-colors" />
                       </motion.a>
                     )
                   )}
@@ -228,7 +225,7 @@ export default function ContactSection() {
             </motion.div>
           </motion.div>
 
-          {/* Contact Form з анімацією справа */}
+          {/* Contact Form */}
           <motion.div
             className="lg:col-span-5"
             variants={formVariants}
@@ -236,16 +233,16 @@ export default function ContactSection() {
             animate="visible"
             transition={{ duration: 0.6 }}
           >
-            <motion.div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl p-8 border border-gray-100 dark:border-neutral-800 transition-colors">
-              <h2 className="text-3xl font-bold text-black dark:text-neutral-100 mb-2">
+            <motion.div className="bg-white dark:bg-neutral-900 rounded-xl sm:rounded-2xl shadow-xl sm:shadow-2xl p-5 sm:p-6 md:p-8 border border-gray-100 dark:border-neutral-800 transition-colors">
+              <h2 className="text-2xl sm:text-3xl font-bold text-black dark:text-neutral-100 mb-1 sm:mb-2">
                 {tContacts('formTitle')}
               </h2>
-              <p className="text-gray-600 dark:text-neutral-300 mb-8">
+              <p className="text-gray-600 dark:text-neutral-300 mb-6 sm:mb-8 text-sm sm:text-base">
                 {tContacts('formSubtitle')}
               </p>
 
               <motion.div
-                className="space-y-6"
+                className="space-y-5 sm:space-y-6"
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
@@ -268,7 +265,7 @@ export default function ContactSection() {
                       value={formData.name}
                       onChange={handleInputChange}
                       placeholder={tContacts('formNamePlaceholder')}
-                      className="w-full px-4 py-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-gray-900 dark:focus:ring-neutral-300 focus:border-transparent focus:bg-white dark:focus:bg-neutral-700 transition-all duration-200 text-gray-900 dark:text-neutral-100"
+                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-gray-900 dark:focus:ring-neutral-300 focus:border-transparent focus:bg-white dark:focus:bg-neutral-700 transition-all duration-200 text-gray-900 dark:text-neutral-100 text-sm sm:text-base"
                     />
                   </motion.div>
                   <motion.div whileFocus={{ scale: 1.02 }}>
@@ -285,7 +282,7 @@ export default function ContactSection() {
                       value={formData.email}
                       onChange={handleInputChange}
                       placeholder={tContacts('formEmailPlaceholder')}
-                      className="w-full px-4 py-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-gray-900 dark:focus:ring-neutral-300 focus:border-transparent focus:bg-white dark:focus:bg-neutral-700 transition-all duration-200 text-gray-900 dark:text-neutral-100"
+                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-gray-900 dark:focus:ring-neutral-300 focus:border-transparent focus:bg-white dark:focus:bg-neutral-700 transition-all duration-200 text-gray-900 dark:text-neutral-100 text-sm sm:text-base"
                     />
                   </motion.div>
                 </motion.div>
@@ -307,7 +304,7 @@ export default function ContactSection() {
                     value={formData.subject}
                     onChange={handleInputChange}
                     placeholder={tContacts('formSubjectPlaceholder')}
-                    className="w-full px-4 py-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-gray-900 dark:focus:ring-neutral-300 focus:border-transparent focus:bg-white dark:focus:bg-neutral-700 transition-all duration-200 text-gray-900 dark:text-neutral-100"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-gray-900 dark:focus:ring-neutral-300 focus:border-transparent focus:bg-white dark:focus:bg-neutral-700 transition-all duration-200 text-gray-900 dark:text-neutral-100 text-sm sm:text-base"
                   />
                 </motion.div>
 
@@ -324,11 +321,11 @@ export default function ContactSection() {
                   <textarea
                     id="message"
                     name="message"
-                    rows={6}
+                    rows={5}
                     value={formData.message}
                     onChange={handleInputChange}
                     placeholder={tContacts('formMessagePlaceholder')}
-                    className="w-full px-4 py-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-gray-900 dark:focus:ring-neutral-300 focus:border-transparent focus:bg-white dark:focus:bg-neutral-700 transition-all duration-200 resize-none text-gray-900 dark:text-neutral-100"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-gray-900 dark:focus:ring-neutral-300 focus:border-transparent focus:bg-white dark:focus:bg-neutral-700 transition-all duration-200 resize-none text-gray-900 dark:text-neutral-100 text-sm sm:text-base"
                   />
                 </motion.div>
 
@@ -336,7 +333,7 @@ export default function ContactSection() {
                   type="button"
                   onClick={handleSubmit}
                   disabled={isSubmitting}
-                  className="w-full bg-black dark:bg-white text-white dark:text-black py-4 px-6 rounded-xl font-semibold hover:bg-neutral-800 dark:hover:bg-neutral-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  className="w-full bg-black dark:bg-white text-white dark:text-black py-3 sm:py-4 px-5 sm:px-6 rounded-xl font-semibold hover:bg-neutral-800 dark:hover:bg-neutral-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer active:scale-95 text-sm sm:text-base"
                   variants={itemVariants}
                   whileHover={!isSubmitting ? { scale: 1.02 } : {}}
                   whileTap={!isSubmitting ? { scale: 0.98 } : {}}
@@ -344,7 +341,7 @@ export default function ContactSection() {
                   {isSubmitting ? (
                     <>
                       <motion.div
-                        className="w-5 h-5 border-2 border-white dark:border-black border-t-transparent rounded-full"
+                        className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white dark:border-black border-t-transparent rounded-full"
                         animate={{ rotate: 360 }}
                         transition={{
                           duration: 1,
@@ -365,7 +362,7 @@ export default function ContactSection() {
                           ease: 'easeInOut',
                         }}
                       >
-                        <Send className="w-5 h-5 text-white dark:text-black " />
+                        <Send className="w-4 h-4 sm:w-5 sm:h-5 text-white dark:text-black" />
                       </motion.div>
                     </>
                   )}

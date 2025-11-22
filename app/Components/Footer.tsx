@@ -26,8 +26,40 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 py-5">
         {/* Основний контент футера */}
         <div className="flex flex-wrap justify-between text-base">
-          {/* Логотип */}
-          <div className="w-full md:w-auto mb-6 mt-5 md:mb-0">
+          {/* Логотип і соціальні мережі (мобільна версія) */}
+          <div className="w-full flex justify-between items-start mb-6 mt-5 md:hidden">
+            <h2 className="text-2xl font-bold">MadEdge</h2>
+
+            {/* Social links з розділювачами - тільки на мобільних */}
+            <div className="flex items-center space-x-3 mt-2">
+              <a
+                href="#"
+                aria-label="Telegram"
+                className="text-gray-500 hover:text-gray-900 dark:text-neutral-400/80 dark:hover:text-white transition-colors"
+              >
+                <TelegramIcon className="h-5 w-5" />
+              </a>
+              <div className="w-px h-5 bg-gray-300 dark:bg-neutral-700"></div>
+              <a
+                href="#"
+                aria-label="YouTube"
+                className="text-gray-500 hover:text-gray-900 dark:text-neutral-400/80 dark:hover:text-white transition-colors"
+              >
+                <YouTubeIcon className="h-5 w-5" />
+              </a>
+              <div className="w-px h-5 bg-gray-300 dark:bg-neutral-700"></div>
+              <a
+                href="#"
+                aria-label="Instagram"
+                className="text-gray-500 hover:text-gray-900 dark:text-neutral-400/80 dark:hover:text-white transition-colors"
+              >
+                <InstagramIcon className="h-5 w-5" />
+              </a>
+            </div>
+          </div>
+
+          {/* Логотип (десктопна версія) */}
+          <div className="hidden md:block w-full md:w-auto mb-6 mt-5 md:mb-0">
             <h2 className="text-2xl font-bold">MadEdge</h2>
           </div>
 
@@ -39,7 +71,7 @@ export default function Footer() {
             <ul className="space-y-3 text-gray-500 dark:text-neutral-400/80 transition-colors duration-300">
               <li>
                 <a
-                  href="#our-products"
+                  href="/#our-products"
                   className="hover:text-neutral-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerOurProducts')}
@@ -47,7 +79,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="#info-section"
+                  href="/#info-section"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tInfo('infoTitle')}
@@ -63,7 +95,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="#video-section"
+                  href="/#video-section"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerAssembly')}
@@ -71,7 +103,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="#reviews-section"
+                  href="/#reviews-section"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerReviews')}
@@ -234,80 +266,128 @@ export default function Footer() {
       </div>
 
       {/* Copyright + Theme controls */}
-      <div className="transition-colors duration-300">
-        <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-col sm:flex-row sm:items-center">
-            <div className="mb-4 sm:mb-0">
+      <div className="dark:border-neutral-700 transition-colors duration-300">
+        <div className="max-w-7xl mx-auto px-6 py-6">
+          {/* Мобільна версія - копірайт і тема в один рядок */}
+          <div className="flex sm:hidden items-center justify-between">
+            <div className="text-gray-500 dark:text-neutral-400/80 text-sm transition-colors duration-300">
+              © {new Date().getFullYear()} MadEdge, Inc.
+            </div>
+
+            {/* Theme controls - мобільна версія */}
+            <div className="flex items-center border border-neutral-300 dark:border-neutral-700 rounded-full w-fit">
+              <button
+                aria-label={tTheme('themeLight')}
+                onClick={() => setTheme('light')}
+                className={`p-3 rounded-full transition-colors cursor-pointer ${
+                  theme === 'light'
+                    ? 'bg-gray-200 dark:bg-neutral-800'
+                    : 'hover:bg-gray-100 dark:hover:bg-neutral-800'
+                }`}
+              >
+                <Sun className="h-4 w-4" />
+              </button>
+
+              <button
+                aria-label={tTheme('themeSystem')}
+                onClick={() => setTheme('system')}
+                className={`p-3 rounded-full transition-colors cursor-pointer ${
+                  theme === 'system'
+                    ? 'bg-gray-200 dark:bg-neutral-800'
+                    : 'hover:bg-gray-100 dark:hover:bg-neutral-800'
+                }`}
+              >
+                <Monitor className="h-4 w-4" />
+              </button>
+
+              <button
+                aria-label={tTheme('themeDark')}
+                onClick={() => setTheme('dark')}
+                className={`p-3 rounded-full transition-colors cursor-pointer ${
+                  theme === 'dark'
+                    ? 'bg-gray-200 dark:bg-neutral-800'
+                    : 'hover:bg-gray-100 dark:hover:bg-neutral-800'
+                }`}
+              >
+                <Moon className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Десктопна версія */}
+          <div className="hidden sm:flex items-start justify-between">
+            {/* Копірайт і соціальні мережі */}
+            <div className="flex flex-col">
               <div className="text-gray-500 dark:text-neutral-400/80 text-sm transition-colors duration-300">
                 © {new Date().getFullYear()} MadEdge, Inc.
               </div>
 
-              {/* Social links with dividers */}
+              {/* Social links */}
               <div className="flex items-center space-x-3 mt-4">
                 <a
                   href="#"
                   aria-label="Telegram"
-                  className="text-gray-500 hover:text-gray-900 dark:text-neutral-400/80  dark:hover:text-white"
+                  className="text-gray-500 hover:text-gray-900 dark:text-neutral-400/80 dark:hover:text-white transition-colors"
                 >
-                  <TelegramIcon className="h-4 w-4 mb-5 ml-1" />
+                  <TelegramIcon className="h-5 w-5" />
                 </a>
-                <div className="w-px h-4 bg-gray-300 dark:bg-neutral-800 mb-5"></div>
+                <div className="w-px h-5 bg-gray-300 dark:bg-neutral-700"></div>
                 <a
                   href="#"
                   aria-label="YouTube"
-                  className="text-gray-500 hover:text-gray-900 dark:text-neutral-400/80  dark:hover:text-white"
+                  className="text-gray-500 hover:text-gray-900 dark:text-neutral-400/80 dark:hover:text-white transition-colors"
                 >
-                  <YouTubeIcon className="h-4 w-4 mb-5 ml-1" />
+                  <YouTubeIcon className="h-5 w-5" />
                 </a>
-                <div className="w-px h-4 bg-gray-300 dark:bg-neutral-800 mb-5"></div>
+                <div className="w-px h-5 bg-gray-300 dark:bg-neutral-700"></div>
                 <a
                   href="#"
                   aria-label="Instagram"
-                  className="text-gray-500 hover:text-gray-900 dark:text-neutral-400/80  dark:hover:text-white"
+                  className="text-gray-500 hover:text-gray-900 dark:text-neutral-400/80 dark:hover:text-white transition-colors"
                 >
-                  <InstagramIcon className="h-4 w-4 mb-5 ml-1" />
+                  <InstagramIcon className="h-5 w-5" />
                 </a>
               </div>
             </div>
-          </div>
 
-          {/* Theme controls */}
-          <div className="flex items-center border border-neutral-300 dark:border-neutral-700  rounded-full mt-4 sm:mt-0">
-            <button
-              aria-label={tTheme('themeLight')}
-              onClick={() => setTheme('light')}
-              className={`p-3 rounded-full transition-colors cursor-pointer ${
-                theme === 'light'
-                  ? 'bg-gray-200  dark:bg-neutral-800'
-                  : 'hover:bg-gray-100 dark:hover:bg-neutral-800'
-              }`}
-            >
-              <Sun className="h-4 w-4" />
-            </button>
+            {/* Theme controls - десктопна версія */}
+            <div className="flex items-center border border-neutral-300 dark:border-neutral-700 rounded-full w-fit">
+              <button
+                aria-label={tTheme('themeLight')}
+                onClick={() => setTheme('light')}
+                className={`p-3 rounded-full transition-colors cursor-pointer ${
+                  theme === 'light'
+                    ? 'bg-gray-200 dark:bg-neutral-800'
+                    : 'hover:bg-gray-100 dark:hover:bg-neutral-800'
+                }`}
+              >
+                <Sun className="h-4 w-4" />
+              </button>
 
-            <button
-              aria-label={tTheme('themeSystem')}
-              onClick={() => setTheme('system')}
-              className={`p-3 rounded-full transition-colors cursor-pointer ${
-                theme === 'system'
-                  ? 'bg-gray-200  dark:bg-neutral-800'
-                  : 'hover:bg-gray-100 dark:hover:bg-neutral-800'
-              }`}
-            >
-              <Monitor className="h-4 w-4" />
-            </button>
+              <button
+                aria-label={tTheme('themeSystem')}
+                onClick={() => setTheme('system')}
+                className={`p-3 rounded-full transition-colors cursor-pointer ${
+                  theme === 'system'
+                    ? 'bg-gray-200 dark:bg-neutral-800'
+                    : 'hover:bg-gray-100 dark:hover:bg-neutral-800'
+                }`}
+              >
+                <Monitor className="h-4 w-4" />
+              </button>
 
-            <button
-              aria-label={tTheme('themeDark')}
-              onClick={() => setTheme('dark')}
-              className={`p-3 rounded-full transition-colors cursor-pointer ${
-                theme === 'dark'
-                  ? 'bg-gray-200 dark:bg-neutral-800'
-                  : 'hover:bg-gray-100 dark:hover:bg-neutral-800'
-              }`}
-            >
-              <Moon className="h-4 w-4" />
-            </button>
+              <button
+                aria-label={tTheme('themeDark')}
+                onClick={() => setTheme('dark')}
+                className={`p-3 rounded-full transition-colors cursor-pointer ${
+                  theme === 'dark'
+                    ? 'bg-gray-200 dark:bg-neutral-800'
+                    : 'hover:bg-gray-100 dark:hover:bg-neutral-800'
+                }`}
+              >
+                <Moon className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
