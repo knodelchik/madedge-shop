@@ -11,6 +11,7 @@ export type User = {
   };
   created_at?: string;
   updated_at?: string;
+  email_confirmed_at?: string | null;
 }
 
 export type AuthFormData = {

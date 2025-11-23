@@ -52,7 +52,7 @@ export const authService = {
   },
 
   // Отримати поточного користувача
-  async getCurrentUser(): Promise<{ user: User | null; error: string | null }> {
+async getCurrentUser(): Promise<{ user: User | null; error: string | null }> {
     const {
       data: { user },
       error,
@@ -67,6 +67,8 @@ export const authService = {
         ...user,
         full_name: user.user_metadata?.full_name || '',
         phone: user.phone || user.user_metadata?.phone || '',
+        // Додаємо мапінг статусу пошти
+        email_confirmed_at: user.email_confirmed_at || null, 
       };
       return { user: mappedUser as User, error: null };
     }
@@ -119,4 +121,37 @@ export const authService = {
 
     return { profile: data as unknown as User, error: null };
   },
+
+  async resetPasswordForEmail(email: string): Promise<{ error: string | null }> {
+    const redirectTo = typeof window !== 'undefined' 
+      ? `${window.location.origin}/auth/update-password`
+      : undefined;
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo,
+    });
+
+    return { error: error?.message || null };
+  },
+
+  async updatePassword(newPassword: string): Promise<{ error: string | null }> {
+    const { error } = await supabase.auth.updateUser({
+      password: newPassword
+    });
+
+    return { error: error?.message || null };
+  },
+  
+  async resendVerificationEmail(email: string): Promise<{ error: string | null }> {
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: email,
+      options: {
+        emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/profile` : undefined
+      }
+    });
+
+    return { error: error?.message || null };
+  }
+  
 };

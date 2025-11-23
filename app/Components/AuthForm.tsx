@@ -1,21 +1,24 @@
 'use client';
 
 import { useState } from 'react';
-import { authService } from '../[locale]/services/authService';
-import { AuthFormData } from '../types/users';
-import { useCartStore } from '../[locale]/store/cartStore';
+import { authService } from '../../app/[locale]/services/authService';
+import { AuthFormData } from '../../app/types/users';
+import { useCartStore } from '../../app/[locale]/store/cartStore';
 import { useTranslations } from 'next-intl';
+import { toast } from 'sonner'; // Імпортуємо toast
 
 interface AuthFormProps {
   type: 'signin' | 'signup';
   onSuccess?: () => void;
   onToggleType?: () => void;
+  onForgotPassword?: () => void;
 }
 
 export default function AuthForm({
   type,
   onSuccess,
   onToggleType,
+  onForgotPassword,
 }: AuthFormProps) {
   const t = useTranslations('AuthForm');
 
@@ -37,9 +40,22 @@ export default function AuthForm({
 
       if (type === 'signup') {
         result = await authService.signUp(formData);
+        
+        // === ЛОГІКА ПОВІДОМЛЕННЯ ПРО ПІДТВЕРДЖЕННЯ ===
+        if (result?.user && !result.error) {
+          toast.message('Акаунт створено!', {
+            description: 'На вашу пошту надіслано лист. Будь ласка, підтвердіть її, щоб мати можливість оформлювати замовлення.',
+            duration: 8000, // Показуємо довше
+            action: {
+              label: 'Зрозуміло',
+              onClick: () => console.log('Closed'),
+            },
+          });
+        }
       } else {
         result = await authService.signIn(formData);
       }
+
       if (result?.user) {
         // Синхронізуємо корзину після входу
         await useCartStore.getState().syncCartWithDatabase(result.user.id);
@@ -59,7 +75,7 @@ export default function AuthForm({
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({
+    setFormData((prev: any) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
@@ -137,6 +153,18 @@ export default function AuthForm({
             placeholder={t('placeholders.password')}
           />
         </div>
+
+        {type === 'signin' && onForgotPassword && (
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={onForgotPassword}
+              className="text-sm text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors cursor-pointer"
+            >
+              Забули пароль?
+            </button>
+          </div>
+        )}
 
         <button
           type="submit"

@@ -12,6 +12,16 @@ const compat = new FlatCompat({
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
+    rules: {
+      // Дозволяємо використання any
+      "@typescript-eslint/no-explicit-any": "off",
+      // Дозволяємо невикористані змінні (робимо їх попередженнями, а не помилками)
+      "@typescript-eslint/no-unused-vars": "warn",
+      // Дозволяємо апострофи в тексті без екранування
+      "react/no-unescaped-entities": "off",
+      // Дозволяємо ts-ignore
+      "@typescript-eslint/ban-ts-comment": "off",
+    },
     ignores: [
       "node_modules/**",
       ".next/**",

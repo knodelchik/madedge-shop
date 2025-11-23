@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { Moon, Sun, Monitor } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { InstagramIcon, TelegramIcon, YouTubeIcon } from './icons/SocialIcons';
+import { Link } from '@/navigation'; // Використовуємо Link з налаштувань навігації
 
 export default function Footer() {
   const { theme, setTheme } = useTheme();
@@ -70,44 +71,44 @@ export default function Footer() {
             </h3>
             <ul className="space-y-3 text-gray-500 dark:text-neutral-400/80 transition-colors duration-300">
               <li>
-                <a
+                <Link
                   href="/#our-products"
                   className="hover:text-neutral-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerOurProducts')}
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   href="/#info-section"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tInfo('infoTitle')}
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#product-comparison"
+                <Link
+                  href="/#product-comparison"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerComparison')}
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   href="/#video-section"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerAssembly')}
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   href="/#reviews-section"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerReviews')}
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -119,28 +120,28 @@ export default function Footer() {
             </h3>
             <ul className="space-y-3 text-gray-500 dark:text-neutral-400/80 ">
               <li>
-                <a
+                <Link
                   href="/shop?category=sharpeners"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerKnifeSharpeners')}
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   href="/shop?category=stones"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerWhetstones')}
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   href="/shop?category=accessories"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerAccessories')}
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -152,60 +153,60 @@ export default function Footer() {
             </h3>
             <ul className="space-y-3 text-gray-500 dark:text-neutral-400/80 ">
               <li>
-                <a
+                <Link
                   href="/about#our-background"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerOurBackground')}
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   href="/about#manufacturing"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerManufacturing')}
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   href="/about/sharpeners"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerSharperensKnowledge')}
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   href="/about/grindingstones"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerStonesKnowledge')}
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   href="/about/accessories"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerAccessoriessKnowledge')}
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   href="/about/delivery#calculator"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerDeliveryCostCalculator')}
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   href="/about/delivery#returns-warranty"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerDeliveryPolicy')}
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -217,20 +218,20 @@ export default function Footer() {
             </h3>
             <ul className="space-y-3 text-gray-500 dark:text-neutral-400/80 ">
               <li>
-                <a
+                <Link
                   href="/contact"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerWriteUs')}
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   href="/contact"
                   className="hover:text-gray-900 dark:hover:text-white text-sm"
                 >
                   {tFooter('footerSocialNetworks')}
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

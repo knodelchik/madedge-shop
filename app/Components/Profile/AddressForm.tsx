@@ -65,7 +65,7 @@ export default function AddressForm({ onSave, onCancel, defaultPhone = '' }: Add
     address_line1: '',
     address_line2: '',
     postal_code: '',
-    phone: defaultPhone, // <--- 2. Використовуємо проп як значення за замовчуванням
+    phone: defaultPhone || '',
     is_default: false,
   });
 

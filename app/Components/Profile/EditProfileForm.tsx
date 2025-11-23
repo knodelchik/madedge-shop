@@ -6,7 +6,7 @@ import { User } from '@/app/types/users';
 import { authService } from '@/app/[locale]/services/authService';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Pencil, User as UserIcon, Phone, Mail, X, Save } from 'lucide-react';
+import { Pencil, User as UserIcon, Phone, Mail, X, Save, CheckCircle2, AlertCircle } from 'lucide-react';
 
 interface EditProfileFormProps {
   user: User;
@@ -16,23 +16,37 @@ export default function EditProfileForm({ user }: EditProfileFormProps) {
   const t = useTranslations('Profile');
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [resendingEmail, setResendingEmail] = useState(false);
   
   // Стан форми
   const [fullName, setFullName] = useState(user.full_name || '');
   const [phone, setPhone] = useState(user.phone || '');
+
+  // Перевірка статусу пошти
+  const isEmailConfirmed = !!user.email_confirmed_at;
+
+  const handleResendEmail = async () => {
+    setResendingEmail(true);
+    // Припускаємо, що ви додали цей метод в authService на попередньому кроці
+    const { error } = await authService.resendVerificationEmail(user.email);
+    
+    if (error) {
+      toast.error(error);
+    } else {
+      toast.success(`Лист підтвердження надіслано на ${user.email}`);
+    }
+    setResendingEmail(false);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // === ВИПРАВЛЕННЯ ТУТ ===
-      // Ми повинні передати email, щоб upsert міг створити запис, 
-      // якщо він відсутній в public.users
       const { error } = await authService.updateProfile(user.id, {
         full_name: fullName,
         phone: phone,
-        email: user.email, // <--- ДОДАНО ЦЕЙ РЯДОК
+        email: user.email, 
       });
 
       if (error) {
@@ -41,7 +55,6 @@ export default function EditProfileForm({ user }: EditProfileFormProps) {
       } else {
         toast.success(t('saveSuccess') || 'Профіль оновлено!');
         setIsEditing(false);
-        // Примусове оновлення, щоб підтягнути свіжі дані
         window.location.reload(); 
       }
     } catch (err) {
@@ -78,7 +91,7 @@ export default function EditProfileForm({ user }: EditProfileFormProps) {
 
       <AnimatePresence mode="wait">
         {!isEditing ? (
-          // РЕЖИМ ПЕРЕГЛЯДУ
+          // ==================== РЕЖИМ ПЕРЕГЛЯДУ ====================
           <motion.div
             key="view"
             initial={{ opacity: 0, y: 10 }}
@@ -87,19 +100,55 @@ export default function EditProfileForm({ user }: EditProfileFormProps) {
             transition={{ duration: 0.2 }}
             className="space-y-6"
           >
-            {/* Пошта */}
-            <div className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 dark:bg-neutral-800/50 border border-gray-100 dark:border-neutral-800">
-              <div className="p-3 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full">
-                <Mail size={20} />
+            {/* Блок Пошти зі статусом */}
+            <div className={`flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-xl border ${
+              isEmailConfirmed 
+                ? 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-900/30' 
+                : 'bg-yellow-50 dark:bg-yellow-900/10 border-yellow-200 dark:border-yellow-900/30'
+            }`}>
+              <div className="flex items-center gap-4 flex-1">
+                <div className={`p-3 rounded-full ${
+                  isEmailConfirmed 
+                    ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' 
+                    : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400'
+                }`}>
+                  <Mail size={20} />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs text-gray-500 dark:text-neutral-500 uppercase tracking-wide font-semibold">
+                      {t('emailLabel')}
+                    </p>
+                    {isEmailConfirmed ? (
+                      <span className="flex items-center gap-1 text-[10px] font-bold text-green-600 dark:text-green-400 bg-white dark:bg-neutral-900 px-2 py-0.5 rounded-full shadow-sm">
+                        <CheckCircle2 size={10} /> ПІДТВЕРДЖЕНО
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1 text-[10px] font-bold text-yellow-600 dark:text-yellow-400 bg-white dark:bg-neutral-900 px-2 py-0.5 rounded-full shadow-sm">
+                        <AlertCircle size={10} /> НЕ ПІДТВЕРДЖЕНО
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-gray-900 dark:text-white font-medium text-lg">
+                    {user.email}
+                  </p>
+                  {!isEmailConfirmed && (
+                    <p className="text-xs text-red-500 mt-1 font-medium">
+                      Неможливо оформити замовлення без підтвердженої пошти.
+                    </p>
+                  )}
+                </div>
               </div>
-              <div>
-                <p className="text-xs text-gray-500 dark:text-neutral-500 uppercase tracking-wide font-semibold">
-                  {t('emailLabel')}
-                </p>
-                <p className="text-gray-900 dark:text-white font-medium text-lg">
-                  {user.email}
-                </p>
-              </div>
+              
+              {!isEmailConfirmed && (
+                <button
+                  onClick={handleResendEmail}
+                  disabled={resendingEmail}
+                  className="px-4 py-2 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 text-sm font-medium rounded-lg hover:bg-yellow-200 dark:hover:bg-yellow-900/50 transition-colors disabled:opacity-50 whitespace-nowrap cursor-pointer"
+                >
+                  {resendingEmail ? 'Надсилання...' : 'Підтвердити пошту'}
+                </button>
+              )}
             </div>
 
             {/* Ім'я */}
@@ -133,7 +182,7 @@ export default function EditProfileForm({ user }: EditProfileFormProps) {
             </div>
           </motion.div>
         ) : (
-          // РЕЖИМ РЕДАГУВАННЯ
+          // ==================== РЕЖИМ РЕДАГУВАННЯ ====================
           <motion.form
             key="edit"
             initial={{ opacity: 0, y: 10 }}
@@ -148,8 +197,13 @@ export default function EditProfileForm({ user }: EditProfileFormProps) {
               <label className="block text-sm font-medium text-gray-500 dark:text-neutral-500 mb-1.5">
                 {t('emailLabel')} (не можна змінити)
               </label>
-              <div className="px-4 py-3 bg-gray-100 dark:bg-neutral-800/50 rounded-xl text-gray-500 dark:text-gray-400 border border-transparent">
-                {user.email}
+              <div className="px-4 py-3 bg-gray-100 dark:bg-neutral-800/50 rounded-xl text-gray-500 dark:text-gray-400 border border-transparent flex justify-between items-center">
+                <span>{user.email}</span>
+                {!isEmailConfirmed && (
+                   <span className="text-xs text-yellow-600 dark:text-yellow-500 font-bold bg-yellow-100 dark:bg-yellow-900/30 px-2 py-1 rounded">
+                     Не підтверджено
+                   </span>
+                )}
               </div>
             </div>
 
@@ -196,7 +250,7 @@ export default function EditProfileForm({ user }: EditProfileFormProps) {
               </p>
             </div>
 
-            {/* Кнопки */}
+            {/* Кнопки Дії */}
             <div className="flex items-center gap-3 pt-2">
               <button
                 type="submit"

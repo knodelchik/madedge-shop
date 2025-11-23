@@ -1,240 +1,444 @@
 'use client';
 
 import { useCartStore } from '../store/cartStore';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { authService } from '../services/authService';
+import { addressService } from '../services/adressService';
+import { Address } from '../../types/address';
+import { toast } from 'sonner';
+import { Truck, ChevronDown, Plus, MapPin, Clock, Plane } from 'lucide-react';
+import { getShippingPrice } from '@/app/constants/deliveryData';
 
-// Функція для створення slug з назви
 const createSlug = (str: string) =>
-  str
-    .toLowerCase()
-    .trim()
-    .replace(/[\s\W-]+/g, '-');
+  str.toLowerCase().trim().replace(/[\s\W-]+/g, '-');
 
 export default function OrderPage() {
   const t = useTranslations('Order');
-
   const { cartItems } = useCartStore();
-  const [paymentMethod, setPaymentMethod] = useState<'fondy' | 'paypal'>(
-    'fondy'
-  );
+  
+  // Стейт
+  const [paymentMethod, setPaymentMethod] = useState<'fondy' | 'paypal'>('fondy');
+  const [loading, setLoading] = useState(true);
+  const [processing, setProcessing] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  
+  // Адреси
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
+  const [isAddressMenuOpen, setIsAddressMenuOpen] = useState(false);
 
-  const totalPrice = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
+  // Доставка
+  const [shippingType, setShippingType] = useState<'Standard' | 'Express'>('Standard');
+  const [shippingCost, setShippingCost] = useState(0);
+
   const priceUnit = t('priceUnit');
 
-  const handlePayment = async () => {
-    const res = await fetch('/api/create-payment', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items: cartItems, method: paymentMethod }),
-    });
-    const data = await res.json();
-    if (data.payment_url) {
-      window.location.href = data.payment_url;
+  // 1. Завантаження даних
+  useEffect(() => {
+    const initData = async () => {
+      setLoading(true);
+      const { user } = await authService.getCurrentUser();
+      
+      if (user) {
+        setUser(user);
+        const userAddresses = await addressService.getAddresses(user.id);
+        setAddresses(userAddresses);
+
+        if (userAddresses.length > 0) {
+          const defaultAddr = userAddresses.find(a => a.is_default) || userAddresses[0];
+          setSelectedAddressId(defaultAddr.id);
+        }
+      }
+      setLoading(false);
+    };
+    initData();
+  }, []);
+
+  // 2. Розрахунок вартості доставки
+  useEffect(() => {
+    if (!selectedAddressId) {
+      setShippingCost(0);
+      return;
+    }
+
+    const address = addresses.find(a => a.id === selectedAddressId);
+    if (!address) return;
+
+    // Передаємо обраний тип (Standard або Express) у функцію розрахунку
+    const cost = getShippingPrice(address.country_code, shippingType);
+    
+    if (cost === null) {
+      toast.error('Доставка цього типу недоступна в ваш регіон');
+      // Якщо Express недоступний, спробуємо перемкнути на Standard
+      if (shippingType === 'Express') {
+         setShippingType('Standard');
+      } else {
+         setShippingCost(0);
+      }
     } else {
-      alert(t('paymentError'));
+      setShippingCost(cost);
+    }
+
+  }, [selectedAddressId, addresses, shippingType]); // Додали shippingType в залежності
+
+  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const total = subtotal + shippingCost;
+  const selectedAddress = addresses.find(a => a.id === selectedAddressId);
+
+  // Отримуємо ціни для відображення на кнопках вибору
+  const getCostForUI = (type: 'Standard' | 'Express') => {
+    if (!selectedAddress) return 0;
+    const cost = getShippingPrice(selectedAddress.country_code, type);
+    return cost; // поверне число, 0 або null
+  };
+
+  const standardCost = getCostForUI('Standard');
+  const expressCost = getCostForUI('Express');
+
+const handlePayment = async () => {
+    setProcessing(true);
+
+    try {
+      // 1. Перевірка авторизації
+      if (!user) {
+        toast.error('Ви не авторизовані. Будь ласка, увійдіть.');
+        return;
+      }
+
+      // 2. Перевірка підтвердження пошти
+      if (!user.email_confirmed_at) {
+        toast.error('Для оформлення замовлення необхідно підтвердити електронну пошту.', {
+          action: {
+            label: 'Перейти в профіль',
+            onClick: () => window.location.href = '/profile'
+          },
+          duration: 5000,
+        });
+        return;
+      }
+
+      // 3. Перевірка вибору адреси
+      if (!selectedAddressId) {
+        toast.error('Оберіть адресу доставки');
+        return;
+      }
+
+      // Знаходимо повний об'єкт адреси за ID
+      const currentAddress = addresses.find(a => a.id === selectedAddressId);
+      
+      if (!currentAddress) {
+        toast.error('Помилка: обрану адресу не знайдено');
+        return;
+      }
+
+      // 4. Відправка запиту на сервер
+      const res = await fetch('/api/create-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          items: cartItems, 
+          method: paymentMethod,
+          shippingAddress: currentAddress,
+          shippingCost,
+          shippingType, 
+          totalAmount: total 
+        }),
+      });
+      
+      const data = await res.json();
+
+      // 5. Обробка відповіді
+      if (!res.ok) {
+        throw new Error(data.error || 'Помилка при створенні платежу');
+      }
+
+      if (data.payment_url) {
+        // Перенаправлення на сторінку оплати (Fondy)
+        window.location.href = data.payment_url;
+      } else {
+        toast.error('Не вдалося отримати посилання на оплату');
+      }
+
+    } catch (error: any) {
+      console.error('Payment Error:', error);
+      toast.error(error.message || 'Помилка з\'єднання з сервером');
+    } finally {
+      // Цей код виконається завжди, знімаючи блокування кнопки
+      setProcessing(false);
     }
   };
 
-  if (cartItems.length === 0)
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50 dark:from-black dark:via-neutral-900 dark:to-black flex items-center justify-center py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center"
-        >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-            className="w-24 h-24 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-neutral-800 dark:to-neutral-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl"
-          >
-            <svg
-              className="w-12 h-12 text-gray-400 dark:text-neutral-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-              />
-            </svg>
-          </motion.div>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="text-xl text-gray-500 dark:text-neutral-400"
-          >
-            {t('emptyCart')}
-          </motion.p>
-        </motion.div>
-      </div>
-    );
+  if (cartItems.length === 0) return <EmptyCartState t={t} />;
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">Loading...</div>;
 
   return (
     <div className="min-h-screen bg-white dark:bg-black py-12 transition-colors">
-      <div className="p-6 max-w-5xl mx-auto space-y-6 lg:space-y-0">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-8 text-center lg:text-left lg:mb-8"
-        >
+      <div className="p-6 max-w-6xl mx-auto space-y-6">
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-white dark:via-neutral-200 dark:to-white bg-clip-text text-transparent">
             {t('title')}
           </h1>
         </motion.div>
 
-        <div className="flex flex-col lg:grid lg:grid-cols-3 lg:gap-6">
-          {/* Підсумок */}
-          <div className="order-1 lg:order-2 lg:col-span-1 mb-8 lg:mb-0">
-            <div className="bg-white dark:bg-neutral-900 rounded-3xl shadow-2xl p-6 border border-gray-100 dark:border-neutral-800 sticky top-4 z-10 lg:static lg:top-6">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-neutral-200/20 to-neutral-200/20 dark:from-neutral-500/10 dark:to-neutral-500/10 rounded-full blur-3xl" />
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* ЛІВА ЧАСТИНА: Товари */}
+          <div className="lg:col-span-2 space-y-6">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Ваше замовлення</h2>
+            <div className="space-y-4">
+              <AnimatePresence mode="popLayout">
+                {cartItems.map((item, index) => (
+                  <CartItem key={item.id} item={item} index={index} priceUnit={priceUnit} />
+                ))}
+              </AnimatePresence>
+            </div>
+          </div>
 
-              <h2 className="text-xl font-bold text-gray-900 dark:text-neutral-100 mb-4 relative z-10">
+          {/* ПРАВА ЧАСТИНА: Сайдбар */}
+          <div className="lg:col-span-1">
+            <div className="bg-white dark:bg-neutral-900 rounded-3xl shadow-xl p-6 border border-gray-100 dark:border-neutral-800 sticky top-6">
+              
+              {/* === 1. ВИБІР АДРЕСИ === */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Адреса доставки
+                </label>
+                
+                {addresses.length === 0 ? (
+                  <Link 
+                    href="/profile?tab=addresses" 
+                    className="flex items-center justify-center gap-2 w-full p-3 border-2 border-dashed border-yellow-400 bg-yellow-50 dark:bg-yellow-900/10 rounded-xl text-yellow-700 dark:text-yellow-500 hover:bg-yellow-100 transition-colors text-sm font-medium"
+                  >
+                    <Plus size={16} /> Додати адресу
+                  </Link>
+                ) : (
+                  <div className="relative">
+                    <button 
+                      onClick={() => setIsAddressMenuOpen(!isAddressMenuOpen)}
+                      className="w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-xl hover:border-gray-400 transition-colors text-left"
+                    >
+                      {selectedAddress ? (
+                        <div className="flex items-center gap-2 overflow-hidden">
+                          <MapPin size={18} className="text-gray-500 shrink-0" />
+                          <div className="truncate">
+                            <span className="font-bold text-gray-900 dark:text-white block truncate">
+                              {selectedAddress.city}, {selectedAddress.country_name}
+                            </span>
+                            <span className="text-xs text-gray-500 block truncate">
+                              {selectedAddress.address_line1}
+                            </span>
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-gray-500">Оберіть адресу</span>
+                      )}
+                      <ChevronDown size={16} className={`text-gray-400 transition-transform ${isAddressMenuOpen ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    <AnimatePresence>
+                      {isAddressMenuOpen && (
+                        <motion.div 
+                          initial={{ opacity: 0, y: 5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 5 }}
+                          className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-xl shadow-xl z-20 overflow-hidden"
+                        >
+                          <div className="max-h-60 overflow-y-auto py-1">
+                            {addresses.map((addr) => (
+                              <button
+                                key={addr.id}
+                                onClick={() => {
+                                  setSelectedAddressId(addr.id);
+                                  setIsAddressMenuOpen(false);
+                                }}
+                                className={`w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-neutral-700 transition-colors flex flex-col ${selectedAddressId === addr.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''}`}
+                              >
+                                <span className="font-medium text-gray-900 dark:text-white text-sm">
+                                  {addr.country_code} - {addr.city}
+                                </span>
+                                <span className="text-xs text-gray-500 truncate w-full">
+                                  {addr.address_line1}
+                                </span>
+                              </button>
+                            ))}
+                            <div className="border-t border-gray-100 dark:border-neutral-700 mt-1 pt-1">
+                              <Link 
+                                href="/profile?tab=addresses" 
+                                className="flex items-center gap-2 px-4 py-3 text-sm text-blue-600 dark:text-blue-400 hover:bg-gray-50 dark:hover:bg-neutral-700"
+                              >
+                                <Plus size={14} /> Додати нову адресу
+                              </Link>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                )}
+              </div>
+
+              {/* === 2. СПОСІБ ДОСТАВКИ (НОВИЙ БЛОК) === */}
+              {selectedAddressId && (
+                <div className="mb-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Спосіб доставки
+                  </label>
+                  <div className="space-y-2">
+                    {/* STANDARD */}
+                    <button
+                      onClick={() => setShippingType('Standard')}
+                      disabled={standardCost === null}
+                      className={`w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all ${
+                        shippingType === 'Standard'
+                          ? 'border-black bg-gray-50 dark:border-white dark:bg-neutral-800'
+                          : 'border-gray-200 dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600'
+                      } ${standardCost === null ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-full ${shippingType === 'Standard' ? 'bg-white dark:bg-neutral-700 shadow-sm' : 'bg-gray-100 dark:bg-neutral-800'}`}>
+                          <Clock size={18} className="text-gray-700 dark:text-gray-300" />
+                        </div>
+                        <div className="text-left">
+                          <span className="block font-semibold text-sm text-gray-900 dark:text-white">Standard</span>
+                          <span className="text-xs text-gray-500">Звичайна доставка</span>
+                        </div>
+                      </div>
+                      <span className="font-medium text-gray-900 dark:text-white">
+                        {standardCost === 0 ? 'Безкоштовно' : standardCost === null ? 'Н/Д' : `${standardCost} ${priceUnit}`}
+                      </span>
+                    </button>
+
+                    {/* EXPRESS */}
+                    <button
+                      onClick={() => setShippingType('Express')}
+                      disabled={expressCost === null}
+                      className={`w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all ${
+                        shippingType === 'Express'
+                          ? 'border-black bg-gray-50 dark:border-white dark:bg-neutral-800'
+                          : 'border-gray-200 dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600'
+                      } ${expressCost === null ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-full ${shippingType === 'Express' ? 'bg-white dark:bg-neutral-700 shadow-sm' : 'bg-gray-100 dark:bg-neutral-800'}`}>
+                          <Plane size={18} className="text-gray-700 dark:text-gray-300" />
+                        </div>
+                        <div className="text-left">
+                          <span className="block font-semibold text-sm text-gray-900 dark:text-white">Express</span>
+                          <span className="text-xs text-gray-500">Швидка доставка</span>
+                        </div>
+                      </div>
+                      <span className="font-medium text-gray-900 dark:text-white">
+                        {expressCost === 0 ? 'Безкоштовно' : expressCost === null ? 'Н/Д' : `${expressCost} ${priceUnit}`}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* === 3. SUMMARY === */}
+              <h2 className="text-xl font-bold text-gray-900 dark:text-neutral-100 mb-6 border-t border-gray-100 dark:border-neutral-800 pt-6">
                 {t('orderSummary')}
               </h2>
 
-              <div className="space-y-3 mb-4 pb-4 border-b border-gray-200 dark:border-neutral-800 relative z-10">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600 dark:text-neutral-400">
-                    {t('subtotal')}
-                  </span>
-                  <span className="font-medium text-gray-900 dark:text-neutral-100">
-                    {totalPrice.toFixed(2)} {priceUnit}
+              <div className="space-y-3 mb-6 pb-6 border-b border-gray-200 dark:border-neutral-800">
+                <div className="flex justify-between text-gray-600 dark:text-neutral-400">
+                  <span>{t('subtotal')}</span>
+                  <span className="text-gray-900 dark:text-white font-medium">
+                    {subtotal.toFixed(2)} {priceUnit}
                   </span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600 dark:text-neutral-400">
-                    {t('shipping')}
+                
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600 dark:text-neutral-400 flex items-center gap-1">
+                    {t('shipping')} <Truck size={14} />
                   </span>
-                  <span className="font-medium text-green-600 dark:text-green-400">
-                    {t('freeShipping')}
+                  <span className={`font-medium ${shippingCost === 0 ? 'text-green-600' : 'text-gray-900 dark:text-white'}`}>
+                    {shippingCost === 0 ? t('freeShipping') : `${shippingCost.toFixed(2)} ${priceUnit}`}
                   </span>
                 </div>
               </div>
 
-              <div className="flex justify-between items-center font-bold text-xl mb-6 relative z-10">
-                <span className="text-gray-900 dark:text-neutral-100">
-                  {t('totalLabel')}
-                </span>
-                <span className="text-transparent bg-clip-text bg-black dark:bg-white">
-                  {totalPrice.toFixed(2)} {priceUnit}
-                </span>
+              <div className="flex justify-between items-center font-bold text-2xl mb-8">
+                <span className="text-gray-900 dark:text-white">{t('totalLabel')}</span>
+                <span>{total.toFixed(2)} {priceUnit}</span>
               </div>
 
-              <div className="mb-6 relative z-10">
-                <span className="block font-semibold text-gray-900 dark:text-neutral-100 mb-3">
+              <div className="mb-6">
+                <span className="block font-semibold text-sm text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wide">
                   {t('paymentMethodLabel')}
                 </span>
                 <div className="grid grid-cols-2 gap-3">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className={`px-4 py-3 rounded-xl border-2 font-medium ${
+                  <button
+                    className={`px-4 py-3 rounded-xl border-2 font-medium transition-all ${
                       paymentMethod === 'fondy'
-                        ? 'bg-neutral-500 text-white border-neutral-500'
-                        : 'bg-gray-50 dark:bg-neutral-900 border-gray-200 dark:border-neutral-700 text-gray-900 dark:text-neutral-100'
+                        ? 'border-black bg-black text-white dark:border-white dark:bg-white dark:text-black'
+                        : 'border-gray-200 text-gray-600 hover:border-gray-300 dark:border-neutral-700 dark:text-neutral-400'
                     }`}
                     onClick={() => setPaymentMethod('fondy')}
                   >
                     Fondy
-                  </motion.button>
-
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className={`px-4 py-3 rounded-xl border-2 font-medium ${
+                  </button>
+                  <button
+                    className={`px-4 py-3 rounded-xl border-2 font-medium transition-all ${
                       paymentMethod === 'paypal'
-                        ? 'bg-neutral-500 text-white border-neutral-500'
-                        : 'bg-gray-50 dark:bg-neutral-900 border-gray-200 dark:border-neutral-700 text-gray-900 dark:text-neutral-100'
+                        ? 'border-black bg-black text-white dark:border-white dark:bg-white dark:text-black'
+                        : 'border-gray-200 text-gray-600 hover:border-gray-300 dark:border-neutral-700 dark:text-neutral-400'
                     }`}
                     onClick={() => setPaymentMethod('paypal')}
                   >
                     PayPal
-                  </motion.button>
+                  </button>
                 </div>
               </div>
 
-              <motion.button
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1 }}
-                whileTap={{ scale: 0.98 }}
+              <button
                 onClick={handlePayment}
-                className="w-full bg-gradient-to-r from-neutral-900 to-neutral-800 dark:from-white dark:to-neutral-100 text-white dark:text-black py-4 rounded-xl font-bold hover:shadow-2xl transition-all duration-200 shadow-lg relative overflow-hidden group"
+                disabled={processing || !selectedAddressId}
+                className="w-full bg-black dark:bg-white text-white dark:text-black py-4 rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex items-center justify-center gap-2"
               >
-                <span className="relative z-10">
-                  {t('payButton')} {totalPrice.toFixed(2)} {priceUnit}
-                </span>
-              </motion.button>
+                {processing ? 'Обробка...' : `${t('payButton')} ${total.toFixed(2)} ${priceUnit}`}
+              </button>
             </div>
           </div>
-
-          {/* Товари */}
-          <div className="order-2 lg:order-1 lg:col-span-2 space-y-4">
-            <AnimatePresence mode="popLayout">
-              {cartItems.map((item, index) => {
-                const slug = createSlug(item.title);
-
-                return (
-                  <Link
-                    key={item.id}
-                    href={`/shop/${slug}?from=checkout`}
-                    className="block"
-                  >
-                    <motion.div
-                      initial={{ opacity: 0, x: -50 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 50 }}
-                      transition={{ delay: index * 0.1, duration: 0.4 }}
-                      className="relative flex flex-col sm:flex-row items-center gap-4 p-5 bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 hover:shadow-2xl hover:bg-gray-50 dark:hover:bg-neutral-800 transition-all duration-300 cursor-pointer group"
-                    >
-                      {/* Фото */}
-                      <div className="relative w-32 h-32 sm:w-36 sm:h-36 lg:w-24 lg:h-24 rounded-xl overflow-hidden flex-shrink-0 shadow-md">
-                        <Image
-                          src={item.images[0]}
-                          alt={item.title}
-                          fill
-                          className="object-contain group-hover:scale-110 transition-transform duration-500"
-                        />
-                      </div>
-
-                      {/* Текст */}
-                      <div className="flex-1 min-w-0 text-center sm:text-left px-2">
-                        <p className="font-semibold text-gray-900 dark:text-neutral-100 text-base sm:text-lg leading-tight">
-                          {item.title}
-                        </p>
-                        <p className="text-sm text-gray-500 dark:text-neutral-400 mt-2">
-                          {item.quantity} × {item.price.toFixed(2)} {priceUnit}
-                        </p>
-                      </div>
-
-                      {/* Ціна */}
-                      <div className="text-right">
-                        <p className="font-semibold text-xl sm:text-xl text-gray-900 dark:text-neutral-100 whitespace-nowrap">
-                          {(item.price * item.quantity).toFixed(2)} {priceUnit}
-                        </p>
-                      </div>
-                    </motion.div>
-                  </Link>
-                );
-              })}
-            </AnimatePresence>
-          </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function CartItem({ item, index, priceUnit }: any) {
+  const slug = createSlug(item.title);
+  return (
+    <Link href={`/shop/${slug}?from=checkout`} className="block">
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: index * 0.1 }}
+        className="flex items-center gap-4 p-4 bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 rounded-2xl hover:shadow-md transition-all"
+      >
+        <div className="relative w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-neutral-800">
+          <Image src={item.images[0]} alt={item.title} fill className="object-contain" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="font-semibold text-lg text-gray-900 dark:text-neutral-100 truncate">{item.title}</p>
+          <p className="text-gray-500 dark:text-neutral-400 mt-1">{item.quantity} шт.</p>
+        </div>
+        <div className="text-right font-bold text-lg text-gray-900 dark:text-white">
+          {(item.price * item.quantity).toFixed(2)} {priceUnit}
+        </div>
+      </motion.div>
+    </Link>
+  );
+}
+
+function EmptyCartState({ t }: any) {
+  return (
+    <div className="min-h-screen flex items-center justify-center py-12 bg-white dark:bg-black">
+      <div className="text-center">
+        <p className="text-xl text-gray-500 dark:text-neutral-400">{t('emptyCart')}</p>
       </div>
     </div>
   );

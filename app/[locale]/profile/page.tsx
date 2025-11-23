@@ -30,6 +30,9 @@ import { useCartStore } from '../store/cartStore';
 import AddressManager from '../../Components/Profile/AddressManager';
 import EditProfileForm from '@/app/Components/Profile/EditProfileForm';
 import Link from 'next/link';
+import WishlistPage from '@/app/Components/Profile/WishlistPage';
+import ChangePasswordForm from '@/app/Components/Profile/ChangePasswordForm';
+import OrderHistory from '@/app/Components/Profile/OrderHistory';
 
 // Тип для вкладок
 type ProfileTab =
@@ -227,7 +230,7 @@ function ProfilePageContent() {
                   userPhone={user.phone} // <--- Передаємо телефон з профілю
                 />}
                 {activeTab === 'wishlist' && <WishlistPage userId={user.id} />}
-                {activeTab === 'security' && <ChangePasswordForm />}
+                {activeTab === 'security' && <ChangePasswordForm user={user}/>}
               </motion.div>
             </AnimatePresence>
           </main>
@@ -247,187 +250,4 @@ export default function ProfilePage() {
 
 
 
-function ChangePasswordForm() {
-  const t = useTranslations('Profile');
-  const [loading, setLoading] = useState(false);
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (newPassword.length < 6) {
-      toast.error(t('passwordErrorLength')); // TODO: Додати переклад
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      toast.error(t('passwordErrorMatch')); // TODO: Додати переклад
-      return;
-    }
-
-    setLoading(true);
-
-    const { error } = await authService.supabase.auth.updateUser({
-      password: newPassword
-    });
-
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success(t('passwordSaveSuccess')); // TODO: Додати переклад
-      setNewPassword('');
-      setConfirmPassword('');
-    }
-    setLoading(false);
-  };
-
-  return (
-    <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-lg border border-gray-100 dark:border-neutral-800 p-6">
-      <h2 className="text-2xl font-bold text-gray-800 dark:text-neutral-100 mb-6">
-        {t('tabSecurity')} {/* TODO: Додати переклад */}
-      </h2>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1">
-            {t('newPasswordLabel')} {/* TODO: Додати переклад */}
-          </label>
-          <input
-            type="password"
-            id="newPassword"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-neutral-300 transition-colors"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1">
-            {t('confirmPasswordLabel')} {/* TODO: Додати переклад */}
-          </label>
-          <input
-            type="password"
-            id="confirmPassword"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-neutral-300 transition-colors"
-          />
-        </div>
-
-        <div className="pt-2">
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 transition-colors disabled:opacity-50"
-          >
-            {loading ? t('updatingPasswordButton') : t('updatePasswordButton')}
-          </button>
-        </div>
-      </form>
-    </div>
-  );
-}
-
-function WishlistPage({ userId }: { userId: string }) {
-  const t = useTranslations('Wishlist');
-  const t_cart = useTranslations('CartSheet');
-
-  const { wishlistItems, removeFromWishlist, moveToCart } = useWishlistStore();
-  const { addToCart } = useCartStore(); // Додано addToCart для сумісності з moveToCart
-
-  const handleMoveToCart = async (item: any) => {
-    // 5. ВИПРАВЛЕНО: `moveToCart` з `wishlistStore` очікує (userId, productId)
-    // і він сам обробляє `addToCart`
-    toast.promise(moveToCart(userId, item.product_id), {
-      loading: t('addingToCart'),
-      success: `${item.products.title} додано до кошика!`, // TODO: Використати переклад
-      error: 'Помилка при переміщенні',
-    });
-  };
-
-  const handleRemove = (productId: number) => {
-    removeFromWishlist(userId, productId);
-    toast.error(t('remove'), { // TODO: Додати переклад для "Видалено з бажань"
-      description: t('remove')
-    });
-  };
-
-  return (
-    <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-lg border border-gray-100 dark:border-neutral-800 p-6">
-      <h2 className="text-2xl font-bold text-gray-800 dark:text-neutral-100 mb-6">
-        {t('title')} ({wishlistItems.length})
-      </h2>
-
-      {wishlistItems.length === 0 ? (
-        <div className="h-48 flex flex-col items-center justify-center bg-gray-50 dark:bg-neutral-800/50 rounded-lg border-2 border-dashed border-gray-300 dark:border-neutral-700">
-          <Heart className="w-12 h-12 mx-auto mb-4 opacity-30 text-gray-500" />
-          <p className="text-gray-500 dark:text-neutral-400">{t('empty')}</p>
-          <p className="text-sm text-gray-400 mt-1">{t('emptyDescription')}</p>
-          <Link href="/shop" className="mt-4 text-sm font-medium text-blue-600 hover:underline">
-            {t('continueShopping')}
-          </Link>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {wishlistItems.map((item) => (
-            <div
-              key={item.id}
-              className="flex items-center gap-4 p-3 rounded-lg border bg-white dark:bg-neutral-800 border-gray-200 dark:border-neutral-700"
-            >
-              <Image
-                src={item.products.images?.[0] || '/images/placeholder.jpg'}
-                alt={item.products.title}
-                width={64}
-                height={64}
-                className="w-16 h-16 object-cover rounded-md flex-shrink-0"
-              />
-              <div className="flex-1 min-w-0">
-                <Link href={`/shop/${item.products.title.replace(/\s+/g, '-').toLowerCase()}`} className="font-medium text-sm truncate hover:underline text-gray-800 dark:text-neutral-100">
-                  {item.products.title}
-                </Link>
-                <p className="text-green-600 font-semibold text-sm">
-                  ${item.products.price}
-                </p>
-              </div>
-              <div className="flex flex-col gap-1">
-                <button
-                  onClick={() => handleMoveToCart(item)}
-                  className="p-2 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-neutral-700 rounded-md transition"
-                  title={t('addToCart')}
-                >
-                  <ShoppingCart className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={() => handleRemove(item.product_id)}
-                  className="p-2 text-red-600 hover:bg-red-50 dark:text-red-500 dark:hover:bg-neutral-700 rounded-md transition"
-                  title={t('remove')}
-                >
-                  <Trash2 className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function OrderHistory({ userId }: { userId: string }) {
-  const t = useTranslations('Profile');
-
-  return (
-    <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-lg border border-gray-100 dark:border-neutral-800 p-6">
-      <h2 className="text-2xl font-bold text-gray-800 dark:text-neutral-100 mb-6">
-        {t('tabOrders')}
-      </h2>
-      <div className="h-48 flex flex-col items-center justify-center bg-gray-50 dark:bg-neutral-800/50 rounded-lg border-2 border-dashed border-gray-300 dark:border-neutral-700">
-        <History className="w-12 h-12 mx-auto mb-4 opacity-30 text-gray-500" />
-        <p className="text-gray-500 dark:text-neutral-400">
-          {t('noOrders')}
-        </p>
-        <p className="text-sm text-gray-400 mt-1">TODO: Реалізувати orderService</p>
-      </div>
-    </div>
-  );
-}

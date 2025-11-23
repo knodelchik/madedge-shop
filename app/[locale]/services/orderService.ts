@@ -1,41 +1,36 @@
-// app/[locale]/services/orderService.ts
 import { supabase } from '../../lib/supabase';
-import { CartItem } from '@/app/types/cart'; // Використаємо ваш існуючий тип
-type Address = any; // (Використайте тип з addressService)
-type Order = any; // (Використайте згенерований тип)
+
+// Типи для TypeScript (щоб все було чітко)
+export interface OrderItem {
+  id: number;
+  product_title: string;
+  quantity: number;
+  price: number;
+  image_url: string;
+}
+
+export interface Order {
+  id: string;
+  created_at: string;
+  total_amount: number;
+  status: 'pending' | 'success' | 'failure';
+  shipping_address: any;
+  shipping_cost: number;
+  shipping_type: string;
+  order_items: OrderItem[]; // Масив товарів
+}
 
 export const orderService = {
-
-  async createOrder(
-    userId: string,
-    items: CartItem[],
-    totalAmount: number,
-    shippingAddress: Address 
-  ): Promise<Order | null> {
-    
-    const { data, error } = await supabase
-      .from('orders')
-      .insert({
-        user_id: userId,
-        total_amount: totalAmount,
-        items: items as any, // Supabase очікує jsonb
-        shipping_address: shippingAddress as any, // Supabase очікує jsonb
-        status: 'pending' // Початковий статус
-      })
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error creating order:', error);
-      return null;
-    }
-    return data;
-  },
+  // createOrder нам тут більше не потрібен для клієнта, 
+  // бо ми створюємо замовлення через API route (create-payment)
   
   async getOrders(userId: string): Promise<Order[]> {
     const { data, error } = await supabase
       .from('orders')
-      .select('*')
+      .select(`
+        *,
+        order_items (*)
+      `)
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
 
@@ -43,6 +38,6 @@ export const orderService = {
       console.error('Error fetching orders:', error);
       return [];
     }
-    return data;
+    return data as Order[];
   }
 };
