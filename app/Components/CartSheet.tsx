@@ -14,6 +14,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import { useCurrency } from '@/app/context/CurrencyContext'; // 1. Імпорт
 
 interface CartItem {
   id: number;
@@ -27,6 +28,9 @@ export default function CartSheet() {
   const t = useTranslations('CartSheet');
   const { cartItems, increaseQuantity, decreaseQuantity } = useCartStore();
   const [open, setOpen] = useState(false);
+  
+  // 2. Отримуємо функцію форматування
+  const { formatPrice } = useCurrency();
 
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = cartItems.reduce(
@@ -34,7 +38,6 @@ export default function CartSheet() {
     0
   );
 
-  const priceUnit = t('priceUnit');
   const placeholderAlt = t('placeholderAlt');
 
   const getSafeImage = (item: CartItem) => {
@@ -110,8 +113,9 @@ export default function CartSheet() {
                     <p className="font-medium text-gray-800 dark:text-neutral-100 truncate">
                       {item.title}
                     </p>
+                    {/* 3. Використовуємо formatPrice для ціни одиниці */}
                     <p className="text-sm text-gray-500 dark:text-neutral-400 mt-1">
-                      {item.price.toFixed(2)} {priceUnit}
+                      {formatPrice(item.price)}
                     </p>
                   </div>
 
@@ -134,8 +138,9 @@ export default function CartSheet() {
                               text-gray-800 dark:text-neutral-100 mb-4"
               >
                 <span>{t('totalLabel')}</span>
+                {/* 4. Використовуємо formatPrice для загальної суми */}
                 <span>
-                  {totalPrice.toFixed(2)} {priceUnit}
+                  {formatPrice(totalPrice)}
                 </span>
               </div>
 

@@ -2,15 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { orderService, Order } from '@/app/[locale]/services/orderService';
-import { Package, ChevronDown, ChevronUp, Calendar, MapPin, CreditCard } from 'lucide-react';
+import { Package, ChevronDown, Calendar, MapPin, CreditCard } from 'lucide-react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useCurrency } from '@/app/context/CurrencyContext'; // 1. Імпорт
 
 export default function OrderHistory({ userId }: { userId: string }) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  // Стейт для відкриття деталей замовлення (акордеон)
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
+  
+  // 2. Отримуємо функцію форматування
+  const { formatPrice } = useCurrency();
 
   useEffect(() => {
     const loadOrders = async () => {
@@ -72,7 +75,7 @@ export default function OrderHistory({ userId }: { userId: string }) {
             key={order.id} 
             className="bg-white dark:bg-neutral-900 rounded-2xl border border-gray-200 dark:border-neutral-800 overflow-hidden hover:shadow-md transition-shadow"
           >
-            {/* HEADER ЗАМОВЛЕННЯ (Завжди видно) */}
+            {/* HEADER */}
             <div 
               onClick={() => toggleOrder(order.id)}
               className="p-5 cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gray-50/50 dark:bg-neutral-900"
@@ -97,14 +100,15 @@ export default function OrderHistory({ userId }: { userId: string }) {
                     </span>
                     <span>•</span>
                     <span className="font-medium text-gray-900 dark:text-neutral-200">
-                      {order.total_amount} грн
+                      {/* 3. Використовуємо formatPrice */}
+                      {formatPrice(order.total_amount)}
                     </span>
                   </div>
                 </div>
               </div>
 
               <div className="flex items-center justify-between md:justify-end gap-4">
-                {/* Мініатюри товарів (показуємо до 3х штук) */}
+                {/* Мініатюри */}
                 <div className="flex -space-x-3">
                   {order.order_items.slice(0, 3).map((item, idx) => (
                     <div key={idx} className="relative w-10 h-10 rounded-full border-2 border-white dark:border-neutral-800 bg-white dark:bg-neutral-900 overflow-hidden">
@@ -128,7 +132,7 @@ export default function OrderHistory({ userId }: { userId: string }) {
               </div>
             </div>
 
-            {/* ДЕТАЛІ (Розкриваються) */}
+            {/* ДЕТАЛІ */}
             <AnimatePresence>
               {expandedOrderId === order.id && (
                 <motion.div
@@ -156,11 +160,11 @@ export default function OrderHistory({ userId }: { userId: string }) {
                               {item.product_title}
                             </p>
                             <p className="text-xs text-gray-500">
-                              {item.quantity} шт. x {item.price} грн
+                              {item.quantity} шт. x {formatPrice(item.price)}
                             </p>
                           </div>
                           <div className="font-medium text-gray-900 dark:text-white">
-                            {item.quantity * item.price} грн
+                            {formatPrice(item.quantity * item.price)}
                           </div>
                         </div>
                       ))}
@@ -185,7 +189,7 @@ export default function OrderHistory({ userId }: { userId: string }) {
                         <div>
                           <p className="text-sm font-medium text-gray-900 dark:text-white">Оплата</p>
                           <p className="text-sm text-gray-500 dark:text-neutral-400 mt-1 capitalize">
-                            {order.shipping_type} Delivery • {order.shipping_cost > 0 ? `${order.shipping_cost} грн` : 'Безкоштовно'}
+                            {order.shipping_type} Delivery • {order.shipping_cost > 0 ? formatPrice(order.shipping_cost) : 'Безкоштовно'}
                           </p>
                         </div>
                       </div>

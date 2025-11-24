@@ -13,6 +13,7 @@ import { Product } from '@/app/types/products';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
+import Price from '@/app/Components/Price';
 
 export default function ProductPage() {
   const { slug } = useParams();
@@ -177,7 +178,7 @@ export default function ProductPage() {
                   {product.title}
                 </h1>
                 <p className="text-xl sm:text-2xl font-semibold text-gray-700 dark:text-neutral-200">
-                  {product.price} $
+                  <Price amount={product.price} />
                 </p>
               </div>
 

@@ -10,6 +10,7 @@ import MagnetLines from '../../../components/MagnetLines';
 import { productsService } from '../services/productService';
 import { Product } from '../../types/products';
 import WishlistButton from '../../Components/WishlistButton';
+import Price from '@/app/Components/Price';
 
 type Category = 'all' | 'sharpeners' | 'stones' | 'accessories';
 
@@ -340,54 +341,54 @@ function ProductCard({ product }: { product: Product }) {
       ? product.images[0]
       : '/images/placeholder.jpg';
 
-  return (
-    <div
-      className="group flex flex-col items-center hover:scale-105 active:scale-100 transition-transform duration-300 relative"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {/* Wishlist Button - завжди видима на мобільних, з'являється при hover на desktop */}
+    return (
       <div
-        className={`absolute top-1 right-2 sm:right-3.5 z-20 transition-all duration-300 
-          opacity-100 scale-100 
-          md:opacity-0 md:scale-90 
-          ${isHovered ? 'md:opacity-100 md:scale-100' : ''}`}
+        className="group flex flex-col items-center hover:scale-105 active:scale-100 transition-transform duration-300 relative"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
-        <WishlistButton
-          productId={product.id}
-          size="sm"
-          onClick={(e: React.MouseEvent) => {
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-        />
-      </div>
-
-      <Link
-        href={`/shop/${product.title.replace(/\s+/g, '-').toLowerCase()}`}
-        className="w-full"
-      >
-        <div className="flex flex-col items-center w-full">
-          <Image
-            src={mainImage}
-            alt={product.title}
-            width={300}
-            height={256}
-            className="w-full h-48 sm:h-56 md:h-64 rounded-xl sm:rounded-2xl shadow-lg object-contain group-hover:opacity-90 transition cursor-pointer"
-            onError={(e) => {
-              e.currentTarget.src = '/images/placeholder.jpg';
+        {/* Wishlist Button - завжди видима на мобільних, з'являється при hover на desktop */}
+        <div
+          className={`absolute top-1 right-2 sm:right-3.5 z-20 transition-all duration-300 
+            opacity-100 scale-100 
+            md:opacity-0 md:scale-90 
+            ${isHovered ? 'md:opacity-100 md:scale-100' : ''}`}
+        >
+          <WishlistButton
+            productId={product.id}
+            size="sm"
+            onClick={(e: React.MouseEvent) => {
+              e.preventDefault();
+              e.stopPropagation();
             }}
           />
-          <div className="flex justify-between items-center mt-2 sm:mt-3 w-full px-1 sm:px-2">
-            <h3 className="text-base sm:text-lg font-bold text-gray-800 line-clamp-2 dark:text-neutral-200">
-              {product.title}
-            </h3>
-            <p className="text-xs sm:text-sm font-semibold text-gray-600 whitespace-nowrap ml-2 dark:text-neutral-400">
-              {product.price} {t('priceUnit')}
-            </p>
-          </div>
         </div>
-      </Link>
-    </div>
-  );
+
+        <Link
+          href={`/shop/${product.title.replace(/\s+/g, '-').toLowerCase()}`}
+          className="w-full"
+        >
+          <div className="flex flex-col items-center w-full">
+            <Image
+              src={mainImage}
+              alt={product.title}
+              width={300}
+              height={256}
+              className="w-full h-48 sm:h-56 md:h-64 rounded-xl sm:rounded-2xl shadow-lg object-contain group-hover:opacity-90 transition cursor-pointer"
+              onError={(e) => {
+                e.currentTarget.src = '/images/placeholder.jpg';
+              }}
+            />
+            <div className="flex justify-between items-center mt-2 sm:mt-3 w-full px-1 sm:px-2">
+              <h3 className="text-base sm:text-lg font-bold text-gray-800 line-clamp-2 dark:text-neutral-200">
+                {product.title}
+              </h3>
+              <p className="text-xs sm:text-sm font-semibold text-gray-600 whitespace-nowrap ml-2 dark:text-neutral-400">
+                <Price amount={product.price} />
+              </p>
+            </div>
+          </div>
+        </Link>
+      </div>
+    );
 }
