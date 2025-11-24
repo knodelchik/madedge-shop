@@ -11,7 +11,13 @@ import { addressService } from '../services/adressService';
 import { Address } from '../../types/address';
 import { toast } from 'sonner';
 import { Truck, ChevronDown, Plus, MapPin, Clock, Plane } from 'lucide-react';
-import { getShippingPrice } from '@/app/constants/deliveryData';
+import { createClient } from '@supabase/supabase-js'; // Імпортуємо клієнт для завантаження налаштувань
+
+// Створюємо клієнт тут (або імпортуємо з lib/supabase)
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 const createSlug = (str: string) =>
   str.toLowerCase().trim().replace(/[\s\W-]+/g, '-');
@@ -31,20 +37,24 @@ export default function OrderPage() {
   const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
   const [isAddressMenuOpen, setIsAddressMenuOpen] = useState(false);
 
-  // Доставка
+  // Доставка (Дані з БД)
+  const [deliverySettings, setDeliverySettings] = useState<any[]>([]); // Масив налаштувань
   const [shippingType, setShippingType] = useState<'Standard' | 'Express'>('Standard');
   const [shippingCost, setShippingCost] = useState(0);
 
   const priceUnit = t('priceUnit');
 
-  // 1. Завантаження даних
+  // 1. Завантаження даних (Юзер, Адреси, Налаштування доставки)
   useEffect(() => {
     const initData = async () => {
       setLoading(true);
-      const { user } = await authService.getCurrentUser();
       
+      // А. Юзер
+      const { user } = await authService.getCurrentUser();
       if (user) {
         setUser(user);
+        
+        // Б. Адреси
         const userAddresses = await addressService.getAddresses(user.id);
         setAddresses(userAddresses);
 
@@ -53,12 +63,39 @@ export default function OrderPage() {
           setSelectedAddressId(defaultAddr.id);
         }
       }
+
+      // В. Налаштування доставки (З бази даних!)
+      const { data: settingsData } = await supabase.from('delivery_settings').select('*');
+      setDeliverySettings(settingsData || []);
+
       setLoading(false);
     };
     initData();
   }, []);
 
-  // 2. Розрахунок вартості доставки
+  // Хелпер для розрахунку ціни (шукає в deliverySettings)
+  const calculateShippingPrice = (countryCode: string, type: 'Standard' | 'Express') => {
+    if (!deliverySettings.length) return 0;
+
+    // 1. Шукаємо налаштування для конкретної країни
+    let setting = deliverySettings.find(s => s.country_code === countryCode);
+
+    // 2. Якщо немає, шукаємо ROW (Rest of World)
+    if (!setting) {
+      setting = deliverySettings.find(s => s.country_code === 'ROW');
+    }
+
+    // 3. Якщо навіть ROW немає (або країна в чорному списку, якщо ви так зробите)
+    if (!setting) return null; // Доставка недоступна
+
+    // 4. Повертаємо ціну залежно від типу
+    if (type === 'Standard') return Number(setting.standard_price);
+    if (type === 'Express') return Number(setting.express_price);
+    
+    return 0;
+  };
+
+  // 2. Ефект для оновлення вартості доставки
   useEffect(() => {
     if (!selectedAddressId) {
       setShippingCost(0);
@@ -68,12 +105,11 @@ export default function OrderPage() {
     const address = addresses.find(a => a.id === selectedAddressId);
     if (!address) return;
 
-    // Передаємо обраний тип (Standard або Express) у функцію розрахунку
-    const cost = getShippingPrice(address.country_code, shippingType);
+    // Використовуємо нову функцію
+    const cost = calculateShippingPrice(address.country_code, shippingType);
     
     if (cost === null) {
       toast.error('Доставка цього типу недоступна в ваш регіон');
-      // Якщо Express недоступний, спробуємо перемкнути на Standard
       if (shippingType === 'Express') {
          setShippingType('Standard');
       } else {
@@ -82,34 +118,31 @@ export default function OrderPage() {
     } else {
       setShippingCost(cost);
     }
-
-  }, [selectedAddressId, addresses, shippingType]); // Додали shippingType в залежності
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedAddressId, addresses, shippingType, deliverySettings]); 
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const total = subtotal + shippingCost;
   const selectedAddress = addresses.find(a => a.id === selectedAddressId);
 
-  // Отримуємо ціни для відображення на кнопках вибору
+  // Отримуємо ціни для UI кнопок
   const getCostForUI = (type: 'Standard' | 'Express') => {
     if (!selectedAddress) return 0;
-    const cost = getShippingPrice(selectedAddress.country_code, type);
-    return cost; // поверне число, 0 або null
+    return calculateShippingPrice(selectedAddress.country_code, type);
   };
 
   const standardCost = getCostForUI('Standard');
   const expressCost = getCostForUI('Express');
 
-const handlePayment = async () => {
+  const handlePayment = async () => {
     setProcessing(true);
 
     try {
-      // 1. Перевірка авторизації
       if (!user) {
         toast.error('Ви не авторизовані. Будь ласка, увійдіть.');
         return;
       }
 
-      // 2. Перевірка підтвердження пошти
       if (!user.email_confirmed_at) {
         toast.error('Для оформлення замовлення необхідно підтвердити електронну пошту.', {
           action: {
@@ -121,13 +154,11 @@ const handlePayment = async () => {
         return;
       }
 
-      // 3. Перевірка вибору адреси
       if (!selectedAddressId) {
         toast.error('Оберіть адресу доставки');
         return;
       }
 
-      // Знаходимо повний об'єкт адреси за ID
       const currentAddress = addresses.find(a => a.id === selectedAddressId);
       
       if (!currentAddress) {
@@ -135,7 +166,6 @@ const handlePayment = async () => {
         return;
       }
 
-      // 4. Відправка запиту на сервер
       const res = await fetch('/api/create-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -151,13 +181,11 @@ const handlePayment = async () => {
       
       const data = await res.json();
 
-      // 5. Обробка відповіді
       if (!res.ok) {
         throw new Error(data.error || 'Помилка при створенні платежу');
       }
 
       if (data.payment_url) {
-        // Перенаправлення на сторінку оплати (Fondy)
         window.location.href = data.payment_url;
       } else {
         toast.error('Не вдалося отримати посилання на оплату');
@@ -167,7 +195,6 @@ const handlePayment = async () => {
       console.error('Payment Error:', error);
       toast.error(error.message || 'Помилка з\'єднання з сервером');
     } finally {
-      // Цей код виконається завжди, знімаючи блокування кнопки
       setProcessing(false);
     }
   };
@@ -280,7 +307,7 @@ const handlePayment = async () => {
                 )}
               </div>
 
-              {/* === 2. СПОСІБ ДОСТАВКИ (НОВИЙ БЛОК) === */}
+              {/* === 2. СПОСІБ ДОСТАВКИ === */}
               {selectedAddressId && (
                 <div className="mb-6 animate-in fade-in slide-in-from-top-2 duration-300">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

@@ -53,23 +53,31 @@ export const authService = {
 
   // Отримати поточного користувача
 async getCurrentUser(): Promise<{ user: User | null; error: string | null }> {
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser();
+    // 1. Отримуємо користувача з Auth (email, id)
+    const { data: { user }, error } = await supabase.auth.getUser();
 
     if (error) {
       return { user: null, error: error.message };
     }
 
     if (user) {
+      // 2. Отримуємо додаткові дані з public.users (role, name, phone)
+      const { data: profile } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      // 3. Об'єднуємо дані
       const mappedUser: any = {
         ...user,
-        full_name: user.user_metadata?.full_name || '',
-        phone: user.phone || user.user_metadata?.phone || '',
-        // Додаємо мапінг статусу пошти
-        email_confirmed_at: user.email_confirmed_at || null, 
+        // Якщо профіль є - беремо дані з нього, якщо ні - з метаданих
+        full_name: profile?.full_name || user.user_metadata?.full_name || '',
+        phone: profile?.phone || user.phone || '',
+        email_confirmed_at: user.email_confirmed_at || null,
+        role: profile?.role || 'user', // <--- ОСЬ ТУТ МИ ОТРИМУЄМО РОЛЬ
       };
+
       return { user: mappedUser as User, error: null };
     }
 
@@ -77,25 +85,14 @@ async getCurrentUser(): Promise<{ user: User | null; error: string | null }> {
   },
 
   // Отримати профіль користувача
-  async getUserProfile(
-    userId: string
-  ): Promise<{ profile: User | null; error: string | null }> {
+  async getUserProfile(userId: string): Promise<{ profile: User | null; error: string | null }> {
     const { data, error } = await supabase
       .from('users')
       .select('*')
       .eq('id', userId)
-      .maybeSingle(); // Використовуємо maybeSingle, щоб не було помилки JSON, якщо профілю немає
+      .maybeSingle();
 
-    if (error) {
-      console.error('Error fetching profile:', error);
-      return { profile: null, error: error.message };
-    }
-
-    // Якщо даних немає, повертаємо null, а не помилку
-    if (!data) {
-      return { profile: null, error: null };
-    }
-
+    if (error) return { profile: null, error: error.message };
     return { profile: data as unknown as User, error: null };
   },
 
@@ -141,7 +138,7 @@ async getCurrentUser(): Promise<{ user: User | null; error: string | null }> {
 
     return { error: error?.message || null };
   },
-  
+
   async resendVerificationEmail(email: string): Promise<{ error: string | null }> {
     const { error } = await supabase.auth.resend({
       type: 'signup',
