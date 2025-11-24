@@ -49,17 +49,24 @@ const customStyles = (isDark: boolean) => ({
 interface AddressFormProps {
   onSave: (data: AddressFormData) => void;
   onCancel: () => void;
-  defaultPhone?: string; // <--- 1. Додали проп
+  defaultPhone?: string;
 }
 
-export default function AddressForm({ onSave, onCancel, defaultPhone = '' }: AddressFormProps) {
+export default function AddressForm({
+  onSave,
+  onCancel,
+  defaultPhone = '',
+}: AddressFormProps) {
+  // Використовуємо namespace 'Profile'
   const t = useTranslations('Profile');
-  const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+  const isDark =
+    typeof document !== 'undefined' &&
+    document.documentElement.classList.contains('dark');
 
   const [selectedCountry, setSelectedCountry] = useState<any>(null);
   const [selectedState, setSelectedState] = useState<any>(null);
   const [states, setStates] = useState<any[]>([]);
-  
+
   const [formData, setFormData] = useState({
     city: '',
     address_line1: '',
@@ -108,32 +115,36 @@ export default function AddressForm({ onSave, onCancel, defaultPhone = '' }: Add
       className="space-y-4 p-6 bg-gray-50 dark:bg-neutral-800/50 rounded-xl border border-gray-200 dark:border-neutral-700 mt-6"
     >
       <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-4">
-        Додати нову адресу
+        {t('AddressForm.title')}
       </h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1">
-            Країна *
+            {t('AddressForm.countryLabel')}
           </label>
           <Select
             options={countries}
             value={selectedCountry}
             onChange={setSelectedCountry}
-            placeholder="Оберіть країну"
+            placeholder={t('AddressForm.selectCountryPlaceholder')}
             styles={customStyles(isDark)}
             required
           />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1">
-            Область / Штат
+            {t('AddressForm.stateLabel')}
           </label>
           <Select
             options={states}
             value={selectedState}
             onChange={setSelectedState}
-            placeholder={states.length > 0 ? "Оберіть регіон" : "Немає регіонів"}
+            placeholder={
+              states.length > 0
+                ? t('AddressForm.selectRegionPlaceholder')
+                : t('AddressForm.noRegionsPlaceholder')
+            }
             isDisabled={states.length === 0}
             styles={customStyles(isDark)}
           />
@@ -143,7 +154,7 @@ export default function AddressForm({ onSave, onCancel, defaultPhone = '' }: Add
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1">
-            Місто *
+            {t('AddressForm.cityLabel')}
           </label>
           <input
             type="text"
@@ -155,13 +166,15 @@ export default function AddressForm({ onSave, onCancel, defaultPhone = '' }: Add
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1">
-            Поштовий індекс *
+            {t('AddressForm.postalCodeLabel')}
           </label>
           <input
             type="text"
             required
             value={formData.postal_code}
-            onChange={(e) => setFormData({ ...formData, postal_code: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, postal_code: e.target.value })
+            }
             className="w-full px-4 py-2.5 border border-gray-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
           />
         </div>
@@ -169,45 +182,49 @@ export default function AddressForm({ onSave, onCancel, defaultPhone = '' }: Add
 
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1">
-          Вулиця, будинок *
+          {t('AddressForm.addressLine1Label')}
         </label>
         <input
           type="text"
           required
-          placeholder="Вул. Шевченка 1, кв. 10"
+          placeholder={t('AddressForm.addressLine1Placeholder')}
           value={formData.address_line1}
-          onChange={(e) => setFormData({ ...formData, address_line1: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, address_line1: e.target.value })
+          }
           className="w-full px-4 py-2.5 border border-gray-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
         />
       </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1">
-          Додаткова інформація (опціонально)
+          {t('AddressForm.addressLine2Label')}
         </label>
         <input
           type="text"
-          placeholder="Під'їзд, код домофону тощо"
+          placeholder={t('AddressForm.addressLine2Placeholder')}
           value={formData.address_line2}
-          onChange={(e) => setFormData({ ...formData, address_line2: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, address_line2: e.target.value })
+          }
           className="w-full px-4 py-2.5 border border-gray-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
         />
       </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1">
-          Телефон *
+          {t('AddressForm.phoneLabel')}
         </label>
         <input
           type="tel"
           required
-          placeholder="+380..."
+          placeholder={t('AddressForm.phonePlaceholder')}
           value={formData.phone}
           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
           className="w-full px-4 py-2.5 border border-gray-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
         />
         <p className="text-xs text-gray-500 mt-1 ml-1">
-          Ми використали ваш номер з профілю. Ви можете змінити його для цієї адреси.
+          {t('AddressForm.phoneHelperText')}
         </p>
       </div>
 
@@ -216,27 +233,32 @@ export default function AddressForm({ onSave, onCancel, defaultPhone = '' }: Add
           type="checkbox"
           id="is_default"
           checked={formData.is_default}
-          onChange={(e) => setFormData({ ...formData, is_default: e.target.checked })}
-          className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          onChange={(e) =>
+            setFormData({ ...formData, is_default: e.target.checked })
+          }
+          className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
         />
-        <label htmlFor="is_default" className="text-sm text-gray-700 dark:text-neutral-300 cursor-pointer">
-          Зробити основною адресою
+        <label
+          htmlFor="is_default"
+          className="text-sm text-gray-700 dark:text-neutral-300 cursor-pointer"
+        >
+          {t('AddressForm.setDefaultLabel')}
         </label>
       </div>
 
       <div className="flex gap-3 pt-4">
         <button
           type="submit"
-          className="px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-lg font-medium hover:opacity-90 transition-opacity"
+          className="px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-lg font-medium hover:opacity-90 transition-opacity cursor-pointer"
         >
-          Зберегти
+          {t('AddressForm.saveButton')}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="px-6 py-2.5 border border-gray-300 dark:border-neutral-600 text-gray-700 dark:text-neutral-300 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors"
+          className="px-6 py-2.5 border border-gray-300 dark:border-neutral-600 text-gray-700 dark:text-neutral-300 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors cursor-pointer"
         >
-          Скасувати
+          {t('AddressForm.cancelButton')}
         </button>
       </div>
     </motion.form>

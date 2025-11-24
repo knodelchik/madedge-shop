@@ -1,5 +1,3 @@
-// app/[locale]/profile/page.tsx
-
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
@@ -16,31 +14,21 @@ import {
   Lock,
   LogOut,
   History,
-  ShoppingCart,
-  Trash2,
 } from 'lucide-react';
-import { toast } from 'sonner';
-import Image from 'next/image';
 
 // Імпорти сторів та сервісів
 import { useWishlistStore } from '../store/wishlistStore';
 import { useCartStore } from '../store/cartStore';
 
-// ІМПОРТ АДРЕСНОГО МЕНЕДЖЕРА
+// ІМПОРТ АДРЕСНОГО МЕНЕДЖЕРА ТА ІНШИХ КОМПОНЕНТІВ
 import AddressManager from '../../Components/Profile/AddressManager';
 import EditProfileForm from '@/app/Components/Profile/EditProfileForm';
-import Link from 'next/link';
 import WishlistPage from '@/app/Components/Profile/WishlistPage';
 import ChangePasswordForm from '@/app/Components/Profile/ChangePasswordForm';
 import OrderHistory from '@/app/Components/Profile/OrderHistory';
 
 // Тип для вкладок
-type ProfileTab =
-  | 'profile'
-  | 'orders'
-  | 'addresses'
-  | 'wishlist'
-  | 'security';
+type ProfileTab = 'profile' | 'orders' | 'addresses' | 'wishlist' | 'security';
 
 function ProfilePageContent() {
   const t = useTranslations('Profile');
@@ -58,7 +46,7 @@ function ProfilePageContent() {
     const checkAuth = async () => {
       setLoading(true);
 
-      // 1. Отримуємо дані авторизації (тут правильна пошта, але старе ім'я)
+      // 1. Отримуємо дані авторизації
       const { user: authUser } = await authService.getCurrentUser();
 
       if (!authUser) {
@@ -66,13 +54,10 @@ function ProfilePageContent() {
         return;
       }
 
-      // 2. Отримуємо дані з бази (тут правильне ім'я та телефон)
+      // 2. Отримуємо дані з бази
       const { profile } = await authService.getUserProfile(authUser.id);
 
-      // 3. === МАГІЯ ОБ'ЄДНАННЯ ===
-      // Ми беремо authUser як основу (для ID та Email)
-      // І "накладаємо" зверху profile (для Full Name та Phone)
-      // Якщо в profile є дані, вони перекриють старі дані з authUser
+      // 3. Об'єднуємо дані
       const mergedUser = {
         ...authUser,
         ...profile,
@@ -114,12 +99,12 @@ function ProfilePageContent() {
     },
     {
       id: 'orders',
-      label: 'Історія замовлень',
+      label: t('tabOrders'), // Використовуємо переклад
       icon: <History size={18} />,
     },
     {
       id: 'addresses',
-      label: 'Адреси доставки',
+      label: t('tabAddresses'), // Використовуємо переклад
       icon: <MapPin size={18} />,
     },
     {
@@ -129,10 +114,11 @@ function ProfilePageContent() {
     },
     {
       id: 'security',
-      label: 'Безпека',
+      label: t('tabSecurity'), // Використовуємо переклад
       icon: <Lock size={18} />,
     },
   ];
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-black flex items-center justify-center transition-colors duration-300">
@@ -190,10 +176,11 @@ function ProfilePageContent() {
                   <button
                     key={tab.id}
                     onClick={() => handleTabChange(tab.id as ProfileTab)}
-                    className={`flex items-center space-x-3 w-full p-3 rounded-lg font-medium text-sm transition-colors ${activeTab === tab.id
+                    className={`flex items-center space-x-3 w-full p-3 rounded-lg font-medium text-sm transition-colors ${
+                      activeTab === tab.id
                         ? 'bg-gray-100 dark:bg-neutral-800 text-gray-900 dark:text-white'
                         : 'text-gray-600 dark:text-neutral-400 hover:bg-gray-50 dark:hover:bg-neutral-800/50'
-                      }`}
+                    }`}
                   >
                     {tab.icon}
                     <span>{tab.label}</span>
@@ -224,13 +211,11 @@ function ProfilePageContent() {
               >
                 {activeTab === 'profile' && <EditProfileForm user={user} />}
                 {activeTab === 'orders' && <OrderHistory userId={user.id} />}
-                {/* ВИКОРИСТОВУЄМО ОНОВЛЕНИЙ КОМПОНЕНТ */}
-                {activeTab === 'addresses' && <AddressManager
-                  userId={user.id}
-                  userPhone={user.phone} // <--- Передаємо телефон з профілю
-                />}
+                {activeTab === 'addresses' && (
+                  <AddressManager userId={user.id} userPhone={user.phone} />
+                )}
                 {activeTab === 'wishlist' && <WishlistPage userId={user.id} />}
-                {activeTab === 'security' && <ChangePasswordForm user={user}/>}
+                {activeTab === 'security' && <ChangePasswordForm user={user} />}
               </motion.div>
             </AnimatePresence>
           </main>
@@ -247,7 +232,3 @@ export default function ProfilePage() {
     </Suspense>
   );
 }
-
-
-
-

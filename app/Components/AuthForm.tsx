@@ -5,7 +5,7 @@ import { authService } from '../../app/[locale]/services/authService';
 import { AuthFormData } from '../../app/types/users';
 import { useCartStore } from '../../app/[locale]/store/cartStore';
 import { useTranslations } from 'next-intl';
-import { toast } from 'sonner'; // Імпортуємо toast
+import { toast } from 'sonner';
 
 interface AuthFormProps {
   type: 'signin' | 'signup';
@@ -21,6 +21,7 @@ export default function AuthForm({
   onForgotPassword,
 }: AuthFormProps) {
   const t = useTranslations('AuthForm');
+  const tAuth = useTranslations('Auth'); // Використовуємо існуючий namespace для спільних текстів
 
   const [formData, setFormData] = useState<AuthFormData>({
     email: '',
@@ -40,14 +41,15 @@ export default function AuthForm({
 
       if (type === 'signup') {
         result = await authService.signUp(formData);
-        
+
         // === ЛОГІКА ПОВІДОМЛЕННЯ ПРО ПІДТВЕРДЖЕННЯ ===
         if (result?.user && !result.error) {
-          toast.message('Акаунт створено!', {
-            description: 'На вашу пошту надіслано лист. Будь ласка, підтвердіть її, щоб мати можливість оформлювати замовлення.',
-            duration: 8000, // Показуємо довше
+          // Використовуємо нові ключі для toast
+          toast.message(t('signupSuccessTitle'), {
+            description: t('signupSuccessDesc'),
+            duration: 8000,
             action: {
-              label: 'Зрозуміло',
+              label: t('signupSuccessAction'),
               onClick: () => console.log('Closed'),
             },
           });
@@ -161,7 +163,8 @@ export default function AuthForm({
               onClick={onForgotPassword}
               className="text-sm text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors cursor-pointer"
             >
-              Забули пароль?
+              {/* Використовуємо ключ з namespace 'Auth', оскільки він там вже є */}
+              {tAuth('forgotPasswordLink')}
             </button>
           </div>
         )}
