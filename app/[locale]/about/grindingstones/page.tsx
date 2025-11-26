@@ -235,7 +235,7 @@ export default function GrindingStonesPage() {
           </div>
         </section>
 
-        {/* === Comparison Table === */}
+        {/* === Comparison Table (FIXED CENTER) === */}
         <motion.section
           id="comparison"
           className="mb-16 sm:mb-20 scroll-mt-24"
@@ -245,15 +245,19 @@ export default function GrindingStonesPage() {
             {t('comparison.title')}
           </h2>
 
-          <div className="overflow-x-auto -mx-4 sm:-mx-0">
-            <table className="min-w-full sm:min-w-[800px] border-collapse text-sm sm:text-base">
+          {/* ADDED: flex justify-center to wrapper */}
+          <div className="overflow-x-auto -mx-4 sm:-mx-0 flex justify-center">
+            {/* ADDED: mx-auto to table and w-1/3 to headers */}
+            <table className="min-w-full sm:min-w-[800px] mx-auto border-collapse text-sm sm:text-base table-fixed">
               <thead className="bg-neutral-900 text-white dark:bg-neutral-800">
                 <tr>
-                  <th className="p-3 sm:p-4 text-left">{t_comp('feature')}</th>
-                  <th className="p-3 sm:p-4 text-center">
+                  <th className="p-3 sm:p-4 text-left w-1/3">
+                    {t_comp('feature')}
+                  </th>
+                  <th className="p-3 sm:p-4 text-center w-1/3">
                     {t_comp('diamondStonesTitle')}
                   </th>
-                  <th className="p-3 sm:p-4 text-center">
+                  <th className="p-3 sm:p-4 text-center w-1/3">
                     {t_comp('aluminumOxideTitle')}
                   </th>
                 </tr>
@@ -265,7 +269,6 @@ export default function GrindingStonesPage() {
                 whileInView="animate"
                 viewport={{ once: true }}
               >
-                {/* таблиця без змін, тільки зменшив падінги на мобілці */}
                 {[
                   'material',
                   'size',
@@ -293,7 +296,6 @@ export default function GrindingStonesPage() {
                           : ''
                       }`}
                     >
-                      {/* контент без змін */}
                       {row === 'material'
                         ? t_comp('materialDiamond')
                         : row === 'size'

@@ -1037,7 +1037,7 @@ export const translations = {
         globalStandard: { name: 'Глобальний стандарт', time: '10–30 днів' },
         globalExpress: { name: 'Глобальний експрес', time: '5–15 днів' },
 
-        ruUnavailable: { name: 'Іди до біса', time: 'Н/Д' },
+        ruUnavailable: { name: 'Іди до біса', time: 'Н/Д', price: '-' },
       },
       service: {
         standard: 'Стандарт',

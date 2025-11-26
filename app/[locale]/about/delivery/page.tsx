@@ -1,32 +1,43 @@
 'use client';
 
-import { DELIVERY_DATA, DeliveryOption, DeliveryCost } from '@/app/constants/deliveryData';
-
 import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
-import {
-  Truck,
-  Skull,
-  Smile,
-  Frown,
-  DollarSign,
-  Loader,
-  Globe,
-} from 'lucide-react';
+import { createClient } from '@supabase/supabase-js';
+import { Truck, Skull, Smile, Frown, DollarSign, Loader } from 'lucide-react';
 import { Country, State } from 'country-state-city';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// --- Types ---
+// --- 1. Налаштування Supabase ---
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+// --- 2. Типи ---
 interface SelectOption {
   value: string;
   label: string;
 }
 
+interface DbDeliveryRule {
+  country_code: string;
+  standard_price: number;
+  express_price: number;
+}
+
+export interface DeliveryOption {
+  service: string;
+  price: number | 'Free' | 'N/A';
+  time: string;
+  serviceKey?: string;
+  timeKey?: string;
+}
+
+// --- 3. Стилі Select (без змін) ---
 function getCustomStyles(themeMode: 'light' | 'dark') {
   const isDark = themeMode === 'dark';
-
   const controlBg = isDark ? '#111111' : '#fff';
   const controlBorder = isDark ? '#262626' : '#d1d5db';
   const controlBorderFocus = isDark ? '#737373' : '#3b82f6';
@@ -35,14 +46,12 @@ function getCustomStyles(themeMode: 'light' | 'dark') {
   const optionHoverBg = isDark ? '#333333' : '#f3f4f6';
   const optionActiveBg = isDark ? '#111111' : '#e6eef8';
   const placeholderColor = isDark ? '#9ca3af' : '#6b7280';
-  const dropdownIndicatorColor = isDark ? '#a1a1aa' : '#6b7280';
   const menuBorder = isDark ? '#262626' : '#e5e7eb';
 
   return {
     control: (provided: any, state: any) => ({
       ...provided,
       minHeight: '48px',
-      // Важливо для iOS: 16px запобігає зуму при фокусі
       fontSize: '16px',
       background: controlBg,
       borderColor: state.isFocused ? controlBorderFocus : controlBorder,
@@ -52,98 +61,24 @@ function getCustomStyles(themeMode: 'light' | 'dark') {
       },
       color: textColor,
       outline: 'none',
-      userSelect: 'none',
-      WebkitTapHighlightColor: 'transparent',
     }),
-
-    valueContainer: (provided: any) => ({
-      ...provided,
-      padding: '0 8px',
-      color: textColor,
-      userSelect: 'none',
-    }),
-
-    singleValue: (provided: any) => ({
-      ...provided,
-      color: textColor,
-      userSelect: 'none',
-    }),
-
-    input: (provided: any) => ({
-      ...provided,
-      color: textColor,
-    }),
-
-    placeholder: (provided: any) => ({
-      ...provided,
-      color: placeholderColor,
-    }),
-
-    indicatorsContainer: (provided: any) => ({
-      ...provided,
-      color: dropdownIndicatorColor,
-    }),
-
-    dropdownIndicator: (provided: any) => ({
-      ...provided,
-      color: dropdownIndicatorColor,
-      '&:hover': { color: dropdownIndicatorColor },
-    }),
-
+    singleValue: (provided: any) => ({ ...provided, color: textColor }),
+    input: (provided: any) => ({ ...provided, color: textColor }),
     menu: (provided: any) => ({
       ...provided,
       zIndex: 9999,
       background: menuBg,
       border: `1px solid ${menuBorder}`,
-      boxShadow: isDark
-        ? '0 8px 24px rgba(0,0,0,0.6)'
-        : '0 8px 24px rgba(15,23,42,0.08)',
-      outline: 'none',
-      WebkitTapHighlightColor: 'transparent',
     }),
-
-    menuList: (provided: any) => ({
-      ...provided,
-      padding: 0,
-      color: textColor,
-      maxHeight: '320px',
-      WebkitTapHighlightColor: 'transparent',
-    }),
-
     option: (provided: any, state: any) => ({
       ...provided,
-      fontSize: '16px', // Адаптація шрифту
       background: state.isSelected
         ? optionActiveBg
         : state.isFocused
         ? optionHoverBg
         : 'transparent',
       color: textColor,
-      padding: '10px 12px',
       cursor: 'pointer',
-      userSelect: 'none',
-      outline: 'none',
-      WebkitTapHighlightColor: 'transparent',
-      ':active': {
-        background: state.isSelected ? optionActiveBg : optionHoverBg,
-      },
-    }),
-
-    noOptionsMessage: (provided: any) => ({
-      ...provided,
-      color: placeholderColor,
-      padding: '8px 12px',
-    }),
-
-    clearIndicator: (provided: any) => ({
-      ...provided,
-      color: dropdownIndicatorColor,
-      '&:hover': { color: dropdownIndicatorColor },
-    }),
-
-    menuPortal: (provided: any) => ({
-      ...provided,
-      zIndex: 9999,
     }),
   };
 }
@@ -160,10 +95,7 @@ export default function DeliveryPage() {
   ];
 
   const allCountriesOptions: SelectOption[] = Country.getAllCountries().map(
-    (c) => ({
-      value: c.isoCode,
-      label: c.name,
-    })
+    (c) => ({ value: c.isoCode, label: c.name })
   );
 
   const initialCountryOption =
@@ -177,9 +109,9 @@ export default function DeliveryPage() {
   const [selectedStateOption, setSelectedStateOption] =
     useState<SelectOption | null>(null);
 
-  const [shippingOptions, setShippingOptions] = useState<DeliveryOption[]>(
-    DELIVERY_DATA[initialCountryOption.value] || DELIVERY_DATA['ROW']
-  );
+  const [dbRules, setDbRules] = useState<Record<string, DbDeliveryRule>>({});
+  const [rulesLoaded, setRulesLoaded] = useState(false);
+  const [shippingOptions, setShippingOptions] = useState<DeliveryOption[]>([]);
   const [isCalculating, setIsCalculating] = useState(false);
   const [surchargeApplied, setSurchargeApplied] = useState(false);
   const [availableStatesOptions, setAvailableStatesOptions] = useState<
@@ -192,9 +124,9 @@ export default function DeliveryPage() {
   const selectedStateName = selectedStateOption
     ? selectedStateOption.label
     : '';
+
   const { theme, systemTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-
   const resolvedTheme = theme === 'system' ? systemTheme : theme;
   const themeMode = mounted
     ? (resolvedTheme as string) === 'dark'
@@ -203,20 +135,46 @@ export default function DeliveryPage() {
     : 'dark';
 
   useEffect(() => {
+    const fetchDeliverySettings = async () => {
+      const { data, error } = await supabase
+        .from('delivery_settings')
+        .select('*');
+      if (!error && data) {
+        const rulesMap: Record<string, DbDeliveryRule> = {};
+        data.forEach((item: DbDeliveryRule) => {
+          rulesMap[item.country_code] = item;
+        });
+        setDbRules(rulesMap);
+      }
+      setRulesLoaded(true);
+    };
+    fetchDeliverySettings();
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
     const states = State.getStatesOfCountry(selectedCountryCode).map((s) => ({
       value: s.name,
       label: s.name,
     }));
     setAvailableStatesOptions(states);
     setSelectedStateOption(null);
-
-    handleCalculate(selectedCountryCode, selectedServiceName, '');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCountryCode, selectedServiceName]);
+  }, [selectedCountryCode]);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    handleCalculate(
+      selectedCountryCode,
+      selectedServiceName,
+      selectedStateName
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    selectedCountryCode,
+    selectedServiceName,
+    selectedStateName,
+    rulesLoaded,
+    dbRules,
+  ]);
 
   const getEmoji = (
     price: number | 'Free' | 'N/A',
@@ -225,11 +183,16 @@ export default function DeliveryPage() {
   ) => {
     if (['RU', 'BY'].includes(countryCode))
       return <Skull className="w-6 h-6 text-red-600" />;
-    if (countryCode === 'UA' && price === 'Free')
+
+    // Враховуємо і 'Free', і ціну 0 як безкоштовну
+    if (countryCode === 'UA' && (price === 'Free' || price === 0))
       return <Smile className="w-6 h-6 text-green-600" />;
+
     if (!isServiceAvailable || price === 'N/A')
       return <Frown className="w-6 h-6 text-orange-500" />;
-    if (price === 'Free') return <Smile className="w-6 h-6 text-green-600" />;
+
+    if (price === 'Free' || price === 0)
+      return <Smile className="w-6 h-6 text-green-600" />;
 
     if (typeof price === 'number') {
       if (price <= 20) return <Smile className="w-6 h-6 text-blue-600" />;
@@ -248,32 +211,85 @@ export default function DeliveryPage() {
     setIsCalculating(true);
 
     setTimeout(() => {
-      const deliveryKey = DELIVERY_DATA[countryCode] ? countryCode : 'ROW';
-      const countryData = DELIVERY_DATA[deliveryKey];
-
-      let filteredOptions: DeliveryOption[] = [];
-      if (countryCode === 'RU' || countryCode === 'BY') {
-        filteredOptions = countryData;
-      } else {
-        filteredOptions = countryData.filter((opt) =>
-          opt.service.includes(service)
-        );
-      }
-
+      let baseOptions: DeliveryOption[] = [];
       let finalSurcharge = false;
 
+      // 1. САНКЦІЇ (RU/BY)
+      if (countryCode === 'RU' || countryCode === 'BY') {
+        baseOptions = [
+          {
+            service: t('options.ruUnavailable.name'),
+            price: 'N/A',
+            time: t('options.ruUnavailable.time'),
+          },
+        ];
+      }
+      // 2. РЕШТА СВІТУ
+      else {
+        let rule = dbRules[countryCode] || dbRules['ROW'];
+
+        if (!rule) {
+          rule = { country_code: 'ROW', standard_price: 35, express_price: 55 };
+        }
+
+        baseOptions = [
+          {
+            service: 'Standard Shipping',
+            price: Number(rule.standard_price),
+            time: '8-15 business days',
+            serviceKey: 'options.globalStandard.name',
+            timeKey: 'options.globalStandard.time',
+          },
+          {
+            service: 'Express Shipping',
+            price: Number(rule.express_price),
+            time: '3-7 business days',
+            serviceKey: 'options.globalExpress.name',
+            timeKey: 'options.globalExpress.time',
+          },
+        ];
+      }
+
+      // Фільтрація
+      let filteredOptions = baseOptions;
+      if (countryCode !== 'RU' && countryCode !== 'BY') {
+        filteredOptions = baseOptions.filter((opt) =>
+          opt.service.toLowerCase().includes(service.toLowerCase())
+        );
+        if (filteredOptions.length === 0) filteredOptions = baseOptions;
+      }
+
+      // Модифікатори
       const finalOptions = filteredOptions.map((opt) => {
         let finalPrice = opt.price;
         let finalService = opt.service;
+        let finalServiceKey = opt.serviceKey;
+        let finalTimeKey = opt.timeKey; // Додаємо змінну для ключа часу
 
+        // 🇺🇦 UA Special Logic
         if (countryCode === 'UA') {
-          finalPrice = opt.service.includes('Standard')
-            ? 'Free'
-            : (opt.price as number);
-          finalService = opt.service;
-          return { ...opt, price: finalPrice, service: finalService };
+          const isStandard = opt.service.toLowerCase().includes('standard');
+
+          if (isStandard) {
+            finalPrice = 'Free';
+            finalServiceKey = 'options.uaStandard.name';
+            finalTimeKey = 'options.uaStandard.time'; // 👈 Встановлюємо правильний час для Стандарту
+          } else {
+            // Експрес залишаємо як є з бази (але якщо там 0, то в UI буде безкоштовно)
+            finalPrice = opt.price;
+            finalServiceKey = 'options.uaExpress.name';
+            finalTimeKey = 'options.uaExpress.time'; // 👈 Встановлюємо правильний час для Експресу
+          }
+
+          return {
+            ...opt,
+            price: finalPrice,
+            serviceKey: finalServiceKey,
+            timeKey: finalTimeKey,
+          };
         }
 
+        // Remote surcharge
         const remoteKeywords = [
           'remote',
           'island',
@@ -287,61 +303,56 @@ export default function DeliveryPage() {
         const isRemote = remoteKeywords.some((keyword) =>
           state.toLowerCase().includes(keyword)
         );
-
         const canApplySurcharge =
           typeof finalPrice === 'number' &&
           finalPrice !== 0 &&
           countryCode !== 'RU' &&
+          countryCode !== 'BY' &&
           isRemote;
+
         if (canApplySurcharge) {
           finalPrice = (finalPrice as number) + 20;
           finalService = `${opt.service} (+ Remote Surcharge)`;
           finalSurcharge = true;
+          finalServiceKey = undefined;
         }
 
-        return { ...opt, price: finalPrice, service: finalService };
+        return {
+          ...opt,
+          price: finalPrice,
+          service: finalService,
+          serviceKey: finalServiceKey,
+          timeKey: finalTimeKey,
+        };
       });
 
       setSurchargeApplied(finalSurcharge);
-      setShippingOptions(
-        finalOptions.length > 0 ? finalOptions : DELIVERY_DATA['ROW']
-      );
+      setShippingOptions(finalOptions);
       setIsCalculating(false);
-    }, 800);
+    }, 600);
   };
 
   const handleCountryChange = (option: SelectOption | null) => {
     if (option) {
       setSelectedCountryOption(option);
       setSelectedStateOption(null);
-      handleCalculate(option.value, selectedServiceName, '');
     }
   };
-
-  const handleStateChange = (option: SelectOption | null) => {
+  const handleStateChange = (option: SelectOption | null) =>
     setSelectedStateOption(option);
-    const stateValue = option ? option.value : '';
-    handleCalculate(selectedCountryCode, selectedServiceName, stateValue);
-  };
-
-  const handleServiceChange = (option: SelectOption | null) => {
-    if (option) {
-      setSelectedServiceOption(option);
-      handleCalculate(selectedCountryCode, option.value, selectedStateName);
-    }
-  };
+  const handleServiceChange = (option: SelectOption | null) =>
+    option && setSelectedServiceOption(option);
 
   return (
     <div className="min-h-screen bg-white dark:bg-black transition-colors overflow-x-hidden">
       <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {/* Hero */}
         <motion.div
-          className="mb-12 lg:mb-16" // Зменшено відступ для мобільного
+          className="mb-12 lg:mb-16"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
         >
-          {/* Зменшено шрифт для мобільного (text-3xl) */}
           <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight mb-4 dark:text-neutral-100">
             {t('hero.title')}
           </h1>
@@ -358,11 +369,10 @@ export default function DeliveryPage() {
         {/* Policy */}
         <motion.section
           id="policy"
-          className="mb-12 lg:mb-20 scroll-mt-24" // Адаптивний відступ
+          className="mb-12 lg:mb-20 scroll-mt-24"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
         >
           <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-6 border-l-4 border-gray-900 pl-3 dark:text-neutral-100 dark:border-neutral-300">
             {t('policy.title')}
@@ -370,21 +380,14 @@ export default function DeliveryPage() {
           <p className="text-gray-700 mb-6 text-base lg:text-lg dark:text-neutral-300">
             {t('policy.intro')}
           </p>
-
           <motion.div
             className="bg-blue-50 p-5 lg:p-6 rounded-xl border border-blue-200 dark:bg-neutral-900 dark:border-neutral-800"
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.2, duration: 0.5 }}
           >
             <h3 className="font-bold text-gray-900 mb-3 flex items-center dark:text-neutral-100">
-              <motion.div
-                animate={{ x: [0, 5, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-              >
-                <Truck className="w-5 h-5 mr-3 text-blue-600 dark:text-blue-300" />
-              </motion.div>
+              <Truck className="w-5 h-5 mr-3 text-blue-600 dark:text-blue-300" />
               {t('policy.keyTitle')}
             </h3>
             <ul className="space-y-2 text-gray-700 list-disc list-inside ml-4 dark:text-neutral-300 text-sm sm:text-base">
@@ -409,33 +412,30 @@ export default function DeliveryPage() {
           initial={{ scaleX: 0 }}
           whileInView={{ scaleX: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
         />
 
         {/* Calculator */}
         <motion.section
           id="calculator"
-          // Зменшено padding для мобільного (p-4 sm:p-8)
           className="mb-12 lg:mb-20 scroll-mt-24 bg-gray-50 p-4 sm:p-8 rounded-xl border border-gray-200 shadow-lg dark:bg-neutral-900 dark:border-neutral-800"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
         >
-          <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-6 dark:text-neutral-100">
-            {t_calc('title')}
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-neutral-100">
+              {t_calc('title')}
+            </h2>
+            {!rulesLoaded && (
+              <Loader className="animate-spin text-gray-400" size={16} />
+            )}
+          </div>
+
           <p className="text-gray-700 mb-6 dark:text-neutral-300 text-base lg:text-lg">
             {t_calc('intro')}
           </p>
 
-          <motion.div
-            className="flex flex-col md:flex-row gap-4 mb-8"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-          >
+          <motion.div className="flex flex-col md:flex-row gap-4 mb-8">
             <div className="flex-1">
               <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-neutral-200">
                 {t_calc('labelCountry')}
@@ -450,11 +450,9 @@ export default function DeliveryPage() {
                   menuPortalTarget={
                     typeof document !== 'undefined' ? document.body : undefined
                   }
-                  menuPosition="fixed"
                 />
               </div>
             </div>
-
             <div className="flex-1">
               <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-neutral-200">
                 {t_calc('labelState')}
@@ -474,11 +472,9 @@ export default function DeliveryPage() {
                   menuPortalTarget={
                     typeof document !== 'undefined' ? document.body : undefined
                   }
-                  menuPosition="fixed"
                 />
               </div>
             </div>
-
             <div className="flex-1">
               <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-neutral-200">
                 {t_calc('labelService')}
@@ -492,7 +488,6 @@ export default function DeliveryPage() {
                   menuPortalTarget={
                     typeof document !== 'undefined' ? document.body : undefined
                   }
-                  menuPosition="fixed"
                 />
               </div>
             </div>
@@ -505,7 +500,6 @@ export default function DeliveryPage() {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
               >
                 <span className="font-bold">
                   {t_calc('surchargeNoteStrong')}:
@@ -545,13 +539,13 @@ export default function DeliveryPage() {
                   {shippingOptions.map((option, index) => (
                     <motion.div
                       key={index}
-                      // Адаптація: На мобільному flex-col або flex-row з можливістю переносу
-                      // sm:flex-row тримає їх в рядок на планшетах/ПК
+                      // 🟢 ВИПРАВЛЕНА ЛОГІКА КОЛЬОРІВ: якщо 'Free' АБО 0 — то зелений
                       className={`flex flex-col sm:flex-row sm:items-center items-start p-4 sm:p-5 rounded-xl transition shadow-md border
                         ${
-                          selectedCountryCode === 'RU'
+                          selectedCountryCode === 'RU' ||
+                          selectedCountryCode === 'BY'
                             ? 'bg-red-50 border-red-300 dark:bg-red-900/20 dark:border-red-700'
-                            : option.price === 'Free'
+                            : option.price === 'Free' || option.price === 0
                             ? 'bg-green-50 border-green-300 dark:bg-green-900/20 dark:border-green-700'
                             : 'bg-white border-gray-200 dark:bg-neutral-800 dark:border-neutral-700'
                         }`}
@@ -559,12 +553,10 @@ export default function DeliveryPage() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
                     >
-                      {/* Верхня частина на мобільному (іконка + текст) */}
                       <div className="flex items-center w-full sm:w-auto mb-2 sm:mb-0">
                         <motion.div
                           className="shrink-0 mr-4"
                           whileHover={{ scale: 1.2, rotate: 10 }}
-                          transition={{ type: 'spring', stiffness: 300 }}
                         >
                           {getEmoji(
                             option.price,
@@ -572,7 +564,6 @@ export default function DeliveryPage() {
                             option.price !== 'N/A'
                           )}
                         </motion.div>
-
                         <div className="flex-1 min-w-0">
                           <p className="font-semibold text-gray-900 dark:text-neutral-100 truncate sm:whitespace-normal">
                             {option.serviceKey
@@ -585,29 +576,30 @@ export default function DeliveryPage() {
                           </p>
                         </div>
                       </div>
-
-                      {/* Ціна (на мобільному може бути окремим рядком або праворуч) */}
                       <div className="flex-shrink-0 text-left sm:text-right w-full sm:w-auto pl-[40px] sm:pl-0 sm:ml-auto">
                         <p
                           className={`text-xl font-bold ${
-                            option.price === 'Free'
+                            option.price === 'Free' || option.price === 0
                               ? 'text-green-600 dark:text-green-400'
                               : option.price === 'N/A'
                               ? 'text-red-600 dark:text-red-400'
                               : 'text-gray-900 dark:text-neutral-100'
                           }`}
                         >
-                          {option.price === 'Free'
+                          {/* 🟢 ВІДОБРАЖЕННЯ ЦІНИ: якщо 0, пишемо БЕЗКОШТОВНО */}
+                          {option.price === 'Free' || option.price === 0
                             ? t_calc('resultsFree')
                             : option.price === 'N/A'
                             ? t_calc('resultsNA')
                             : `${(option.price as number).toFixed(2)}`}
                         </p>
-                        {option.price !== 'N/A' && (
-                          <p className="text-xs text-gray-500 dark:text-neutral-400">
-                            {t_calc('resultsApproxPrice')}
-                          </p>
-                        )}
+                        {option.price !== 'N/A' &&
+                          option.price !== 'Free' &&
+                          option.price !== 0 && (
+                            <p className="text-xs text-gray-500 dark:text-neutral-400">
+                              {t_calc('resultsApproxPrice')}
+                            </p>
+                          )}
                       </div>
                     </motion.div>
                   ))}
@@ -627,43 +619,26 @@ export default function DeliveryPage() {
           </div>
         </motion.section>
 
-        <motion.hr
-          className="my-12 lg:my-16 border-gray-200 dark:border-neutral-800"
-          initial={{ scaleX: 0 }}
-          whileInView={{ scaleX: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-        />
-
-        {/* Returns & Warranty */}
+        {/* Returns */}
         <motion.section
           id="returns-warranty"
           className="mb-12 lg:mb-20 scroll-mt-24"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
         >
           <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-6 border-l-4 border-gray-900 pl-3 dark:text-neutral-100 dark:border-neutral-300">
             {t_returns('title')}
           </h2>
-
           <p className="text-gray-700 mb-8 text-base lg:text-lg dark:text-neutral-300">
             {t_returns('intro')}
           </p>
-
           <motion.div
             className="grid grid-cols-1 md:grid-cols-3 gap-6"
             initial="initial"
             whileInView="animate"
             viewport={{ once: true }}
-            variants={{
-              animate: {
-                transition: {
-                  staggerChildren: 0.15,
-                },
-              },
-            }}
+            variants={{ animate: { transition: { staggerChildren: 0.15 } } }}
           >
             <motion.div
               className="bg-white p-5 rounded-xl border border-gray-200 shadow-md dark:bg-neutral-900 dark:border-neutral-700"
@@ -673,27 +648,13 @@ export default function DeliveryPage() {
               }}
             >
               <h3 className="font-bold text-xl text-gray-900 mb-3 flex items-center dark:text-neutral-100">
-                <motion.svg
-                  className="w-6 h-6 mr-2 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  whileHover={{ scale: 1.2, rotate: 10 }}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                  ></path>
-                </motion.svg>
+                <Truck className="w-6 h-6 mr-2 text-blue-600" />{' '}
                 {t_returns('returnTitle')}
               </h3>
               <p className="text-gray-700 text-sm dark:text-neutral-300">
                 {t_returns('returnText')}
               </p>
             </motion.div>
-
             <motion.div
               className="bg-white p-5 rounded-xl border border-gray-200 shadow-md dark:bg-neutral-900 dark:border-neutral-700"
               variants={{
@@ -702,27 +663,13 @@ export default function DeliveryPage() {
               }}
             >
               <h3 className="font-bold text-xl text-gray-900 mb-3 flex items-center dark:text-neutral-100">
-                <motion.svg
-                  className="w-5 h-5 mr-2 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  whileHover={{ scale: 1.2 }}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M9 12l2 2 4-4m5.618-4.018A9.955 9.955 0 0112 5.053 10.038 10.038 0 003.055 7.5c-.714 2.21-1.077 4.603-1.055 7.417C2.023 18.913 5.483 22 10 22h4c4.517 0 7.977-3.087 7.977-7.03c.022-2.814-.341-5.207-1.055-7.417z"
-                  ></path>
-                </motion.svg>
+                <Smile className="w-5 h-5 mr-2 text-blue-600" />{' '}
                 {t_returns('warrantyTitle')}
               </h3>
               <p className="text-gray-700 text-sm dark:text-neutral-300">
                 {t_returns('warrantyText')}
               </p>
             </motion.div>
-
             <motion.div
               className="bg-orange-50 p-5 rounded-xl border border-orange-200 shadow-md dark:bg-orange-900/10 dark:border-neutral-700"
               variants={{
@@ -731,20 +678,7 @@ export default function DeliveryPage() {
               }}
             >
               <h3 className="font-bold text-xl text-gray-900 mb-3 flex items-center dark:text-neutral-100">
-                <motion.svg
-                  className="w-7 h-7 mr-2 text-red-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  whileHover={{ scale: 1.2, rotate: 10 }}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.3 16c-.77 1.333.192 3 1.732 3z"
-                  ></path>
-                </motion.svg>
+                <Skull className="w-7 h-7 mr-2 text-red-600" />{' '}
                 {t_returns('lostTitle')}
               </h3>
               <p className="text-gray-700 text-sm dark:text-neutral-300">
