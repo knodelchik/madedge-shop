@@ -109,7 +109,7 @@ export default function Header() {
       <header className="sticky top-0 z-50 w-full bg-white dark:bg-black md:bg-white/85 md:dark:bg-black border-b border-gray-200 dark:border-neutral-500 px-6 py-4">
         <div className="relative flex items-center justify-between max-w-screen-2xl mx-auto">
           {/* ===== ЛІВА ЧАСТИНА - Назва MadEdge ===== */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 z-10">
             <div
               className="text-2xl font-bold text-gray-800 dark:text-white cursor-pointer"
               onClick={() => router.push('/')}
@@ -118,8 +118,46 @@ export default function Header() {
             </div>
           </div>
 
-          {/* ===== ЦЕНТР - Логотип (з анімацією обертання) ===== */}
-          <div className="hidden md:block absolute left-1/2 -translate-x-1/2">
+          {/* ======================================================== */}
+          {/* 1. ПЛАНШЕТНЕ МЕНЮ (md - lg)                          */}
+          {/* Показується від 768px до 1024px. Логотипа немає.     */}
+          {/* Клас lg:hidden гарантує, що воно зникне на великих екранах */}
+          {/* ======================================================== */}
+          <div className="hidden md:flex lg:hidden absolute left-1/2 -translate-x-1/2 items-center gap-6 z-0">
+            <Link
+              href="/"
+              className="text-sm font-medium text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+            >
+              {t('footerHome')}
+            </Link>
+            <Link
+              href="/shop"
+              className="text-sm font-medium text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+            >
+              {t('footerShop')}
+            </Link>
+            <Link
+              href="/about"
+              className="text-sm font-medium text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+            >
+              {t('footerAboutUs')}
+            </Link>
+            <Link
+              href="/contact"
+              className="text-sm font-medium text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+            >
+              {t('footerContacts')}
+            </Link>
+          </div>
+
+          {/* ======================================================== */}
+          {/* 2. DESKTOP МЕНЮ (lg+)                                */}
+          {/* Логотип по центру, меню розбите навпіл.              */}
+          {/* З'являється тільки від 1024px (lg)                   */}
+          {/* ======================================================== */}
+
+          {/* Логотип */}
+          <div className="hidden lg:block absolute left-1/2 -translate-x-1/2 z-10">
             <motion.div
               className="w-16 h-16 flex items-center justify-center cursor-pointer"
               animate={controls}
@@ -141,8 +179,8 @@ export default function Header() {
             </motion.div>
           </div>
 
-          {/* ===== Навігація зліва ===== */}
-          <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2 -ml-[140px]">
+          {/* Навігація зліва від лого */}
+          <div className="hidden lg:flex items-center gap-8 absolute left-1/2 -translate-x-1/2 -ml-[140px]">
             <Link
               href="/"
               className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium cursor-pointer"
@@ -157,8 +195,8 @@ export default function Header() {
             </Link>
           </div>
 
-          {/* ===== Навігація справа ===== */}
-          <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2 ml-[148px]">
+          {/* Навігація справа від лого */}
+          <div className="hidden lg:flex items-center gap-8 absolute left-1/2 -translate-x-1/2 ml-[148px]">
             <Link
               href="/about"
               className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium cursor-pointer"
@@ -174,14 +212,14 @@ export default function Header() {
           </div>
 
           {/* ===== ПРАВА ЧАСТИНА - Іконки ===== */}
-          <div className="hidden md:flex items-center gap-4 text-gray-700 dark:text-neutral-300">
+          <div className="hidden md:flex items-center gap-4 text-gray-700 dark:text-neutral-300 z-10">
             <SettingsDropdown />
             <UserDropdown user={user} onSignOut={handleSignOut} />
             <WishlistDropdown user={user} />
             <CartSheet />
           </div>
 
-          {/* ===== МОБІЛЬНЕ МЕНЮ ===== */}
+          {/* ===== МОБІЛЬНЕ МЕНЮ (< md) ===== */}
           <div className="md:hidden">
             <BurgerMenu
               user={user}
@@ -203,13 +241,12 @@ export default function Header() {
         </div>
       </header>
 
-      {/* ===== MOBILE CART SHEET ===== */}
+      {/* ===== MOBILE SHEETS ===== */}
       <MobileCartSheet
         isOpen={isMobileCartOpen}
         onClose={() => setIsMobileCartOpen(false)}
       />
 
-      {/* ===== MOBILE WISHLIST SHEET ===== */}
       <MobileWishlistSheet
         isOpen={isMobileWishlistOpen}
         onClose={() => setIsMobileWishlistOpen(false)}
