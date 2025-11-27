@@ -4,8 +4,13 @@ import { useTheme } from 'next-themes';
 import { useState, useEffect } from 'react';
 import { Moon, Sun, Monitor } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { InstagramIcon, TelegramIcon, YouTubeIcon } from './icons/SocialIcons';
-import { Link } from '@/navigation'; // Використовуємо Link з налаштувань навігації
+import {
+  FacebookIcon,
+  InstagramIcon,
+  TelegramIcon,
+  YouTubeIcon,
+} from './icons/SocialIcons';
+import { Link } from '@/navigation';
 
 export default function Footer() {
   const { theme, setTheme } = useTheme();
@@ -19,7 +24,6 @@ export default function Footer() {
 
   useEffect(() => setMounted(true), []);
 
-  // Рендеринг лише після монтування для коректної роботи теми
   if (!mounted) return null;
 
   return (
@@ -34,7 +38,9 @@ export default function Footer() {
             {/* Social links з розділювачами - тільки на мобільних */}
             <div className="flex items-center space-x-3 mt-2">
               <a
-                href="#"
+                href="https://t.me/+380501391539"
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="Telegram"
                 className="text-gray-500 hover:text-gray-900 dark:text-neutral-400/80 dark:hover:text-white transition-colors"
               >
@@ -42,7 +48,9 @@ export default function Footer() {
               </a>
               <div className="w-px h-5 bg-gray-300 dark:bg-neutral-700"></div>
               <a
-                href="#"
+                href="https://www.youtube.com/@and-1717"
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="YouTube"
                 className="text-gray-500 hover:text-gray-900 dark:text-neutral-400/80 dark:hover:text-white transition-colors"
               >
@@ -50,11 +58,23 @@ export default function Footer() {
               </a>
               <div className="w-px h-5 bg-gray-300 dark:bg-neutral-700"></div>
               <a
-                href="#"
+                href="https://www.instagram.com/_madedge/"
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="Instagram"
                 className="text-gray-500 hover:text-gray-900 dark:text-neutral-400/80 dark:hover:text-white transition-colors"
               >
                 <InstagramIcon className="h-5 w-5" />
+              </a>
+              <div className="w-px h-5 bg-gray-300 dark:bg-neutral-700"></div>
+              <a
+                href="https://www.facebook.com/MadEdgeK"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
+                className="text-gray-500 hover:text-gray-900 dark:text-neutral-400/80 dark:hover:text-white transition-colors"
+              >
+                <FacebookIcon className="h-5 w-5" />
               </a>
             </div>
           </div>
@@ -326,27 +346,43 @@ export default function Footer() {
               {/* Social links */}
               <div className="flex items-center space-x-3 mt-4">
                 <a
-                  href="#"
+                  href="https://t.me/+380501391539"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label="Telegram"
                   className="text-gray-500 hover:text-gray-900 dark:text-neutral-400/80 dark:hover:text-white transition-colors"
                 >
-                  <TelegramIcon className="h-5 w-5" />
+                  <TelegramIcon className="h-4 w-4" />
                 </a>
                 <div className="w-px h-5 bg-gray-300 dark:bg-neutral-700"></div>
                 <a
-                  href="#"
+                  href="https://www.youtube.com/@and-1717"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label="YouTube"
                   className="text-gray-500 hover:text-gray-900 dark:text-neutral-400/80 dark:hover:text-white transition-colors"
                 >
-                  <YouTubeIcon className="h-5 w-5" />
+                  <YouTubeIcon className="h-4 w-4" />
                 </a>
                 <div className="w-px h-5 bg-gray-300 dark:bg-neutral-700"></div>
                 <a
-                  href="#"
+                  href="https://www.instagram.com/_madedge/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label="Instagram"
                   className="text-gray-500 hover:text-gray-900 dark:text-neutral-400/80 dark:hover:text-white transition-colors"
                 >
-                  <InstagramIcon className="h-5 w-5" />
+                  <InstagramIcon className="h-4 w-4" />
+                </a>
+                <div className="w-px h-5 bg-gray-300 dark:bg-neutral-700"></div>
+                <a
+                  href="https://www.facebook.com/MadEdgeK"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  className="text-gray-500 hover:text-gray-900 dark:text-neutral-400/80 dark:hover:text-white transition-colors"
+                >
+                  <FacebookIcon className="h-4 w-4" />
                 </a>
               </div>
             </div>
