@@ -138,20 +138,25 @@ export default function OrderPage() {
         toast.error(t('errorSelectAddress'));
         return;
       }
+const subtotalUSD = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const totalUSD = subtotalUSD + shippingCost;
+      const totalUAH = totalUSD * rates['UAH'];
 
-      const totalInUAH = total * rates['UAH'];
-      const res = await fetch('/api/create-payment', {
+    const res = await fetch('/api/create-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: cartItems,
+        body: JSON.stringify({ 
+          items: cartItems, 
           method: paymentMethod,
           shippingAddress: selectedAddress,
-          shippingCost,
-          shippingType,
-          totalAmount: totalInUAH,
+          shippingCost: shippingCost, 
+          shippingType, 
+          
+          // ПЕРЕДАЄМО ДВІ СУМИ:
+          amountUSD: totalUSD, // Для бази (напр. 100)
+          amountUAH: totalUAH  // Для Fondy (напр. 4150)
         }),
-      });
+    });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || t('paymentError'));
 

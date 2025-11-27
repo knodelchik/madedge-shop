@@ -11,6 +11,7 @@ import {
   YouTubeIcon,
 } from './icons/SocialIcons';
 import { Link } from '@/navigation';
+import { toast } from 'sonner';
 
 export default function Footer() {
   const { theme, setTheme } = useTheme();
@@ -24,6 +25,31 @@ export default function Footer() {
   const tInfo = useTranslations('Info');
   const tContacts = useTranslations('Contacts');
   const tTheme = useTranslations('Theme');
+
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    
+    setSubmitting(true);
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        body: JSON.stringify({ email }),
+      });
+      
+      if (res.ok) {
+        toast.success('Ви успішно підписались!');
+        setEmail('');
+      } else {
+        toast.error('Щось пішло не так');
+      }
+    } catch (e) {
+      toast.error('Помилка з\'єднання');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   useEffect(() => setMounted(true), []);
 

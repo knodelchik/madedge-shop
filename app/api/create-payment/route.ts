@@ -2,14 +2,8 @@ import { NextResponse } from 'next/server';
 import { generateFondySignature } from '../../lib/fondy';
 import { createClient } from '@supabase/supabase-js';
 
-// === SUPABASE ADMIN (Service Role) ===
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!; 
-
-if (!supabaseServiceKey) {
-  console.error('CRITICAL: SUPABASE_SERVICE_ROLE_KEY is missing');
-}
-
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
 const MERCHANT_ID = process.env.FONDY_MERCHANT_ID;
@@ -19,23 +13,26 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { totalAmount, items, shippingAddress, shippingCost, shippingType, method } = body;
+    
+    // ПРИЙМАЄМО ДВІ СУМИ:
+    // amountUSD - чисті долари для бази даних
+    // amountUAH - гривні для Fondy
+    const { amountUSD, amountUAH, items, shippingAddress, shippingCost, shippingType, method } = body;
 
-    // ... (Валідації залишаємо ті самі) ...
-    if (!totalAmount || !items || !shippingAddress) {
-      return NextResponse.json({ error: 'Невірні дані' }, { status: 400 });
+    // Валідація
+    if (!amountUSD || !amountUAH || !items || !shippingAddress) {
+      return NextResponse.json({ error: 'Невірні дані (відсутня сума USD або UAH)' }, { status: 400 });
     }
-    const userId = shippingAddress.user_id;
 
-    // Генеруємо ID
+    const userId = shippingAddress.user_id; 
     const uniqueOrderId = `order_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
-    // 1. Записуємо в БД зі статусом "pending"
+    // 1. В БАЗУ ПИШЕМО ДОЛАРИ (USD)
     const { error: dbError } = await supabaseAdmin.from('orders').insert({
       id: uniqueOrderId,
       user_id: userId,
-      total_amount: totalAmount,
-      status: 'pending', // Чекаємо вебхук
+      total_amount: amountUSD, // <--- ЗБЕРІГАЄМО USD
+      status: 'pending',
       payment_method: method,
       shipping_address: shippingAddress,
       shipping_cost: shippingCost,
@@ -49,25 +46,24 @@ export async function POST(req: Request) {
       order_id: uniqueOrderId,
       product_title: item.title,
       quantity: item.quantity,
-      price: item.price,
+      price: item.price, // Ціна товару зазвичай теж в USD в базі
       image_url: item.images?.[0] || ''
     }));
     await supabaseAdmin.from('order_items').insert(orderItemsData);
 
-    // 2. Формуємо запит до Fondy
-    const amountInCents = Math.round(Number(totalAmount) * 100);
+    // 2. В FONDY ВІДПРАВЛЯЄМО ГРИВНІ (UAH)
+    // Fondy приймає копійки, тому множимо UAH на 100
+    const amountInCents = Math.round(Number(amountUAH) * 100);
+    
     const orderDesc = items.map((i: any) => `${i.title} x${i.quantity}`).join(', ').substring(0, 1000);
 
     const requestData: any = {
       order_id: uniqueOrderId,
       merchant_id: MERCHANT_ID,
       order_desc: orderDesc || 'Order payment',
-      amount: amountInCents,
-      currency: 'UAH',
-      // ВАЖЛИВО: response_url тепер веде просто на сторінку "Дякуємо"
-      // Вона НЕ змінює статус замовлення, а просто показує результат
+      amount: amountInCents, // <--- ОПЛАТА В ГРИВНІ
+      currency: 'UAH',       // <--- ВАЛЮТА ГРИВНЯ
       response_url: `${BASE_URL}/api/payment-return`,
-      // ВАЖЛИВО: server_callback_url - сюди прийде справжнє підтвердження
       server_callback_url: `${BASE_URL}/api/payment-webhook`,
       lang: 'uk',
       sender_email: shippingAddress.email || '', 
