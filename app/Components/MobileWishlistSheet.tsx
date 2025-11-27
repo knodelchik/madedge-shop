@@ -1,6 +1,6 @@
 'use client';
 
-import { X, Heart, Trash2, ShoppingCart } from 'lucide-react';
+import { X, Heart, Trash2, ShoppingCart, Check, Loader2 } from 'lucide-react';
 import { useWishlistStore } from '@/app/[locale]/store/wishlistStore';
 import { useCartStore } from '@/app/[locale]/store/cartStore';
 import { authService } from '@/app/[locale]/services/authService';
@@ -19,15 +19,24 @@ export default function MobileWishlistSheet({
   onClose,
 }: MobileWishlistSheetProps) {
   const t = useTranslations('WishlistSheet');
-  const { wishlistItems, localWishlist, removeFromWishlist } =
-    useWishlistStore();
+  const {
+    wishlistItems,
+    localWishlist,
+    removeFromWishlist,
+    removeFromLocalWishlist, // Додаємо функцію для локального видалення
+  } = useWishlistStore();
   const { addToCart } = useCartStore();
   const [userId, setUserId] = useState<string | null>(null);
+
+  // Стан для відстеження, який саме товар зараз обробляється або успішно доданий
+  const [processingId, setProcessingId] = useState<number | string | null>(
+    null
+  );
+  const [successId, setSuccessId] = useState<number | string | null>(null);
 
   const priceUnit = t('priceUnit');
   const placeholderAlt = t('placeholderAlt');
 
-  // Отримуємо userId
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -41,7 +50,6 @@ export default function MobileWishlistSheet({
     fetchUser();
   }, []);
 
-  // Визначаємо, які items показувати
   const displayItems = userId ? wishlistItems : localWishlist;
   const totalItems = Array.isArray(displayItems) ? displayItems.length : 0;
 
@@ -53,25 +61,55 @@ export default function MobileWishlistSheet({
     return images[0];
   };
 
-  const handleAddToCart = (item: any) => {
-    // Визначаємо, чи це item з БД (має products) чи локальний
+  const handleAddToCart = async (item: any) => {
+    // Отримуємо ID товару коректно для обох випадків
+    const productId =
+      typeof item === 'number' ? item : item.product_id || item.id;
     const productData = item.products || item;
 
-    addToCart({
-      id: item.product_id || item.id,
-      title: productData.title || '',
-      price: productData.price || 0,
-      images: productData.images || [],
-      category: productData.category || 'accessories',
-      description: productData.description || '',
-      created_at: productData.created_at || new Date().toISOString(),
-      quantity: 1,
-    });
+    setProcessingId(productId);
+
+    try {
+      // 1. Додаємо в кошик
+      addToCart({
+        id: productId,
+        title: productData.title || '',
+        price: productData.price || 0,
+        images: productData.images || [],
+        category: productData.category || 'accessories',
+        description: productData.description || '',
+        created_at: productData.created_at || new Date().toISOString(),
+        quantity: 1,
+      });
+
+      // 2. Показуємо статус успіху
+      setProcessingId(null);
+      setSuccessId(productId);
+
+      // 3. Чекаємо 1 секунду, щоб користувач побачив напис "Added", і тоді видаляємо з вішліста
+      setTimeout(async () => {
+        if (userId) {
+          await removeFromWishlist(userId, productId);
+        } else {
+          removeFromLocalWishlist(productId);
+        }
+        // Скидаємо статус успіху (хоча елемент вже зникне)
+        setSuccessId(null);
+      }, 1000);
+    } catch (error) {
+      console.error('Error adding to cart', error);
+      setProcessingId(null);
+    }
   };
 
   const handleRemove = async (item: any) => {
-    const productId = item.product_id || item.id || item;
-    await removeFromWishlist(userId, productId);
+    const productId =
+      typeof item === 'number' ? item : item.product_id || item.id;
+    if (userId) {
+      await removeFromWishlist(userId, productId);
+    } else {
+      removeFromLocalWishlist(productId);
+    }
   };
 
   if (!isOpen) return null;
@@ -131,13 +169,18 @@ export default function MobileWishlistSheet({
             ) : (
               <div className="space-y-4">
                 {(userId ? wishlistItems : localWishlist).map((item: any) => {
-                  // Для локального wishlist item - це просто number (productId)
-                  // Для авторизованих - це об'єкт з products
                   const isLocalItem = typeof item === 'number';
+                  // Визначаємо ID для порівняння зі станом success/processing
+                  const currentId = isLocalItem
+                    ? item
+                    : item.product_id || item.id;
+
+                  const isSuccess = successId === currentId;
+                  const isProcessing = processingId === currentId;
 
                   return (
                     <div
-                      key={isLocalItem ? item : item.id}
+                      key={currentId}
                       className="flex gap-3 bg-gray-50 dark:bg-neutral-800 rounded-xl p-3 border border-gray-200 dark:border-neutral-700"
                     >
                       {!isLocalItem && (
@@ -172,10 +215,22 @@ export default function MobileWishlistSheet({
                             {/* Add to Cart button */}
                             <button
                               onClick={() => handleAddToCart(item)}
-                              className="flex items-center gap-1.5 px-3 py-1.5 bg-black dark:bg-white text-white dark:text-black text-xs font-medium rounded-lg hover:opacity-90 transition-all active:scale-95"
+                              disabled={isProcessing || isSuccess}
+                              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-all active:scale-95 ${
+                                isSuccess
+                                  ? 'bg-green-600 text-white'
+                                  : 'bg-black dark:bg-white text-white dark:text-black hover:opacity-90'
+                              }`}
                             >
-                              <ShoppingCart className="h-3.5 w-3.5" />
-                              {t('addToCart')}
+                              {isProcessing ? (
+                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                              ) : isSuccess ? (
+                                <Check className="h-3.5 w-3.5" />
+                              ) : (
+                                <ShoppingCart className="h-3.5 w-3.5" />
+                              )}
+
+                              {isSuccess ? t('added') : t('addToCart')}
                             </button>
                           </div>
 
@@ -189,7 +244,7 @@ export default function MobileWishlistSheet({
                         </>
                       )}
 
-                      {/* Для локальних items показуємо placeholder */}
+                      {/* Для локальних items */}
                       {isLocalItem && (
                         <>
                           <div className="w-20 h-20 bg-gray-200 dark:bg-neutral-700 rounded-lg flex-shrink-0 flex items-center justify-center">
@@ -221,7 +276,6 @@ export default function MobileWishlistSheet({
           {/* Footer */}
           {totalItems > 0 && (
             <div className="border-t border-gray-200 dark:border-neutral-700 p-5 space-y-3">
-              {/* Continue shopping */}
               <button
                 onClick={onClose}
                 className="block w-full text-center bg-neutral-700 dark:bg-neutral-800 text-white dark:text-white py-3.5 px-6 rounded-xl font-semibold shadow-lg active:scale-95 transition-transform"
