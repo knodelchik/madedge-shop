@@ -514,6 +514,7 @@ export const translations = {
       errorDeliveryUnavailable: 'Доставка цього типу недоступна у ваш регіон',
       errorPaymentLink: 'Не вдалося отримати посилання на оплату',
       errorServer: "Помилка з'єднання з сервером",
+      quantityLabel: 'Кількість',
     },
     OrderResult: {
       successTitle: 'Дякуємо за замовлення!',
@@ -1732,6 +1733,7 @@ export const translations = {
         'This delivery type is unavailable for your region',
       errorPaymentLink: 'Failed to get payment link',
       errorServer: 'Server connection error',
+      quantityLabel: 'Quantity',
     },
     OrderResult: {
       successTitle: 'Thank you for your order!',

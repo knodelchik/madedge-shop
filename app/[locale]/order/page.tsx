@@ -14,7 +14,6 @@ import { Truck, ChevronDown, Plus, MapPin, Clock, Plane } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import { useCurrency } from '@/app/context/CurrencyContext';
 
-// Створюємо клієнт тут
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -29,11 +28,8 @@ const createSlug = (str: string) =>
 export default function OrderPage() {
   const t = useTranslations('Order');
   const { cartItems } = useCartStore();
-
-  // Отримуємо функції валюти
   const { formatPrice, rates } = useCurrency();
 
-  // Стейт
   const [paymentMethod, setPaymentMethod] = useState<'fondy' | 'paypal'>(
     'fondy'
   );
@@ -41,83 +37,67 @@ export default function OrderPage() {
   const [processing, setProcessing] = useState(false);
   const [user, setUser] = useState<any>(null);
 
-  // Адреси
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<number | null>(
     null
   );
   const [isAddressMenuOpen, setIsAddressMenuOpen] = useState(false);
 
-  // Доставка (Дані з БД)
   const [deliverySettings, setDeliverySettings] = useState<any[]>([]);
   const [shippingType, setShippingType] = useState<'Standard' | 'Express'>(
     'Standard'
   );
-  const [shippingCost, setShippingCost] = useState(0); // Зберігаємо в USD (базова валюта)
+  const [shippingCost, setShippingCost] = useState(0);
 
-  // 1. Завантаження даних
   useEffect(() => {
     const initData = async () => {
       setLoading(true);
-
       const { user } = await authService.getCurrentUser();
       if (user) {
         setUser(user);
         const userAddresses = await addressService.getAddresses(user.id);
         setAddresses(userAddresses);
-
         if (userAddresses.length > 0) {
           const defaultAddr =
             userAddresses.find((a) => a.is_default) || userAddresses[0];
           setSelectedAddressId(defaultAddr.id);
         }
       }
-
-      // Завантажуємо налаштування доставки
       const { data: settingsData } = await supabase
         .from('delivery_settings')
         .select('*');
       setDeliverySettings(settingsData || []);
-
       setLoading(false);
     };
     initData();
   }, []);
 
-  // Хелпер для розрахунку ціни (в USD)
   const calculateShippingPrice = (
     countryCode: string,
     type: 'Standard' | 'Express'
   ) => {
     if (!deliverySettings.length) return 0;
-
     let setting = deliverySettings.find((s) => s.country_code === countryCode);
     if (!setting) {
       setting = deliverySettings.find((s) => s.country_code === 'ROW');
     }
-
     if (!setting) return null;
-
     if (type === 'Standard') return Number(setting.standard_price);
     if (type === 'Express') return Number(setting.express_price);
-
     return 0;
   };
 
-  // 2. Ефект для оновлення вартості доставки
   useEffect(() => {
     if (!selectedAddressId) {
       setShippingCost(0);
       return;
     }
-
     const address = addresses.find((a) => a.id === selectedAddressId);
     if (!address) return;
 
     const cost = calculateShippingPrice(address.country_code, shippingType);
-
     if (cost === null) {
-      toast.error(t('errorDeliveryUnavailable')); // "Доставка цього типу недоступна..."
+      toast.error(t('errorDeliveryUnavailable'));
       if (shippingType === 'Express') {
         setShippingType('Standard');
       } else {
@@ -126,19 +106,15 @@ export default function OrderPage() {
     } else {
       setShippingCost(cost);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAddressId, addresses, shippingType, deliverySettings]);
 
-  // Підрахунок сум (в USD)
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
   const total = subtotal + shippingCost;
-
   const selectedAddress = addresses.find((a) => a.id === selectedAddressId);
 
-  // Ціни для кнопок вибору доставки (USD)
   const getCostForUI = (type: 'Standard' | 'Express') => {
     if (!selectedAddress) return 0;
     return calculateShippingPrice(selectedAddress.country_code, type);
@@ -149,26 +125,21 @@ export default function OrderPage() {
 
   const handlePayment = async () => {
     setProcessing(true);
-
     try {
       if (!user) {
-        toast.error(t('errorAuth')); // "Ви не авторизовані..."
+        toast.error(t('errorAuth'));
         return;
       }
-
       if (!user.email_confirmed_at) {
-        toast.error(t('errorEmail')); // "Для оформлення замовлення..."
+        toast.error(t('errorEmail'));
         return;
       }
-
       if (!selectedAddressId || !selectedAddress) {
-        toast.error(t('errorSelectAddress')); // "Оберіть адресу доставки"
+        toast.error(t('errorSelectAddress'));
         return;
       }
 
-      // === 3. КОНВЕРТАЦІЯ ДЛЯ FONDY ===
       const totalInUAH = total * rates['UAH'];
-
       const res = await fetch('/api/create-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -181,21 +152,17 @@ export default function OrderPage() {
           totalAmount: totalInUAH,
         }),
       });
-
       const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || t('paymentError'));
-      }
+      if (!res.ok) throw new Error(data.error || t('paymentError'));
 
       if (data.payment_url) {
         window.location.href = data.payment_url;
       } else {
-        toast.error(t('errorPaymentLink')); // "Не вдалося отримати посилання..."
+        toast.error(t('errorPaymentLink'));
       }
     } catch (error: any) {
       console.error('Payment Error:', error);
-      toast.error(error.message || t('errorServer')); // "Помилка з'єднання..."
+      toast.error(error.message || t('errorServer'));
     } finally {
       setProcessing(false);
     }
@@ -205,30 +172,31 @@ export default function OrderPage() {
   if (loading)
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
-        Loading...
+        {t('processing')}
       </div>
     );
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black py-12 transition-colors">
-      <div className="p-6 max-w-6xl mx-auto space-y-6">
+    <div className="min-h-screen bg-white dark:bg-black w-full py-4 lg:py-12 transition-colors">
+      <div className="px-3 md:px-6 lg:p-6 max-w-6xl mx-auto space-y-4 lg:space-y-6">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-2 lg:mb-8"
         >
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-white dark:via-neutral-200 dark:to-white bg-clip-text text-transparent">
+          {/* Адаптивний заголовок */}
+          <h1 className="text-2xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-white dark:via-neutral-200 dark:to-white bg-clip-text text-transparent">
             {t('title')}
           </h1>
         </motion.div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
           {/* ЛІВА ЧАСТИНА: Товари */}
-          <div className="lg:col-span-2 space-y-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-              {t('yourOrder')} {/* "Ваше замовлення" */}
+          <div className="lg:col-span-2 space-y-4 lg:space-y-6">
+            <h2 className="text-lg lg:text-xl font-bold text-gray-900 dark:text-white mb-2 lg:mb-4">
+              {t('yourOrder')}
             </h2>
-            <div className="space-y-4">
+            <div className="space-y-3">
               <AnimatePresence mode="popLayout">
                 {cartItems.map((item, index) => (
                   <CartItem
@@ -236,6 +204,7 @@ export default function OrderPage() {
                     item={item}
                     index={index}
                     formatPrice={formatPrice}
+                    t={t}
                   />
                 ))}
               </AnimatePresence>
@@ -244,18 +213,18 @@ export default function OrderPage() {
 
           {/* ПРАВА ЧАСТИНА: Сайдбар */}
           <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-neutral-900 rounded-3xl shadow-xl p-6 border border-gray-100 dark:border-neutral-800 sticky top-6">
+            <div className="bg-white dark:bg-neutral-900 rounded-3xl shadow-xl p-4 lg:p-6 border border-gray-100 dark:border-neutral-800 lg:sticky lg:top-6">
               {/* ВИБІР АДРЕСИ */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t('deliveryAddress')} {/* "Адреса доставки" */}
+                  {t('deliveryAddress')}
                 </label>
                 {addresses.length === 0 ? (
                   <Link
                     href="/profile?tab=addresses"
                     className="flex items-center justify-center gap-2 w-full p-3 border-2 border-dashed border-yellow-400 bg-yellow-50 dark:bg-yellow-900/10 rounded-xl text-yellow-700 dark:text-yellow-500 hover:bg-yellow-100 transition-colors text-sm font-medium"
                   >
-                    <Plus size={16} /> {t('addAddress')} {/* "Додати адресу" */}
+                    <Plus size={16} /> {t('addAddress')}
                   </Link>
                 ) : (
                   <div className="relative">
@@ -264,13 +233,13 @@ export default function OrderPage() {
                       className="w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-xl hover:border-gray-400 transition-colors text-left"
                     >
                       {selectedAddress ? (
-                        <div className="flex items-center gap-2 overflow-hidden">
+                        <div className="flex items-center gap-2 overflow-hidden w-full">
                           <MapPin
                             size={18}
                             className="text-gray-500 shrink-0"
                           />
-                          <div className="truncate">
-                            <span className="font-bold text-gray-900 dark:text-white block truncate">
+                          <div className="flex-1 min-w-0">
+                            <span className="font-bold text-gray-900 dark:text-white block text-sm lg:text-base truncate">
                               {selectedAddress.city},{' '}
                               {selectedAddress.country_name}
                             </span>
@@ -283,11 +252,10 @@ export default function OrderPage() {
                         <span className="text-gray-500">
                           {t('selectAddress')}
                         </span>
-                      )}{' '}
-                      {/* "Оберіть адресу" */}
+                      )}
                       <ChevronDown
                         size={16}
-                        className={`text-gray-400 transition-transform ${
+                        className={`text-gray-400 shrink-0 ml-2 transition-transform ${
                           isAddressMenuOpen ? 'rotate-180' : ''
                         }`}
                       />
@@ -327,8 +295,7 @@ export default function OrderPage() {
                                 href="/profile?tab=addresses"
                                 className="flex items-center gap-2 px-4 py-3 text-sm text-blue-600 dark:text-blue-400 hover:bg-gray-50 dark:hover:bg-neutral-700"
                               >
-                                <Plus size={14} /> {t('addNewAddress')}{' '}
-                                {/* "Додати нову адресу" */}
+                                <Plus size={14} /> {t('addNewAddress')}
                               </Link>
                             </div>
                           </div>
@@ -343,9 +310,10 @@ export default function OrderPage() {
               {selectedAddressId && (
                 <div className="mb-6 animate-in fade-in slide-in-from-top-2 duration-300">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {t('shippingMethod')} {/* "Спосіб доставки" */}
+                    {t('shippingMethod')}
                   </label>
                   <div className="space-y-2">
+                    {/* Standard Shipping */}
                     <button
                       onClick={() => setShippingType('Standard')}
                       disabled={standardCost === null}
@@ -359,9 +327,9 @@ export default function OrderPage() {
                           : ''
                       }`}
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 overflow-hidden">
                         <div
-                          className={`p-2 rounded-full ${
+                          className={`p-2 rounded-full flex-shrink-0 ${
                             shippingType === 'Standard'
                               ? 'bg-white dark:bg-neutral-700 shadow-sm'
                               : 'bg-gray-100 dark:bg-neutral-800'
@@ -372,16 +340,16 @@ export default function OrderPage() {
                             className="text-gray-700 dark:text-gray-300"
                           />
                         </div>
-                        <div className="text-left">
-                          <span className="block font-semibold text-sm text-gray-900 dark:text-white">
+                        <div className="text-left overflow-hidden">
+                          <span className="block font-semibold text-sm text-gray-900 dark:text-white truncate">
                             {t('standard')}
                           </span>
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-gray-500 truncate block">
                             {t('standardDesc')}
                           </span>
                         </div>
                       </div>
-                      <span className="font-medium text-gray-900 dark:text-white">
+                      <span className="font-medium text-gray-900 dark:text-white text-sm whitespace-nowrap ml-2">
                         {standardCost === 0
                           ? t('freeShipping')
                           : standardCost === null
@@ -389,6 +357,8 @@ export default function OrderPage() {
                           : formatPrice(standardCost)}
                       </span>
                     </button>
+
+                    {/* Express Shipping */}
                     <button
                       onClick={() => setShippingType('Express')}
                       disabled={expressCost === null}
@@ -402,9 +372,9 @@ export default function OrderPage() {
                           : ''
                       }`}
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 overflow-hidden">
                         <div
-                          className={`p-2 rounded-full ${
+                          className={`p-2 rounded-full flex-shrink-0 ${
                             shippingType === 'Express'
                               ? 'bg-white dark:bg-neutral-700 shadow-sm'
                               : 'bg-gray-100 dark:bg-neutral-800'
@@ -415,16 +385,16 @@ export default function OrderPage() {
                             className="text-gray-700 dark:text-gray-300"
                           />
                         </div>
-                        <div className="text-left">
-                          <span className="block font-semibold text-sm text-gray-900 dark:text-white">
+                        <div className="text-left overflow-hidden">
+                          <span className="block font-semibold text-sm text-gray-900 dark:text-white truncate">
                             {t('express')}
                           </span>
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-gray-500 truncate block">
                             {t('expressDesc')}
                           </span>
                         </div>
                       </div>
-                      <span className="font-medium text-gray-900 dark:text-white">
+                      <span className="font-medium text-gray-900 dark:text-white text-sm whitespace-nowrap ml-2">
                         {expressCost === 0
                           ? t('freeShipping')
                           : expressCost === null
@@ -437,10 +407,10 @@ export default function OrderPage() {
               )}
 
               {/* ПІДСУМОК */}
-              <h2 className="text-xl font-bold text-gray-900 dark:text-neutral-100 mb-6 border-t border-gray-100 dark:border-neutral-800 pt-6">
+              <h2 className="text-lg lg:text-xl font-bold text-gray-900 dark:text-neutral-100 mb-4 border-t border-gray-100 dark:border-neutral-800 pt-4">
                 {t('orderSummary')}
               </h2>
-              <div className="space-y-3 mb-6 pb-6 border-b border-gray-200 dark:border-neutral-800">
+              <div className="space-y-2 mb-4 pb-4 border-b border-gray-200 dark:border-neutral-800 text-sm">
                 <div className="flex justify-between text-gray-600 dark:text-neutral-400">
                   <span>{t('subtotal')}</span>
                   <span className="text-gray-900 dark:text-white font-medium">
@@ -465,7 +435,7 @@ export default function OrderPage() {
                 </div>
               </div>
 
-              <div className="flex justify-between items-center font-bold text-2xl mb-8">
+              <div className="flex justify-between items-center font-bold text-xl lg:text-2xl mb-6">
                 <span className="text-gray-900 dark:text-white">
                   {t('totalLabel')}
                 </span>
@@ -473,12 +443,12 @@ export default function OrderPage() {
               </div>
 
               <div className="mb-6">
-                <span className="block font-semibold text-sm text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wide">
+                <span className="block font-semibold text-xs lg:text-sm text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">
                   {t('paymentMethodLabel')}
                 </span>
                 <div className="grid grid-cols-2 gap-3">
                   <button
-                    className={`px-4 py-3 rounded-xl border-2 font-medium transition-all ${
+                    className={`px-2 py-3 lg:px-4 rounded-xl border-2 font-medium transition-all text-sm ${
                       paymentMethod === 'fondy'
                         ? 'border-black bg-black text-white dark:border-white dark:bg-white dark:text-black'
                         : 'border-gray-200 text-gray-600 hover:border-gray-300 dark:border-neutral-700 dark:text-neutral-400'
@@ -488,7 +458,7 @@ export default function OrderPage() {
                     Fondy
                   </button>
                   <button
-                    className={`px-4 py-3 rounded-xl border-2 font-medium transition-all ${
+                    className={`px-2 py-3 lg:px-4 rounded-xl border-2 font-medium transition-all text-sm ${
                       paymentMethod === 'paypal'
                         ? 'border-black bg-black text-white dark:border-white dark:bg-white dark:text-black'
                         : 'border-gray-200 text-gray-600 hover:border-gray-300 dark:border-neutral-700 dark:text-neutral-400'
@@ -503,7 +473,7 @@ export default function OrderPage() {
               <button
                 onClick={handlePayment}
                 disabled={processing || !selectedAddressId}
-                className="w-full bg-black dark:bg-white text-white dark:text-black py-4 rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex items-center justify-center gap-2"
+                className="w-full bg-black dark:bg-white text-white dark:text-black py-3 lg:py-4 rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex items-center justify-center gap-2 text-sm lg:text-base"
               >
                 {processing
                   ? t('processing')
@@ -517,8 +487,8 @@ export default function OrderPage() {
   );
 }
 
-// Допоміжний компонент для товару
-function CartItem({ item, index, formatPrice }: any) {
+// === Оновлений компонент картки ===
+function CartItem({ item, index, formatPrice, t }: any) {
   const slug = createSlug(item.title);
   return (
     <Link href={`/shop/${slug}?from=checkout`} className="block">
@@ -526,9 +496,11 @@ function CartItem({ item, index, formatPrice }: any) {
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: index * 0.1 }}
-        className="flex items-center gap-4 p-4 bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 rounded-2xl hover:shadow-md transition-all"
+        // items-start на моб (щоб текст не сповзав), items-center на ПК
+        className="flex items-start lg:items-center gap-3 lg:gap-4 p-3 lg:p-4 bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 rounded-2xl hover:shadow-md transition-all"
       >
-        <div className="relative w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-neutral-800">
+        {/* Картинка менша на моб (w-16) і більша на ПК (w-24) */}
+        <div className="relative w-16 h-16 lg:w-24 lg:h-24 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-neutral-800">
           <Image
             src={item.images[0]}
             alt={item.title}
@@ -536,15 +508,18 @@ function CartItem({ item, index, formatPrice }: any) {
             className="object-contain"
           />
         </div>
-        <div className="flex-1 min-w-0">
-          <p className="font-semibold text-lg text-gray-900 dark:text-neutral-100 truncate">
+
+        <div className="flex-1 min-w-0 flex flex-col justify-center h-full">
+          {/* line-clamp-2 дозволяє перенос тексту на 2 рядки замість обрізання одним */}
+          <p className="font-semibold text-sm lg:text-lg text-gray-900 dark:text-neutral-100 line-clamp-2 leading-tight">
             {item.title}
           </p>
-          <p className="text-gray-500 dark:text-neutral-400 mt-1">
-            {item.quantity} шт.
+          <p className="text-gray-500 dark:text-neutral-400 mt-1 text-xs lg:text-base">
+            {t('quantityLabel')}: {item.quantity}
           </p>
         </div>
-        <div className="text-right font-bold text-lg text-gray-900 dark:text-white">
+
+        <div className="text-right font-bold text-sm lg:text-lg text-gray-900 dark:text-white whitespace-nowrap">
           {formatPrice(item.price * item.quantity)}
         </div>
       </motion.div>
@@ -555,8 +530,8 @@ function CartItem({ item, index, formatPrice }: any) {
 function EmptyCartState({ t }: any) {
   return (
     <div className="min-h-screen flex items-center justify-center py-12 bg-white dark:bg-black">
-      <div className="text-center">
-        <p className="text-xl text-gray-500 dark:text-neutral-400">
+      <div className="text-center px-4">
+        <p className="text-lg lg:text-xl text-gray-500 dark:text-neutral-400">
           {t('emptyCart')}
         </p>
       </div>
