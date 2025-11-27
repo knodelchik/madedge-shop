@@ -1,6 +1,6 @@
 'use client';
 
-import { Heart, ShoppingCart, Trash2 } from 'lucide-react';
+import { Heart, ShoppingCart, Trash2, Check, Loader2 } from 'lucide-react'; // Додав іконки Check та Loader2
 import Image from 'next/image';
 import {
   DropdownMenu,
@@ -37,14 +37,16 @@ interface WishlistItem {
 interface WishlistItemsProps {
   items: WishlistItem[];
   movingItem: number | null;
-  onMoveToCart: (productId: number) => void;
+  successItem: number | null; // Додано
+  onMoveToCart: (e: React.MouseEvent, productId: number) => void;
   onRemove: (productId: number) => void;
 }
 
 interface LocalWishlistItemsProps {
   productIds: number[];
   movingItem: number | null;
-  onMoveToCart: (productId: number) => void;
+  successItem: number | null; // Додано
+  onMoveToCart: (e: React.MouseEvent, productId: number) => void;
   onRemove: (productId: number) => void;
   productsData: Product[];
 }
@@ -52,6 +54,7 @@ interface LocalWishlistItemsProps {
 export default function WishlistDropdown({ user }: WishlistDropdownProps) {
   const t = useTranslations('Wishlist');
   const [movingItem, setMovingItem] = useState<number | null>(null);
+  const [successItem, setSuccessItem] = useState<number | null>(null); // Стан для успішного додавання
   const [localProducts, setLocalProducts] = useState<Product[]>([]);
   const router = useRouter();
   const {
@@ -63,7 +66,6 @@ export default function WishlistDropdown({ user }: WishlistDropdownProps) {
   } = useWishlistStore();
   const { addToCart } = useCartStore();
 
-  // Завантажуємо дані продуктів для локального wishlist
   useEffect(() => {
     const loadLocalProducts = async () => {
       if (localWishlist.length > 0) {
@@ -84,21 +86,36 @@ export default function WishlistDropdown({ user }: WishlistDropdownProps) {
     loadLocalProducts();
   }, [localWishlist]);
 
-  const handleMoveToCart = async (productId: number) => {
+  // Оновлена функція з обробкою подій
+  const handleMoveToCart = async (e: React.MouseEvent, productId: number) => {
+    // Критично важливо для мобільних пристроїв:
+    e.preventDefault();
+    e.stopPropagation();
+
     setMovingItem(productId);
+
     try {
       if (user) {
-        // Для авторизованих - використовуємо moveToCart
+        // Логіка для авторизованих
+        // Спочатку додаємо до кошика (якщо moveToCart робить і те, і інше - ок)
         await moveToCart(user.id, productId);
       } else {
-        // Для неавторизованих - додаємо безпосередньо до кошика
+        // Логіка для гостей
         const product = localProducts.find((p) => p.id === productId);
         if (product) {
           addToCart({ ...product, quantity: 1 });
         }
-        // Видаляємо з локального wishlist
+        // Видаляємо локально
         removeFromLocalWishlist(productId);
       }
+
+      // Показуємо успіх
+      setSuccessItem(productId);
+
+      // Скидаємо статуси через короткий час (хоча товар вже може зникнути зі списку через оновлення стору)
+      setTimeout(() => {
+        setSuccessItem(null);
+      }, 2000);
     } catch (error) {
       console.error('❌ Error moving to cart:', error);
     } finally {
@@ -114,14 +131,13 @@ export default function WishlistDropdown({ user }: WishlistDropdownProps) {
     }
   };
 
-  // Отримуємо загальну кількість елементів
   const totalItems = user ? wishlistItems.length : localWishlist.length;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="relative flex items-center gap-2 hover:text-gray-600 transition-colors p-2 rounded-lg hover:bg-gray-100 cursor-pointer"
+          className="relative flex items-center gap-2 hover:text-gray-600 transition-colors p-2 rounded-lg hover:bg-gray-100 cursor-pointer outline-none" // outline-none для кращого вигляду
           aria-label="Wishlist"
         >
           <Heart className="w-6 h-6" />
@@ -142,18 +158,18 @@ export default function WishlistDropdown({ user }: WishlistDropdownProps) {
         {totalItems === 0 ? (
           <EmptyWishlist />
         ) : user ? (
-          // Для авторизованих користувачів
           <WishlistItems
             items={wishlistItems}
             movingItem={movingItem}
+            successItem={successItem}
             onMoveToCart={handleMoveToCart}
             onRemove={handleRemoveFromWishlist}
           />
         ) : (
-          // Для неавторизованих користувачів
           <LocalWishlistItems
             productIds={localWishlist}
             movingItem={movingItem}
+            successItem={successItem}
             onMoveToCart={handleMoveToCart}
             onRemove={handleRemoveFromWishlist}
             productsData={localProducts}
@@ -178,10 +194,8 @@ export default function WishlistDropdown({ user }: WishlistDropdownProps) {
   );
 }
 
-// Підкомпонент для порожнього wishlist
 function EmptyWishlist() {
   const t = useTranslations('Wishlist');
-
   return (
     <div className="px-2 py-4 text-center text-gray-500 dark:text-neutral-500">
       <Heart className="w-8 h-8 mx-auto mb-2 opacity-50" />
@@ -191,10 +205,10 @@ function EmptyWishlist() {
   );
 }
 
-// Підкомпонент для списку товарів авторизованих користувачів
 function WishlistItems({
   items,
   movingItem,
+  successItem,
   onMoveToCart,
   onRemove,
 }: WishlistItemsProps) {
@@ -223,14 +237,29 @@ function WishlistItems({
             </div>
 
             <div className="flex flex-col gap-1">
+              {/* Кнопка кошика */}
               <button
-                onClick={() => onMoveToCart(item.product_id)}
-                disabled={movingItem === item.product_id}
-                className="p-1 text-green-600 hover:bg-green-50 rounded transition disabled:opacity-50 cursor-pointer"
+                onClick={(e) => onMoveToCart(e, item.product_id)}
+                disabled={
+                  movingItem === item.product_id ||
+                  successItem === item.product_id
+                }
+                className={`p-1 rounded transition disabled:opacity-70 cursor-pointer ${
+                  successItem === item.product_id
+                    ? 'bg-green-100 text-green-700'
+                    : 'text-green-600 hover:bg-green-50'
+                }`}
                 title={t('addToCart')}
               >
-                <ShoppingCart className="w-4 h-4" />
+                {movingItem === item.product_id ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : successItem === item.product_id ? (
+                  <Check className="w-4 h-4" />
+                ) : (
+                  <ShoppingCart className="w-4 h-4" />
+                )}
               </button>
+
               <button
                 onClick={() => onRemove(item.product_id)}
                 className="p-1 text-red-600 hover:bg-red-50 rounded transition cursor-pointer"
@@ -240,8 +269,9 @@ function WishlistItems({
               </button>
             </div>
           </div>
+          {/* Текстове повідомлення */}
           {movingItem === item.product_id && (
-            <div className="text-xs text-green-600 mt-1">
+            <div className="text-xs text-green-600 mt-1 flex items-center gap-1">
               {t('addingToCart')}
             </div>
           )}
@@ -251,10 +281,10 @@ function WishlistItems({
   );
 }
 
-// Підкомпонент для локального wishlist неавторизованих користувачів
 function LocalWishlistItems({
   productIds,
   movingItem,
+  successItem,
   onMoveToCart,
   onRemove,
   productsData,
@@ -288,12 +318,24 @@ function LocalWishlistItems({
 
               <div className="flex flex-col gap-1">
                 <button
-                  onClick={() => onMoveToCart(productId)}
-                  disabled={movingItem === productId}
-                  className="p-1 text-green-600 hover:bg-green-50 rounded transition disabled:opacity-50"
+                  onClick={(e) => onMoveToCart(e, productId)}
+                  disabled={
+                    movingItem === productId || successItem === productId
+                  }
+                  className={`p-1 rounded transition disabled:opacity-70 ${
+                    successItem === productId
+                      ? 'bg-green-100 text-green-700'
+                      : 'text-green-600 hover:bg-green-50'
+                  }`}
                   title={t('addToCart')}
                 >
-                  <ShoppingCart className="w-4 h-4" />
+                  {movingItem === productId ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : successItem === productId ? (
+                    <Check className="w-4 h-4" />
+                  ) : (
+                    <ShoppingCart className="w-4 h-4" />
+                  )}
                 </button>
                 <button
                   onClick={() => onRemove(productId)}
@@ -304,6 +346,7 @@ function LocalWishlistItems({
                 </button>
               </div>
             </div>
+
             {movingItem === productId && (
               <div className="text-xs text-green-600 mt-1">
                 {t('addingToCart')}

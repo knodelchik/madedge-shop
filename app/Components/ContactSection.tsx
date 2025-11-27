@@ -87,6 +87,30 @@ export default function ContactSection() {
     }
   };
 
+  // Масив із посиланнями та відповідними іконками
+  const socialLinks = [
+    {
+      Icon: TelegramIcon,
+      href: 'https://t.me/+380501391539',
+      label: 'Telegram',
+    },
+    {
+      Icon: YouTubeIcon,
+      href: 'https://www.youtube.com/@and-1717',
+      label: 'YouTube',
+    },
+    {
+      Icon: FacebookIcon,
+      href: 'https://www.facebook.com/MadEdgeK',
+      label: 'Facebook',
+    },
+    {
+      Icon: InstagramIcon,
+      href: 'https://www.instagram.com/_madedge/',
+      label: 'Instagram',
+    },
+  ];
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -253,18 +277,19 @@ export default function ContactSection() {
                   className="grid grid-cols-4 gap-2"
                   variants={containerVariants}
                 >
-                  {[TelegramIcon, YouTubeIcon, FacebookIcon, InstagramIcon].map(
-                    (Icon, idx) => (
-                      <motion.a
-                        key={idx}
-                        href="#"
-                        className="w-full aspect-square bg-gray-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center hover:bg-gradient-to-r from-[#475fd8] to-[#35297e] transition-all duration-300 group active:scale-95"
-                        variants={itemVariants}
-                      >
-                        <Icon className="w-7 h-7 sm:w-8 sm:h-8 text-gray-700 dark:text-neutral-100 group-hover:text-white transition-colors" />
-                      </motion.a>
-                    )
-                  )}
+                  {socialLinks.map(({ Icon, href, label }, idx) => (
+                    <motion.a
+                      key={idx}
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={label}
+                      className="w-full aspect-square bg-gray-100 dark:bg-neutral-800 rounded-xl flex items-center justify-center hover:bg-gradient-to-r from-[#475fd8] to-[#35297e] transition-all duration-300 group active:scale-95"
+                      variants={itemVariants}
+                    >
+                      <Icon className="w-7 h-7 sm:w-8 sm:h-8 text-gray-700 dark:text-neutral-100 group-hover:text-white transition-colors" />
+                    </motion.a>
+                  ))}
                 </motion.div>
               </motion.div>
             </motion.div>
