@@ -47,7 +47,7 @@ export const translations = {
       products: [
         {
           id: 1,
-          name: 'MadEdge Модель 1',
+          name: 'MadEdge Model 1',
           features: [
             { name: 'Кут заточки', value: '15°-30°' },
             { name: 'Матеріал корпусу', value: 'Алюміній' },
@@ -58,7 +58,7 @@ export const translations = {
         },
         {
           id: 2,
-          name: 'MadEdge Модель 2',
+          name: 'MadEdge with Digital Sharpening Angle Measurement',
           features: [
             { name: 'Кут заточки', value: '10°-40°' },
             { name: 'Матеріал корпусу', value: 'Сталь + Алюміній' },
@@ -69,7 +69,7 @@ export const translations = {
         },
         {
           id: 3,
-          name: 'MadEdge Модель 3',
+          name: 'MadEdge Model 2',
           features: [
             { name: 'Кут заточки', value: '20°-35°' },
             { name: 'Матеріал корпусу', value: 'Титан' },
@@ -80,7 +80,7 @@ export const translations = {
         },
         {
           id: 4,
-          name: 'MadEdge Модель 4',
+          name: 'MadEdge for convex',
           features: [
             { name: 'Кут заточки', value: '12°-38°' },
             { name: 'Матеріал корпусу', value: 'Вуглецеве волокно' },
@@ -1278,7 +1278,7 @@ export const translations = {
         },
         {
           id: 2,
-          name: 'MadEdge Model 2',
+          name: 'MadEdge with Digital Sharpening Angle Measurement',
           features: [
             { name: 'Sharpening Angle', value: '10°-40°' },
             { name: 'Body Material', value: 'Steel + Aluminum' },
@@ -1289,7 +1289,7 @@ export const translations = {
         },
         {
           id: 3,
-          name: 'MadEdge Model 3',
+          name: 'MadEdge Model 2',
           features: [
             { name: 'Sharpening Angle', value: '20°-35°' },
             { name: 'Body Material', value: 'Titanium' },
@@ -1300,7 +1300,7 @@ export const translations = {
         },
         {
           id: 4,
-          name: 'MadEdge Model 4',
+          name: 'MadEdge for convex',
           features: [
             { name: 'Sharpening Angle', value: '12°-38°' },
             { name: 'Body Material', value: 'Carbon Fiber' },
