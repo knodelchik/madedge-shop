@@ -1,8 +1,11 @@
 'use client';
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import { Phone, Mail, Clock, Send } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
+import { authService } from '../[locale]/services/authService'; // Імпорт сервісу авторизації
 import {
   TelegramIcon,
   YouTubeIcon,
@@ -22,6 +25,34 @@ export default function ContactSection() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // === АВТОЗАПОВНЕННЯ ===
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        // 1. Отримуємо поточного юзера (щоб дізнатися ID)
+        const { user } = await authService.getCurrentUser();
+        
+        if (user) {
+          // 2. Отримуємо профіль саме з "звичайної таблиці" (public.users)
+          const { profile } = await authService.getUserProfile(user.id);
+          
+          // 3. Заповнюємо форму
+          setFormData(prev => ({
+            ...prev,
+            // Якщо в профілі є ім'я/пошта - беремо їх. Якщо ні - беремо з Auth або залишаємо пустим.
+            name: profile?.full_name || user.full_name || '',
+            email: profile?.email || user.email || '',
+          }));
+        }
+      } catch (error) {
+        console.error('Error autoloading user data:', error);
+      }
+    };
+
+    loadUserData();
+  }, []);
+  // ======================
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -29,17 +60,31 @@ export default function ContactSection() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setIsSubmitting(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
 
-    console.log('Form submitted:', formData);
-    console.log(
-      `[SUCCESS] Notification placeholder: ${tContacts('formSubmit')}`
-    );
+      const data = await res.json();
 
-    setIsSubmitting(false);
+      if (res.ok) {
+        toast.success(tContacts('formSubmitSuccess') || 'Повідомлення надіслано! Ми зв\'яжемося з вами.');
+        // Очищаємо тільки повідомлення та тему, ім'я та пошту залишаємо (зручно, якщо треба написати ще)
+        setFormData(prev => ({ ...prev, subject: '', message: '' }));
+      } else {
+        toast.error(data.error || 'Помилка відправки. Спробуйте пізніше.');
+      }
+    } catch (error) {
+      toast.error('Помилка з\'єднання.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const containerVariants = {
@@ -241,133 +286,138 @@ export default function ContactSection() {
                 {tContacts('formSubtitle')}
               </p>
 
-              <motion.div
-                className="space-y-5 sm:space-y-6"
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-              >
+              <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
                 <motion.div
-                  className="grid md:grid-cols-2 gap-4"
-                  variants={itemVariants}
+                  className="space-y-5 sm:space-y-6"
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
                 >
-                  <motion.div whileFocus={{ scale: 1.02 }}>
+                  <motion.div
+                    className="grid md:grid-cols-2 gap-4"
+                    variants={itemVariants}
+                  >
+                    <motion.div whileFocus={{ scale: 1.02 }}>
+                      <label
+                        htmlFor="name"
+                        className="block text-sm font-medium text-black dark:text-neutral-100 mb-2"
+                      >
+                        {tContacts('formNameLabel')}
+                      </label>
+                      <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        placeholder={tContacts('formNamePlaceholder')}
+                        required
+                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-gray-900 dark:focus:ring-neutral-300 focus:border-transparent focus:bg-white dark:focus:bg-neutral-700 transition-all duration-200 text-gray-900 dark:text-neutral-100 text-sm sm:text-base"
+                      />
+                    </motion.div>
+                    <motion.div whileFocus={{ scale: 1.02 }}>
+                      <label
+                        htmlFor="email"
+                        className="block text-sm font-medium text-black dark:text-neutral-100 mb-2"
+                      >
+                        {tContacts('formEmailLabel')}
+                      </label>
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        placeholder={tContacts('formEmailPlaceholder')}
+                        required
+                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-gray-900 dark:focus:ring-neutral-300 focus:border-transparent focus:bg-white dark:focus:bg-neutral-700 transition-all duration-200 text-gray-900 dark:text-neutral-100 text-sm sm:text-base"
+                      />
+                    </motion.div>
+                  </motion.div>
+
+                  <motion.div
+                    variants={itemVariants}
+                    whileFocus={{ scale: 1.02 }}
+                  >
                     <label
-                      htmlFor="name"
+                      htmlFor="subject"
                       className="block text-sm font-medium text-black dark:text-neutral-100 mb-2"
                     >
-                      {tContacts('formNameLabel')}
+                      {tContacts('formSubjectLabel')}
                     </label>
                     <input
                       type="text"
-                      id="name"
-                      name="name"
-                      value={formData.name}
+                      id="subject"
+                      name="subject"
+                      value={formData.subject}
                       onChange={handleInputChange}
-                      placeholder={tContacts('formNamePlaceholder')}
+                      placeholder={tContacts('formSubjectPlaceholder')}
+                      required
                       className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-gray-900 dark:focus:ring-neutral-300 focus:border-transparent focus:bg-white dark:focus:bg-neutral-700 transition-all duration-200 text-gray-900 dark:text-neutral-100 text-sm sm:text-base"
                     />
                   </motion.div>
-                  <motion.div whileFocus={{ scale: 1.02 }}>
+
+                  <motion.div
+                    variants={itemVariants}
+                    whileFocus={{ scale: 1.02 }}
+                  >
                     <label
-                      htmlFor="email"
+                      htmlFor="message"
                       className="block text-sm font-medium text-black dark:text-neutral-100 mb-2"
                     >
-                      {tContacts('formEmailLabel')}
+                      {tContacts('formMessageLabel')}
                     </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
+                    <textarea
+                      id="message"
+                      name="message"
+                      rows={5}
+                      value={formData.message}
                       onChange={handleInputChange}
-                      placeholder={tContacts('formEmailPlaceholder')}
-                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-gray-900 dark:focus:ring-neutral-300 focus:border-transparent focus:bg-white dark:focus:bg-neutral-700 transition-all duration-200 text-gray-900 dark:text-neutral-100 text-sm sm:text-base"
+                      placeholder={tContacts('formMessagePlaceholder')}
+                      required
+                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-gray-900 dark:focus:ring-neutral-300 focus:border-transparent focus:bg-white dark:focus:bg-neutral-700 transition-all duration-200 resize-none text-gray-900 dark:text-neutral-100 text-sm sm:text-base"
                     />
                   </motion.div>
-                </motion.div>
 
-                <motion.div
-                  variants={itemVariants}
-                  whileFocus={{ scale: 1.02 }}
-                >
-                  <label
-                    htmlFor="subject"
-                    className="block text-sm font-medium text-black dark:text-neutral-100 mb-2"
+                  <motion.button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full bg-black dark:bg-white text-white dark:text-black py-3 sm:py-4 px-5 sm:px-6 rounded-xl font-semibold hover:bg-neutral-800 dark:hover:bg-neutral-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer active:scale-95 text-sm sm:text-base"
+                    variants={itemVariants}
+                    whileHover={!isSubmitting ? { scale: 1.02 } : {}}
+                    whileTap={!isSubmitting ? { scale: 0.98 } : {}}
                   >
-                    {tContacts('formSubjectLabel')}
-                  </label>
-                  <input
-                    type="text"
-                    id="subject"
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleInputChange}
-                    placeholder={tContacts('formSubjectPlaceholder')}
-                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-gray-900 dark:focus:ring-neutral-300 focus:border-transparent focus:bg-white dark:focus:bg-neutral-700 transition-all duration-200 text-gray-900 dark:text-neutral-100 text-sm sm:text-base"
-                  />
+                    {isSubmitting ? (
+                      <>
+                        <motion.div
+                          className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white dark:border-black border-t-transparent rounded-full"
+                          animate={{ rotate: 360 }}
+                          transition={{
+                            duration: 1,
+                            repeat: Infinity,
+                            ease: 'linear',
+                          }}
+                        />
+                        <span>{tContacts('formSubmitting')}</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>{tContacts('formSubmit')}</span>
+                        <motion.div
+                          animate={{ x: [0, 5, 0] }}
+                          transition={{
+                            duration: 1.5,
+                            repeat: Infinity,
+                            ease: 'easeInOut',
+                          }}
+                        >
+                          <Send className="w-4 h-4 sm:w-5 sm:h-5 text-white dark:text-black" />
+                        </motion.div>
+                      </>
+                    )}
+                  </motion.button>
                 </motion.div>
-
-                <motion.div
-                  variants={itemVariants}
-                  whileFocus={{ scale: 1.02 }}
-                >
-                  <label
-                    htmlFor="message"
-                    className="block text-sm font-medium text-black dark:text-neutral-100 mb-2"
-                  >
-                    {tContacts('formMessageLabel')}
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    rows={5}
-                    value={formData.message}
-                    onChange={handleInputChange}
-                    placeholder={tContacts('formMessagePlaceholder')}
-                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-gray-900 dark:focus:ring-neutral-300 focus:border-transparent focus:bg-white dark:focus:bg-neutral-700 transition-all duration-200 resize-none text-gray-900 dark:text-neutral-100 text-sm sm:text-base"
-                  />
-                </motion.div>
-
-                <motion.button
-                  type="button"
-                  onClick={handleSubmit}
-                  disabled={isSubmitting}
-                  className="w-full bg-black dark:bg-white text-white dark:text-black py-3 sm:py-4 px-5 sm:px-6 rounded-xl font-semibold hover:bg-neutral-800 dark:hover:bg-neutral-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer active:scale-95 text-sm sm:text-base"
-                  variants={itemVariants}
-                  whileHover={!isSubmitting ? { scale: 1.02 } : {}}
-                  whileTap={!isSubmitting ? { scale: 0.98 } : {}}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <motion.div
-                        className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white dark:border-black border-t-transparent rounded-full"
-                        animate={{ rotate: 360 }}
-                        transition={{
-                          duration: 1,
-                          repeat: Infinity,
-                          ease: 'linear',
-                        }}
-                      />
-                      <span>{tContacts('formSubmitting')}</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>{tContacts('formSubmit')}</span>
-                      <motion.div
-                        animate={{ x: [0, 5, 0] }}
-                        transition={{
-                          duration: 1.5,
-                          repeat: Infinity,
-                          ease: 'easeInOut',
-                        }}
-                      >
-                        <Send className="w-4 h-4 sm:w-5 sm:h-5 text-white dark:text-black" />
-                      </motion.div>
-                    </>
-                  )}
-                </motion.button>
-              </motion.div>
+              </form>
             </motion.div>
           </motion.div>
         </div>

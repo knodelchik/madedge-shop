@@ -23,10 +23,10 @@ export default function SettingsDropdown() {
   const pathname = usePathname();
   const router = useRouter();
 
-  const tSettings = translations[currentLocale as 'ua' | 'en'].Settings;
+  const tSettings = translations[currentLocale as 'uk' | 'en'].Settings;
 
   const locales = [
-    { code: 'ua', label: tSettings.languageUA, flag: '🇺🇦' },
+    { code: 'uk', label: tSettings.languageUA, flag: '🇺🇦' },
     { code: 'en', label: tSettings.languageEN, flag: '🇬🇧' },
   ];
 
@@ -36,7 +36,7 @@ export default function SettingsDropdown() {
     { code: 'EUR' as const, label: tSettings.currencyEUR },
   ];
 
-  // ✅ Безпечне перемикання локалі без дублювання /ua/en
+  // ✅ Безпечне перемикання локалі без дублювання /uk/en
   const handleLocaleChange = (code: string) => {
     router.replace(pathname, { locale: code });
   };

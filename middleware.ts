@@ -3,16 +3,27 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 const intlMiddleware = createMiddleware({
-  locales: ['en', 'ua'],
-  defaultLocale: 'ua',
+  locales: ['en', 'uk'],
+  defaultLocale: 'uk',
   localePrefix: 'always',
 });
 
 export default async function middleware(request: NextRequest) {
-  // 1. Запускаємо локалізацію
+  // 1. ПЕРЕВІРКА НА API ТА СТАТИКУ (КРИТИЧНО ВАЖЛИВО ДЛЯ FONDY)
+  // Якщо запит йде на /api/..., /_next/..., або це файл (зображення, css) — пропускаємо middleware
+  if (
+    request.nextUrl.pathname.startsWith('/api') ||
+    request.nextUrl.pathname.startsWith('/_next') ||
+    request.nextUrl.pathname.includes('.') // Перевірка на розширення файлу (.png, .css)
+  ) {
+    return NextResponse.next();
+  }
+
+  // 2. Запускаємо локалізацію (тільки для сторінок)
   let response = intlMiddleware(request);
 
-  // 2. Створюємо Supabase клієнт для роботи з куками
+  // 3. Створюємо Supabase клієнт (тільки для сторінок)
+  // Це не "важка" операція, це просто ініціалізація класу
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -22,11 +33,9 @@ export default async function middleware(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          // Оновлюємо куки в запиті
           cookiesToSet.forEach(({ name, value, options }) => {
             request.cookies.set(name, value);
           });
-          // Оновлюємо куки у відповіді (щоб збереглись у браузері)
           cookiesToSet.forEach(({ name, value, options }) => {
             response.cookies.set(name, value, options);
           });
@@ -35,13 +44,13 @@ export default async function middleware(request: NextRequest) {
     }
   );
 
-  // 3. Оновлюємо сесію користувача
-  // Це найважливіший рядок: він гарантує, що Auth токен свіжий
+  // 4. Оновлюємо сесію (важливо для Auth, щоб не вилогінювало)
   await supabase.auth.getUser();
 
   return response;
 }
 
 export const config = {
-  matcher: ['/', '/(ua|en)/:path*', '/((?!api|_next|_vercel|.*\\..*).*)'],
+  // Matcher залишаємо широким, але ми вже відфільтрували зайве через if на початку функції
+  matcher: ['/((?!_next|_vercel|.*\\..*).*)'],
 };

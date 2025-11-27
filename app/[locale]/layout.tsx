@@ -8,7 +8,7 @@ import Header from '../Components/Header/Header';
 import Footer from '../Components/Footer';
 import '@/app/globals.css'; // ✅ Додай імпорт стилів
 
-const locales = ['en', 'ua'] as const;
+const locales = ['en', 'uk'] as const;
 type Locale = (typeof locales)[number];
 
 // SEO
@@ -20,17 +20,17 @@ export async function generateMetadata({
   const { locale } = await params;
 
   const titles: Record<Locale, string> = {
-    ua: 'MadEdge - Професійне заточування',
+    uk: 'MadEdge - Професійне заточування',
     en: 'MadEdge - Professional Sharpening',
   };
   const descriptions: Record<Locale, string> = {
-    ua: 'Все для професійного заточування інструментів',
+    uk: 'Все для професійного заточування інструментів',
     en: 'Everything for professional tool sharpening',
   };
 
   return {
-    title: titles[locale as Locale] || titles.ua,
-    description: descriptions[locale as Locale] || descriptions.ua,
+    title: titles[locale as Locale] || titles.uk,
+    description: descriptions[locale as Locale] || descriptions.uk,
   };
 }
 

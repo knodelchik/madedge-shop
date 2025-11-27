@@ -1,9 +1,12 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { Button } from '@/components/ui/button';
 import { Link } from '@/navigation';
 import { useTranslations } from 'next-intl';
+import useWindowSize from '../hooks/useWindowSize';
+
 
 // 1. Імпортуємо motion ТА Variants з framer-motion
 import { motion, Variants } from 'framer-motion';
@@ -42,8 +45,18 @@ const itemVariants: Variants = {
   },
 };
 
+
+  
 export default function Main() {
+  const [isClient, setIsClient] = useState(false);
   const t = useTranslations('Main');
+  const { width } = useWindowSize();
+  const isTablet = width <= 800;
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
 
   return (
     <main className="w-full h-full relative">
@@ -54,9 +67,10 @@ lg:pt-0      /* ПК — як було */
 "
       >
         {/* Фон Threads, завантажується лише на клієнті */}
-        <div className="absolute -z-10 top-0 left-0 w-full h-full">
+        {isClient && !isTablet && (<div className="absolute -z-10 top-0 left-0 w-full h-full">
           <Threads amplitude={1.2} distance={0.0001} color={[1, 1, 1]} />
-        </div>
+        </div>)}
+
 
         <motion.div
           className="flex flex-col items-center justify-center text-center z-10"

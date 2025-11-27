@@ -1,25 +1,17 @@
 import crypto from 'crypto';
 
-interface FondyParams {
-  [key: string]: string | number | undefined;
+export function generateFondySignature(params: any, secretKey: string): string {
+  // 1. Беремо всі ключі, крім signature та response_signature_string
+  const keys = Object.keys(params)
+    .filter(key => key !== 'signature' && key !== 'response_signature_string')
+    .sort(); // 2. Сортуємо за алфавітом
+
+  // 3. Збираємо значення, які не порожні
+  const values = keys.map(key => params[key]).filter(val => val !== '' && val !== null && val !== undefined);
+
+  // 4. Додаємо секретний ключ на початок
+  const rawString = [secretKey, ...values].join('|');
+
+  // 5. SHA1 хеш
+  return crypto.createHash('sha1').update(rawString).digest('hex');
 }
-
-export const generateFondySignature = (params: FondyParams, secretKey: string): string => {
-  // 1. Отримуємо всі ключі і сортуємо їх за алфавітом (вимога Fondy)
-  const sortedKeys = Object.keys(params).sort();
-
-  // 2. Формуємо рядок для підпису:
-  // Беремо тільки значення, ігноруємо пусті та сам підпис
-  const signatureString = sortedKeys
-    .filter((key) => key !== 'signature' && params[key] !== '' && params[key] !== undefined)
-    .map((key) => params[key])
-    .join('|');
-
-  // 3. Додаємо секретний ключ у кінець рядка
-  const stringToSign = `${secretKey}|${signatureString}`;
-
-  // 4. Хешуємо.
-  // ВАЖЛИВО: Fondy вимагає саме SHA-1 для своїх стандартних інтеграцій.
-  // Зміна на sha256/sha512 призведе до помилки "Signature mismatch" на стороні Fondy.
-  return crypto.createHash('sha1').update(stringToSign).digest('hex');
-};

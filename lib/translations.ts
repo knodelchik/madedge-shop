@@ -1,6 +1,6 @@
 // translations.ts
 export const translations = {
-  ua: {
+  uk: {
     Main: {
       heroTitle: 'Вітаємо в MadEdge Shop',
       heroSubtitle:

@@ -101,6 +101,7 @@ export default function Header() {
   }, [handleAuthChange, loadWishlist, clearWishlist]);
 
   if (loading) {
+
     return <HeaderSkeleton />;
   }
 

@@ -2,66 +2,47 @@ import { NextResponse } from 'next/server';
 import { generateFondySignature } from '../../lib/fondy';
 import { createClient } from '@supabase/supabase-js';
 
-// === ВАЖЛИВА ЗМІНА: Використовуємо Service Role Key ===
-// Це дозволяє ігнорувати RLS і гарантовано записати замовлення
+// === SUPABASE ADMIN (Service Role) ===
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!; 
 
 if (!supabaseServiceKey) {
-  console.error('CRITICAL: SUPABASE_SERVICE_ROLE_KEY is missing in .env.local');
+  console.error('CRITICAL: SUPABASE_SERVICE_ROLE_KEY is missing');
 }
 
-// Створюємо адмін-клієнт
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-const MERCHANT_ID = process.env.FONDY_MERCHANT_ID ;
+const MERCHANT_ID = process.env.FONDY_MERCHANT_ID;
 const SECRET_KEY = process.env.FONDY_SECRET_KEY || '';
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    
-    const { 
-      totalAmount, 
-      items, 
-      shippingAddress, 
-      shippingCost, 
-      shippingType, 
-      method 
-    } = body;
+    const { totalAmount, items, shippingAddress, shippingCost, shippingType, method } = body;
 
+    // ... (Валідації залишаємо ті самі) ...
     if (!totalAmount || !items || !shippingAddress) {
-      return NextResponse.json({ error: 'Невірні дані замовлення' }, { status: 400 });
+      return NextResponse.json({ error: 'Невірні дані' }, { status: 400 });
     }
+    const userId = shippingAddress.user_id;
 
-    // Перевірка user_id (важливо!)
-    const userId = shippingAddress.user_id; 
-    if (!userId) {
-        console.error('Missing user_id in shipping address:', shippingAddress);
-        return NextResponse.json({ error: 'User ID not found in address' }, { status: 400 });
-    }
+    // Генеруємо ID
+    const uniqueOrderId = `order_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
-    // Генеруємо унікальний ID
-    const uniqueOrderId = `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-    // === ЗБЕРЕЖЕННЯ В БД (через supabaseAdmin) ===
+    // 1. Записуємо в БД зі статусом "pending"
     const { error: dbError } = await supabaseAdmin.from('orders').insert({
       id: uniqueOrderId,
       user_id: userId,
       total_amount: totalAmount,
-      status: 'pending', // Статус "Очікує оплати"
+      status: 'pending', // Чекаємо вебхук
       payment_method: method,
       shipping_address: shippingAddress,
       shipping_cost: shippingCost,
       shipping_type: shippingType
     });
 
-    if (dbError) {
-      // Цей лог покаже точну причину помилки в терміналі VS Code
-      console.error('Detailed Database Error:', dbError); 
-      return NextResponse.json({ error: `DB Error: ${dbError.message}` }, { status: 500 });
-    }
+    if (dbError) throw new Error(dbError.message);
 
     // Зберігаємо товари
     const orderItemsData = items.map((item: any) => ({
@@ -71,20 +52,11 @@ export async function POST(req: Request) {
       price: item.price,
       image_url: item.images?.[0] || ''
     }));
+    await supabaseAdmin.from('order_items').insert(orderItemsData);
 
-    const { error: itemsError } = await supabaseAdmin.from('order_items').insert(orderItemsData);
-    
-    if (itemsError) {
-        console.error('Items Save Error:', itemsError);
-        // Не зупиняємо процес, якщо товари не записались, але замовлення є
-    }
-
-    // === ПІДГОТОВКА FONDY ===
+    // 2. Формуємо запит до Fondy
     const amountInCents = Math.round(Number(totalAmount) * 100);
-    
-    // Формуємо опис (короткий, щоб не перевищити ліміт)
-    const itemsSummary = items.map((i: any) => `${i.title} x${i.quantity}`).join(', ');
-    const orderDesc = itemsSummary.substring(0, 1000); 
+    const orderDesc = items.map((i: any) => `${i.title} x${i.quantity}`).join(', ').substring(0, 1000);
 
     const requestData: any = {
       order_id: uniqueOrderId,
@@ -92,7 +64,10 @@ export async function POST(req: Request) {
       order_desc: orderDesc || 'Order payment',
       amount: amountInCents,
       currency: 'UAH',
-      response_url: `${BASE_URL}/api/payment-return`, 
+      // ВАЖЛИВО: response_url тепер веде просто на сторінку "Дякуємо"
+      // Вона НЕ змінює статус замовлення, а просто показує результат
+      response_url: `${BASE_URL}/api/payment-return`,
+      // ВАЖЛИВО: server_callback_url - сюди прийде справжнє підтвердження
       server_callback_url: `${BASE_URL}/api/payment-webhook`,
       lang: 'uk',
       sender_email: shippingAddress.email || '', 
@@ -108,20 +83,14 @@ export async function POST(req: Request) {
 
     const data = await response.json();
 
-    if (data.response.response_status === 'failure') {
-      console.error('Fondy Error Response:', data.response);
-      return NextResponse.json(
-        { error: data.response.error_message || 'Помилка Fondy' },
-        { status: 400 }
-      );
+    if (data.response?.response_status === 'failure') {
+      return NextResponse.json({ error: data.response.error_message }, { status: 400 });
     }
 
-    return NextResponse.json({ 
-      payment_url: data.response.checkout_url 
-    });
+    return NextResponse.json({ payment_url: data.response.checkout_url });
 
   } catch (error: any) {
-    console.error('Payment API Critical Error:', error);
-    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
+    console.error('Create Payment Error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

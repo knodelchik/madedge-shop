@@ -283,7 +283,7 @@ export default function BurgerMenu({
                   </p>
                   <div className="flex items-center border border-gray-200 dark:border-neutral-700 rounded-xl overflow-hidden">
                     {[
-                      { label: 'УКР', value: 'ua' },
+                      { label: 'УКР', value: 'uk' },
                       { label: 'ENG', value: 'en' },
                     ].map((lang) => (
                       <button
