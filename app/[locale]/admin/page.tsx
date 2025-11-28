@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
-import { DollarSign, Package, ShoppingBag, Users, TrendingUp, Calendar } from 'lucide-react';
+import { useEffect, useState, useCallback } from 'react';
+// 1. ВИПРАВЛЕННЯ: Імпортуємо правильний клієнт, який має доступ до сесії
+import { supabase } from '@/app/lib/supabase';
+import { DollarSign, Package, ShoppingBag, Users, TrendingUp, Calendar, RefreshCw } from 'lucide-react';
 import { 
   AreaChart, 
   Area, 
@@ -15,11 +16,7 @@ import {
 import { format, subDays } from 'date-fns';
 import Link from 'next/link';
 
-// Ініціалізація клієнта
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+// Видаляємо ручну ініціалізацію createClient
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -31,26 +28,31 @@ export default function AdminDashboard() {
   const [chartData, setChartData] = useState<any[]>([]);
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    const loadDashboardData = async () => {
-      setLoading(true);
-      const now = new Date();
-      const thirtyDaysAgo = subDays(now, 30).toISOString();
-
-      // 1. Загальна статистика (як було)
-      const { data: allOrders } = await supabase
+  const loadDashboardData = useCallback(async () => {
+    try {
+      // 1. Загальна статистика
+      const { data: allOrders, error: ordersError } = await supabase
         .from('orders')
         .select('total_amount, status, created_at');
 
-      const { count: usersCount } = await supabase
+      if (ordersError) throw ordersError;
+
+      // 2. Кількість користувачів
+      const { count: usersCount, error: usersError } = await supabase
         .from('users')
         .select('*', { count: 'exact', head: true });
 
-      // Обчислення карток
+      if (usersError) throw usersError;
+
+      // Обчислення для карток
       const successOrders = allOrders?.filter(o => o.status === 'success') || [];
-      const revenue = successOrders.reduce((sum, o) => sum + Number(o.total_amount), 0);
+      // pending - це нові замовлення
       const pending = allOrders?.filter(o => o.status === 'pending').length || 0;
+      
+      // Дохід рахуємо тільки з успішних
+      const revenue = successOrders.reduce((sum, o) => sum + Number(o.total_amount), 0);
 
       setStats({
         totalRevenue: revenue,
@@ -59,16 +61,14 @@ export default function AdminDashboard() {
         totalUsers: usersCount || 0
       });
 
-      // 2. Підготовка даних для графіка (Останні 30 днів)
+      // 3. Графік (тільки success orders)
       const chartMap = new Map();
-      
       // Ініціалізуємо останні 30 днів нулями
       for (let i = 29; i >= 0; i--) {
         const dateKey = format(subDays(new Date(), i), 'dd.MM');
         chartMap.set(dateKey, 0);
       }
 
-      // Заповнюємо даними успішних замовлень
       successOrders.forEach(order => {
         const dateKey = format(new Date(order.created_at), 'dd.MM');
         if (chartMap.has(dateKey)) {
@@ -79,8 +79,8 @@ export default function AdminDashboard() {
       const formattedChartData = Array.from(chartMap, ([name, value]) => ({ name, value }));
       setChartData(formattedChartData);
 
-      // 3. Останні 5 замовлень (з іменами)
-      const { data: lastOrders } = await supabase
+      // 4. Останні 5 замовлень (всі статуси)
+      const { data: lastOrders, error: recentError } = await supabase
         .from('orders')
         .select(`
           id, 
@@ -92,12 +92,43 @@ export default function AdminDashboard() {
         .order('created_at', { ascending: false })
         .limit(5);
 
-      setRecentOrders(lastOrders || []);
-      setLoading(false);
-    };
+      if (recentError) throw recentError;
 
-    loadDashboardData();
+      setRecentOrders(lastOrders || []);
+    } catch (error: any) {
+      console.error('Dashboard Error:', error.message);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
   }, []);
+
+  // Первинне завантаження + Підписка на зміни (Realtime)
+  useEffect(() => {
+    loadDashboardData();
+
+    // Підписка на нові замовлення в реальному часі
+    const channel = supabase
+      .channel('admin-dashboard-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'orders' },
+        () => {
+          console.log('New order or update detected, refreshing stats...');
+          loadDashboardData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [loadDashboardData]);
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    loadDashboardData();
+  };
 
   if (loading) return <div className="p-8 text-center">Завантаження аналітики...</div>;
 
@@ -105,9 +136,19 @@ export default function AdminDashboard() {
     <div className="space-y-8">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Дашборд</h1>
-        <div className="text-sm text-gray-500 bg-white dark:bg-neutral-900 px-3 py-1 rounded-lg border border-gray-200 dark:border-neutral-800 flex items-center gap-2">
-          <Calendar size={16} />
-          Останні 30 днів
+        <div className="flex gap-3">
+            <button 
+                onClick={handleRefresh}
+                disabled={refreshing}
+                className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors disabled:opacity-50"
+            >
+                <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
+                Оновити
+            </button>
+            <div className="text-sm text-gray-500 bg-white dark:bg-neutral-900 px-3 py-2 rounded-lg border border-gray-200 dark:border-neutral-800 flex items-center gap-2">
+                <Calendar size={16} />
+                Останні 30 днів
+            </div>
         </div>
       </div>
       
@@ -115,7 +156,7 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard 
           title="Загальний дохід" 
-          value={`${stats.totalRevenue.toLocaleString()} ₴`} 
+          value={`${stats.totalRevenue.toLocaleString()} $`} 
           icon={<DollarSign size={24} />} 
           color="green" 
         />
@@ -140,11 +181,11 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid lg:grid-cols-3 gap-8">
-        {/* 2. ГРАФІК ПРОДАЖІВ (Займає 2/3 ширини) */}
+        {/* 2. ГРАФІК ПРОДАЖІВ */}
         <div className="lg:col-span-2 bg-white dark:bg-neutral-900 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-neutral-800">
           <h3 className="text-lg font-bold mb-6 text-gray-800 dark:text-white flex items-center gap-2">
             <TrendingUp size={20} className="text-blue-500" />
-            Динаміка продажів
+            Динаміка продажів (оплачені)
           </h3>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -167,7 +208,7 @@ export default function AdminDashboard() {
                   axisLine={false} 
                   tickLine={false} 
                   tick={{ fill: '#9ca3af', fontSize: 12 }} 
-                  tickFormatter={(value) => `${value}₴`}
+                  tickFormatter={(value) => `${value}$`}
                 />
                 <Tooltip 
                   contentStyle={{ 
@@ -176,7 +217,7 @@ export default function AdminDashboard() {
                     borderRadius: '8px', 
                     color: '#fff' 
                   }}
-                  formatter={(value: number) => [`${value} ₴`, 'Дохід']}
+                  formatter={(value: number) => [`${value} $`, 'Дохід']}
                 />
                 <Area 
                   type="monotone" 
@@ -191,7 +232,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* 3. ОСТАННІ ЗАМОВЛЕННЯ (Займає 1/3 ширини) */}
+        {/* 3. ОСТАННІ ЗАМОВЛЕННЯ */}
         <div className="lg:col-span-1 bg-white dark:bg-neutral-900 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-neutral-800">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-bold text-gray-800 dark:text-white">Останні замовлення</h3>
@@ -216,7 +257,7 @@ export default function AdminDashboard() {
                   </div>
                   <div className="text-right">
                     <p className="font-bold text-gray-900 dark:text-white text-sm">
-                      {order.total_amount} ₴
+                      {order.total_amount} $
                     </p>
                     <span className={`text-[10px] px-2 py-0.5 rounded-full uppercase font-bold ${
                        order.status === 'success' ? 'bg-green-100 text-green-700' : 

@@ -102,7 +102,7 @@ export default function AdminOrdersPage() {
                 </td>
                 <td className="p-4">
                   <div className="font-bold text-black dark:text-white">
-                    {order.total_amount} UAH
+                    {order.total_amount} $
                   </div>
                   <div className="text-xs text-gray-500 uppercase">{order.payment_method}</div>
                 </td>
@@ -176,7 +176,7 @@ export default function AdminOrdersPage() {
                 </div>
                 <div>
                   <div className="text-xs text-gray-500 mb-1">Сума</div>
-                  <div className="font-bold text-lg">{selectedOrder.total_amount} UAH</div>
+                  <div className="font-bold text-lg">{selectedOrder.total_amount} $</div>
                 </div>
                 <div>
                   <div className="text-xs text-gray-500 mb-1">Метод</div>
@@ -247,11 +247,11 @@ export default function AdminOrdersPage() {
                           {item.product_title}
                         </p>
                         <p className="text-xs text-gray-500">
-                          {item.quantity} шт. x {item.price} UAH
+                          {item.quantity} шт. x {item.price} $
                         </p>
                       </div>
                       <div className="font-bold text-sm whitespace-nowrap">
-                        {item.quantity * item.price} UAH
+                        {item.quantity * item.price} $
                       </div>
                     </div>
                   ))}
@@ -261,12 +261,12 @@ export default function AdminOrdersPage() {
               {/* Вартість доставки окремо */}
               <div className="flex justify-between items-center pt-4 border-t dark:border-neutral-800">
                 <span className="text-gray-600 dark:text-gray-400">Доставка ({selectedOrder.shipping_type}):</span>
-                <span className="font-bold">{selectedOrder.shipping_cost > 0 ? `${selectedOrder.shipping_cost} UAH` : 'Безкоштовно'}</span>
+                <span className="font-bold">{selectedOrder.shipping_cost > 0 ? `${selectedOrder.shipping_cost} $` : 'Безкоштовно'}</span>
               </div>
 
               <div className="flex justify-between items-center pt-2 text-xl font-bold border-t border-gray-900 dark:border-white">
                 <span>Разом:</span>
-                <span>{selectedOrder.total_amount} UAH</span>
+                <span>{selectedOrder.total_amount} $</span>
               </div>
 
             </div>

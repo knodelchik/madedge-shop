@@ -4,8 +4,8 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
-// Використовуємо ваш існуючий клієнт
-import { supabase } from '@/app/lib/supabase';
+// Імпортуємо сервіс замість прямого клієнта Supabase
+import { productsService } from '@/app/[locale]/services/productService';
 import {
   Select,
   SelectContent,
@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-// Базовий URL для картинок (про всяк випадок, якщо в базі відносні шляхи)
+// Базовий URL для картинок
 const STORAGE_URL = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/products`;
 
 interface ProductFeature {
@@ -24,20 +24,20 @@ interface ProductFeature {
 
 interface ComparisonProduct {
   id: number;
-  name: string; // Це поле має співпадати з 'title' в базі даних
+  name: string;
   features: ProductFeature[];
 }
 
 const ProductComparison: React.FC = () => {
   const t = useTranslations('Product');
   
-  // 1. ДАНІ ПОРІВНЯННЯ БЕРЕМО ТІЛЬКИ З ПЕРЕКЛАДІВ
+  // 1. ДАНІ ПОРІВНЯННЯ БЕРЕМО З ПЕРЕКЛАДІВ
   const products = t.raw('products') as ComparisonProduct[];
 
-  // 2. СТАН ДЛЯ КАРТИНОК (Словник: "Назва" -> "URL Картинки")
+  // 2. СТАН ДЛЯ КАРТИНОК (Словник: "ID" -> "URL Картинки")
   const [imagesMap, setImagesMap] = useState<Record<string, string>>({});
 
-  // Стейт для вибраних ID
+  // Стейт для вибраних ID (для Select)
   const [firstId, setFirstId] = useState<string>(
     products.length > 0 ? products[0].id.toString() : ''
   );
@@ -45,55 +45,45 @@ const ProductComparison: React.FC = () => {
     products.length > 1 ? products[1].id.toString() : ''
   );
 
-  // 3. ФЕТЧИМО ТІЛЬКИ КАРТИНКИ З БАЗИ
+  // 3. ЗАВАНТАЖЕННЯ ЗОБРАЖЕНЬ ЧЕРЕЗ СЕРВІС
   useEffect(() => {
-    const fetchImages = async () => {
+    const loadImages = async () => {
       try {
-        // Беремо всі продукти (або фільтруємо за категорією, якщо треба)
-        const { data, error } = await supabase
-          .from('products')
-          .select('title, images');
-
-        if (error) {
-          console.error('Supabase error:', error);
-          return;
-        }
+        // Використовуємо існуючий сервіс замість прямого запиту
+        const allProducts = await productsService.getAllProducts();
 
         const map: Record<string, string> = {};
 
-        if (data) {
-          data.forEach((item: any) => {
-            // Перевірка: чи є масив картинок і чи він не пустий
-            if (Array.isArray(item.images) && item.images.length > 0) {
-               // Ключ = Назва з бази (має співпадати з перекладом)
-               // Значення = Перше фото
-               map[item.title] = item.images[0];
+        if (allProducts && allProducts.length > 0) {
+          allProducts.forEach((item) => {
+            // Перевіряємо наявність зображень
+            if (item.images && item.images.length > 0) {
+               // Використовуємо ID як ключ для мапінгу
+               map[item.id.toString()] = item.images[0];
             }
           });
         }
         setImagesMap(map);
       } catch (e) {
-        console.error(e);
+        console.error('Error loading comparison images:', e);
       }
     };
 
-    fetchImages();
+    loadImages();
   }, []);
 
-  // Знаходимо вибрані продукти (з перекладів)
   const product1 = products.find((p) => p.id.toString() === firstId);
   const product2 = products.find((p) => p.id.toString() === secondId);
 
-  // 4. ФУНКЦІЯ ОТРИМАННЯ КАРТИНКИ ПО НАЗВІ
-  const getImageUrl = (productName: string) => {
-    const imagePath = imagesMap[productName];
+  // 4. ФУНКЦІЯ ОТРИМАННЯ КАРТИНКИ ПО ID
+  const getImageUrl = (productId: number) => {
+    const idStr = productId.toString();
+    const imagePath = imagesMap[idStr];
+    
+    if (!imagePath) return '/images/notfound.png'; // Або ваш placeholder
 
-    if (!imagePath) return '/images/notfound.png';
-
-    // Якщо в базі повний URL - повертаємо його
     if (imagePath.startsWith('http')) return imagePath;
     
-    // Якщо відносний шлях - додаємо домен стореджа
     return `${STORAGE_URL}/${imagePath}`;
   };
 
@@ -102,7 +92,6 @@ const ProductComparison: React.FC = () => {
     e.currentTarget.src = '/images/notfound.png';
   };
 
-  // Характеристики другого товару
   const getFeatureValue = (product: ComparisonProduct, featureName: string) => {
     const f = product.features.find((item) => item.name === featureName);
     return f ? f.value : '-';
@@ -191,7 +180,7 @@ const ProductComparison: React.FC = () => {
           {/* Product 1 */}
           <AnimatePresence mode="wait">
             <motion.div
-              key={`p1-${product1.name}`}
+              key={`p1-${product1.id}`}
               variants={productVariants}
               initial="hidden"
               animate="visible"
@@ -199,7 +188,7 @@ const ProductComparison: React.FC = () => {
             >
               <div className="relative w-full max-w-[280px] lg:max-w-[320px] aspect-square mx-auto">
                 <Image
-                  src={getImageUrl(product1.name)} // Пошук фото по назві з перекладу
+                  src={getImageUrl(product1.id)} // Беремо URL з мапи по ID
                   alt={product1.name}
                   fill
                   onError={onImgError}
@@ -221,11 +210,9 @@ const ProductComparison: React.FC = () => {
                 variants={featureVariants}
                 className="flex items-center py-3 text-center"
               >
-                {/* Val 1 */}
                 <div className="w-1/3 text-sm px-2 text-gray-700 dark:text-gray-400">
                   {f.value}
                 </div>
-                {/* Name */}
                 <div className="w-1/3 flex flex-col items-center">
                    <span className="bg-gray-100 dark:bg-[#111111] px-2 py-1 rounded text-xs font-medium border dark:border-neutral-800 text-gray-800 dark:text-white whitespace-nowrap">
                      {f.name}
@@ -234,7 +221,6 @@ const ProductComparison: React.FC = () => {
                       <div className="h-4 border-l border-gray-200 dark:border-neutral-800 mt-2"></div>
                    )}
                 </div>
-                {/* Val 2 */}
                 <div className="w-1/3 text-sm px-2 text-gray-700 dark:text-gray-400">
                   {getFeatureValue(product2, f.name)}
                 </div>
@@ -245,7 +231,7 @@ const ProductComparison: React.FC = () => {
           {/* Product 2 */}
           <AnimatePresence mode="wait">
             <motion.div
-              key={`p2-${product2.name}`}
+              key={`p2-${product2.id}`}
               variants={productVariants}
               initial="hidden"
               animate="visible"
@@ -253,7 +239,7 @@ const ProductComparison: React.FC = () => {
             >
               <div className="relative w-full max-w-[280px] lg:max-w-[320px] aspect-square mx-auto">
                 <Image
-                  src={getImageUrl(product2.name)} // Пошук фото по назві з перекладу
+                  src={getImageUrl(product2.id)} // Беремо URL з мапи по ID
                   alt={product2.name}
                   fill
                   onError={onImgError}
@@ -273,7 +259,7 @@ const ProductComparison: React.FC = () => {
            <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl p-4 border border-gray-200 dark:border-neutral-800">
               <div className="relative w-[200px] h-[200px] mx-auto mb-4">
                  <Image 
-                   src={getImageUrl(product1.name)} 
+                   src={getImageUrl(product1.id)} // Беремо URL з мапи по ID
                    alt={product1.name} 
                    fill 
                    onError={onImgError}
@@ -293,7 +279,7 @@ const ProductComparison: React.FC = () => {
            <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl p-4 border border-gray-200 dark:border-neutral-800">
               <div className="relative w-[200px] h-[200px] mx-auto mb-4">
                  <Image 
-                   src={getImageUrl(product2.name)} 
+                   src={getImageUrl(product2.id)} // Беремо URL з мапи по ID
                    alt={product2.name} 
                    fill 
                    onError={onImgError}

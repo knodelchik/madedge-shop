@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Zap, ClipboardList, Target, Wrench } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
+import { YouTubeEmbed } from '@next/third-parties/google';
 
 export default function VideoSection() {
   const t = useTranslations('Assembly');
@@ -50,13 +51,12 @@ export default function VideoSection() {
           transition={{ duration: 0.7 }}
           viewport={{ once: true }}
         >
-          <iframe
-            src="https://www.youtube.com/embed/WXdFfbQfzBs"
-            title={t('assemblyTitle')}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            className="w-full h-full"
-            allowFullScreen
+          <YouTubeEmbed 
+            videoid="WXdFfbQfzBs" 
+            height={400} // Налаштуйте висоту/параметри під дизайн
+            params="controls=1"
           />
+          
         </motion.div>
 
         {/* Right side – Text + Cards + Buttons */}

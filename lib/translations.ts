@@ -1076,7 +1076,7 @@ export const translations = {
           id: 'rotary-mechanism',
           name: 'Поворотний механізм MadEdge Модель 1',
           price: 80,
-          imageSrc: '/images/rotarymechanism-1.jpg',
+          imageSrc: 'https://umnwnrvuonyiwylxqoiq.supabase.co/storage/v1/object/sign/product%20images/rotarymechanism-1.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mYTY2MjExZi1lZmNjLTQ0ZmMtOWY2Ni0xZDM5N2NhNGE3NzYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9kdWN0IGltYWdlcy9yb3RhcnltZWNoYW5pc20tMS5qcGciLCJpYXQiOjE3NjEzMzM5MjYsImV4cCI6MjA3NjY5MzkyNn0.As5HBUXaYP7_4WS0Ff1e6SQl6u5qC2yJB0uhCx54TO4',
           features: [
             'Дві симетричні фіксовані поворотні позиції для стабільного налаштування.',
             'Легке обертання завдяки потужній пружині, що усуває необхідність тягнути механізм.',
@@ -1096,7 +1096,7 @@ export const translations = {
           id: 'table-mount',
           name: 'Кріплення до столу',
           price: 16,
-          imageSrc: '/images/tablemount-1.jpg',
+          imageSrc: 'https://umnwnrvuonyiwylxqoiq.supabase.co/storage/v1/object/sign/product%20images/tablemount-1.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mYTY2MjExZi1lZmNjLTQ0ZmMtOWY2Ni0xZDM5N2NhNGE3NzYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9kdWN0IGltYWdlcy90YWJsZW1vdW50LTEuanBnIiwiaWF0IjoxNzYxMzM0MDIxLCJleHAiOjIwNzY2OTQwMjF9.TtQ_GrgCh-ERn7Q2QXoEvYG6w04a55_0Q5fmV4bfQ8k',
           features: [
             'Забезпечує стабільну та надійну основу для системи заточування.',
             'Призначене для міцного затискання системи MadEdge до будь-якої горизонтальної поверхні.',
@@ -1109,7 +1109,7 @@ export const translations = {
           id: 'hinge-rest-hook',
           name: 'Шарнір з гачком-обмежувачем',
           price: 10,
-          imageSrc: '/images/hinge-1.jpg',
+          imageSrc: 'https://umnwnrvuonyiwylxqoiq.supabase.co/storage/v1/object/sign/product%20images/hinge-1.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mYTY2MjExZi1lZmNjLTQ0ZmMtOWY2Ni0xZDM5N2NhNGE3NzYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9kdWN0IGltYWdlcy9oaW5nZS0xLmpwZyIsImlhdCI6MTc2MTMzMzQ3OSwiZXhwIjoyMDc2NjkzNDc5fQ.C4RRY-gc03uG8VDzMn0Y-wm38bhqQfkQTEsOAm94mE4',
           features: [
             'Діаметр отвору: 8 мм.',
             'Оснащений впресованою втулкою з антифрикційної бронзи.',
@@ -1122,7 +1122,7 @@ export const translations = {
           id: 'clamp-full-flat',
           name: 'Затискач MadEdge для клинків "Full Flat"',
           price: 23,
-          imageSrc: '/images/adapterclamps-1.jpg',
+          imageSrc: 'https://umnwnrvuonyiwylxqoiq.supabase.co/storage/v1/object/sign/product%20images/clamp-1.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mYTY2MjExZi1lZmNjLTQ0ZmMtOWY2Ni0xZDM5N2NhNGE3NzYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9kdWN0IGltYWdlcy9jbGFtcC0xLmpwZyIsImlhdCI6MTc2MTMzMzM3MCwiZXhwIjoyMDc2NjkzMzcwfQ.ef5-ofFD4cr4vZG0CtW7HzSLcMDL5JjVo-PXSVFBuww',
           features: [
             'Виготовлений із термообробленої пружинної сталі для оптимальної міцності та фіксації.',
             'Спеціально розроблений для надійної фіксації ножів із прямими спусками від обуха (full flat grind).',
@@ -1136,7 +1136,7 @@ export const translations = {
           id: 'adapter-flat-chisels',
           name: 'Адаптер для заточування плоских стамесок',
           price: 13,
-          imageSrc: '/images/adaptersharp-1.jpg',
+          imageSrc: 'https://umnwnrvuonyiwylxqoiq.supabase.co/storage/v1/object/sign/product%20images/adaptersharp-1.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mYTY2MjExZi1lZmNjLTQ0ZmMtOWY2Ni0xZDM5N2NhNGE3NzYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9kdWN0IGltYWdlcy9hZGFwdGVyc2hhcnAtMS5qcGciLCJpYXQiOjE3NjEzMzMyNzEsImV4cCI6MjA3NjY5MzI3MX0._dbe0CKZZxfjcoNyaAQ7FSzxTUzXtSdY03yAwvqHju8',
           features: [
             'Розширює можливості системи MadEdge для роботи з плоскими стамесками.',
             'Забезпечує необхідну жорстку та пряму фіксацію для заточування.',
@@ -1147,7 +1147,7 @@ export const translations = {
           id: 'adapter-for-clamps',
           name: 'Адаптер центрального затискача',
           price: 10,
-          imageSrc: '/images/clamp-2.jpg',
+          imageSrc: 'https://umnwnrvuonyiwylxqoiq.supabase.co/storage/v1/object/sign/product%20images/adapterclamps-1.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mYTY2MjExZi1lZmNjLTQ0ZmMtOWY2Ni0xZDM5N2NhNGE3NzYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9kdWN0IGltYWdlcy9hZGFwdGVyY2xhbXBzLTEuanBnIiwiaWF0IjoxNzYxMzMzMjI5LCJleHAiOjIwNzY2OTMyMjl9.yx889QdZZdwzrWGGgqBjaz1yJivH12sahUEFTF-cBR0',
           features: [
             'Дозволяє ближче розташувати затискачі для заточування коротких лез.',
             'Забезпечує жорстку фіксацію навіть при мінімальній відстані між затискачами.',
@@ -1158,7 +1158,7 @@ export const translations = {
           id: 'hinge-convex',
           name: 'Шарнір для опуклого заточування (Convex)',
           price: 9,
-          imageSrc: '/images/hingeconvex-1.jpg',
+          imageSrc: 'https://umnwnrvuonyiwylxqoiq.supabase.co/storage/v1/object/sign/product%20images/hingeconvex-1.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mYTY2MjExZi1lZmNjLTQ0ZmMtOWY2Ni0xZDM5N2NhNGE3NzYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9kdWN0IGltYWdlcy9oaW5nZWNvbnZleC0xLmpwZyIsImlhdCI6MTc2MTMzMzY0OCwiZXhwIjoyMDc2NjkzNjQ4fQ.23tbu38a9nkdwn25Hr10PhupgYVo-HZuHnjyM2ij2Qg',
           features: [
             'Спеціалізований шарнір для заточування ножів з опуклою (лінзовидною) кромкою.',
             'Дозволяє контрольований рух, необхідний для досягнення ідеального Convex-профілю.',
@@ -1169,7 +1169,7 @@ export const translations = {
           id: 'fine-turning-adapter',
           name: 'Адаптер для точного налаштування',
           price: 4,
-          imageSrc: '/images/fineadapter-1.jpg',
+         imageSrc: 'https://umnwnrvuonyiwylxqoiq.supabase.co/storage/v1/object/sign/product%20images/fineadapter-1.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mYTY2MjExZi1lZmNjLTQ0ZmMtOWY2Ni0xZDM5N2NhNGE3NzYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9kdWN0IGltYWdlcy9maW5lYWRhcHRlci0xLmpwZyIsImlhdCI6MTc2MTMzMzQ0NCwiZXhwIjoyMDc2NjkzNDQ0fQ.P_oRpoTxzNaq2ACdsNUMef1zXXQZQ-ShRbZnsAcK6qI',
           features: [
             'Простий інструмент для точного регулювання та підтримки кута заточування.',
             'Діаметр отвору: 8 мм.',
@@ -2298,7 +2298,7 @@ export const translations = {
           id: 'rotary-mechanism',
           name: 'MadEdge Rotary Mechanism Model 1',
           price: 80,
-          imageSrc: '/images/rotarymechanism-1.jpg',
+          imageSrc: 'https://umnwnrvuonyiwylxqoiq.supabase.co/storage/v1/object/sign/product%20images/rotarymechanism-1.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mYTY2MjExZi1lZmNjLTQ0ZmMtOWY2Ni0xZDM5N2NhNGE3NzYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9kdWN0IGltYWdlcy9yb3RhcnltZWNoYW5pc20tMS5qcGciLCJpYXQiOjE3NjEzMzM5MjYsImV4cCI6MjA3NjY5MzkyNn0.As5HBUXaYP7_4WS0Ff1e6SQl6u5qC2yJB0uhCx54TO4',
           features: [
             'Dual symmetrical fixed rotary positions for consistent setup.',
             'Easy rotation despite a powerful spring, eliminating the need to pull the mechanism.',
@@ -2318,7 +2318,7 @@ export const translations = {
           id: 'table-mount',
           name: 'Table Mount',
           price: 16,
-          imageSrc: '/images/tablemount-1.jpg',
+          imageSrc: 'https://umnwnrvuonyiwylxqoiq.supabase.co/storage/v1/object/sign/product%20images/tablemount-1.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mYTY2MjExZi1lZmNjLTQ0ZmMtOWY2Ni0xZDM5N2NhNGE3NzYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9kdWN0IGltYWdlcy90YWJsZW1vdW50LTEuanBnIiwiaWF0IjoxNzYxMzM0MDIxLCJleHAiOjIwNzY2OTQwMjF9.TtQ_GrgCh-ERn7Q2QXoEvYG6w04a55_0Q5fmV4bfQ8k',
           features: [
             'Provides a stable and secure base for the sharpening system.',
             'Designed to firmly clamp the MadEdge system to any horizontal surface.',
@@ -2331,7 +2331,7 @@ export const translations = {
           id: 'hinge-rest-hook',
           name: 'Hinge with Rest Hook',
           price: 10,
-          imageSrc: '/images/hinge-1.jpg',
+          imageSrc: 'https://umnwnrvuonyiwylxqoiq.supabase.co/storage/v1/object/sign/product%20images/hinge-1.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mYTY2MjExZi1lZmNjLTQ0ZmMtOWY2Ni0xZDM5N2NhNGE3NzYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9kdWN0IGltYWdlcy9oaW5nZS0xLmpwZyIsImlhdCI6MTc2MTMzMzQ3OSwiZXhwIjoyMDc2NjkzNDc5fQ.C4RRY-gc03uG8VDzMn0Y-wm38bhqQfkQTEsOAm94mE4',
           features: [
             'Hole diameter: 8 mm.',
             'Features a pressed-in sleeve made of anti-friction bronze.',
@@ -2344,7 +2344,7 @@ export const translations = {
           id: 'clamp-full-flat',
           name: 'MadEdge Clamp for Full Flat',
           price: 23, // Price per piece
-          imageSrc: '/images/adapterclamps-1.jpg',
+          imageSrc: 'https://umnwnrvuonyiwylxqoiq.supabase.co/storage/v1/object/sign/product%20images/clamp-1.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mYTY2MjExZi1lZmNjLTQ0ZmMtOWY2Ni0xZDM5N2NhNGE3NzYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9kdWN0IGltYWdlcy9jbGFtcC0xLmpwZyIsImlhdCI6MTc2MTMzMzM3MCwiZXhwIjoyMDc2NjkzMzcwfQ.ef5-ofFD4cr4vZG0CtW7HzSLcMDL5JjVo-PXSVFBuww',
           features: [
             'Made of heat-treated spring steel for optimal strength and retention.',
             'Specifically designed for securely fixing knives with a full flat grind.',
@@ -2358,7 +2358,7 @@ export const translations = {
           id: 'adapter-flat-chisels',
           name: 'Adapter for Sharpening Flat Chisels',
           price: 13,
-          imageSrc: '/images/adaptersharp-1.jpg',
+          imageSrc: 'https://umnwnrvuonyiwylxqoiq.supabase.co/storage/v1/object/sign/product%20images/adaptersharp-1.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mYTY2MjExZi1lZmNjLTQ0ZmMtOWY2Ni0xZDM5N2NhNGE3NzYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9kdWN0IGltYWdlcy9hZGFwdGVyc2hhcnAtMS5qcGciLCJpYXQiOjE3NjEzMzMyNzEsImV4cCI6MjA3NjY5MzI3MX0._dbe0CKZZxfjcoNyaAQ7FSzxTUzXtSdY03yAwvqHju8',
           features: [
             'Expands the MadEdge system capability to include flat chisels.',
             'Provides the necessary rigid and straight fixation for chiseled edges.',
@@ -2371,7 +2371,7 @@ export const translations = {
           id: 'adapter-for-clamps',
           name: 'Center Clamp Adapter',
           price: 10,
-          imageSrc: '/images/clamp-2.jpg',
+          imageSrc: 'https://umnwnrvuonyiwylxqoiq.supabase.co/storage/v1/object/sign/product%20images/adapterclamps-1.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mYTY2MjExZi1lZmNjLTQ0ZmMtOWY2Ni0xZDM5N2NhNGE3NzYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9kdWN0IGltYWdlcy9hZGFwdGVyY2xhbXBzLTEuanBnIiwiaWF0IjoxNzYxMzMzMjI5LCJleHAiOjIwNzY2OTMyMjl9.yx889QdZZdwzrWGGgqBjaz1yJivH12sahUEFTF-cBR0',
           features: [
             'Enables closer positioning of clamps for sharpening short blades.',
             'Ensures a rigid fixing position even at minimal clamp spacing.',
@@ -2382,7 +2382,7 @@ export const translations = {
           id: 'hinge-convex',
           name: 'Hinge for Convex',
           price: 9,
-          imageSrc: '/images/hingeconvex-1.jpg',
+          imageSrc: 'https://umnwnrvuonyiwylxqoiq.supabase.co/storage/v1/object/sign/product%20images/hingeconvex-1.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mYTY2MjExZi1lZmNjLTQ0ZmMtOWY2Ni0xZDM5N2NhNGE3NzYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9kdWN0IGltYWdlcy9oaW5nZWNvbnZleC0xLmpwZyIsImlhdCI6MTc2MTMzMzY0OCwiZXhwIjoyMDc2NjkzNjQ4fQ.23tbu38a9nkdwn25Hr10PhupgYVo-HZuHnjyM2ij2Qg',
           features: [
             'Specialized hinge for sharpening knives with a convex (lenticular) edge.',
             'Allows for the controlled movement necessary to achieve a perfect convex profile.',
@@ -2393,7 +2393,7 @@ export const translations = {
           id: 'fine-turning-adapter',
           name: 'Fine-Tuning Adapter',
           price: 4,
-          imageSrc: '/images/fineadapter-1.jpg',
+          imageSrc: 'https://umnwnrvuonyiwylxqoiq.supabase.co/storage/v1/object/sign/product%20images/fineadapter-1.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mYTY2MjExZi1lZmNjLTQ0ZmMtOWY2Ni0xZDM5N2NhNGE3NzYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9kdWN0IGltYWdlcy9maW5lYWRhcHRlci0xLmpwZyIsImlhdCI6MTc2MTMzMzQ0NCwiZXhwIjoyMDc2NjkzNDQ0fQ.P_oRpoTxzNaq2ACdsNUMef1zXXQZQ-ShRbZnsAcK6qI',
           features: [
             'Simple tool for precisely adjusting and maintaining the sharpening angle.',
             'Hole diameter: 8 mm.',

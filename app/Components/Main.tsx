@@ -20,13 +20,12 @@ const Threads = dynamic(() => import('../../components/Threads'), {
 
 // 2. Визначаємо варіанти анімації та явно типізуємо їх
 const containerVariants: Variants = {
-  // <-- Використовуємо : Variants
-  hidden: { opacity: 0 },
+  hidden: { opacity: 1 }, // 👈 БУЛО 0, СТАЛО 1 (Критично для LCP)
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.2,
-      delayChildren: 0.3,
+      staggerChildren: 0.1, // Трохи пришвидшили появу дітей
+      delayChildren: 0.1,
     },
   },
 };
@@ -80,12 +79,14 @@ lg:pt-0      /* ПК — як було */
         >
           <motion.h1
             className="
-    text-5xl        /* мобільний */
-    sm:text-6xl     /* починаючи з планшета — оригінальний розмір, ПК не чіпаємо */
-
-    font-extrabold text-gray-900 dark:text-white mb-6 transition-colors duration-300
-  "
-            variants={itemVariants}
+              text-5xl
+              sm:text-6xl
+              font-extrabold text-gray-900 dark:text-white mb-6 transition-colors duration-300
+            "
+            // Ми примусово робимо його видимим одразу. 
+            // Якщо хочете анімацію руху без зникнення, можна додати y: [20, 0]
+            initial={{ opacity: 1, y: 0 }} 
+            animate={{ opacity: 1, y: 0 }}
           >
             {t('heroTitle')}
           </motion.h1>

@@ -69,6 +69,7 @@ export default async function AdminLayout({
           <AdminLink href="/admin/orders" label="Замовлення" />
           <AdminLink href="/admin/products" label="Товари" />
           <AdminLink href="/admin/delivery" label="Доставка" />
+          <AdminLink href="/admin/newsletter" label="Розсилка" />
           <div className="pt-4 border-t dark:border-neutral-800 mt-4">
             <Link
               href="/"

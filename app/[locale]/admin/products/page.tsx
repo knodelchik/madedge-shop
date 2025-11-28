@@ -124,7 +124,7 @@ export default function AdminProductsPage() {
                                     {product.title}
                                 </td>
                                 <td className="p-4 text-gray-600 dark:text-gray-300">
-                                    {product.price} ₴
+                                    {product.price} $
                                 </td>
                                 <td className="p-4 text-sm text-gray-500">
                                     <span className="px-2 py-1 bg-gray-100 dark:bg-neutral-800 rounded-full">

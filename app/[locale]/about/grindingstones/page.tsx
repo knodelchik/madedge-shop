@@ -74,7 +74,7 @@ export default function GrindingStonesPage() {
             <div className="lg:w-2/5 order-1 lg:order-2">
               <motion.div className="bg-gray-100 aspect-square flex items-center justify-center overflow-hidden w-full rounded-lg border border-gray-200 shadow-sm dark:bg-gray-900 dark:border-neutral-800">
                 <img
-                  src="/images/diamondstones.jpg"
+                  src="https://umnwnrvuonyiwylxqoiq.supabase.co/storage/v1/object/sign/product%20images/diamondstones.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mYTY2MjExZi1lZmNjLTQ0ZmMtOWY2Ni0xZDM5N2NhNGE3NzYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9kdWN0IGltYWdlcy9kaWFtb25kc3RvbmVzLmpwZyIsImlhdCI6MTc2MTMzMzQxNiwiZXhwIjoyMDc2NjkzNDE2fQ.esjqfSOB4geQgYcmwiniXXGJU_rN2YGs2VxlJz1LtMU"
                   alt={t('diamond.imageAlt')}
                   className="w-full h-full object-cover"
                 />
@@ -163,7 +163,7 @@ export default function GrindingStonesPage() {
             <div className="lg:w-2/5 order-1 lg:order-2">
               <motion.div className="bg-gray-100 aspect-square flex items-center justify-center overflow-hidden w-full rounded-lg border border-gray-200 shadow-sm dark:bg-gray-900 dark:border-neutral-800">
                 <img
-                  src="/images/sharpstones-1.jpg"
+                  src="https://umnwnrvuonyiwylxqoiq.supabase.co/storage/v1/object/sign/product%20images/sharpstones-1.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mYTY2MjExZi1lZmNjLTQ0ZmMtOWY2Ni0xZDM5N2NhNGE3NzYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9kdWN0IGltYWdlcy9zaGFycHN0b25lcy0xLmpwZyIsImlhdCI6MTc2MTMzMzk2OSwiZXhwIjoyMDc2NjkzOTY5fQ.ZJBOYET7hKlaJuV7GAFTZXX3spY0UHz45847TwmLdJk"
                   alt={t('oxide.imageAlt')}
                   className="w-full h-full object-cover"
                 />

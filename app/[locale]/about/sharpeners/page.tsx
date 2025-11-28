@@ -94,7 +94,7 @@ export default function SharpenersPage() {
                 transition={{ type: 'spring', stiffness: 300 }}
               >
                 <img
-                  src="/images/madedgemodel1-1.jpg"
+                  src="https://umnwnrvuonyiwylxqoiq.supabase.co/storage/v1/object/sign/product%20images/madedgemodel1-1.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mYTY2MjExZi1lZmNjLTQ0ZmMtOWY2Ni0xZDM5N2NhNGE3NzYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9kdWN0IGltYWdlcy9tYWRlZGdlbW9kZWwxLTEuanBnIiwiaWF0IjoxNzYxMzMzNzExLCJleHAiOjIwNzY2OTM3MTF9.cSXD5I1EoRLa80GByhmHbB8xu9LZK1wc0EXa-cc8lFI"
                   alt={t('model1.imageAlt')}
                   className="w-full h-full object-cover"
                 />
@@ -175,7 +175,7 @@ export default function SharpenersPage() {
                 transition={{ type: 'spring', stiffness: 300 }}
               >
                 <img
-                  src="/images/madedgemodel3-1.jpg"
+                  src="https://umnwnrvuonyiwylxqoiq.supabase.co/storage/v1/object/sign/product%20images/madedgemodel3-1.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mYTY2MjExZi1lZmNjLTQ0ZmMtOWY2Ni0xZDM5N2NhNGE3NzYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9kdWN0IGltYWdlcy9tYWRlZGdlbW9kZWwzLTEuanBnIiwiaWF0IjoxNzYxMzMzODEyLCJleHAiOjIwNzY2OTM4MTJ9.1cJxG-WOnzr5euvyHAdSww-GPHqGwcvlaVGcuBo8hww"
                   alt={t('digital.imageAlt')}
                   className="w-full h-full object-cover"
                 />
@@ -247,7 +247,7 @@ export default function SharpenersPage() {
                 transition={{ type: 'spring', stiffness: 300 }}
               >
                 <img
-                  src="/images/madedgemodel2-1.jpg"
+                  src="https://umnwnrvuonyiwylxqoiq.supabase.co/storage/v1/object/sign/product%20images/madedgemodel2-1.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mYTY2MjExZi1lZmNjLTQ0ZmMtOWY2Ni0xZDM5N2NhNGE3NzYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9kdWN0IGltYWdlcy9tYWRlZGdlbW9kZWwyLTEuanBnIiwiaWF0IjoxNzYxMzMzNzY1LCJleHAiOjIwNzY2OTM3NjV9.7gf9yAig6VHSj_ypOh1RyrEdXfOP_I6QZq9utdYskQw"
                   alt={t('model2.imageAlt')}
                   className="w-full h-full object-cover"
                 />
@@ -340,7 +340,7 @@ export default function SharpenersPage() {
                 transition={{ type: 'spring', stiffness: 300 }}
               >
                 <img
-                  src="/images/madedgemodel4-1.jpg"
+                  src="https://umnwnrvuonyiwylxqoiq.supabase.co/storage/v1/object/sign/product%20images/madedgemodel4-1.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mYTY2MjExZi1lZmNjLTQ0ZmMtOWY2Ni0xZDM5N2NhNGE3NzYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9kdWN0IGltYWdlcy9tYWRlZGdlbW9kZWw0LTEuanBnIiwiaWF0IjoxNzYxMzMzODc5LCJleHAiOjIwNzY2OTM4Nzl9.4JNXMjywQw7yOZGhFYwAO0vPWM45cdSgaaW1k-VV4N0"
                   alt={t('convex.imageAlt')}
                   className="w-full h-full object-cover"
                 />
