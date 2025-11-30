@@ -77,6 +77,22 @@ export const wishlistService = {
 
     return !!data;
   },
+  // === ДОДАЙТЕ ЦЕЙ НОВИЙ МЕТОД ===
+  async getProductsByIds(productIds: number[]): Promise<any[]> {
+    if (!productIds || productIds.length === 0) return [];
+
+    const { data, error } = await supabase
+      .from('products') // Переконайтеся, що таблиця називається 'products'
+      .select('*')
+      .in('id', productIds);
+
+    if (error) {
+      console.error('Error fetching products by ids:', error);
+      return [];
+    }
+
+    return data || [];
+  },
 
   // Перемістити з wishlist в cart
   async moveToCart(userId: string, productId: number): Promise<boolean> {

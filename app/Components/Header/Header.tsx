@@ -101,13 +101,12 @@ export default function Header() {
   }, [handleAuthChange, loadWishlist, clearWishlist]);
 
   if (loading) {
-
     return <HeaderSkeleton />;
   }
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full bg-white dark:bg-black md:bg-white/85 md:dark:bg-black border-b border-gray-200 dark:border-neutral-500 px-6 py-4">
+      <header className="sticky top-0 z-50 w-full bg-white dark:bg-black md:bg-white/85 md:backdrop-blur-sm md:dark:bg-black border-b border-gray-200 dark:border-neutral-500 px-6 py-4">
         <div className="relative flex items-center justify-between max-w-screen-2xl mx-auto">
           {/* ===== ЛІВА ЧАСТИНА - Назва MadEdge ===== */}
           <div className="flex-shrink-0 z-10">

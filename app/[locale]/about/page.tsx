@@ -389,7 +389,9 @@ export default function AboutPage() {
             {[
               {
                 icon: (
-                  <Wrench className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-blue-600 dark:text-blue-300" />
+                  <span className="text-blue-600 mr-2 dark:text-blue-300">
+                    ◆
+                  </span>
                 ),
                 key: 'Maintenance',
               },
