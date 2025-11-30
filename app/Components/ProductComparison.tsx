@@ -30,7 +30,7 @@ interface ComparisonProduct {
 
 const ProductComparison: React.FC = () => {
   const t = useTranslations('Product');
-  
+
   // 1. ДАНІ ПОРІВНЯННЯ БЕРЕМО З ПЕРЕКЛАДІВ
   const products = t.raw('products') as ComparisonProduct[];
 
@@ -49,17 +49,13 @@ const ProductComparison: React.FC = () => {
   useEffect(() => {
     const loadImages = async () => {
       try {
-        // Використовуємо існуючий сервіс замість прямого запиту
         const allProducts = await productsService.getAllProducts();
-
         const map: Record<string, string> = {};
 
         if (allProducts && allProducts.length > 0) {
           allProducts.forEach((item) => {
-            // Перевіряємо наявність зображень
             if (item.images && item.images.length > 0) {
-               // Використовуємо ID як ключ для мапінгу
-               map[item.id.toString()] = item.images[0];
+              map[item.id.toString()] = item.images[0];
             }
           });
         }
@@ -79,11 +75,10 @@ const ProductComparison: React.FC = () => {
   const getImageUrl = (productId: number) => {
     const idStr = productId.toString();
     const imagePath = imagesMap[idStr];
-    
-    if (!imagePath) return '/images/notfound.png'; // Або ваш placeholder
 
+    if (!imagePath) return '/images/notfound.png';
     if (imagePath.startsWith('http')) return imagePath;
-    
+
     return `${STORAGE_URL}/${imagePath}`;
   };
 
@@ -120,7 +115,7 @@ const ProductComparison: React.FC = () => {
 
   return (
     <section className="py-12 sm:py-16 bg-white dark:bg-black transition-colors duration-500">
-      <motion.div 
+      <motion.div
         className="max-w-7xl mx-auto px-4 sm:px-6"
         variants={containerVariants}
         initial="hidden"
@@ -133,16 +128,19 @@ const ProductComparison: React.FC = () => {
 
         {/* SELECTS */}
         <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-8 mb-10 max-w-2xl mx-auto">
-          <div className="w-full">
+          {/* --- ПЕРШИЙ СЕЛЕКТ (ЛІВИЙ) --- */}
+          <div className="w-full min-w-0">
+            {/* ТУТ БУЛА ПОМИЛКА: value={secondId} -> value={firstId} */}
             <Select value={firstId} onValueChange={setFirstId}>
-              <SelectTrigger className="w-full h-12 bg-white dark:bg-[#111111] border-gray-300 dark:border-neutral-800 text-gray-900 dark:text-white rounded-xl">
-                <SelectValue placeholder="Select product 1" />
+              <SelectTrigger className="w-full bg-white dark:bg-[#111111] border-gray-300 dark:border-neutral-800 rounded-xl">
+                <SelectValue placeholder="Select product" />
               </SelectTrigger>
               <SelectContent>
                 {products.map((p) => (
-                  <SelectItem 
-                    key={p.id} 
-                    value={p.id.toString()} 
+                  <SelectItem
+                    key={p.id}
+                    value={p.id.toString()}
+                    // Блокуємо, якщо цей продукт обраний у другому селекті
                     disabled={p.id.toString() === secondId}
                     className="cursor-pointer"
                   >
@@ -153,16 +151,18 @@ const ProductComparison: React.FC = () => {
             </Select>
           </div>
 
-          <div className="w-full">
+          {/* --- ДРУГИЙ СЕЛЕКТ (ПРАВИЙ) --- */}
+          <div className="w-full min-w-0">
             <Select value={secondId} onValueChange={setSecondId}>
-              <SelectTrigger className="w-full h-12 bg-white dark:bg-[#111111] border-gray-300 dark:border-neutral-800 text-gray-900 dark:text-white rounded-xl">
-                <SelectValue placeholder="Select product 2" />
+              <SelectTrigger className="w-full bg-white dark:bg-[#111111] border-gray-300 dark:border-neutral-800 rounded-xl">
+                <SelectValue placeholder="Select product" />
               </SelectTrigger>
               <SelectContent>
                 {products.map((p) => (
-                  <SelectItem 
-                    key={p.id} 
+                  <SelectItem
+                    key={p.id}
                     value={p.id.toString()}
+                    // Блокуємо, якщо цей продукт обраний у першому селекті
                     disabled={p.id.toString() === firstId}
                     className="cursor-pointer"
                   >
@@ -176,7 +176,6 @@ const ProductComparison: React.FC = () => {
 
         {/* DESKTOP COMPARISON */}
         <div className="hidden md:grid md:grid-cols-3 gap-6 lg:gap-10 items-start text-center">
-          
           {/* Product 1 */}
           <AnimatePresence mode="wait">
             <motion.div
@@ -188,7 +187,7 @@ const ProductComparison: React.FC = () => {
             >
               <div className="relative w-full max-w-[280px] lg:max-w-[320px] aspect-square mx-auto">
                 <Image
-                  src={getImageUrl(product1.id)} // Беремо URL з мапи по ID
+                  src={getImageUrl(product1.id)}
                   alt={product1.name}
                   fill
                   onError={onImgError}
@@ -204,8 +203,8 @@ const ProductComparison: React.FC = () => {
           {/* Features List */}
           <div className="flex flex-col pt-4">
             {product1.features.map((f, idx) => (
-              <motion.div 
-                key={idx} 
+              <motion.div
+                key={idx}
                 custom={idx}
                 variants={featureVariants}
                 className="flex items-center py-3 text-center"
@@ -214,12 +213,12 @@ const ProductComparison: React.FC = () => {
                   {f.value}
                 </div>
                 <div className="w-1/3 flex flex-col items-center">
-                   <span className="bg-gray-100 dark:bg-[#111111] px-2 py-1 rounded text-xs font-medium border dark:border-neutral-800 text-gray-800 dark:text-white whitespace-nowrap">
-                     {f.name}
-                   </span>
-                   {idx !== product1.features.length - 1 && (
-                      <div className="h-4 border-l border-gray-200 dark:border-neutral-800 mt-2"></div>
-                   )}
+                  <span className="bg-gray-100 dark:bg-[#111111] px-2 py-1 rounded text-xs font-medium border dark:border-neutral-800 text-gray-800 dark:text-white whitespace-nowrap">
+                    {f.name}
+                  </span>
+                  {idx !== product1.features.length - 1 && (
+                    <div className="h-4 border-l border-gray-200 dark:border-neutral-800 mt-2"></div>
+                  )}
                 </div>
                 <div className="w-1/3 text-sm px-2 text-gray-700 dark:text-gray-400">
                   {getFeatureValue(product2, f.name)}
@@ -239,7 +238,7 @@ const ProductComparison: React.FC = () => {
             >
               <div className="relative w-full max-w-[280px] lg:max-w-[320px] aspect-square mx-auto">
                 <Image
-                  src={getImageUrl(product2.id)} // Беремо URL з мапи по ID
+                  src={getImageUrl(product2.id)}
                   alt={product2.name}
                   fill
                   onError={onImgError}
@@ -255,47 +254,60 @@ const ProductComparison: React.FC = () => {
 
         {/* MOBILE VERSION */}
         <div className="md:hidden space-y-8">
-           {/* Render Product 1 */}
-           <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl p-4 border border-gray-200 dark:border-neutral-800">
-              <div className="relative w-[200px] h-[200px] mx-auto mb-4">
-                 <Image 
-                   src={getImageUrl(product1.id)} // Беремо URL з мапи по ID
-                   alt={product1.name} 
-                   fill 
-                   onError={onImgError}
-                   className="object-contain rounded-xl"
-                 />
+          {/* Render Product 1 */}
+          <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl p-4 border border-gray-200 dark:border-neutral-800">
+            <div className="relative w-[200px] h-[200px] mx-auto mb-4">
+              <Image
+                src={getImageUrl(product1.id)}
+                alt={product1.name}
+                fill
+                onError={onImgError}
+                className="object-contain rounded-xl"
+              />
+            </div>
+            <h3 className="text-center font-bold mb-4 text-gray-900 dark:text-white">
+              {product1.name}
+            </h3>
+            {product1.features.map((f, i) => (
+              <div
+                key={i}
+                className="flex justify-between py-2 border-b border-gray-100 dark:border-neutral-800 text-sm last:border-0"
+              >
+                <span className="text-gray-500">{f.name}</span>
+                <span className="font-medium text-gray-900 dark:text-white">
+                  {f.value}
+                </span>
               </div>
-              <h3 className="text-center font-bold mb-4 text-gray-900 dark:text-white">{product1.name}</h3>
-              {product1.features.map((f, i) => (
-                <div key={i} className="flex justify-between py-2 border-b border-gray-100 dark:border-neutral-800 text-sm last:border-0">
-                  <span className="text-gray-500">{f.name}</span>
-                  <span className="font-medium text-gray-900 dark:text-white">{f.value}</span>
-                </div>
-              ))}
-           </div>
+            ))}
+          </div>
 
-           {/* Render Product 2 */}
-           <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl p-4 border border-gray-200 dark:border-neutral-800">
-              <div className="relative w-[200px] h-[200px] mx-auto mb-4">
-                 <Image 
-                   src={getImageUrl(product2.id)} // Беремо URL з мапи по ID
-                   alt={product2.name} 
-                   fill 
-                   onError={onImgError}
-                   className="object-contain rounded-xl" 
-                 />
+          {/* Render Product 2 */}
+          <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl p-4 border border-gray-200 dark:border-neutral-800">
+            <div className="relative w-[200px] h-[200px] mx-auto mb-4">
+              <Image
+                src={getImageUrl(product2.id)}
+                alt={product2.name}
+                fill
+                onError={onImgError}
+                className="object-contain rounded-xl"
+              />
+            </div>
+            <h3 className="text-center font-bold mb-4 text-gray-900 dark:text-white">
+              {product2.name}
+            </h3>
+            {product2.features.map((f, i) => (
+              <div
+                key={i}
+                className="flex justify-between py-2 border-b border-gray-100 dark:border-neutral-800 text-sm last:border-0"
+              >
+                <span className="text-gray-500">{f.name}</span>
+                <span className="font-medium text-gray-900 dark:text-white">
+                  {getFeatureValue(product2, f.name)}
+                </span>
               </div>
-              <h3 className="text-center font-bold mb-4 text-gray-900 dark:text-white">{product2.name}</h3>
-              {product2.features.map((f, i) => (
-                <div key={i} className="flex justify-between py-2 border-b border-gray-100 dark:border-neutral-800 text-sm last:border-0">
-                   <span className="text-gray-500">{f.name}</span>
-                   <span className="font-medium text-gray-900 dark:text-white">{getFeatureValue(product2, f.name)}</span>
-                </div>
-              ))}
-           </div>
+            ))}
+          </div>
         </div>
-
       </motion.div>
     </section>
   );
