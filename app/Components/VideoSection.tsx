@@ -51,12 +51,11 @@ export default function VideoSection() {
           transition={{ duration: 0.7 }}
           viewport={{ once: true }}
         >
-          <YouTubeEmbed 
-            videoid="WXdFfbQfzBs" 
+          <YouTubeEmbed
+            videoid="WXdFfbQfzBs"
             height={400} // Налаштуйте висоту/параметри під дизайн
             params="controls=1"
           />
-          
         </motion.div>
 
         {/* Right side – Text + Cards + Buttons */}

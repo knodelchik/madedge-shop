@@ -362,7 +362,7 @@ export default function BurgerMenu({
               {/* Футер */}
               <div className="p-4 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-sm">
                 <p className="text-xs text-neutral-500 dark:text-neutral-400 text-center">
-                  {t('footer.copyright')}
+                  © {new Date().getFullYear()} {t('footer.copyright')}
                 </p>
               </div>
             </div>
