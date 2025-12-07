@@ -1,20 +1,20 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 // i18n.ts
 import { getRequestConfig } from 'next-intl/server';
-import { translations } from '@/lib/translations';
 import { notFound } from 'next/navigation';
 
-const locales = ['en', 'uk'] as const;
+const locales = ['en', 'uk'];
 
 export default getRequestConfig(async ({ requestLocale }) => {
+  // Очікуємо (await) отримання локалі
   const locale = await requestLocale;
 
+  // Перевірка валідності
   if (!locale || !locales.includes(locale as any)) {
     notFound();
   }
 
   return {
     locale,
-    messages: translations[locale as keyof typeof translations],
+    messages: (await import(`./messages/${locale}.json`)).default,
   };
 });

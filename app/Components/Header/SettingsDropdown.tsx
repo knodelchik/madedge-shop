@@ -1,4 +1,4 @@
-// SettingsDropdown.tsx
+// components/header/SettingsDropdown.tsx
 'use client';
 
 import { Settings, Moon, Sun, Monitor } from 'lucide-react';
@@ -12,29 +12,28 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useTheme } from 'next-themes';
 import { useCurrency } from '../../context/CurrencyContext';
-import { translations } from '@/lib/translations';
-import { useLocale } from 'next-intl';
+// 1. Прибираємо старий імпорт translations
+import { useTranslations } from 'next-intl'; // Додаємо новий хук
 
 export default function SettingsDropdown() {
   const { setTheme, theme } = useTheme();
   const { currency, setCurrency } = useCurrency();
-  const currentLocale = useLocale();
 
-  const tSettings = translations[currentLocale as 'uk' | 'en'].Settings;
+  // 2. Отримуємо функцію t для секції 'Settings'
+  const t = useTranslations('Settings');
 
-  // Видаляємо масив locales та handleLocaleChange, вони тут більше не потрібні
-
+  // 3. Замінюємо tSettings.currencyUAH на t('currencyUAH') і так далі
   const currencies = [
-    { code: 'UAH' as const, label: tSettings.currencyUAH },
-    { code: 'USD' as const, label: tSettings.currencyUSD },
-    { code: 'EUR' as const, label: tSettings.currencyEUR },
+    { code: 'UAH' as const, label: t('currencyUAH') },
+    { code: 'USD' as const, label: t('currencyUSD') },
+    { code: 'EUR' as const, label: t('currencyEUR') },
   ];
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          aria-label={tSettings.ariaLabelSettings}
+          aria-label={t('ariaLabelSettings')}
           className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white dark:hover:text-black transition-colors cursor-pointer"
         >
           <Settings className="w-6 h-6" />
@@ -42,10 +41,8 @@ export default function SettingsDropdown() {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-56">
-        {/* Секцію з мовою (LanguageTitle) повністю видаляємо звідси */}
-
         {/* === Валюта === */}
-        <DropdownMenuLabel>{tSettings.currencyTitle}</DropdownMenuLabel>
+        <DropdownMenuLabel>{t('currencyTitle')}</DropdownMenuLabel>
         {currencies.map(({ code, label }) => (
           <DropdownMenuItem
             key={code}
@@ -60,13 +57,13 @@ export default function SettingsDropdown() {
         <DropdownMenuSeparator />
 
         {/* === Тема === */}
-        <DropdownMenuLabel>{tSettings.themeTitle}</DropdownMenuLabel>
+        <DropdownMenuLabel>{t('themeTitle')}</DropdownMenuLabel>
         <DropdownMenuItem
           onClick={() => setTheme('light')}
           className="cursor-pointer"
         >
           <Sun className="mr-2 w-4 h-4" />
-          <span className="flex-1">{tSettings.themeLight}</span>
+          <span className="flex-1">{t('themeLight')}</span>
           {theme === 'light' && <span className="ml-2">✓</span>}
         </DropdownMenuItem>
         <DropdownMenuItem
@@ -74,7 +71,7 @@ export default function SettingsDropdown() {
           className="cursor-pointer"
         >
           <Moon className="mr-2 w-4 h-4" />
-          <span className="flex-1">{tSettings.themeDark}</span>
+          <span className="flex-1">{t('themeDark')}</span>
           {theme === 'dark' && <span className="ml-2">✓</span>}
         </DropdownMenuItem>
         <DropdownMenuItem
@@ -82,7 +79,7 @@ export default function SettingsDropdown() {
           className="cursor-pointer"
         >
           <Monitor className="mr-2 w-4 h-4" />
-          <span className="flex-1">{tSettings.themeSystem}</span>
+          <span className="flex-1">{t('themeSystem')}</span>
           {theme === 'system' && <span className="ml-2">✓</span>}
         </DropdownMenuItem>
       </DropdownMenuContent>
