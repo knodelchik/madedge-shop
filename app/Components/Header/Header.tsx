@@ -19,7 +19,7 @@ import CartSheet from '../CartSheet';
 import BurgerMenu from './BurgerMenu';
 import MobileCartSheet from '../MobileCartSeet';
 import MobileWishlistSheet from '../MobileWishlistSheet';
-
+import LanguageSwitcher from './LanguageSwitcher';
 export default function Header() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -213,6 +213,9 @@ export default function Header() {
 
           {/* ===== ПРАВА ЧАСТИНА - Іконки ===== */}
           <div className="hidden md:flex items-center gap-4 text-gray-700 dark:text-neutral-300 z-10">
+            {/* Додаємо перемикач сюди */}
+            <LanguageSwitcher />
+
             <SettingsDropdown />
             <UserDropdown user={user} onSignOut={handleSignOut} />
             <WishlistDropdown user={user} />

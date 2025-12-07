@@ -1,3 +1,4 @@
+// SettingsDropdown.tsx
 'use client';
 
 import { Settings, Moon, Sun, Monitor } from 'lucide-react';
@@ -12,34 +13,22 @@ import {
 import { useTheme } from 'next-themes';
 import { useCurrency } from '../../context/CurrencyContext';
 import { translations } from '@/lib/translations';
-import { Link, useRouter, usePathname } from '@/navigation';
 import { useLocale } from 'next-intl';
 
 export default function SettingsDropdown() {
   const { setTheme, theme } = useTheme();
   const { currency, setCurrency } = useCurrency();
-
   const currentLocale = useLocale();
-  const pathname = usePathname();
-  const router = useRouter();
 
   const tSettings = translations[currentLocale as 'uk' | 'en'].Settings;
 
-  const locales = [
-    { code: 'uk', label: tSettings.languageUA, flag: '🇺🇦' },
-    { code: 'en', label: tSettings.languageEN, flag: '🇬🇧' },
-  ];
+  // Видаляємо масив locales та handleLocaleChange, вони тут більше не потрібні
 
   const currencies = [
     { code: 'UAH' as const, label: tSettings.currencyUAH },
     { code: 'USD' as const, label: tSettings.currencyUSD },
     { code: 'EUR' as const, label: tSettings.currencyEUR },
   ];
-
-  // ✅ Безпечне перемикання локалі без дублювання /uk/en
-  const handleLocaleChange = (code: string) => {
-    router.replace(pathname, { locale: code });
-  };
 
   return (
     <DropdownMenu>
@@ -53,21 +42,7 @@ export default function SettingsDropdown() {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-56">
-        {/* === Мова === */}
-        <DropdownMenuLabel>{tSettings.languageTitle}</DropdownMenuLabel>
-        {locales.map(({ code, label, flag }) => (
-          <DropdownMenuItem
-            key={code}
-            onClick={() => handleLocaleChange(code)}
-            className="cursor-pointer"
-          >
-            <span className="mr-2">{flag}</span>
-            <span className="flex-1">{label}</span>
-            {currentLocale === code && <span className="ml-2">✓</span>}
-          </DropdownMenuItem>
-        ))}
-
-        <DropdownMenuSeparator />
+        {/* Секцію з мовою (LanguageTitle) повністю видаляємо звідси */}
 
         {/* === Валюта === */}
         <DropdownMenuLabel>{tSettings.currencyTitle}</DropdownMenuLabel>
