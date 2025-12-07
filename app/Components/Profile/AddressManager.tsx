@@ -78,7 +78,7 @@ export default function AddressManager({
         {!isAdding && (
           <button
             onClick={() => setIsAdding(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-black text-white dark:bg-white dark:text-black text-sm font-medium rounded-lg hover:bg-gray-800 dark:hover:bg-neutral-200 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-black text-white dark:bg-white dark:text-black text-sm font-medium rounded-lg hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors  cursor-pointer"
           >
             <Plus size={16} />
             {t('AddressManager.addButton')}
@@ -167,7 +167,7 @@ export default function AddressManager({
                       {!addr.is_default && (
                         <button
                           onClick={() => handleSetDefault(addr.id)}
-                          className="p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                          className="p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
                           title={t('AddressManager.setAsDefaultTooltip')}
                         >
                           <Star size={18} />
@@ -175,7 +175,7 @@ export default function AddressManager({
                       )}
                       <button
                         onClick={() => handleDelete(addr.id)}
-                        className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                        className="p-2 text-gray-400 hover:text-red-600 transition-colors  cursor-pointer"
                         title={t('AddressManager.deleteTooltip')}
                       >
                         <Trash2 size={18} />

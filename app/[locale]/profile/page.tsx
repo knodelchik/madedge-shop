@@ -176,7 +176,7 @@ function ProfilePageContent() {
                   <button
                     key={tab.id}
                     onClick={() => handleTabChange(tab.id as ProfileTab)}
-                    className={`flex items-center space-x-3 w-full p-3 rounded-lg font-medium text-sm transition-colors ${
+                    className={`flex items-center space-x-3 w-full p-3 rounded-lg font-medium text-sm transition-colors  cursor-pointer ${
                       activeTab === tab.id
                         ? 'bg-gray-100 dark:bg-neutral-800 text-gray-900 dark:text-white'
                         : 'text-gray-600 dark:text-neutral-400 hover:bg-gray-50 dark:hover:bg-neutral-800/50'
@@ -189,7 +189,7 @@ function ProfilePageContent() {
                 <div className="pt-2 border-t border-gray-100 dark:border-neutral-800">
                   <button
                     onClick={handleSignOut}
-                    className="flex items-center space-x-3 w-full p-3 rounded-lg font-medium text-sm transition-colors text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
+                    className="flex items-center space-x-3 w-full p-3 rounded-lg font-medium text-sm transition-colors text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20  cursor-pointer"
                   >
                     <LogOut size={18} />
                     <span>{t_user_dropdown('signOut')}</span>
