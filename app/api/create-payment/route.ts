@@ -44,6 +44,7 @@ export async function POST(req: Request) {
     // Зберігаємо товари
     const orderItemsData = items.map((item: any) => ({
       order_id: uniqueOrderId,
+      product_id: item.id,
       product_title: item.title,
       quantity: item.quantity,
       price: item.price, // Ціна товару зазвичай теж в USD в базі

@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import { cartService } from '../services/cartService';
 import { authService } from '../services/authService';
 import { Product } from '../../types/products';
+import { toast } from 'sonner'; // <--- Додано для повідомлень
 
 type CartItem = {
   id: number;
@@ -10,6 +11,7 @@ type CartItem = {
   price: number;
   images: string[];
   quantity: number;
+  stock: number; // <--- Додано поле stock, щоб знати ліміт
 };
 
 interface CartStore {
@@ -42,12 +44,24 @@ export const useCartStore = create<CartStore>()(
         const { cartItems } = get();
         const existingItem = cartItems.find((item) => item.id === product.id);
 
+        // 1. ПЕРЕВІРКА STOCK
+        const currentQty = existingItem ? existingItem.quantity : 0;
+        const requestedTotal = currentQty + product.quantity;
+
+        // product.stock може бути undefined, якщо дані прийшли неповні, тому ставимо фолбек
+        const limit = product.stock ?? 999; 
+
+        if (requestedTotal > limit) {
+          toast.error(`Вибачте, доступно лише ${limit} шт. (У вас в кошику: ${currentQty})`);
+          return; // Скасовуємо додавання
+        }
+
         let newCartItems: CartItem[];
 
         if (existingItem) {
           newCartItems = cartItems.map((item) =>
             item.id === product.id
-              ? { ...item, quantity: item.quantity + product.quantity }
+              ? { ...item, quantity: item.quantity + product.quantity, stock: limit } // Оновлюємо також stock про всяк випадок
               : item
           );
         } else {
@@ -59,13 +73,14 @@ export const useCartStore = create<CartStore>()(
               price: product.price,
               images: product.images,
               quantity: product.quantity,
+              stock: limit, // Зберігаємо ліміт
             },
           ];
         }
 
         set({ cartItems: newCartItems });
 
-        // Синхронізація з базою даних, якщо користувач авторизований
+        // Синхронізація
         const syncWithDB = async () => {
           const { user } = await authService.getCurrentUser();
           if (user) {
@@ -88,7 +103,6 @@ export const useCartStore = create<CartStore>()(
         const newCartItems = cartItems.filter((item) => item.id !== productId);
         set({ cartItems: newCartItems });
 
-        // Синхронізація з базою даних
         const syncWithDB = async () => {
           const { user } = await authService.getCurrentUser();
           if (user) {
@@ -101,13 +115,21 @@ export const useCartStore = create<CartStore>()(
 
       updateQuantity: (productId, quantity) => {
         const { cartItems } = get();
+        
+        // Знаходимо товар, щоб перевірити stock
+        const item = cartItems.find(i => i.id === productId);
+        if (item && quantity > item.stock) {
+           toast.error(`Максимум доступно: ${item.stock} шт.`);
+           // Можна форсувати встановлення макс. кількості, або просто ігнорувати
+           quantity = item.stock; 
+        }
+
         const newCartItems = cartItems
           .map((item) => (item.id === productId ? { ...item, quantity } : item))
           .filter((item) => item.quantity > 0);
 
         set({ cartItems: newCartItems });
 
-        // Синхронізація з базою даних
         const syncWithDB = async () => {
           const { user } = await authService.getCurrentUser();
           if (user) {
@@ -127,6 +149,11 @@ export const useCartStore = create<CartStore>()(
         const item = cartItems.find((item) => item.id === productId);
 
         if (item) {
+          // 2. ПЕРЕВІРКА ПРИ ЗБІЛЬШЕННІ
+          if (item.quantity >= item.stock) {
+             toast.error(`Це вся наявна кількість на складі.`);
+             return;
+          }
           get().updateQuantity(productId, item.quantity + 1);
         }
       },
@@ -144,15 +171,12 @@ export const useCartStore = create<CartStore>()(
 
       clearCart: () => {
         set({ cartItems: [] });
-
-        // Синхронізація з базою даних
         const syncWithDB = async () => {
           const { user } = await authService.getCurrentUser();
           if (user) {
             await cartService.clearCart(user.id);
           }
         };
-
         syncWithDB();
       },
 
@@ -185,8 +209,6 @@ export const useCartStore = create<CartStore>()(
 
           const formattedCartItems: CartItem[] = cartItemsFromDB
             .map((item) => {
-              console.log('🔍 Processing item:', item);
-
               if (!item.products) {
                 console.error('❌ Missing products data for item:', item);
                 return null;
@@ -198,6 +220,7 @@ export const useCartStore = create<CartStore>()(
                 price: item.products.price,
                 images: item.products.images,
                 quantity: item.quantity,
+                stock: item.products.stock || 0, // <--- 3. Завантажуємо stock з бази
               };
             })
             .filter((item) => item !== null) as CartItem[];

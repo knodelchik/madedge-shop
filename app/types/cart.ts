@@ -10,7 +10,8 @@ export type CartItem = {
   updated_at?: string;
 }
 export type CartItemWithProduct = CartItem & {
-  products: { // ЗМІНА: products замість product
+  products: {
+    stock: number; // ЗМІНА: products замість product
     id: number;
     title: string;
     price: number;
