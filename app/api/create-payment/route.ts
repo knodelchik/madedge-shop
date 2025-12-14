@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { generateFondySignature } from '../../lib/fondy';
 import { createClient } from '@supabase/supabase-js';
+import paypalClient from '../../lib/paypal'; // <--- Імпорт PayPal клієнта
+import paypal from '@paypal/checkout-server-sdk'; // <--- Імпорт SDK
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!; 
@@ -14,24 +16,20 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     
-    // ПРИЙМАЄМО ДВІ СУМИ:
-    // amountUSD - чисті долари для бази даних
-    // amountUAH - гривні для Fondy
     const { amountUSD, amountUAH, items, shippingAddress, shippingCost, shippingType, method } = body;
 
-    // Валідація
     if (!amountUSD || !amountUAH || !items || !shippingAddress) {
-      return NextResponse.json({ error: 'Невірні дані (відсутня сума USD або UAH)' }, { status: 400 });
+      return NextResponse.json({ error: 'Невірні дані' }, { status: 400 });
     }
 
     const userId = shippingAddress.user_id; 
     const uniqueOrderId = `order_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
-    // 1. В БАЗУ ПИШЕМО ДОЛАРИ (USD) - Створюємо замовлення
+    // 1. Створюємо замовлення в базі
     const { error: dbError } = await supabaseAdmin.from('orders').insert({
       id: uniqueOrderId,
       user_id: userId,
-      total_amount: amountUSD, // <--- ЗБЕРІГАЄМО USD
+      total_amount: amountUSD,
       status: 'pending',
       payment_method: method,
       shipping_address: shippingAddress,
@@ -39,70 +37,89 @@ export async function POST(req: Request) {
       shipping_type: shippingType
     });
 
-    if (dbError) {
-      console.error('Order Insert Error:', dbError);
-      throw new Error('Помилка створення замовлення: ' + dbError.message);
-    }
+    if (dbError) throw new Error(dbError.message);
 
-    // 2. Зберігаємо товари (ВАЖЛИВО: додаємо product_id та перевіряємо помилку)
+    // 2. Зберігаємо товари
     const orderItemsData = items.map((item: any) => ({
       order_id: uniqueOrderId,
-      product_id: item.id, // <--- ОБОВ'ЯЗКОВО: ID товару для зв'язку та списання залишків
+      product_id: item.id,
       product_title: item.title,
       quantity: item.quantity,
-      price: item.price, // Ціна товару зазвичай теж в USD в базі
+      price: item.price,
       image_url: item.images?.[0] || ''
     }));
-
-    // Виконуємо вставку і одразу беремо error
-    const { error: itemsError } = await supabaseAdmin
-      .from('order_items')
-      .insert(orderItemsData);
-
-    // ЯКЩО Є ПОМИЛКА - КИДАЄМО ЇЇ, ЩОБ БАЧИТИ В КОНСОЛІ
-    if (itemsError) {
-      console.error('Order Items Insert Error:', itemsError); // <-- Дивіться сюди в логах, якщо не працює
-      // Можна також видалити саме замовлення, щоб не лишати пустих записів
-      await supabaseAdmin.from('orders').delete().eq('id', uniqueOrderId);
-      throw new Error('Помилка запису товарів: ' + itemsError.message);
-    }
-
-    // 3. В FONDY ВІДПРАВЛЯЄМО ГРИВНІ (UAH)
-    // Fondy приймає копійки, тому множимо UAH на 100
-    const amountInCents = Math.round(Number(amountUAH) * 100);
     
-    const orderDesc = items.map((i: any) => `${i.title} x${i.quantity}`).join(', ').substring(0, 1000);
+    const { error: itemsError } = await supabaseAdmin.from('order_items').insert(orderItemsData);
+    if (itemsError) throw new Error('Помилка запису товарів: ' + itemsError.message);
 
-    const requestData: any = {
-      order_id: uniqueOrderId,
-      merchant_id: MERCHANT_ID,
-      order_desc: orderDesc || 'Order payment',
-      amount: amountInCents, // <--- ОПЛАТА В ГРИВНІ
-      currency: 'UAH',       // <--- ВАЛЮТА ГРИВНЯ
-      response_url: `${BASE_URL}/api/payment-return`,
-      server_callback_url: `${BASE_URL}/api/payment-webhook`,
-      lang: 'uk',
-      sender_email: shippingAddress.email || '', 
-    };
+    // ==========================================
+    // ЛОГІКА ДЛЯ PAYPAL
+    // ==========================================
+    if (method === 'paypal') {
+        const request = new paypal.orders.OrdersCreateRequest();
+        request.prefer("return=representation");
+        request.requestBody({
+            intent: 'CAPTURE',
+            purchase_units: [{
+                reference_id: uniqueOrderId, // Наш внутрішній ID замовлення
+                amount: {
+                    currency_code: 'USD', // PayPal приймає долари
+                    value: amountUSD.toFixed(2)
+                }
+            }],
+            application_context: {
+                // Куди повертати користувача після оплати
+                return_url: `${BASE_URL}/order/result?source=paypal&orderId=${uniqueOrderId}`,
+                cancel_url: `${BASE_URL}/order?status=cancelled`
+            }
+        });
 
-    requestData.signature = generateFondySignature(requestData, SECRET_KEY);
+        const order = await paypalClient().execute(request);
+        
+        // Знаходимо посилання для підтвердження (approve)
+        const approveLink = order.result.links.find((link: any) => link.rel === 'approve').href;
 
-    const response = await fetch('https://pay.fondy.eu/api/checkout/url/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ request: requestData }),
-    });
-
-    const data = await response.json();
-
-    if (data.response?.response_status === 'failure') {
-      return NextResponse.json({ error: data.response.error_message }, { status: 400 });
+        return NextResponse.json({ payment_url: approveLink });
     }
 
-    return NextResponse.json({ payment_url: data.response.checkout_url });
+    // ==========================================
+    // ЛОГІКА ДЛЯ FONDY (Залишається як була)
+    // ==========================================
+    else {
+        const amountInCents = Math.round(Number(amountUAH) * 100);
+        const orderDesc = items.map((i: any) => `${i.title} x${i.quantity}`).join(', ').substring(0, 1000);
+
+        const requestData: any = {
+          order_id: uniqueOrderId,
+          merchant_id: MERCHANT_ID,
+          order_desc: orderDesc || 'Order payment',
+          amount: amountInCents,
+          currency: 'UAH',
+          response_url: `${BASE_URL}/api/payment-return`,
+          server_callback_url: `${BASE_URL}/api/payment-webhook`,
+          lang: 'uk',
+          sender_email: shippingAddress.email || '', 
+        };
+
+        requestData.signature = generateFondySignature(requestData, SECRET_KEY);
+
+        const response = await fetch('https://pay.fondy.eu/api/checkout/url/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ request: requestData }),
+        });
+
+        const data = await response.json();
+
+        if (data.response?.response_status === 'failure') {
+          return NextResponse.json({ error: data.response.error_message }, { status: 400 });
+        }
+
+        return NextResponse.json({ payment_url: data.response.checkout_url });
+    }
 
   } catch (error: any) {
     console.error('Create Payment Error:', error);
-    return NextResponse.json({ error: error.message || 'Server Error' }, { status: 500 });
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
