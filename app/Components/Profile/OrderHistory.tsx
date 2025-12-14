@@ -1,23 +1,26 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { orderService, Order } from '@/app/[locale]/services/orderService';
+import { orderService } from '@/app/[locale]/services/orderService';
 import {
   Package,
   ChevronDown,
   Calendar,
   MapPin,
   CreditCard,
+  Truck,
+  ExternalLink,
+  Copy
 } from 'lucide-react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCurrency } from '@/app/context/CurrencyContext';
 import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 
 export default function OrderHistory({ userId }: { userId: string }) {
-  // Використовуємо namespace 'Profile.OrderHistory'
   const t = useTranslations('Profile.OrderHistory');
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<any[]>([]); 
   const [loading, setLoading] = useState(true);
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
 
@@ -37,22 +40,52 @@ export default function OrderHistory({ userId }: { userId: string }) {
     setExpandedOrderId(expandedOrderId === id ? null : id);
   };
 
+  const copyTrackingToClipboard = (e: React.MouseEvent, code: string) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(code);
+    toast.success('Скопійовано');
+  };
+
+  const getTrackingLink = (trackingNumber: string, manualService?: string) => {
+    const number = trackingNumber.replace(/\s/g, '');
+    const service = manualService?.toLowerCase().trim() || '';
+    
+    const baseUrl = `https://t.17track.net/en#nums=${number}`;
+
+    // 1. Пріоритет: Введений адміном сервіс
+    if (service.includes('nova') || service === 'нп') return `${baseUrl}&fc=100072`;
+    if (service.includes('ukr')) return `${baseUrl}&fc=100098`;
+    if (service.includes('dhl')) return `${baseUrl}&fc=100001`;
+    if (service.includes('ups')) return `${baseUrl}&fc=100002`;
+    if (service.includes('fedex')) return `${baseUrl}&fc=100004`;
+    if (service.includes('usps')) return `${baseUrl}&fc=100003`;
+
+    // 2. Спроба вгадати за форматом (для Нової Пошти)
+    const isNovaPoshtaNumber = /^[125]\d{13}$/.test(number);
+    if (isNovaPoshtaNumber) return `${baseUrl}&fc=100072`;
+
+    return baseUrl;
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'success':
+      case 'completed':
         return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
+      case 'shipped':
+        return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
       case 'pending':
         return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400';
       case 'failure':
+      case 'cancelled':
         return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
       default:
         return 'bg-gray-100 text-gray-700';
     }
   };
 
-  // Використовуємо переклади для статусів
   const getStatusText = (status: string) => {
-    return t(`status.${status}`);
+    return t(`status.${status}`) || status;
   };
 
   if (loading) {
@@ -80,168 +113,123 @@ export default function OrderHistory({ userId }: { userId: string }) {
       </h2>
 
       <div className="space-y-4">
-        {orders.map((order) => (
-          <div
-            key={order.id}
-            className="bg-white dark:bg-neutral-900 rounded-2xl border border-gray-200 dark:border-neutral-800 overflow-hidden hover:shadow-md transition-shadow"
-          >
-            {/* HEADER */}
-            <div
-              onClick={() => toggleOrder(order.id)}
-              className="p-5 cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gray-50/50 dark:bg-neutral-900"
-            >
-              <div className="flex items-center gap-4">
-                <div
-                  className={`p-3 rounded-xl ${getStatusColor(order.status)}`}
-                >
-                  <Package size={24} />
+        {orders.map((order) => {
+          const trackingLink = order.tracking_number 
+            ? getTrackingLink(order.tracking_number, order.shipping_service) 
+            : null;
+          
+          // Визначаємо назву для відображення (з бази або типу)
+          const serviceDisplay = order.shipping_service || order.shipping_type || 'Tracking';
+
+          return (
+            <div key={order.id} className="bg-white dark:bg-neutral-900 rounded-2xl border border-gray-200 dark:border-neutral-800 overflow-hidden hover:shadow-md transition-shadow">
+              {/* HEADER */}
+              <div onClick={() => toggleOrder(order.id)} className="p-5 cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gray-50/50 dark:bg-neutral-900">
+                <div className="flex items-center gap-4">
+                  <div className={`p-3 rounded-xl ${getStatusColor(order.status)}`}>
+                    {order.status === 'shipped' ? <Truck size={24} /> : <Package size={24} />}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-bold text-gray-900 dark:text-white">
+                        {t('orderNumber')} {order.id.split('_')[1] || order.id.substring(0, 8)}
+                      </span>
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded-full uppercase ${getStatusColor(order.status)}`}>
+                        {getStatusText(order.status)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-neutral-400">
+                      <span className="flex items-center gap-1"><Calendar size={14} />{new Date(order.created_at).toLocaleDateString()}</span>
+                      <span>•</span>
+                      <span className="font-medium text-gray-900 dark:text-neutral-200">{formatPrice(order.total_amount)}</span>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-bold text-gray-900 dark:text-white">
-                      {t('orderNumber')}{' '}
-                      {order.id.split('_')[1] || order.id.substring(0, 8)}
-                    </span>
-                    <span
-                      className={`text-xs font-bold px-2 py-0.5 rounded-full uppercase ${getStatusColor(
-                        order.status
-                      )}`}
-                    >
-                      {getStatusText(order.status)}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-neutral-400">
-                    <span className="flex items-center gap-1">
-                      <Calendar size={14} />
-                      {new Date(order.created_at).toLocaleDateString()}
-                    </span>
-                    <span>•</span>
-                    <span className="font-medium text-gray-900 dark:text-neutral-200">
-                      {formatPrice(order.total_amount)}
-                    </span>
-                  </div>
+                <div className="flex items-center justify-between md:justify-end gap-4">
+                  <ChevronDown className={`text-gray-400 transition-transform duration-300 ${expandedOrderId === order.id ? 'rotate-180' : ''}`} />
                 </div>
               </div>
 
-              <div className="flex items-center justify-between md:justify-end gap-4">
-                {/* Мініатюри */}
-                <div className="flex -space-x-3">
-                  {order.order_items.slice(0, 3).map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="relative w-10 h-10 rounded-full border-2 border-white dark:border-neutral-800 bg-white dark:bg-neutral-900 overflow-hidden"
-                    >
-                      {item.image_url ? (
-                        <Image
-                          src={item.image_url}
-                          alt="product"
-                          fill
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gray-200" />
+              {/* ДЕТАЛІ */}
+              <AnimatePresence>
+                {expandedOrderId === order.id && (
+                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="border-t border-gray-100 dark:border-neutral-800">
+                    <div className="p-5 space-y-6">
+                      
+                      {/* === БЛОК ТРЕКІНГУ === */}
+                      {order.tracking_number && trackingLink && (
+                        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-100 dark:border-blue-800/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 bg-white dark:bg-blue-950 rounded-lg text-blue-600 dark:text-blue-400 shadow-sm">
+                              <Truck size={20} />
+                            </div>
+                            <div>
+                              <p className="text-xs font-bold text-blue-600 dark:text-blue-300 uppercase tracking-wide mb-0.5">
+                                Tracking info
+                              </p>
+                              <div className="flex items-center gap-2">
+                                {/* ОСЬ ТУТ ЗМІНА: Додано назву сервісу жирним шрифтом перед номером */}
+                                <p className="text-base font-mono text-gray-900 dark:text-white select-all break-all">
+                                  <span className="font-bold mr-2 text-blue-800 dark:text-blue-200">
+                                    {serviceDisplay}:
+                                  </span>
+                                  {order.tracking_number}
+                                </p>
+                                
+                                <button onClick={(e) => copyTrackingToClipboard(e, order.tracking_number)} className="text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors" title="Copy">
+                                  <Copy size={14} />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <a href={trackingLink} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-lg transition-all shadow-sm hover:shadow-md active:scale-95 whitespace-nowrap">
+                            Відстежити <ExternalLink size={16} />
+                          </a>
+                        </div>
                       )}
-                    </div>
-                  ))}
-                  {order.order_items.length > 3 && (
-                    <div className="w-10 h-10 rounded-full border-2 border-white dark:border-neutral-800 bg-gray-100 dark:bg-neutral-800 flex items-center justify-center text-xs font-bold text-gray-500">
-                      +{order.order_items.length - 3}
-                    </div>
-                  )}
-                </div>
+                      {/* ===================== */}
 
-                <ChevronDown
-                  className={`text-gray-400 transition-transform duration-300 ${
-                    expandedOrderId === order.id ? 'rotate-180' : ''
-                  }`}
-                />
-              </div>
+                      <div className="space-y-3 pt-2">
+                        <h4 className="text-sm font-medium text-gray-500 dark:text-neutral-400 uppercase tracking-wider">{t('itemsHeader')} ({order.order_items.length})</h4>
+                        {order.order_items.map((item: any) => (
+                          <div key={item.id} className="flex items-center gap-4 py-2 border-b border-gray-50 dark:border-neutral-800/50 last:border-0">
+                            <div className="relative w-16 h-16 rounded-lg bg-gray-100 dark:bg-neutral-800 overflow-hidden shrink-0 border border-gray-200 dark:border-neutral-700">
+                              {item.image_url && <Image src={item.image_url} alt={item.product_title} fill className="object-contain p-1" />}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{item.product_title}</p>
+                              <p className="text-xs text-gray-500">{item.quantity} {t('quantityUnit')} x {formatPrice(item.price)}</p>
+                            </div>
+                            <div className="font-medium text-gray-900 dark:text-white">{formatPrice(item.quantity * item.price)}</div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="grid md:grid-cols-2 gap-4 pt-4 border-t border-gray-100 dark:border-neutral-800">
+                        <div className="flex gap-3">
+                          <MapPin className="w-5 h-5 text-gray-400 mt-0.5" />
+                          <div>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">{t('deliveryAddress')}</p>
+                            <p className="text-sm text-gray-500 dark:text-neutral-400 mt-1">{order.shipping_address?.country_name}, {order.shipping_address?.city}</p>
+                            <p className="text-xs text-gray-400">{order.shipping_address?.address_line1}</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-3">
+                          <CreditCard className="w-5 h-5 text-gray-400 mt-0.5" />
+                          <div>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">{t('payment')}</p>
+                            <p className="text-sm text-gray-500 dark:text-neutral-400 mt-1 capitalize">{order.shipping_type} • {order.shipping_cost > 0 ? formatPrice(order.shipping_cost) : t('freeShipping')}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
-
-            {/* ДЕТАЛІ */}
-            <AnimatePresence>
-              {expandedOrderId === order.id && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="border-t border-gray-100 dark:border-neutral-800"
-                >
-                  <div className="p-5 space-y-6">
-                    {/* Список товарів */}
-                    <div className="space-y-3">
-                      <h4 className="text-sm font-medium text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
-                        {t('itemsHeader')} ({order.order_items.length})
-                      </h4>
-                      {order.order_items.map((item) => (
-                        <div
-                          key={item.id}
-                          className="flex items-center gap-4 py-2"
-                        >
-                          <div className="relative w-16 h-16 rounded-lg bg-gray-100 dark:bg-neutral-800 overflow-hidden shrink-0 border border-gray-200 dark:border-neutral-700">
-                            {item.image_url && (
-                              <Image
-                                src={item.image_url}
-                                alt={item.product_title}
-                                fill
-                                className="object-contain p-1"
-                              />
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                              {item.product_title}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              {item.quantity} {t('quantityUnit')} x{' '}
-                              {formatPrice(item.price)}
-                            </p>
-                          </div>
-                          <div className="font-medium text-gray-900 dark:text-white">
-                            {formatPrice(item.quantity * item.price)}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Інфо про доставку */}
-                    <div className="grid md:grid-cols-2 gap-4 pt-4 border-t border-gray-100 dark:border-neutral-800">
-                      <div className="flex gap-3">
-                        <MapPin className="w-5 h-5 text-gray-400 mt-0.5" />
-                        <div>
-                          <p className="text-sm font-medium text-gray-900 dark:text-white">
-                            {t('deliveryAddress')}
-                          </p>
-                          <p className="text-sm text-gray-500 dark:text-neutral-400 mt-1">
-                            {order.shipping_address?.country_name},{' '}
-                            {order.shipping_address?.city}
-                          </p>
-                          <p className="text-xs text-gray-400">
-                            {order.shipping_address?.address_line1}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex gap-3">
-                        <CreditCard className="w-5 h-5 text-gray-400 mt-0.5" />
-                        <div>
-                          <p className="text-sm font-medium text-gray-900 dark:text-white">
-                            {t('payment')}
-                          </p>
-                          <p className="text-sm text-gray-500 dark:text-neutral-400 mt-1 capitalize">
-                            {order.shipping_type} {t('deliverySuffix')} •{' '}
-                            {order.shipping_cost > 0
-                              ? formatPrice(order.shipping_cost)
-                              : t('freeShipping')}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
