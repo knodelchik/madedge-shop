@@ -2,11 +2,11 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image'; // Використовуємо Image замість motion.img
+import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
-import { useCartStore } from '../../store/cartStore'; // Перевірте шлях
+import { useCartStore } from '../../store/cartStore';
 import QuantityCounter from '@/app/Components/QuantityCounter';
 import WishlistButton from '@/app/Components/WishlistButton';
 import Price from '@/app/Components/Price';
@@ -25,11 +25,21 @@ export default function ProductClient({ product }: ProductClientProps) {
 
   const { addToCart, cartItems } = useCartStore();
   const itemInCart = cartItems.find((i) => i.id === product.id);
+  
+  // Визначаємо максимальну доступну кількість (якщо товар вже в кошику - враховуємо це)
+  const maxAvailable = product.stock;
+  
   const [quantity, setQuantity] = useState(
     itemInCart ? itemInCart.quantity : 1
   );
 
   const handleAddToCart = () => {
+    // Додаткова перевірка перед додаванням
+    if (quantity > maxAvailable) {
+      toast.error(`Вибачте, доступно лише ${maxAvailable} шт.`);
+      return;
+    }
+    
     addToCart({ ...product, quantity });
     toast.success(t('addToCartSuccess'), {
       description: product.title,
@@ -48,6 +58,8 @@ export default function ProductClient({ product }: ProductClientProps) {
     );
   };
 
+  const isOutOfStock = product.stock <= 0;
+
   return (
     <div className="min-h-screen bg-gray-50 py-4 sm:py-6 md:py-8 dark:bg-black">
       <div className="max-w-6xl mx-auto px-4">
@@ -64,18 +76,25 @@ export default function ProductClient({ product }: ProductClientProps) {
             {/* Слайдер фото */}
             <div className="space-y-3 sm:space-y-4">
               <div className="relative w-full flex items-center justify-center bg-gray-100 rounded-xl sm:rounded-2xl p-3 sm:p-4 dark:bg-white overflow-hidden h-64 sm:h-72 md:h-80">
-                {/* ОПТИМІЗАЦІЯ: Використовуємо Next.js Image замість motion.img */}
-                {/* priority={true} критично важливо для LCP */}
                 <Image
                   src={
                     product.images[currentImage] || '/images/placeholder.jpg'
                   }
                   alt={product.title}
                   fill
-                  className="object-contain p-2"
+                  className={`object-contain p-2 ${isOutOfStock ? 'grayscale opacity-70' : ''}`}
                   priority={true}
                   sizes="(max-width: 768px) 100vw, 50vw"
                 />
+                
+                {/* Лейбл "Немає в наявності" на фото */}
+                {isOutOfStock && (
+                   <div className="absolute inset-0 flex items-center justify-center z-10">
+                      <span className="bg-black/70 text-white px-4 py-2 rounded-lg font-bold text-lg uppercase">
+                        Out of Stock
+                      </span>
+                   </div>
+                )}
 
                 {/* Кнопки навігації */}
                 {product.images.length > 1 && (
@@ -128,14 +147,26 @@ export default function ProductClient({ product }: ProductClientProps) {
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4 dark:text-white">
                   {product.title}
                 </h1>
-                <p className="text-xl sm:text-2xl font-semibold text-gray-700 dark:text-neutral-200">
-                  <Price amount={product.price} />
-                </p>
+                <div className="flex items-center gap-4">
+                    <p className="text-xl sm:text-2xl font-semibold text-gray-700 dark:text-neutral-200">
+                    <Price amount={product.price} />
+                    </p>
+                    
+                    {/* Статус наявності текстом */}
+                    {isOutOfStock ? (
+                        <span className="text-red-500 font-medium bg-red-50 dark:bg-red-900/20 px-3 py-1 rounded-full text-sm">
+                            Немає в наявності
+                        </span>
+                    ) : (
+                        <span className="text-green-600 font-medium bg-green-50 dark:bg-green-900/20 px-3 py-1 rounded-full text-sm">
+                           В наявності: {product.stock} шт.
+                        </span>
+                    )}
+                </div>
               </div>
 
               {product.description && (
                 <div className="prose max-w-none">
-                  {/* Оптимізація: використовуємо звичайний div, стилізований через CSS, замість складних парсерів якщо не треба */}
                   <div
                     className="text-sm sm:text-base text-gray-600 leading-relaxed dark:text-neutral-400"
                     dangerouslySetInnerHTML={{ __html: product.description }}
@@ -152,7 +183,12 @@ export default function ProductClient({ product }: ProductClientProps) {
                     </span>
                     <QuantityCounter
                       value={quantity}
-                      onIncrease={() => setQuantity((q) => q + 1)}
+                      // Якщо stock=0, то max=1 (щоб не ламати UI), але кнопка буде disabled
+                      max={isOutOfStock ? 1 : maxAvailable} 
+                      onIncrease={() => {
+                          if (quantity < maxAvailable) setQuantity((q) => q + 1);
+                          else toast.error(`Максимум ${maxAvailable} шт.`);
+                      }}
                       onDecrease={() => setQuantity((q) => (q > 1 ? q - 1 : 1))}
                     />
                   </div>
@@ -161,9 +197,14 @@ export default function ProductClient({ product }: ProductClientProps) {
                 <div className="flex gap-3">
                   <button
                     onClick={handleAddToCart}
-                    className="flex-1 bg-black text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl font-semibold hover:bg-neutral-800 dark:text-white dark:bg-neutral-500 dark:hover:text-black dark:hover:bg-neutral-100 transition-colors cursor-pointer active:scale-95 text-sm sm:text-base"
+                    disabled={isOutOfStock}
+                    className={`flex-1 px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl font-semibold transition-colors cursor-pointer text-sm sm:text-base
+                        ${isOutOfStock 
+                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed dark:bg-neutral-700 dark:text-neutral-500' 
+                            : 'bg-black text-white hover:bg-neutral-800 dark:text-white dark:bg-neutral-500 dark:hover:text-black dark:hover:bg-neutral-100 active:scale-95'
+                        }`}
                   >
-                    {t('addToCart')}
+                    {isOutOfStock ? 'Розпродано' : t('addToCart')}
                   </button>
 
                   <div className="md:hidden">

@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { supabase } from '@/app/lib/supabase'; // <--- ВАЖЛИВО: Імпортуємо спільний клієнт
-import { Loader2, Upload, X, Star, Trash2 } from 'lucide-react';
+import { supabase } from '@/app/lib/supabase';
+import { Loader2, Upload, Star, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import Image from 'next/image';
 
@@ -18,11 +18,11 @@ export default function ProductForm({ product, onSaved, onCancel }: ProductFormP
   const [formData, setFormData] = useState({
     title: product?.title || '',
     price: product?.price || '',
-    category: product?.category || 'sharpeners', // Значення за замовчуванням
+    stock: product?.stock || 0, // <-- 1. Додано стан для кількості
+    category: product?.category || 'sharpeners',
     description: product?.description || '',
   });
 
-  // Якщо у продукта images це не масив (наприклад null), робимо пустим масивом
   const [images, setImages] = useState<string[]>(
     Array.isArray(product?.images) ? product.images : []
   );
@@ -39,19 +39,16 @@ export default function ProductForm({ product, onSaved, onCancel }: ProductFormP
     try {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        // Генеруємо унікальне ім'я, щоб уникнути конфліктів
         const fileExt = file.name.split('.').pop();
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
         const filePath = `${fileName}`;
 
-        // 1. Завантажуємо
         const { error: uploadError } = await supabase.storage
-          .from('products') // Переконайтеся, що бакет називається саме 'products'
+          .from('products')
           .upload(filePath, file);
 
         if (uploadError) throw uploadError;
 
-        // 2. Отримуємо публічне посилання
         const { data } = supabase.storage.from('products').getPublicUrl(filePath);
         newImages.push(data.publicUrl);
       }
@@ -85,7 +82,6 @@ export default function ProductForm({ product, onSaved, onCancel }: ProductFormP
     setLoading(true);
 
     try {
-      // Перевіряємо сесію перед записом (для дебагу)
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         throw new Error('Ви не авторизовані. Перезавантажте сторінку і увійдіть знову.');
@@ -94,23 +90,22 @@ export default function ProductForm({ product, onSaved, onCancel }: ProductFormP
       const productData = {
         title: formData.title,
         price: parseFloat(formData.price),
+        stock: parseInt(formData.stock.toString()), // <-- 2. Зберігаємо кількість як число
         category: formData.category,
         description: formData.description,
-        images: images, // JSONB масив
+        images: images,
         updated_at: new Date().toISOString(),
       };
 
       let error;
 
       if (product?.id) {
-        // Оновлення
         const result = await supabase
           .from('products')
           .update(productData)
           .eq('id', product.id);
         error = result.error;
       } else {
-        // Створення
         const result = await supabase
           .from('products')
           .insert([productData]);
@@ -217,8 +212,22 @@ export default function ProductForm({ product, onSaved, onCancel }: ProductFormP
               className="w-full px-3 py-2 border rounded-lg dark:bg-neutral-800 dark:border-neutral-700 focus:ring-2 focus:ring-blue-500 outline-none"
             />
           </div>
+          {/* 3. Додано поле вводу Stock */}
           <div>
-            <label className="block text-sm font-medium mb-1">Категорія</label>
+            <label className="block text-sm font-medium mb-1">Кількість (Stock)</label>
+            <input
+              type="number"
+              min="0"
+              required
+              value={formData.stock}
+              onChange={e => setFormData({...formData, stock: parseInt(e.target.value) || 0})}
+              className="w-full px-3 py-2 border rounded-lg dark:bg-neutral-800 dark:border-neutral-700 focus:ring-2 focus:ring-blue-500 outline-none"
+            />
+          </div>
+        </div>
+
+        <div>
+           <label className="block text-sm font-medium mb-1">Категорія</label>
             <select
               value={formData.category}
               onChange={e => setFormData({...formData, category: e.target.value})}
@@ -228,7 +237,6 @@ export default function ProductForm({ product, onSaved, onCancel }: ProductFormP
               <option value="stones">Stones</option>
               <option value="accessories">Accessories</option>
             </select>
-          </div>
         </div>
 
         <div>

@@ -6,14 +6,13 @@ export async function POST(req: Request) {
     const formData = await req.formData();
     const orderId = formData.get('order_id') as string;
     const responseStatus = formData.get('response_status') as string; // success або failure
-
+  
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
     // Використовуємо 303 See Other — це спеціальний код, 
     // який каже браузеру: "Зроби GET запит на цю нову адресу"
     return NextResponse.redirect(
       `${baseUrl}/order/result?order_id=${orderId}&status=${responseStatus}`, 
-      303
     );
 
   } catch (error) {
