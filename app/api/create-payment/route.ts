@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     const userId = shippingAddress.user_id; 
     const uniqueOrderId = `order_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
-    // 1. В БАЗУ ПИШЕМО ДОЛАРИ (USD)
+    // 1. В БАЗУ ПИШЕМО ДОЛАРИ (USD) - Створюємо замовлення
     const { error: dbError } = await supabaseAdmin.from('orders').insert({
       id: uniqueOrderId,
       user_id: userId,
@@ -39,20 +39,35 @@ export async function POST(req: Request) {
       shipping_type: shippingType
     });
 
-    if (dbError) throw new Error(dbError.message);
+    if (dbError) {
+      console.error('Order Insert Error:', dbError);
+      throw new Error('Помилка створення замовлення: ' + dbError.message);
+    }
 
-    // Зберігаємо товари
+    // 2. Зберігаємо товари (ВАЖЛИВО: додаємо product_id та перевіряємо помилку)
     const orderItemsData = items.map((item: any) => ({
       order_id: uniqueOrderId,
-      product_id: item.id,
+      product_id: item.id, // <--- ОБОВ'ЯЗКОВО: ID товару для зв'язку та списання залишків
       product_title: item.title,
       quantity: item.quantity,
       price: item.price, // Ціна товару зазвичай теж в USD в базі
       image_url: item.images?.[0] || ''
     }));
-    await supabaseAdmin.from('order_items').insert(orderItemsData);
 
-    // 2. В FONDY ВІДПРАВЛЯЄМО ГРИВНІ (UAH)
+    // Виконуємо вставку і одразу беремо error
+    const { error: itemsError } = await supabaseAdmin
+      .from('order_items')
+      .insert(orderItemsData);
+
+    // ЯКЩО Є ПОМИЛКА - КИДАЄМО ЇЇ, ЩОБ БАЧИТИ В КОНСОЛІ
+    if (itemsError) {
+      console.error('Order Items Insert Error:', itemsError); // <-- Дивіться сюди в логах, якщо не працює
+      // Можна також видалити саме замовлення, щоб не лишати пустих записів
+      await supabaseAdmin.from('orders').delete().eq('id', uniqueOrderId);
+      throw new Error('Помилка запису товарів: ' + itemsError.message);
+    }
+
+    // 3. В FONDY ВІДПРАВЛЯЄМО ГРИВНІ (UAH)
     // Fondy приймає копійки, тому множимо UAH на 100
     const amountInCents = Math.round(Number(amountUAH) * 100);
     
@@ -88,6 +103,6 @@ export async function POST(req: Request) {
 
   } catch (error: any) {
     console.error('Create Payment Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Server Error' }, { status: 500 });
   }
 }

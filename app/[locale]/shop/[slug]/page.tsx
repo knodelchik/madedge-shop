@@ -3,15 +3,18 @@ import ProductClient from './ProductClient';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 
+// 1. Змінюємо тип Props - params тепер Promise
 type Props = {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 };
 
-// 1. Генеруємо SEO динамічно (Заголовок сторінки буде назвою товару)
+// 2. Виправляємо generateMetadata
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params; // <--- Очікуємо params
+
   const products = await productsService.getAllProducts();
   const product = products.find(
-    (p) => p.title.replace(/\s+/g, '-').toLowerCase() === params.slug
+    (p) => p.title.replace(/\s+/g, '-').toLowerCase() === slug
   );
 
   if (!product) return { title: 'Product Not Found' };
@@ -23,13 +26,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-// 2. Серверний компонент завантажує дані
+// 3. Виправляємо компонент сторінки
 export default async function ProductPage({ params }: Props) {
+  const { slug } = await params; // <--- Очікуємо params
+
   const products = await productsService.getAllProducts();
 
   // Шукаємо продукт на сервері
   const product = products.find(
-    (p) => p.title.replace(/\s+/g, '-').toLowerCase() === params.slug
+    (p) => p.title.replace(/\s+/g, '-').toLowerCase() === slug
   );
 
   // Якщо не знайшли - віддаємо 404
