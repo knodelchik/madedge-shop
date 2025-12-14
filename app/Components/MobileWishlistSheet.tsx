@@ -119,6 +119,7 @@ export default function MobileWishlistSheet({
         description: productData.description || '',
         created_at: productData.created_at || new Date().toISOString(),
         quantity: 1,
+        stock: productData.stock || 0,
       });
 
       setProcessingId(null);

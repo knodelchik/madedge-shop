@@ -7,6 +7,7 @@ type QuantityCounterProps = {
   value: number;
   onIncrease: () => void;
   onDecrease: () => void;
+  max?: number;
   fontSize?: number;
   places?: number[];
   padding?: number;
@@ -22,6 +23,7 @@ export default function QuantityCounter({
   places = [10, 1],
   padding = 2,
   gap = 2,
+  max,
   fontWeight = 'small',
 }: QuantityCounterProps) {
   return (
@@ -46,6 +48,7 @@ export default function QuantityCounter({
 
       <button
         onClick={onIncrease}
+        disabled={max !== undefined && value >= max}
         className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 transition disabled:opacity-50 disabled:cursor-not-allowed dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-200 dark:hover:text-white cursor-pointer"
       >
         +
