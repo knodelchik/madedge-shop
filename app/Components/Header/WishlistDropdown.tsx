@@ -98,7 +98,7 @@ export default function WishlistDropdown({ user }: WishlistDropdownProps) {
       if (user) {
         // Логіка для авторизованих
         // Спочатку додаємо до кошика (якщо moveToCart робить і те, і інше - ок)
-        await moveToCart(user.id, productId);
+        await moveToCart(user.id, productId, t);
       } else {
         // Логіка для гостей
         const product = localProducts.find((p) => p.id === productId);

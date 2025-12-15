@@ -3,8 +3,7 @@ import { persist } from 'zustand/middleware';
 import { WishlistItemWithProduct } from '../../types/wishlist';
 import { wishlistService } from '../services/wishlistService';
 import { useCartStore } from './cartStore';
-import { Product } from '../../types/products';
-import { toast } from 'sonner'; // Додано toast
+import { toast } from 'sonner';
 
 interface WishlistState {
   wishlistItems: WishlistItemWithProduct[];
@@ -18,7 +17,10 @@ interface WishlistState {
     productId: number
   ) => Promise<void>;
   isInWishlist: (userId: string | null, productId: number) => Promise<boolean>;
-  moveToCart: (userId: string, productId: number) => Promise<void>;
+
+  // ОНОВЛЕНО: додано аргумент t для перекладу
+  moveToCart: (userId: string, productId: number, t: any) => Promise<void>;
+
   clearWishlist: () => void;
   addToLocalWishlist: (productId: number) => void;
   removeFromLocalWishlist: (productId: number) => void;
@@ -50,7 +52,6 @@ export const useWishlistStore = create<WishlistState>()(
           get().addToLocalWishlist(productId);
           return;
         }
-
         try {
           const success = await wishlistService.addToWishlist(
             userId,
@@ -69,7 +70,6 @@ export const useWishlistStore = create<WishlistState>()(
           get().removeFromLocalWishlist(productId);
           return;
         }
-
         try {
           const success = await wishlistService.removeFromWishlist(
             userId,
@@ -97,28 +97,33 @@ export const useWishlistStore = create<WishlistState>()(
         return await wishlistService.isInWishlist(userId, productId);
       },
 
-      moveToCart: async (userId: string, productId: number) => {
+      // ОНОВЛЕНО: метод тепер приймає функцію t
+      moveToCart: async (userId: string, productId: number, t: any) => {
         try {
-          // 1. Отримуємо дані про товар з поточного вішліста, щоб знати Stock
-          const itemInWishlist = get().wishlistItems.find(i => i.product_id === productId);
-          
+          const itemInWishlist = get().wishlistItems.find(
+            (i) => i.product_id === productId
+          );
+
           if (!itemInWishlist) {
             console.error('Item not found in wishlist state');
             return;
           }
 
           const stock = itemInWishlist.products.stock || 0;
-
-          // 2. Перевіряємо, скільки вже є в кошику
-          const cartItem = useCartStore.getState().cartItems.find(i => i.id === productId);
+          const cartItem = useCartStore
+            .getState()
+            .cartItems.find((i) => i.id === productId);
           const currentQty = cartItem ? cartItem.quantity : 0;
 
           if (currentQty + 1 > stock) {
-            toast.error(`Неможливо додати. Досягнуто ліміт (${stock} шт.)`);
-            return; // Перериваємо операцію
+            // ТУТ ВИКОРИСТОВУЄМО ПЕРЕДАНИЙ t
+            const msg = t('limitReached', { max: stock });
+            toast.error(msg);
+
+            // ВАЖЛИВО: Кидаємо помилку, щоб toast.promise у компоненті не показав "Успішно"
+            throw new Error(msg);
           }
 
-          // 3. Якщо все ок, переміщуємо
           const success = await wishlistService.moveToCart(userId, productId);
 
           if (success) {
@@ -132,6 +137,7 @@ export const useWishlistStore = create<WishlistState>()(
           }
         } catch (error) {
           console.error('❌ Failed to move to cart:', error);
+          throw error; // Прокидаємо помилку далі для toast.promise
         }
       },
 
@@ -157,14 +163,12 @@ export const useWishlistStore = create<WishlistState>()(
 
       syncLocalWishlist: async (userId: string) => {
         const { localWishlist } = get();
-
         if (localWishlist.length === 0) return;
 
         try {
           for (const productId of localWishlist) {
             await wishlistService.addToWishlist(userId, productId);
           }
-
           set({ localWishlist: [] });
           await get().loadWishlist(userId);
           console.log('✅ Local wishlist synced with database');

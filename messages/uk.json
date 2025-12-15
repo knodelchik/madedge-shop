@@ -220,12 +220,19 @@
   "Wishlist": {
     "title": "Список бажань",
     "empty": "Список бажань порожній",
-    "emptyDescription": "Додавайте товари, які сподобались",
+    "emptyDescription": "Додавайте сюди товари, які вам сподобались",
     "continueShopping": "Перейти до магазину",
-    "addToCart": "Додати в кошик",
+    "addToCart": "В кошик",
     "remove": "Видалити",
-    "addingToCart": "Додається в кошик...",
-    "loading": "Завантаження..."
+    "addingToCart": "Додавання в кошик...",
+    "loading": "Завантаження...",
+
+    "outOfStockError": "Цей товар закінчився",
+    "addedToCartSuccess": "{title} додано до кошика",
+    "addToCartError": "Помилка (можливо недостатньо товару)",
+    "removedMessage": "Видалено зі списку бажань",
+    "outOfStockBadge": "НЕМАЄ",
+    "limitReached": "Неможливо додати. Досягнуто ліміт ({max} шт.)"
   },
   "WishlistSheet": {
     "title": "Список бажань",
@@ -305,15 +312,23 @@
     "loading": "Завантаження...",
     "errorLoading": "Помилка завантаження товару",
     "notFound": "Товар не знайдено",
-    "backToShop": "Повернутися до магазину",
-    "backToShopButton": "← Повернутися до магазину",
+    "backToShop": "Назад до магазину",
+    "backToShopButton": "← Назад до магазину",
     "quantityLabel": "Кількість:",
-    "addToCart": "Додати в кошик",
+    "addToCart": "В кошик",
     "addToCartSuccess": "Товар додано в кошик",
-    "addToWishlist": "Додати до списку бажань",
+    "addToWishlist": "Додати в бажане",
     "categoryLabel": "Категорія:",
     "imageAltPrefix": "Зображення",
-    "backToCheckout": "← Повернутись до оформлення замовлення"
+    "backToCheckout": "← Назад до оформлення",
+
+    "stockLimitError": "Вибачте, доступно лише {max} шт.",
+    "outOfStockLabel": "Розпродано",
+    "thumbnailAlt": "Мініатюра",
+    "statusOutOfStock": "Немає в наявності",
+    "statusInStock": "В наявності: {count} шт.",
+    "maxQuantityError": "Максимум {max} шт.",
+    "soldOut": "Розпродано"
   },
   "Profile": {
     "loading": "Завантаження...",
@@ -438,7 +453,7 @@
       "title": "Історія замовлень",
       "loading": "Завантаження історії...",
       "emptyTitle": "Історія порожня",
-      "emptyDesc": "Ви ще не зробили жодного замовлення.",
+      "emptyDesc": "Ви ще не робили замовлень.",
       "orderNumber": "№",
       "itemsHeader": "Товари",
       "quantityUnit": "шт.",
@@ -446,10 +461,18 @@
       "payment": "Оплата",
       "deliverySuffix": "Доставка",
       "freeShipping": "Безкоштовно",
+      "trackingInfo": "Інформація про доставку",
+      "trackButton": "Відстежити",
+      "defaultService": "Служба доставки",
+      "copied": "Скопійовано",
+      "copy": "Скопіювати",
       "status": {
         "success": "Оплачено",
+        "completed": "Виконано",
+        "shipped": "Відправлено",
         "pending": "Очікує оплати",
-        "failure": "Скасовано"
+        "failure": "Помилка оплати",
+        "cancelled": "Скасовано"
       }
     }
   },
@@ -524,7 +547,10 @@
     "checkoutButton": "Оформити замовлення",
     "priceUnit": "$",
     "placeholderAlt": "Запасне зображення товару",
-    "continueShopping": "Продовжити шопінг"
+    "continueShopping": "Продовжити шопінг",
+    "addToCartLimit": "Вибачте, доступно лише {limit} шт. (У вас в кошику: {current})",
+    "updateLimit": "Максимум доступно: {max} шт.",
+    "maxStockReached": "Це вся наявна кількість на складі"
   },
   "Contacts": {
     "contactTitle": "Зв'яжіться з нами",

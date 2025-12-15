@@ -228,7 +228,14 @@
     "addToCart": "Add to cart",
     "remove": "Remove",
     "addingToCart": "Adding to cart...",
-    "loading": "Loading..."
+    "loading": "Loading...",
+
+    "outOfStockError": "Item is out of stock",
+    "addedToCartSuccess": "{title} added to cart",
+    "addToCartError": "Error (possibly insufficient stock)",
+    "removedMessage": "Removed from wishlist",
+    "outOfStockBadge": "SOLD",
+    "limitReached": "Cannot add. Limit reached ({max} pcs)"
   },
   "WishlistSheet": {
     "title": "Wishlist",
@@ -316,7 +323,15 @@
     "addToWishlist": "Add to Wishlist",
     "categoryLabel": "Category:",
     "imageAltPrefix": "Image",
-    "backToCheckout": "← Back to checkout"
+    "backToCheckout": "← Back to checkout",
+
+    "stockLimitError": "Sorry, only {max} items available.",
+    "outOfStockLabel": "Out of Stock",
+    "thumbnailAlt": "Thumbnail",
+    "statusOutOfStock": "Out of Stock",
+    "statusInStock": "In stock: {count} pcs",
+    "maxQuantityError": "Maximum {max} items",
+    "soldOut": "Sold Out"
   },
   "Profile": {
     "loading": "Loading...",
@@ -442,17 +457,25 @@
       "loading": "Loading history...",
       "emptyTitle": "History is empty",
       "emptyDesc": "You haven't placed any orders yet.",
-      "orderNumber": "No.",
+      "orderNumber": "Order #",
       "itemsHeader": "Items",
       "quantityUnit": "pcs",
       "deliveryAddress": "Delivery Address",
       "payment": "Payment",
       "deliverySuffix": "Delivery",
       "freeShipping": "Free",
+      "trackingInfo": "Tracking Info",
+      "trackButton": "Track Order",
+      "defaultService": "Carrier",
+      "copied": "Copied to clipboard",
+      "copy": "Copy",
       "status": {
         "success": "Paid",
+        "completed": "Completed",
+        "shipped": "Shipped",
         "pending": "Pending Payment",
-        "failure": "Cancelled"
+        "failure": "Payment Failed",
+        "cancelled": "Cancelled"
       }
     }
   },
@@ -527,7 +550,10 @@
     "checkoutButton": "Checkout",
     "priceUnit": "$",
     "placeholderAlt": "Placeholder product image",
-    "continueShopping": "Continue shopping"
+    "continueShopping": "Continue shopping",
+    "addToCartLimit": "Sorry, only {limit} items available. (In your cart: {current})",
+    "updateLimit": "Maximum available: {max} pcs",
+    "maxStockReached": "All available stock is already in cart"
   },
   "Contacts": {
     "contactTitle": "Contact Us",

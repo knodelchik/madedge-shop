@@ -14,7 +14,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { useCurrency } from '@/app/context/CurrencyContext'; // 1. Імпорт
+import { useCurrency } from '@/app/context/CurrencyContext';
 
 interface CartItem {
   id: number;
@@ -26,10 +26,12 @@ interface CartItem {
 
 export default function CartSheet() {
   const t = useTranslations('CartSheet');
+  // 1. ДОДАНО: Отримуємо переклади для помилок кошика (там де ключі 'maxStockReached' тощо)
+  const tCart = useTranslations('CartSheet');
+
   const { cartItems, increaseQuantity, decreaseQuantity } = useCartStore();
   const [open, setOpen] = useState(false);
-  
-  // 2. Отримуємо функцію форматування
+
   const { formatPrice } = useCurrency();
 
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -69,14 +71,12 @@ export default function CartSheet() {
         className="w-[400px] sm:w-[500px] p-0 flex flex-col h-full 
                    bg-white dark:bg-neutral-900 text-gray-900 dark:text-neutral-100 "
       >
-        {/* Header */}
         <SheetHeader className="p-6 border-b border-gray-200 dark:border-neutral-700 shrink-0 ">
           <SheetTitle className="text-xl font-bold text-gray-900 dark:text-neutral-100">
             {t('title')}
           </SheetTitle>
         </SheetHeader>
 
-        {/* Якщо корзина порожня */}
         {cartItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center flex-1 p-6">
             <p className="text-gray-500 dark:text-neutral-400 text-center mb-4">
@@ -93,7 +93,6 @@ export default function CartSheet() {
           </div>
         ) : (
           <div className="flex flex-col flex-1 min-h-0">
-            {/* Список товарів */}
             <div className="flex-1 overflow-y-auto p-6 space-y-4">
               {cartItems.map((item) => (
                 <div
@@ -113,7 +112,6 @@ export default function CartSheet() {
                     <p className="font-medium text-gray-800 dark:text-neutral-100 truncate">
                       {item.title}
                     </p>
-                    {/* 3. Використовуємо formatPrice для ціни одиниці */}
                     <p className="text-sm text-gray-500 dark:text-neutral-400 mt-1">
                       {formatPrice(item.price)}
                     </p>
@@ -121,14 +119,14 @@ export default function CartSheet() {
 
                   <QuantityCounter
                     value={item.quantity}
-                    onIncrease={() => increaseQuantity(item.id)}
+                    // 2. ВИПРАВЛЕНО: Передаємо tCart другим аргументом
+                    onIncrease={() => increaseQuantity(item.id, tCart)}
                     onDecrease={() => decreaseQuantity(item.id)}
                   />
                 </div>
               ))}
             </div>
 
-            {/* Підсумок */}
             <div
               className="border-t border-gray-200 dark:border-neutral-700 p-6 
                             bg-white dark:bg-neutral-900 shrink-0"
@@ -138,10 +136,7 @@ export default function CartSheet() {
                               text-gray-800 dark:text-neutral-100 mb-4"
               >
                 <span>{t('totalLabel')}</span>
-                {/* 4. Використовуємо formatPrice для загальної суми */}
-                <span>
-                  {formatPrice(totalPrice)}
-                </span>
+                <span>{formatPrice(totalPrice)}</span>
               </div>
 
               <Link

@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useWishlistStore } from '@/app/[locale]/store/wishlistStore';
+import { useCurrency } from '@/app/context/CurrencyContext'; // Додано для форматування ціни
 import Image from 'next/image';
 import Link from 'next/link';
 import { toast } from 'sonner';
@@ -9,29 +10,33 @@ import { ShoppingCart, Trash2, Heart } from 'lucide-react';
 
 export default function WishlistPage({ userId }: { userId: string }) {
   const t = useTranslations('Wishlist');
-  
+  const { formatPrice } = useCurrency(); // Використовуємо контекст валют
+
   const { wishlistItems, removeFromWishlist, moveToCart } = useWishlistStore();
 
-  const handleMoveToCart = async (product: any) => { // Type 'any' used to safely access joined data
+  const handleMoveToCart = async (product: any) => {
     if (!userId) return;
 
-    // Додаткова UI перевірка
     if (product.stock <= 0) {
-      toast.error('Товар закінчився');
+      // ВИПРАВЛЕНО: Переклад помилки наявності
+      toast.error(t('outOfStockError'));
       return;
     }
 
-    toast.promise(moveToCart(userId, product.id), {
+    toast.promise(moveToCart(userId, product.id, t), {
       loading: t('addingToCart'),
-      success: `${product.title} додано до кошика`,
-      error: 'Помилка (можливо недостатньо товару)',
+
+      success: t('addedToCartSuccess', { title: product.title }),
+
+      error: t('addToCartError'),
     });
   };
 
   const handleRemove = (productId: number) => {
     if (!userId) return;
     removeFromWishlist(userId, productId);
-    toast.error(t('remove'));
+    // ВИПРАВЛЕНО: Повідомлення про видалення (info замість error для дії користувача)
+    toast.info(t('removedMessage'));
   };
 
   return (
@@ -42,44 +47,56 @@ export default function WishlistPage({ userId }: { userId: string }) {
 
       {wishlistItems.length === 0 ? (
         <div className="h-48 flex flex-col items-center justify-center bg-gray-50 dark:bg-neutral-800/50 rounded-lg border-2 border-dashed border-gray-300 dark:border-neutral-700">
-           <Heart className="w-12 h-12 mx-auto mb-4 opacity-30 text-gray-500" />
-           <p className="text-gray-500 dark:text-neutral-400">{t('empty')}</p>
-           <p className="text-sm text-gray-400 mt-1">{t('emptyDescription')}</p>
-           <Link href="/shop" className="mt-4 text-sm font-medium text-blue-600 hover:underline">
+          <Heart className="w-12 h-12 mx-auto mb-4 opacity-30 text-gray-500" />
+          <p className="text-gray-500 dark:text-neutral-400">{t('empty')}</p>
+          <p className="text-sm text-gray-400 mt-1">{t('emptyDescription')}</p>
+          <Link
+            href="/shop"
+            className="mt-4 text-sm font-medium text-blue-600 hover:underline"
+          >
             {t('continueShopping')}
-           </Link>
+          </Link>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {wishlistItems.map((item) => {
             const isOutOfStock = (item.products.stock || 0) <= 0;
-            
+
             return (
-              <div 
-                key={item.id} 
+              <div
+                key={item.id}
                 className="flex items-center gap-4 p-3 rounded-lg border bg-white dark:bg-neutral-800 border-gray-200 dark:border-neutral-700"
               >
                 <div className="relative">
-                   <Image
+                  <Image
                     src={item.products.images?.[0] || '/images/placeholder.jpg'}
                     alt={item.products.title}
                     width={64}
                     height={64}
-                    className={`w-16 h-16 object-cover rounded-md flex-shrink-0 ${isOutOfStock ? 'grayscale opacity-50' : ''}`}
+                    className={`w-16 h-16 object-cover rounded-md flex-shrink-0 ${
+                      isOutOfStock ? 'grayscale opacity-50' : ''
+                    }`}
                   />
                   {isOutOfStock && (
-                     <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-white bg-black/50 rounded-md">
-                        END
-                     </span>
+                    <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-white bg-black/50 rounded-md uppercase">
+                      {/* ВИПРАВЛЕНО: Лейбл на зображенні */}
+                      {t('outOfStockBadge')}
+                    </span>
                   )}
                 </div>
-                
+
                 <div className="flex-1 min-w-0">
-                  <Link href={`/shop/${item.products.title.replace(/\s+/g, '-').toLowerCase()}`} className="font-medium text-sm truncate hover:underline text-gray-800 dark:text-neutral-100">
+                  <Link
+                    href={`/shop/${item.products.title
+                      .replace(/\s+/g, '-')
+                      .toLowerCase()}`}
+                    className="font-medium text-sm truncate hover:underline text-gray-800 dark:text-neutral-100"
+                  >
                     {item.products.title}
                   </Link>
+                  {/* ВИПРАВЛЕНО: Використання formatPrice */}
                   <p className="text-green-600 font-semibold text-sm">
-                    ${item.products.price}
+                    {formatPrice(item.products.price)}
                   </p>
                 </div>
                 <div className="flex flex-col gap-1">
@@ -87,7 +104,7 @@ export default function WishlistPage({ userId }: { userId: string }) {
                     onClick={() => handleMoveToCart(item.products)}
                     disabled={isOutOfStock}
                     className={`p-2 rounded-md transition ${
-                        isOutOfStock 
+                      isOutOfStock
                         ? 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-neutral-700 dark:text-neutral-500'
                         : 'text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-neutral-700'
                     }`}
