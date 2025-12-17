@@ -2,23 +2,28 @@
 
 import { useState } from 'react';
 import { supabase } from '@/app/lib/supabase';
-import { Loader2, Upload, Star, Trash2 } from 'lucide-react';
+import { Loader2, Upload, Star, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import Image from 'next/image';
 
 interface ProductFormProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   product?: any | null;
   onSaved: () => void;
   onCancel: () => void;
 }
 
-export default function ProductForm({ product, onSaved, onCancel }: ProductFormProps) {
+export default function ProductForm({
+  product,
+  onSaved,
+  onCancel,
+}: ProductFormProps) {
   const [loading, setLoading] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     title: product?.title || '',
     price: product?.price || '',
-    stock: product?.stock || 0, // <-- 1. Додано стан для кількості
+    stock: product?.stock || 0,
     category: product?.category || 'sharpeners',
     description: product?.description || '',
   });
@@ -28,7 +33,8 @@ export default function ProductForm({ product, onSaved, onCancel }: ProductFormP
   );
   const [uploading, setUploading] = useState(false);
 
-  // Завантаження фото
+  // --- ЛОГІКА РОБОТИ З ФОТО ---
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -40,7 +46,9 @@ export default function ProductForm({ product, onSaved, onCancel }: ProductFormP
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+        const fileName = `${Date.now()}-${Math.random()
+          .toString(36)
+          .substring(2)}.${fileExt}`;
         const filePath = `${fileName}`;
 
         const { error: uploadError } = await supabase.storage
@@ -49,66 +57,72 @@ export default function ProductForm({ product, onSaved, onCancel }: ProductFormP
 
         if (uploadError) throw uploadError;
 
-        const { data } = supabase.storage.from('products').getPublicUrl(filePath);
+        const { data } = supabase.storage
+          .from('products')
+          .getPublicUrl(filePath);
         newImages.push(data.publicUrl);
       }
 
       setImages((prev) => [...prev, ...newImages]);
       toast.success('Фото успішно завантажено');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error('Upload error:', error);
-      toast.error('Помилка завантаження фото: ' + error.message);
+      toast.error('Помилка завантаження фото');
     } finally {
       setUploading(false);
     }
   };
 
-  // Видалення фото зі списку
   const removeImage = (indexToRemove: number) => {
     setImages(images.filter((_, index) => index !== indexToRemove));
   };
 
-  // Зробити головним
   const makeMain = (indexToMain: number) => {
     const newImages = [...images];
     const [selectedImage] = newImages.splice(indexToMain, 1);
     newImages.unshift(selectedImage);
     setImages(newImages);
+    toast.success('Головне фото змінено');
   };
 
-  // Збереження товару
+  // --- ЗБЕРЕЖЕННЯ ФОРМИ ---
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) {
-        throw new Error('Ви не авторизовані. Перезавантажте сторінку і увійдіть знову.');
+        throw new Error('Сесія закінчилась. Перезавантажте сторінку.');
       }
 
       const productData = {
         title: formData.title,
         price: parseFloat(formData.price),
-        stock: parseInt(formData.stock.toString()), // <-- 2. Зберігаємо кількість як число
+        stock: parseInt(formData.stock.toString()),
         category: formData.category,
         description: formData.description,
         images: images,
         updated_at: new Date().toISOString(),
       };
 
-      let error;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let error: any;
 
       if (product?.id) {
+        // Оновлення
         const result = await supabase
           .from('products')
           .update(productData)
           .eq('id', product.id);
         error = result.error;
       } else {
-        const result = await supabase
-          .from('products')
-          .insert([productData]);
+        // Створення
+        const result = await supabase.from('products').insert([productData]);
         error = result.error;
       }
 
@@ -116,9 +130,12 @@ export default function ProductForm({ product, onSaved, onCancel }: ProductFormP
 
       toast.success(product ? 'Товар оновлено!' : 'Товар створено!');
       onSaved();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error('Save error:', error);
-      toast.error('Помилка збереження: ' + (error.message || error.details || 'Невідома помилка'));
+      toast.error(
+        'Помилка збереження: ' + (error.message || 'Невідома помилка')
+      );
     } finally {
       setLoading(false);
     }
@@ -126,29 +143,41 @@ export default function ProductForm({ product, onSaved, onCancel }: ProductFormP
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 pb-20">
-      {/* Блок фотографій */}
+      {/* === БЛОК ФОТОГРАФІЙ === */}
       <div className="bg-gray-50 dark:bg-neutral-900 p-4 rounded-xl border border-gray-200 dark:border-neutral-800">
         <label className="block text-sm font-bold text-gray-900 dark:text-white mb-3">
-          Фотографії
+          Фотографії ({images.length})
         </label>
-        
-        <div className="grid grid-cols-3 gap-3">
+
+        {/* Адаптивна сітка: 3 колонки на моб, 4 на десктопі */}
+        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
           {images.map((url, index) => (
-            <div key={url} className="relative aspect-square rounded-lg overflow-hidden border border-gray-300 dark:border-neutral-700 group bg-white">
-              <Image src={url} alt={`Product ${index}`} fill className="object-cover" />
-              
+            <div
+              key={url}
+              className="relative aspect-square rounded-lg overflow-hidden border border-gray-300 dark:border-neutral-700 group bg-white"
+            >
+              <Image
+                src={url}
+                alt={`Product ${index}`}
+                fill
+                className="object-cover"
+                sizes="100px"
+              />
+
+              {/* Позначка головного фото */}
               {index === 0 && (
                 <div className="absolute top-1 left-1 bg-green-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm z-10">
-                  ГОЛОВНЕ
+                  MAIN
                 </div>
               )}
 
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+              {/* Кнопки управління (появляються при наведенні або завжди на тачскрінах) */}
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                 {index !== 0 && (
                   <button
                     type="button"
                     onClick={() => makeMain(index)}
-                    className="p-1.5 bg-white text-yellow-500 rounded-full hover:scale-110 transition"
+                    className="p-1.5 bg-white text-yellow-500 rounded-full hover:scale-110 transition shadow-lg"
                     title="Зробити головним"
                   >
                     <Star size={14} fill="currentColor" />
@@ -157,7 +186,7 @@ export default function ProductForm({ product, onSaved, onCancel }: ProductFormP
                 <button
                   type="button"
                   onClick={() => removeImage(index)}
-                  className="p-1.5 bg-white text-red-500 rounded-full hover:scale-110 transition"
+                  className="p-1.5 bg-white text-red-500 rounded-full hover:scale-110 transition shadow-lg"
                   title="Видалити"
                 >
                   <Trash2 size={14} />
@@ -166,106 +195,166 @@ export default function ProductForm({ product, onSaved, onCancel }: ProductFormP
             </div>
           ))}
 
-          <label className="relative aspect-square rounded-lg border-2 border-dashed border-gray-300 dark:border-neutral-700 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
+          {/* Кнопка додавання */}
+          <label className="relative aspect-square rounded-lg border-2 border-dashed border-gray-300 dark:border-neutral-700 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all group">
             {uploading ? (
               <Loader2 className="animate-spin text-blue-500" />
             ) : (
               <>
-                <Upload className="text-gray-400 mb-1" size={20} />
-                <span className="text-[10px] text-gray-500 uppercase font-bold">Додати</span>
+                <Upload
+                  className="text-gray-400 group-hover:text-blue-500 mb-1 transition-colors"
+                  size={24}
+                />
+                <span className="text-[10px] text-gray-500 group-hover:text-blue-500 font-bold uppercase transition-colors">
+                  Додати
+                </span>
               </>
             )}
-            <input 
-              type="file" 
-              multiple 
-              accept="image/*" 
-              onChange={handleImageUpload} 
-              className="hidden" 
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
               disabled={uploading}
             />
           </label>
         </div>
       </div>
 
-      {/* Поля вводу */}
+      {/* === ПОЛЯ ВВОДУ === */}
       <div className="space-y-4">
+        {/* Назва */}
         <div>
-          <label className="block text-sm font-medium mb-1">Назва товару</label>
+          <label className="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">
+            Назва товару
+          </label>
           <input
             type="text"
             required
+            placeholder="Наприклад: Stone Holder PRO"
             value={formData.title}
-            onChange={e => setFormData({...formData, title: e.target.value})}
-            className="w-full px-3 py-2 border rounded-lg dark:bg-neutral-800 dark:border-neutral-700 focus:ring-2 focus:ring-blue-500 outline-none"
+            onChange={(e) =>
+              setFormData({ ...formData, title: e.target.value })
+            }
+            className="w-full px-3 py-2.5 border border-gray-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 focus:ring-2 focus:ring-black dark:focus:ring-white outline-none transition-all"
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        {/* Адаптивний рядок: Ціна та Сток */}
+        {/* grid-cols-1 на моб (один під одним), grid-cols-2 на sm+ (поруч) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Ціна ($)</label>
-            <input
-              type="number"
-              step="0.01"
-              required
-              value={formData.price}
-              onChange={e => setFormData({...formData, price: e.target.value})}
-              className="w-full px-3 py-2 border rounded-lg dark:bg-neutral-800 dark:border-neutral-700 focus:ring-2 focus:ring-blue-500 outline-none"
-            />
+            <label className="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">
+              Ціна ($)
+            </label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                $
+              </span>
+              <input
+                type="number"
+                step="0.01"
+                required
+                placeholder="0.00"
+                value={formData.price}
+                onChange={(e) =>
+                  setFormData({ ...formData, price: e.target.value })
+                }
+                className="w-full pl-7 pr-3 py-2.5 border border-gray-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 focus:ring-2 focus:ring-black dark:focus:ring-white outline-none transition-all"
+              />
+            </div>
           </div>
-          {/* 3. Додано поле вводу Stock */}
           <div>
-            <label className="block text-sm font-medium mb-1">Кількість (Stock)</label>
+            <label className="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">
+              Кількість (Stock)
+            </label>
             <input
               type="number"
               min="0"
               required
+              placeholder="0"
               value={formData.stock}
-              onChange={e => setFormData({...formData, stock: parseInt(e.target.value) || 0})}
-              className="w-full px-3 py-2 border rounded-lg dark:bg-neutral-800 dark:border-neutral-700 focus:ring-2 focus:ring-blue-500 outline-none"
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  stock: parseInt(e.target.value) || 0,
+                })
+              }
+              className="w-full px-3 py-2.5 border border-gray-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 focus:ring-2 focus:ring-black dark:focus:ring-white outline-none transition-all"
             />
           </div>
         </div>
 
+        {/* Категорія */}
         <div>
-           <label className="block text-sm font-medium mb-1">Категорія</label>
+          <label className="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">
+            Категорія
+          </label>
+          <div className="relative">
             <select
               value={formData.category}
-              onChange={e => setFormData({...formData, category: e.target.value})}
-              className="w-full px-3 py-2 border rounded-lg dark:bg-neutral-800 dark:border-neutral-700 focus:ring-2 focus:ring-blue-500 outline-none"
+              onChange={(e) =>
+                setFormData({ ...formData, category: e.target.value })
+              }
+              className="w-full px-3 py-2.5 border border-gray-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 focus:ring-2 focus:ring-black dark:focus:ring-white outline-none appearance-none transition-all cursor-pointer"
             >
-              <option value="sharpeners">Sharpeners</option>
-              <option value="stones">Stones</option>
-              <option value="accessories">Accessories</option>
+              <option value="sharpeners">Sharpeners (Точила)</option>
+              <option value="stones">Stones (Камені)</option>
+              <option value="accessories">Accessories (Аксесуари)</option>
             </select>
+            {/* Стрілочка для селекта */}
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </div>
+          </div>
         </div>
 
+        {/* Опис */}
         <div>
-          <label className="block text-sm font-medium mb-1">Опис</label>
+          <label className="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">
+            Опис
+          </label>
           <textarea
             rows={5}
+            placeholder="Детальний опис товару..."
             value={formData.description}
-            onChange={e => setFormData({...formData, description: e.target.value})}
-            className="w-full px-3 py-2 border rounded-lg dark:bg-neutral-800 dark:border-neutral-700 focus:ring-2 focus:ring-blue-500 outline-none"
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
+            className="w-full px-3 py-2.5 border border-gray-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 focus:ring-2 focus:ring-black dark:focus:ring-white outline-none transition-all resize-y"
           />
         </div>
       </div>
 
-      {/* Кнопки дій */}
+      {/* === КНОПКИ ДІЙ (Sticky Bottom на мобільному для зручності) === */}
       <div className="flex justify-end gap-3 pt-4 border-t dark:border-neutral-800">
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white font-medium"
+          className="px-5 py-2.5 rounded-xl text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-800 dark:hover:text-white font-medium transition-colors flex items-center gap-2"
         >
+          <X size={18} />
           Скасувати
         </button>
         <button
           type="submit"
           disabled={loading || uploading}
-          className="px-6 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg font-bold hover:opacity-90 disabled:opacity-50 flex items-center gap-2"
+          className="px-8 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-xl font-bold hover:opacity-90 disabled:opacity-50 flex items-center gap-2 transition-all active:scale-95 shadow-lg"
         >
-          {loading && <Loader2 className="animate-spin" size={16} />}
-          Зберегти
+          {loading ? <Loader2 className="animate-spin" size={18} /> : null}
+          {product ? 'Оновити' : 'Створити'}
         </button>
       </div>
     </form>

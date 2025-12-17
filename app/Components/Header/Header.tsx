@@ -11,7 +11,6 @@ import { useCartStore } from '../../[locale]/store/cartStore';
 import { useWishlistStore } from '../../[locale]/store/wishlistStore';
 import { authService } from '../../[locale]/services/authService';
 import { User } from '../../types/users';
-import HeaderSkeleton from './HeaderSkeleton';
 import SettingsDropdown from './SettingsDropdown';
 import UserDropdown from './UserDropdown';
 import WishlistDropdown from './WishlistDropdown';
@@ -20,9 +19,10 @@ import BurgerMenu from './BurgerMenu';
 import MobileCartSheet from '../MobileCartSeet';
 import MobileWishlistSheet from '../MobileWishlistSheet';
 import LanguageSwitcher from './LanguageSwitcher';
+
 export default function Header() {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
   const [isMobileCartOpen, setIsMobileCartOpen] = useState(false);
   const [isMobileWishlistOpen, setIsMobileWishlistOpen] = useState(false);
   const t = useTranslations('Footer');
@@ -34,16 +34,18 @@ export default function Header() {
   const handleAuthChange = useCallback(
     async (event: string, session: any) => {
       if (event === 'SIGNED_IN' && session?.user) {
+        // Додаємо role з метаданих, якщо воно там є, або з бази
         const userData: User = {
           id: session.user.id,
           email: session.user.email ?? '',
           full_name: session.user.user_metadata?.full_name,
+          role: session.user.user_metadata?.role || 'user', // Важливо для адмінки
           created_at: session.user.created_at,
           updated_at: session.user.updated_at,
         };
         setUser(userData);
-        await useCartStore.getState().loadCartFromDatabase(session.user.id);
-        await loadWishlist(session.user.id);
+        useCartStore.getState().loadCartFromDatabase(session.user.id);
+        loadWishlist(session.user.id);
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
         useCartStore.getState().clearCart();
@@ -55,7 +57,6 @@ export default function Header() {
   );
 
   const handleSignOut = useCallback(async () => {
-    setLoading(true);
     try {
       await authService.signOut();
       setUser(null);
@@ -71,7 +72,6 @@ export default function Header() {
 
   useEffect(() => {
     let mounted = true;
-
     const initAuth = async () => {
       try {
         const { user } = await authService.getCurrentUser();
@@ -83,32 +83,23 @@ export default function Header() {
       } catch (error) {
         console.error(error);
       } finally {
-        if (mounted) {
-          setLoading(false);
-        }
+        if (mounted) setLoading(false);
       }
     };
-
     const { data: listener } =
       authService.supabase.auth.onAuthStateChange(handleAuthChange);
-
     initAuth();
-
     return () => {
       mounted = false;
       listener.subscription.unsubscribe();
     };
   }, [handleAuthChange, loadWishlist, clearWishlist]);
 
-  if (loading) {
-    return <HeaderSkeleton />;
-  }
-
   return (
     <>
       <header className="sticky top-0 z-50 w-full bg-white dark:bg-black md:bg-white/85 md:backdrop-blur-sm md:dark:bg-black border-b border-gray-200 dark:border-neutral-500 px-6 py-4">
         <div className="relative flex items-center justify-between max-w-screen-2xl mx-auto">
-          {/* ===== ЛІВА ЧАСТИНА - Назва MadEdge ===== */}
+          {/* ЛІВА ЧАСТИНА - Назва */}
           <div className="flex-shrink-0 z-10">
             <div
               className="text-2xl font-bold text-gray-800 dark:text-white cursor-pointer"
@@ -118,45 +109,7 @@ export default function Header() {
             </div>
           </div>
 
-          {/* ======================================================== */}
-          {/* 1. ПЛАНШЕТНЕ МЕНЮ (md - lg)                          */}
-          {/* Показується від 768px до 1024px. Логотипа немає.     */}
-          {/* Клас lg:hidden гарантує, що воно зникне на великих екранах */}
-          {/* ======================================================== */}
-          <div className="hidden md:flex lg:hidden absolute left-1/2 -translate-x-1/2 items-center gap-6 z-0">
-            <Link
-              href="/"
-              className="text-sm font-medium text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors"
-            >
-              {t('footerHome')}
-            </Link>
-            <Link
-              href="/shop"
-              className="text-sm font-medium text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors"
-            >
-              {t('footerShop')}
-            </Link>
-            <Link
-              href="/about"
-              className="text-sm font-medium text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors"
-            >
-              {t('footerAboutUs')}
-            </Link>
-            <Link
-              href="/contact"
-              className="text-sm font-medium text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors"
-            >
-              {t('footerContacts')}
-            </Link>
-          </div>
-
-          {/* ======================================================== */}
-          {/* 2. DESKTOP МЕНЮ (lg+)                                */}
-          {/* Логотип по центру, меню розбите навпіл.              */}
-          {/* З'являється тільки від 1024px (lg)                   */}
-          {/* ======================================================== */}
-
-          {/* Логотип */}
+          {/* DESKTOP МЕНЮ (lg+) - Лого по центру */}
           <div className="hidden lg:block absolute left-1/2 -translate-x-1/2 z-10">
             <motion.div
               className="w-16 h-16 flex items-center justify-center cursor-pointer"
@@ -179,51 +132,51 @@ export default function Header() {
             </motion.div>
           </div>
 
-          {/* Навігація зліва від лого */}
+          {/* Навігація зліва (Desktop) */}
           <div className="hidden lg:flex items-center gap-8 absolute left-1/2 -translate-x-1/2 -ml-[140px]">
             <Link
               href="/"
-              className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium cursor-pointer"
+              className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium"
             >
               {t('footerHome')}
             </Link>
             <Link
               href="/shop"
-              className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium cursor-pointer"
+              className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium"
             >
               {t('footerShop')}
             </Link>
           </div>
 
-          {/* Навігація справа від лого */}
+          {/* Навігація справа (Desktop) */}
           <div className="hidden lg:flex items-center gap-8 absolute left-1/2 -translate-x-1/2 ml-[148px]">
             <Link
               href="/about"
-              className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium cursor-pointer"
+              className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium"
             >
               {t('footerAboutUs')}
             </Link>
             <Link
               href="/contact"
-              className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium cursor-pointer"
+              className="text-gray-700 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium"
             >
               {t('footerContacts')}
             </Link>
           </div>
 
-          {/* ===== ПРАВА ЧАСТИНА - Іконки ===== */}
-          <div className="hidden md:flex items-center gap-4 text-gray-700 dark:text-neutral-300 z-10">
-            {/* Додаємо перемикач сюди */}
+          {/* ===== ПРАВА ЧАСТИНА - Іконки (ТІЛЬКИ ДЕСКТОП LG+) ===== */}
+          {/* ЗМІНЕНО: md:flex -> lg:flex. На планшетах це зникне. */}
+          <div className="hidden lg:flex items-center gap-4 text-gray-700 dark:text-neutral-300 z-10">
             <LanguageSwitcher />
-
             <SettingsDropdown />
             <UserDropdown user={user} onSignOut={handleSignOut} />
             <WishlistDropdown user={user} />
             <CartSheet />
           </div>
 
-          {/* ===== МОБІЛЬНЕ МЕНЮ (< md) ===== */}
-          <div className="md:hidden">
+          {/* ===== BURGER MENU (Тепер видиме до lg включно) ===== */}
+          {/* ЗМІНЕНО: md:hidden -> lg:hidden. Тепер воно є на мобілках І на планшетах */}
+          <div className="lg:hidden flex items-center gap-2">
             <BurgerMenu
               user={user}
               onSignOut={handleSignOut}
@@ -244,12 +197,10 @@ export default function Header() {
         </div>
       </header>
 
-      {/* ===== MOBILE SHEETS ===== */}
       <MobileCartSheet
         isOpen={isMobileCartOpen}
         onClose={() => setIsMobileCartOpen(false)}
       />
-
       <MobileWishlistSheet
         isOpen={isMobileWishlistOpen}
         onClose={() => setIsMobileWishlistOpen(false)}

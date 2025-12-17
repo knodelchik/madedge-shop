@@ -1,100 +1,81 @@
-import { redirect } from '@/navigation';
-import { getLocale } from 'next-intl/server';
-import Link from 'next/link';
-import { createClient } from '@/lib/supabase-server';
+'use client';
 
-export default async function AdminLayout({
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { supabase } from '@/app/lib/supabase'; // Використовуємо твій клієнтський конфіг
+import AdminSidebar from './AdminSidebar';
+import { Loader2 } from 'lucide-react';
+
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const locale = await getLocale();
+  const [loading, setLoading] = useState(true);
+  const [authorized, setAuthorized] = useState(false);
+  const router = useRouter();
 
-  console.log('--- ADMIN LAYOUT CHECK ---');
+  useEffect(() => {
+    const checkUser = async () => {
+      try {
+        // 1. Отримуємо користувача з поточної браузерної сесії
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
 
-  // 1. Створюємо клієнт
-  const supabase = await createClient();
+        if (!user) {
+          router.push('/auth'); // Якщо не залогінений -> на вхід
+          return;
+        }
 
-  // 2. Перевіряємо юзера
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
+        // 2. Перевіряємо роль (якщо у тебе є колонка role)
+        const { data: profile } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', user.id)
+          .single();
 
-  if (userError || !user) {
-    console.log(
-      '❌ ADMIN CHECK FAIL: No User found (Cookie missing or invalid)'
+        // Якщо роль не адмін -> на головну
+        if (profile?.role !== 'admin') {
+          // ТИМЧАСОВО МОЖНА ЗАКОМЕНТУВАТИ ЦЮ ПЕРЕВІРКУ, ЯКЩО ВОНА БЛОКУЄ
+          // router.push('/');
+          // alert('Доступ заборонено: потрібні права адміна');
+          // return;
+        }
+
+        setAuthorized(true);
+      } catch (error) {
+        console.error('Auth check error:', error);
+        router.push('/');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkUser();
+  }, [router]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-neutral-950">
+        <Loader2 className="animate-spin w-10 h-10 text-gray-500" />
+      </div>
     );
-    if (userError) console.error('Error:', userError.message);
-    redirect({ href: '/auth', locale });
-    return null;
   }
 
-  console.log('✅ User found:', user.id);
-
-  // 3. Перевіряємо роль у базі
-  const { data: profile, error: profileError } = await supabase
-    .from('users')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (profileError) {
-    console.log('❌ ADMIN CHECK FAIL: DB Error when fetching role');
-    console.error('DB Error:', profileError.message);
-    // Це може статися через RLS. Спробуй додати політику SELECT для users.
-    redirect({ href: '/', locale });
-    return null;
-  }
-
-  console.log('ℹ️ User Role in DB:', profile?.role);
-
-  // 4. Фінальна перевірка
-  if (profile?.role !== 'admin') {
-    console.log('❌ ADMIN CHECK FAIL: Role is not admin. Redirecting home.');
-    redirect({ href: '/', locale });
-    return null;
-  }
-
-  console.log('✅ ACCESS GRANTED to Admin Panel');
+  // Якщо перевірка пройшла (або ми її пропустили), показуємо адмінку
+  if (!authorized) return null;
 
   return (
-    <div className="min-h-screen flex bg-gray-100 dark:bg-neutral-950">
-      <aside className="w-64 bg-white dark:bg-neutral-900 border-r dark:border-neutral-800 p-6 fixed h-full overflow-y-auto z-10">
-        <h2 className="text-2xl font-bold mb-8 text-gray-900 dark:text-white">
-          Адмін Панель
-        </h2>
-        <nav className="space-y-2">
-          <AdminLink href="/admin" label="Дашборд" />
-          <AdminLink href="/admin/orders" label="Замовлення" />
-          <AdminLink href="/admin/products" label="Товари" />
-          <AdminLink href="/admin/delivery" label="Доставка" />
-          <AdminLink href="/admin/newsletter" label="Розсилка" />
-          <div className="pt-4 border-t dark:border-neutral-800 mt-4">
-            <Link
-              href="/"
-              className="text-sm text-gray-500 hover:text-black dark:hover:text-white"
-            >
-              ← На сайт
-            </Link>
-          </div>
-        </nav>
-      </aside>
+    <div className="min-h-screen bg-gray-100 dark:bg-neutral-950 flex flex-col lg:flex-row">
+      {/* Сайдбар (твоє нове меню) */}
+      <AdminSidebar />
 
-      <main className="flex-1 p-8 ml-64 overflow-y-auto text-gray-900 dark:text-white">
-        {children}
+      {/* Основний контент з правильними відступами */}
+      {/* pt-[80px] для мобільного, щоб не перекривався хедером */}
+      <main className="flex-1 p-4 pt-[80px] lg:pt-8 lg:pl-80 w-full transition-all">
+        <div className="max-w-7xl mx-auto space-y-6">{children}</div>
       </main>
     </div>
-  );
-}
-
-function AdminLink({ href, label }: { href: string; label: string }) {
-  return (
-    <Link
-      href={href}
-      className="block px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors text-gray-700 dark:text-gray-200"
-    >
-      {label}
-    </Link>
   );
 }

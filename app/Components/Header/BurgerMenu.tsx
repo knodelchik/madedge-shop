@@ -15,6 +15,7 @@ import {
   Globe,
   DollarSign,
   ChevronRight,
+  LayoutDashboard, // 1. Додано іконку
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useTranslations, useLocale } from 'next-intl';
@@ -174,6 +175,19 @@ export default function BurgerMenu({
                   {t('sections.navigation')}
                 </h3>
                 <nav className="space-y-1">
+                  {/* 2. АДМІН ПАНЕЛЬ (Показується тільки якщо роль 'admin') */}
+                  {user?.role === 'admin' && (
+                    <button
+                      onClick={() => handleNavigation(`/${locale}/admin`)}
+                      className="w-full flex items-center p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors text-sm font-semibold active:scale-95 mb-2"
+                    >
+                      <LayoutDashboard className="h-4 w-4 mr-3" />
+                      {/* Переконайтеся, що ключ adminPanel є у ваших файлах перекладу, або замініть на текст */}
+                      Адмін Панель
+                    </button>
+                  )}
+                  {/* Кінець блоку адмінки */}
+
                   {navigationItems.map((item) => {
                     const isActive = pathname === item.path;
                     return (
@@ -264,7 +278,7 @@ export default function BurgerMenu({
                         onClick={() => setTheme(themeOption.key)}
                         className={`flex-1 p-3 text-xs transition-colors flex items-center justify-center space-x-1 active:scale-95 ${
                           theme === themeOption.key
-                            ? 'bg-neutral-200 dark:dark:bg-neutral-500/20 text-gray-900 dark:text-white font-semibold'
+                            ? 'bg-neutral-200 dark:bg-neutral-500/20 text-gray-900 dark:text-white font-semibold'
                             : 'hover:bg-gray-100 dark:hover:bg-neutral-800 text-gray-600 dark:text-neutral-400'
                         }`}
                         title={themeOption.label}
