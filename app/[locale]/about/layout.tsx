@@ -242,7 +242,7 @@ export default function AboutLayout({
           className="w-full px-6 py-4 flex items-center justify-between text-gray-800 dark:text-white dark:bg-black transition-colors"
         >
           <div className="flex items-center gap-3">
-            <span className="font-medium text-lg">Menu</span>
+            <span className="font-medium text-lg"> {t('sidebar.menu')}</span>
           </div>
           <motion.div
             animate={{ scaleY: isMobileMenuOpen ? -1 : 1 }}

@@ -299,7 +299,7 @@
     "viewAllProducts": "Переглянути всі товари",
     "heroTitle": "Магазин MadEdge",
     "heroSubtitle": "Оберіть ідеальну точилку, камінь чи аксесуар",
-    "sharpeners": "Професійні точилаs",
+    "sharpeners": "Професійні точила",
     "stones": "Точильні Камені",
     "grindingStones": "Точильні Камені",
     "knifeSharpeners": "Професійні точила",
@@ -650,7 +650,8 @@
     "sidebar": {
       "premiumSharpeners": "Преміальні точила",
       "latestProduct": "Останній продукт",
-      "onThisPage": "На цій сторінці"
+      "onThisPage": "На цій сторінці",
+      "menu": "Меню"
     },
     "menu": {
       "aboutUs": "Про нас",

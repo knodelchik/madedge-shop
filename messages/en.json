@@ -653,7 +653,8 @@
     "sidebar": {
       "premiumSharpeners": "Premium Sharpeners",
       "latestProduct": "Latest Product",
-      "onThisPage": "On this page"
+      "onThisPage": "On this page",
+      "menu": "Menu"
     },
     "menu": {
       "aboutUs": "About us",
