@@ -511,6 +511,7 @@
     "quantityLabel": "Кількість"
   },
   "OrderResult": {
+    "processingPayment": "Обробка платежу...",
     "successTitle": "Дякуємо за замовлення!",
     "errorTitle": "Оплата не пройшла",
     "successMessage": "Ваш платіж успішно оброблено. Ми вже почали збирати ваше замовлення.",

@@ -14,64 +14,52 @@ export default function OrderResultPage() {
   const { clearCart } = useCartStore();
 
   const source = searchParams.get('source'); // 'paypal' або 'monobank'
-  const orderId = searchParams.get('orderId');
+  const orderId = searchParams.get('orderId'); // Наш внутрішній ID
   
-  // Для PayPal
-  const token = searchParams.get('token'); 
-
+  // Стан завантаження потрібен тільки якщо ми щось перевіряємо.
+  // Але якщо ми прийшли від PayPalButtons, то все вже добре.
   const [paymentStatus, setPaymentStatus] = useState<'loading' | 'success' | 'failure'>('loading');
 
   useEffect(() => {
-    const processPayment = async () => {
-      // 1. ЛОГІКА PAYPAL
-      if (source === 'paypal' && token && orderId) {
-        try {
-          const res = await fetch('/api/paypal-capture', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token, orderId }),
-          });
-
-          if (res.ok) {
-            setPaymentStatus('success');
-            clearCart();
-          } else {
-            setPaymentStatus('failure');
-          }
-        } catch (error) {
-          setPaymentStatus('failure');
-        }
+    // Функція ініціалізації
+    const initResult = async () => {
+      if (!orderId) {
+        setPaymentStatus('failure');
         return;
       }
 
-      // 2. ЛОГІКА MONOBANK
-      // Monobank просто редіректить назад.
-      // Реальний статус ми отримуємо через вебхук, але для юзера
-      // ми можемо показати "Успіх", якщо є orderId і source=monobank.
-      // (В ідеалі тут можна зробити запит на бекенд і перевірити статус замовлення, але для UX достатньо цього)
-      if (source === 'monobank' && orderId) {
-          // Тут ми припускаємо успіх, бо вебхук міг ще не дійти, 
-          // але юзер вже повернувся після оплати.
-          // Очищаємо кошик
-          setPaymentStatus('success');
-          clearCart();
-          return;
+      // 1. PAYPAL
+      if (source === 'paypal') {
+        // Якщо ми прийшли сюди, значить компонент PayPalCheckout вже виконав Capture і отримав 'COMPLETED'.
+        // Нам не потрібно робити це знову. Просто показуємо успіх.
+        setPaymentStatus('success');
+        clearCart();
+      } 
+      // 2. MONOBANK
+      else if (source === 'monobank') {
+        // Для Монобанку, оскільки це редірект, ми теж показуємо успіх авансом (для UX).
+        // Реальний статус прийде на вебхук.
+        setPaymentStatus('success');
+        clearCart();
+      } 
+      // 3. НЕВІДОМЕ ДЖЕРЕЛО
+      else {
+        setPaymentStatus('failure');
       }
-
-      setPaymentStatus('failure');
     };
 
-    processPayment();
-  }, [source, token, orderId, clearCart]);
+    initResult();
+  }, [source, orderId, clearCart]);
 
-  // UI Залишається тим самим
+  // --- UI ---
+  
   if (paymentStatus === 'loading') {
     return (
       <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center p-4">
         <div className="text-center">
           <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-            {t('processingPayment') || 'Processing payment...'}
+            {t('processingPayment')} 
           </h2>
         </div>
       </div>
@@ -103,6 +91,12 @@ export default function OrderResultPage() {
         <h1 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">
           {isSuccess ? t('successTitle') : t('errorTitle')}
         </h1>
+        
+        {/* Додаткове повідомлення з номером замовлення */}
+        {isSuccess && orderId && (
+           <p className="text-sm text-gray-500 mb-2">Order #{orderId}</p>
+        )}
+
         <p className="text-gray-600 dark:text-neutral-400 mb-8">
           {isSuccess ? t('successMessage') : t('errorMessage')}
         </p>
