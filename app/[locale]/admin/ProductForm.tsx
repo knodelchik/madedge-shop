@@ -175,7 +175,7 @@ export default function ProductForm({
 
               {index === 0 && (
                 <div className="absolute top-1 left-1 bg-green-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm z-10">
-                  MAIN
+                  Лицьова
                 </div>
               )}
 
@@ -295,13 +295,15 @@ export default function ProductForm({
               min="0"
               required
               placeholder="0"
-              value={formData.stock}
-              onChange={(e) =>
+              value={formData.stock === 0 ? '' : formData.stock}
+              onChange={(e) => {
+                const val = e.target.value;
+
                 setFormData({
                   ...formData,
-                  stock: parseInt(e.target.value) || 0,
-                })
-              }
+                  stock: val === '' ? 0 : parseInt(val),
+                });
+              }}
               className="w-full px-3 py-2.5 border border-gray-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 focus:ring-2 focus:ring-black dark:focus:ring-white outline-none transition-all"
             />
           </div>

@@ -120,7 +120,7 @@ export default function AdminProductsPage() {
                 <th className="p-4 w-24">Фото</th>
                 <th className="p-4">Назва</th>
                 <th className="p-4 w-32">Ціна</th>
-                <th className="p-4 w-24">Stock</th>
+                <th className="p-4 w-24">Сток</th>
                 <th className="p-4 w-32">Категорія</th>
                 <th className="p-4 text-right w-24">Дії</th>
               </tr>

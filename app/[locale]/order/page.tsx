@@ -138,25 +138,28 @@ export default function OrderPage() {
         toast.error(t('errorSelectAddress'));
         return;
       }
-const subtotalUSD = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const totalUSD = subtotalUSD + shippingCost;
+      const subtotalUSD = cartItems.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0
+      );
+      const totalUSD = subtotalUSD + shippingCost;
       const totalUAH = totalUSD * rates['UAH'];
 
-    const res = await fetch('/api/create-payment', {
+      const res = await fetch('/api/create-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          items: cartItems, 
+        body: JSON.stringify({
+          items: cartItems,
           method: paymentMethod,
           shippingAddress: selectedAddress,
-          shippingCost: shippingCost, 
-          shippingType, 
-          
+          shippingCost: shippingCost,
+          shippingType,
+
           // ПЕРЕДАЄМО ДВІ СУМИ:
           amountUSD: totalUSD, // Для бази (напр. 100)
-          amountUAH: totalUAH  // Для Fondy (напр. 4150)
+          amountUAH: totalUAH, // Для Fondy (напр. 4150)
         }),
-    });
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || t('paymentError'));
 
@@ -227,7 +230,7 @@ const subtotalUSD = cartItems.reduce((sum, item) => sum + item.price * item.quan
                 {addresses.length === 0 ? (
                   <Link
                     href="/profile?tab=addresses"
-                    className="flex items-center justify-center gap-2 w-full p-3 border-2 border-dashed border-yellow-400 bg-yellow-50 dark:bg-yellow-900/10 rounded-xl text-yellow-700 dark:text-yellow-500 hover:bg-yellow-100 transition-colors text-sm font-medium"
+                    className="flex items-center justify-center gap-2 w-full p-3 border-2 border-dashed border-yellow-400 bg-yellow-50 dark:bg-yellow-900/10 rounded-xl text-yellow-700 dark:text-yellow-500 hover:bg-yellow-100 transition-colors text-sm font-medium cursor-pointer"
                   >
                     <Plus size={16} /> {t('addAddress')}
                   </Link>
@@ -235,13 +238,13 @@ const subtotalUSD = cartItems.reduce((sum, item) => sum + item.price * item.quan
                   <div className="relative">
                     <button
                       onClick={() => setIsAddressMenuOpen(!isAddressMenuOpen)}
-                      className="w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-xl hover:border-gray-400 transition-colors text-left"
+                      className="w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-xl hover:border-gray-400 transition-colors text-left cursor-pointer"
                     >
                       {selectedAddress ? (
                         <div className="flex items-center gap-2 overflow-hidden w-full">
                           <MapPin
                             size={18}
-                            className="text-gray-500 shrink-0"
+                            className="text-gray-500 shrink-0 "
                           />
                           <div className="flex-1 min-w-0">
                             <span className="font-bold text-gray-900 dark:text-white block text-sm lg:text-base truncate">
@@ -322,7 +325,7 @@ const subtotalUSD = cartItems.reduce((sum, item) => sum + item.price * item.quan
                     <button
                       onClick={() => setShippingType('Standard')}
                       disabled={standardCost === null}
-                      className={`w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all ${
+                      className={`w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all cursor-pointer ${
                         shippingType === 'Standard'
                           ? 'border-black bg-gray-50 dark:border-white dark:bg-neutral-800'
                           : 'border-gray-200 dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600'
@@ -367,10 +370,10 @@ const subtotalUSD = cartItems.reduce((sum, item) => sum + item.price * item.quan
                     <button
                       onClick={() => setShippingType('Express')}
                       disabled={expressCost === null}
-                      className={`w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all ${
+                      className={`w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all cursor-pointer  ${
                         shippingType === 'Express'
                           ? 'border-black bg-gray-50 dark:border-white dark:bg-neutral-800'
-                          : 'border-gray-200 dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600'
+                          : 'border-gray-200 dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600 '
                       } ${
                         expressCost === null
                           ? 'opacity-50 cursor-not-allowed'
@@ -453,7 +456,7 @@ const subtotalUSD = cartItems.reduce((sum, item) => sum + item.price * item.quan
                 </span>
                 <div className="grid grid-cols-2 gap-3">
                   <button
-                    className={`px-2 py-3 lg:px-4 rounded-xl border-2 font-medium transition-all text-sm ${
+                    className={`px-2 py-3 lg:px-4 rounded-xl border-2 font-medium transition-all text-sm cursor-pointer  ${
                       paymentMethod === 'fondy'
                         ? 'border-black bg-black text-white dark:border-white dark:bg-white dark:text-black'
                         : 'border-gray-200 text-gray-600 hover:border-gray-300 dark:border-neutral-700 dark:text-neutral-400'
@@ -463,7 +466,7 @@ const subtotalUSD = cartItems.reduce((sum, item) => sum + item.price * item.quan
                     plata
                   </button>
                   <button
-                    className={`px-2 py-3 lg:px-4 rounded-xl border-2 font-medium transition-all text-sm ${
+                    className={`px-2 py-3 lg:px-4 rounded-xl border-2 font-medium transition-all text-sm cursor-pointer  ${
                       paymentMethod === 'paypal'
                         ? 'border-black bg-black text-white dark:border-white dark:bg-white dark:text-black'
                         : 'border-gray-200 text-gray-600 hover:border-gray-300 dark:border-neutral-700 dark:text-neutral-400'
@@ -478,7 +481,7 @@ const subtotalUSD = cartItems.reduce((sum, item) => sum + item.price * item.quan
               <button
                 onClick={handlePayment}
                 disabled={processing || !selectedAddressId}
-                className="w-full bg-black dark:bg-white text-white dark:text-black py-3 lg:py-4 rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex items-center justify-center gap-2 text-sm lg:text-base"
+                className="w-full bg-black dark:bg-white text-white dark:text-black py-3 lg:py-4 rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex items-center justify-center gap-2 text-sm lg:text-base cursor-pointer "
               >
                 {processing
                   ? t('processing')

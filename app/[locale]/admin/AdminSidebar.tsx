@@ -70,7 +70,7 @@ export default function AdminSidebar() {
           className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-500 hover:text-red-600 transition-colors"
         >
           <LogOut size={20} />
-          Вихід на сайт
+          На сайт
         </Link>
       </div>
     </div>

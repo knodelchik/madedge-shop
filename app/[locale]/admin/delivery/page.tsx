@@ -5,7 +5,6 @@ import { createClient } from '@supabase/supabase-js';
 import { Save, RefreshCw, Plus, Trash2, MapPin, Search } from 'lucide-react';
 import { toast } from 'sonner';
 
-// Ініціалізація клієнта
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -17,7 +16,6 @@ export default function AdminDeliveryPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // Стейт для нової країни
   const [newCountry, setNewCountry] = useState({
     country_code: '',
     country_name: '',
@@ -38,7 +36,6 @@ export default function AdminDeliveryPage() {
     if (error) {
       toast.error('Помилка завантаження: ' + error.message);
     } else {
-      // Сортування: UA перша, ROW остання, решта за алфавітом
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const sorted = (data || []).sort((a: any, b: any) => {
         if (a.country_code === 'UA') return -1;
@@ -52,21 +49,23 @@ export default function AdminDeliveryPage() {
     setLoading(false);
   };
 
-  // Редагування існуючих значень в стейті
-  const handleInputChange = (id: number, field: string, value: string) => {
+  const handleInputChange = (id: number, field: string, rawValue: string) => {
     setSettings((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              [field]: field.includes('price') ? parseFloat(value) || 0 : value,
-            }
-          : item
-      )
+      prev.map((item) => {
+        if (item.id !== id) return item;
+
+        // Логіка обробки нуля:
+        // Якщо значення пусте '', зберігаємо 0 в стейт (щоб не було NaN), але UI покаже пусте місце
+        const numValue = rawValue === '' ? 0 : parseFloat(rawValue);
+
+        return {
+          ...item,
+          [field]: field.includes('price') ? numValue : rawValue,
+        };
+      })
     );
   };
 
-  // Збереження всіх змін (Bulk Update)
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -90,7 +89,6 @@ export default function AdminDeliveryPage() {
     }
   };
 
-  // Додавання нової країни
   const handleAddCountry = async () => {
     if (!newCountry.country_code || !newCountry.country_name) {
       toast.error('Заповніть код (ISO) та назву країни');
@@ -116,11 +114,10 @@ export default function AdminDeliveryPage() {
         standard_price: 0,
         express_price: 0,
       });
-      loadSettings(); // Перезавантаження списку
+      loadSettings();
     }
   };
 
-  // Видалення країни
   const handleDelete = async (id: number) => {
     if (!confirm('Видалити цю країну зі списку доставки?')) return;
 
@@ -145,7 +142,6 @@ export default function AdminDeliveryPage() {
 
   return (
     <div className="max-w-6xl pb-10">
-      {/* ЗАГОЛОВОК + КНОПКА ЗБЕРЕЖЕННЯ (Адаптив: колонка на моб, рядок на десктоп) */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -170,13 +166,12 @@ export default function AdminDeliveryPage() {
         </button>
       </div>
 
-      {/* ФОРМА ДОДАВАННЯ (Адаптивна сітка) */}
+      {/* ФОРМА ДОДАВАННЯ */}
       <div className="bg-gray-50 dark:bg-neutral-900/50 border border-gray-200 dark:border-neutral-800 p-6 rounded-xl mb-8">
         <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-gray-900 dark:text-white">
           <Plus className="w-5 h-5 text-blue-500" /> Додати нову країну
         </h3>
 
-        {/* Grid: 1 колонка (моб) -> 2 колонки (планшет) -> 5 колонок (десктоп) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
           {/* Код */}
           <div>
@@ -195,7 +190,7 @@ export default function AdminDeliveryPage() {
             />
           </div>
 
-          {/* Назва (займає 2 колонки на великих екранах якщо треба, тут 1 або 2) */}
+          {/* Назва */}
           <div className="lg:col-span-2">
             <label className="text-xs text-gray-500 font-bold mb-1.5 block uppercase">
               Назва країни
@@ -218,11 +213,16 @@ export default function AdminDeliveryPage() {
             </label>
             <input
               type="number"
-              value={newCountry.standard_price}
+              placeholder="0"
+              // ЛОГІКА ДЛЯ ФОРМИ ДОДАВАННЯ:
+              value={
+                newCountry.standard_price === 0 ? '' : newCountry.standard_price
+              }
               onChange={(e) =>
                 setNewCountry({
                   ...newCountry,
-                  standard_price: parseFloat(e.target.value) || 0,
+                  standard_price:
+                    e.target.value === '' ? 0 : parseFloat(e.target.value),
                 })
               }
               className="w-full px-3 py-2.5 rounded-lg border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 focus:ring-2 focus:ring-blue-500 outline-none"
@@ -237,11 +237,15 @@ export default function AdminDeliveryPage() {
             <div className="flex gap-2">
               <input
                 type="number"
-                value={newCountry.express_price}
+                placeholder="0"
+                value={
+                  newCountry.express_price === 0 ? '' : newCountry.express_price
+                }
                 onChange={(e) =>
                   setNewCountry({
                     ...newCountry,
-                    express_price: parseFloat(e.target.value) || 0,
+                    express_price:
+                      e.target.value === '' ? 0 : parseFloat(e.target.value),
                   })
                 }
                 className="w-full px-3 py-2.5 rounded-lg border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 focus:ring-2 focus:ring-blue-500 outline-none"
@@ -258,12 +262,10 @@ export default function AdminDeliveryPage() {
         </button>
       </div>
 
-      {/* ТАБЛИЦЯ (З горизонтальним скролом для мобільних) */}
+      {/* ТАБЛИЦЯ */}
       <div className="bg-white dark:bg-neutral-900 rounded-xl shadow border border-gray-100 dark:border-neutral-800 overflow-hidden">
         <div className="overflow-x-auto">
-          {/* <--- Дозволяє скрол на мобільному */}
           <table className="w-full text-left min-w-[650px]">
-            {/* min-w фіксує ширину контенту */}
             <thead className="bg-gray-50 dark:bg-neutral-800 text-gray-500 dark:text-gray-400 uppercase text-xs font-semibold tracking-wider">
               <tr>
                 <th className="p-5 w-24">Код</th>
@@ -293,6 +295,8 @@ export default function AdminDeliveryPage() {
                   <td className="p-5 font-bold text-gray-900 dark:text-white text-sm">
                     {item.country_name}
                   </td>
+
+                  {/* STANDARD PRICE (TABLE) */}
                   <td className="p-5">
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
@@ -300,7 +304,12 @@ export default function AdminDeliveryPage() {
                       </span>
                       <input
                         type="number"
-                        value={item.standard_price}
+                        placeholder="0"
+                        // ЛОГІКА ДЛЯ ТАБЛИЦІ:
+                        // Показуємо пустий рядок, якщо значення 0
+                        value={
+                          item.standard_price === 0 ? '' : item.standard_price
+                        }
                         onChange={(e) =>
                           handleInputChange(
                             item.id,
@@ -312,6 +321,8 @@ export default function AdminDeliveryPage() {
                       />
                     </div>
                   </td>
+
+                  {/* EXPRESS PRICE (TABLE) */}
                   <td className="p-5">
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
@@ -319,7 +330,10 @@ export default function AdminDeliveryPage() {
                       </span>
                       <input
                         type="number"
-                        value={item.express_price}
+                        placeholder="0"
+                        value={
+                          item.express_price === 0 ? '' : item.express_price
+                        }
                         onChange={(e) =>
                           handleInputChange(
                             item.id,
@@ -331,6 +345,7 @@ export default function AdminDeliveryPage() {
                       />
                     </div>
                   </td>
+
                   <td className="p-5 text-right">
                     <button
                       onClick={() => handleDelete(item.id)}
