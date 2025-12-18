@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { createMonoInvoice } from '../../lib/monobank'; 
-import paypalClient from '../../lib/paypal';
-import paypal from '@paypal/checkout-server-sdk';
+import { createMonoInvoice } from '../../lib/monobank';
+import client from '../../lib/paypal';
+// Імпортуємо необхідні класи. 
+// Якщо TS свариться на OrdersController, ми використаємо (client as any) або ordersController as any нижче.
+import { OrdersController, CheckoutPaymentIntent } from '@paypal/paypal-server-sdk';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!; 
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -15,14 +17,15 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { amountUSD, amountUAH, items, shippingAddress, shippingCost, shippingType, method } = body;
 
+    // Валідація даних
     if (!amountUSD || !items || !shippingAddress) {
       return NextResponse.json({ error: 'Невірні дані' }, { status: 400 });
     }
 
-    const userId = shippingAddress.user_id; 
+    const userId = shippingAddress.user_id;
     const uniqueOrderId = `order_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
-    // 1. Створюємо замовлення в базі (статус pending)
+    // 1. Створення запису замовлення в БД (Status: pending)
     const { error: dbError } = await supabaseAdmin.from('orders').insert({
       id: uniqueOrderId,
       user_id: userId,
@@ -36,7 +39,7 @@ export async function POST(req: Request) {
 
     if (dbError) throw new Error(dbError.message);
 
-    // 2. Зберігаємо товари
+    // 2. Збереження товарів у БД
     const orderItemsData = items.map((item: any) => ({
       order_id: uniqueOrderId,
       product_id: item.id,
@@ -45,51 +48,79 @@ export async function POST(req: Request) {
       price: item.price,
       image_url: item.images?.[0] || ''
     }));
-    
+
     await supabaseAdmin.from('order_items').insert(orderItemsData);
 
-    // === PAYPAL ЛОГІКА ===
+    // === PAYPAL ЛОГІКА (Оновлена для React SDK) ===
     if (method === 'paypal') {
-        const request = new paypal.orders.OrdersCreateRequest();
-        request.prefer("return=representation");
-        request.requestBody({
-            intent: 'CAPTURE',
-            purchase_units: [{
-                reference_id: uniqueOrderId,
-                amount: { currency_code: 'USD', value: amountUSD.toFixed(2) }
-            }],
-            application_context: {
-                return_url: `${BASE_URL}/order/result?source=paypal&orderId=${uniqueOrderId}`,
-                cancel_url: `${BASE_URL}/order?status=cancelled`
-            }
-        });
+      try {
+        const ordersController = new OrdersController(client);
 
-        // ОСЬ ТУТ МИ ВСТАВИЛИ НОВИЙ БЛОК З ОБРОБКОЮ ПОМИЛОК
-        try {
-            const order = await paypalClient().execute(request);
-            const approveLink = order.result.links.find((link: any) => link.rel === 'approve').href;
-            return NextResponse.json({ payment_url: approveLink });
-        } catch (paypalError: any) {
-            console.error('PayPal API Error details:', JSON.stringify(paypalError, null, 2));
-            throw new Error('PayPal creation failed: ' + paypalError.message);
-        }
+        const payload = {
+          body: {
+            intent: CheckoutPaymentIntent.Capture,
+            purchaseUnits: [
+              {
+                referenceId: uniqueOrderId,
+                amount: {
+                  currencyCode: 'USD',
+                  value: amountUSD.toFixed(2),
+                },
+              },
+            ],
+            // Для React SDK paymentSource не є обов'язковим, але experienceContext корисний
+            // для налаштування вигляду (назва бренду тощо)
+            paymentSource: {
+                paypal: {
+                    experienceContext: {
+                        brandName: "MadEdge Shop",
+                        userAction: "PAY_NOW",
+                        // Важливо: React SDK сам керує поверненням, але ці URL потрібні для API
+                        returnUrl: `${BASE_URL}/order/result?source=paypal&orderId=${uniqueOrderId}`,
+                        cancelUrl: `${BASE_URL}/order?status=cancelled`,
+                    }
+                }
+            }
+          },
+        };
+
+        // Викликаємо метод створення замовлення.
+        // Використовуємо 'as any', щоб обійти можливу помилку типів TS, якщо визначення відстають
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { body: responseBody } = await (ordersController as any).ordersCreate(payload);
+
+        // Парсимо відповідь
+        const orderData = typeof responseBody === 'string' ? JSON.parse(responseBody) : responseBody;
+
+        // ВАЖЛИВО: Повертаємо тільки ID замовлення, як очікує React SDK
+        return NextResponse.json({ id: orderData.id });
+
+      } catch (paypalError: any) {
+        console.error('PayPal API Error details:', JSON.stringify(paypalError, null, 2));
+        // Повертаємо деталі помилки для фронтенду
+        return NextResponse.json(
+            { error: 'PayPal creation failed', details: paypalError.message }, 
+            { status: 500 }
+        );
+      }
     }
 
-    // === MONOBANK ЛОГІКА ===
+    // === MONOBANK ЛОГІКА (Без змін) ===
     else {
-        const amountInCents = Math.round(Number(amountUAH) * 100);
-        const productsNames = items.map((i: any) => `${i.title} x${i.quantity}`).join(', ').substring(0, 250);
+      const amountInCents = Math.round(Number(amountUAH) * 100);
+      const productsNames = items.map((i: any) => `${i.title} x${i.quantity}`).join(', ').substring(0, 250);
 
-        const invoiceData = await createMonoInvoice({
-            order_id: uniqueOrderId,
-            amount: amountInCents,
-            ccy: 980, 
-            redirectUrl: `${BASE_URL}/order/result?source=monobank&orderId=${uniqueOrderId}`,
-            webHookUrl: `${BASE_URL}/api/payment-webhook`,
-            productName: productsNames || 'Payment for order',
-        });
+      const invoiceData = await createMonoInvoice({
+        order_id: uniqueOrderId,
+        amount: amountInCents,
+        ccy: 980,
+        redirectUrl: `${BASE_URL}/order/result?source=monobank&orderId=${uniqueOrderId}`,
+        webHookUrl: `${BASE_URL}/api/payment-webhook`,
+        productName: productsNames || 'Payment for order',
+      });
 
-        return NextResponse.json({ payment_url: invoiceData.pageUrl });
+      // Для Monobank ми повертаємо URL, бо там редірект, а не popup
+      return NextResponse.json({ payment_url: invoiceData.pageUrl });
     }
 
   } catch (error: any) {

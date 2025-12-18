@@ -11,7 +11,7 @@
   "dependencies": {
     "@next/bundle-analyzer": "^16.0.4",
     "@next/third-parties": "^16.0.5",
-    "@paypal/checkout-server-sdk": "^1.0.3",
+    "@paypal/paypal-server-sdk": "^2.1.0",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
     "@radix-ui/react-select": "^2.2.6",

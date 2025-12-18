@@ -1,20 +1,24 @@
-import checkoutNodeJssdk from '@paypal/checkout-server-sdk';
+import { Client, Environment, LogLevel } from '@paypal/paypal-server-sdk';
 
-const configureEnvironment = function () {
-  const clientId = process.env.PAYPAL_CLIENT_ID || '';
-  const clientSecret = process.env.PAYPAL_CLIENT_SECRET || '';
-  const envName = process.env.PAYPAL_ENVIRONMENT;
-
-  // Debugging log (Remove in production!)
-  console.log(`[PayPal] Init: ${envName === 'sandbox' ? 'SANDBOX' : 'LIVE'}, ClientID starts with: ${clientId.substring(0, 4)}...`);
-
-  return envName === 'sandbox'
-    ? new checkoutNodeJssdk.core.SandboxEnvironment(clientId, clientSecret)
-    : new checkoutNodeJssdk.core.LiveEnvironment(clientId, clientSecret);
+const configureEnvironment = () => {
+  if (process.env.PAYPAL_ENVIRONMENT === 'sandbox') {
+    return Environment.Sandbox;
+  }
+  return Environment.Production;
 };
 
-const client = function () {
-  return new checkoutNodeJssdk.core.PayPalHttpClient(configureEnvironment());
-};
+const client = new Client({
+  clientCredentialsAuthCredentials: {
+    oAuthClientId: process.env.PAYPAL_CLIENT_ID || '',
+    oAuthClientSecret: process.env.PAYPAL_CLIENT_SECRET || '',
+  },
+  timeout: 0,
+  environment: configureEnvironment(),
+  logging: {
+    logLevel: LogLevel.Info,
+    logRequest: { logBody: true },
+    logResponse: { logHeaders: true },
+  },
+});
 
 export default client;
