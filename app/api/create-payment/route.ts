@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { createMonoInvoice } from '../../lib/monobank'; // Імпорт нової функції
+import { createMonoInvoice } from '../../lib/monobank'; 
 import paypalClient from '../../lib/paypal';
 import paypal from '@paypal/checkout-server-sdk';
 
@@ -48,7 +48,7 @@ export async function POST(req: Request) {
     
     await supabaseAdmin.from('order_items').insert(orderItemsData);
 
-    // === PAYPAL ЛОГІКА (залишаємо без змін) ===
+    // === PAYPAL ЛОГІКА ===
     if (method === 'paypal') {
         const request = new paypal.orders.OrdersCreateRequest();
         request.prefer("return=representation");
@@ -63,25 +63,29 @@ export async function POST(req: Request) {
                 cancel_url: `${BASE_URL}/order?status=cancelled`
             }
         });
-        const order = await paypalClient().execute(request);
-        const approveLink = order.result.links.find((link: any) => link.rel === 'approve').href;
-        return NextResponse.json({ payment_url: approveLink });
+
+        // ОСЬ ТУТ МИ ВСТАВИЛИ НОВИЙ БЛОК З ОБРОБКОЮ ПОМИЛОК
+        try {
+            const order = await paypalClient().execute(request);
+            const approveLink = order.result.links.find((link: any) => link.rel === 'approve').href;
+            return NextResponse.json({ payment_url: approveLink });
+        } catch (paypalError: any) {
+            console.error('PayPal API Error details:', JSON.stringify(paypalError, null, 2));
+            throw new Error('PayPal creation failed: ' + paypalError.message);
+        }
     }
 
-    // === MONOBANK ЛОГІКА (Замість Fondy) ===
+    // === MONOBANK ЛОГІКА ===
     else {
-        // Monobank приймає суму в копійках (для UAH code 980)
         const amountInCents = Math.round(Number(amountUAH) * 100);
-        
-        // Формуємо опис замовлення (для чека)
         const productsNames = items.map((i: any) => `${i.title} x${i.quantity}`).join(', ').substring(0, 250);
 
         const invoiceData = await createMonoInvoice({
             order_id: uniqueOrderId,
             amount: amountInCents,
-            ccy: 980, // UAH
-            redirectUrl: `${BASE_URL}/order/result?source=monobank&orderId=${uniqueOrderId}`, // Користувач повернеться сюди
-            webHookUrl: `${BASE_URL}/api/payment-webhook`, // Monobank "стукне" сюди про успіх
+            ccy: 980, 
+            redirectUrl: `${BASE_URL}/order/result?source=monobank&orderId=${uniqueOrderId}`,
+            webHookUrl: `${BASE_URL}/api/payment-webhook`,
             productName: productsNames || 'Payment for order',
         });
 
