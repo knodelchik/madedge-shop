@@ -3,18 +3,24 @@ import ProductClient from './ProductClient';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 
-// 1. Змінюємо тип Props - params тепер Promise
 type Props = {
   params: Promise<{ slug: string }>;
 };
 
-// 2. Виправляємо generateMetadata
+// Функція для нормалізації рядків при порівнянні
+function normalizeSlug(text: string) {
+  return text.replace(/\s+/g, '-').toLowerCase();
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params; // <--- Очікуємо params
+  const { slug } = await params;
+  
+  // 1. Декодуємо URL (hinge-360%C2%B0 -> hinge-360°)
+  const decodedSlug = decodeURIComponent(slug);
 
   const products = await productsService.getAllProducts();
   const product = products.find(
-    (p) => p.title.replace(/\s+/g, '-').toLowerCase() === slug
+    (p) => normalizeSlug(p.title) === decodedSlug
   );
 
   if (!product) return { title: 'Product Not Found' };
@@ -26,22 +32,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-// 3. Виправляємо компонент сторінки
 export default async function ProductPage({ params }: Props) {
-  const { slug } = await params; // <--- Очікуємо params
+  const { slug } = await params;
+
+  // 1. Декодуємо URL
+  const decodedSlug = decodeURIComponent(slug);
 
   const products = await productsService.getAllProducts();
 
-  // Шукаємо продукт на сервері
+  // 2. Шукаємо продукт за декодованим слагом
   const product = products.find(
-    (p) => p.title.replace(/\s+/g, '-').toLowerCase() === slug
+    (p) => normalizeSlug(p.title) === decodedSlug
   );
 
-  // Якщо не знайшли - віддаємо 404
   if (!product) {
     notFound();
   }
 
-  // Передаємо готовий продукт клієнту
   return <ProductClient product={product} />;
 }

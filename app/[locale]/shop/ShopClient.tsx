@@ -3,15 +3,14 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import Image from 'next/image';
-import dynamic from 'next/dynamic'; // Потрібно для оптимізації MagnetLines
+import dynamic from 'next/dynamic';
 import { Product } from '../../types/products';
 import WishlistButton from '../../Components/WishlistButton';
 import Price from '@/app/Components/Price';
 
 // ОПТИМІЗАЦІЯ 1: Динамічний імпорт MagnetLines.
-// ssr: false гарантує, що важкий JS для анімації не гальмуватиме генерацію HTML.
 const MagnetLines = dynamic(() => import('../../../components/MagnetLines'), {
   ssr: false,
 });
@@ -27,14 +26,14 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
   const searchParams = useSearchParams();
   const urlCategory = searchParams.get('category') as Category | null;
 
-  // Ініціалізуємо стан одразу, без зайвих ефектів
+  // Ініціалізуємо стан одразу
   const [activeCategory, setActiveCategory] = useState<Category>(
     urlCategory && ['sharpeners', 'stones', 'accessories'].includes(urlCategory)
       ? urlCategory
       : 'all'
   );
 
-  // Синхронізація з URL при навігації назад/вперед
+  // Синхронізація з URL
   useEffect(() => {
     if (
       urlCategory &&
@@ -74,7 +73,7 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
             {t('heroSubtitle')}
           </p>
 
-          {/* Кнопки фільтрації (ваша верстка) */}
+          {/* Кнопки фільтрації */}
           <div className="relative w-full flex flex-col items-center gap-3 sm:gap-4">
             {/* Мобільна версія */}
             <div className="md:hidden w-full max-w-md px-4">
@@ -92,9 +91,9 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
                     {cat === 'all'
                       ? t('allProducts')
                       : t(
-                          cat === 'knifeSharpeners'
+                          cat === 'sharpeners' // Виправлено ключі перекладу відповідно до типу Category
                             ? 'knifeSharpeners'
-                            : cat === 'grindingStones'
+                            : cat === 'stones'
                             ? 'grindingStones'
                             : cat
                         )}
@@ -106,7 +105,6 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
             {/* Desktop версія */}
             <div className="hidden md:block relative w-full">
               <div className="relative w-full flex justify-center">
-                {/* Тут ваші десктопні кнопки, залишив структуру */}
                 <button
                   onClick={() => setActiveCategory('stones')}
                   className={`px-6 py-3 rounded-xl font-semibold transition shadow-lg cursor-pointer ${
@@ -161,7 +159,6 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
               <ProductCard
                 key={product.id}
                 product={product}
-                // ОПТИМІЗАЦІЯ 3: Priority для перших 4 зображень. Це покращить LCP.
                 priority={index < 4}
               />
             ))}
@@ -186,7 +183,7 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
   );
 }
 
-// Компонент картки (вбудований сюди для зручності, але краще винести в окремий файл)
+// Компонент картки з локалізацією
 function ProductCard({
   product,
   priority = false,
@@ -194,7 +191,12 @@ function ProductCard({
   product: Product;
   priority?: boolean;
 }) {
+  const locale = useLocale();
   const [isHovered, setIsHovered] = useState(false);
+
+  // Визначаємо яку назву показувати
+  const displayTitle =
+    locale === 'uk' && product.title_uk ? product.title_uk : product.title;
 
   const mainImage =
     product.images && product.images.length > 0
@@ -222,22 +224,24 @@ function ProductCard({
         />
       </div>
 
+      {/* ВАЖЛИВО: Для лінку ми використовуємо оригінальний product.title (зазвичай англійський),
+        щоб slug URL залишався стабільним і відповідав базі даних.
+        Якщо ви хочете локалізовані URL, це потребує змін у page.tsx, який шукає товар.
+      */}
       <Link
         href={`/shop/${product.title.replace(/\s+/g, '-').toLowerCase()}`}
         className="w-full"
       >
         <div className="flex flex-col items-center w-full">
           <div className="relative w-full h-48 sm:h-56 md:h-64 rounded-xl sm:rounded-2xl overflow-hidden shadow-lg bg-white">
-            {/* Використовуємо Image з Next.js правильно */}
             <Image
               src={mainImage}
-              alt={product.title}
-              fill // Замість width/height використовуємо fill для адаптивності
+              alt={displayTitle} // Локалізований alt
+              fill
               sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 25vw"
-              priority={priority} // Важливий проп для LCP
+              priority={priority}
               className="object-contain group-hover:opacity-90 transition duration-300"
               onError={(e) => {
-                // Трюк для fallback image, але краще обробляти це на рівні даних
                 const target = e.target as HTMLImageElement;
                 target.src = '/images/placeholder.jpg';
               }}
@@ -246,7 +250,7 @@ function ProductCard({
 
           <div className="flex justify-between items-center mt-2 sm:mt-3 w-full px-1 sm:px-2">
             <h3 className="text-base sm:text-lg font-bold text-gray-800 line-clamp-2 dark:text-neutral-200">
-              {product.title}
+              {displayTitle} {/* Локалізована назва */}
             </h3>
             <p className="text-xs sm:text-sm font-semibold text-gray-600 whitespace-nowrap ml-2 dark:text-neutral-400">
               <Price amount={product.price} />

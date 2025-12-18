@@ -460,7 +460,7 @@ const subtotalUSD = cartItems.reduce((sum, item) => sum + item.price * item.quan
                     }`}
                     onClick={() => setPaymentMethod('fondy')}
                   >
-                    Monobank
+                    plata
                   </button>
                   <button
                     className={`px-2 py-3 lg:px-4 rounded-xl border-2 font-medium transition-all text-sm ${

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useCartStore } from '../../store/cartStore';
 import QuantityCounter from '@/app/Components/QuantityCounter';
 import WishlistButton from '@/app/Components/WishlistButton';
@@ -18,7 +18,8 @@ interface ProductClientProps {
 
 export default function ProductClient({ product }: ProductClientProps) {
   const t = useTranslations('ProductPage');
-  const tCart = useTranslations('CartSheet'); // <--- 1. ДОДАНО: Переклади для кошика
+  const tCart = useTranslations('CartSheet');
+  const locale = useLocale();
   const searchParams = useSearchParams();
   const from = searchParams.get('from');
 
@@ -33,23 +34,32 @@ export default function ProductClient({ product }: ProductClientProps) {
     itemInCart ? itemInCart.quantity : 1
   );
 
+  // --- ЛОКАЛІЗАЦІЯ ДАНИХ ---
+  const displayTitle =
+    locale === 'uk' && product.title_uk ? product.title_uk : product.title;
+
+  const displayDescription =
+    locale === 'uk' && product.description_uk
+      ? product.description_uk
+      : product.description;
+
   const handleAddToCart = () => {
-    // Локальна перевірка поточної вибраної кількості
     if (quantity > maxAvailable) {
       toast.error(t('stockLimitError', { max: maxAvailable }));
       return;
     }
 
-    // <--- 2. ЗМІНЕНО: Передаємо tCart, щоб store міг показати перекладену помилку,
-    // якщо сума (в кошику + нова) перевищить ліміт
-    addToCart({ ...product, quantity }, tCart);
+    // Ми модифікуємо об'єкт product, щоб в кошику відображалась
+    // правильна назва поточною мовою.
+    const localizedProduct = {
+      ...product,
+      title: displayTitle, // Підміняємо title на локалізований для кошика
+    };
 
-    // Примітка: Цей toast успіху покажеться, навіть якщо store заблокує додавання (через throw Error).
-    // Якщо ви хочете ідеальну синхронізацію, краще щоб store сам показував успіх,
-    // або перевіряти стан кошика. Але для базової реалізації це ок,
-    // оскільки store покаже toast.error поверх цього, якщо буде помилка.
+    addToCart({ ...localizedProduct, quantity }, tCart);
+
     toast.success(t('addToCartSuccess'), {
-      description: product.title,
+      description: displayTitle,
     });
   };
 
@@ -79,13 +89,14 @@ export default function ProductClient({ product }: ProductClientProps) {
 
         <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 md:p-8 dark:bg-neutral-800">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+            {/* ГАЛЕРЕЯ ЗОБРАЖЕНЬ */}
             <div className="space-y-3 sm:space-y-4">
               <div className="relative w-full flex items-center justify-center bg-gray-100 rounded-xl sm:rounded-2xl p-3 sm:p-4 dark:bg-white overflow-hidden h-64 sm:h-72 md:h-80">
                 <Image
                   src={
                     product.images[currentImage] || '/images/placeholder.jpg'
                   }
-                  alt={product.title}
+                  alt={displayTitle}
                   fill
                   className={`object-contain p-2 ${
                     isOutOfStock ? 'grayscale opacity-70' : ''
@@ -145,10 +156,11 @@ export default function ProductClient({ product }: ProductClientProps) {
               )}
             </div>
 
+            {/* ІНФОРМАЦІЯ ПРО ТОВАР */}
             <div className="space-y-4 sm:space-y-6 dark:bg-neutral-800">
               <div>
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4 dark:text-white">
-                  {product.title}
+                  {displayTitle}
                 </h1>
                 <div className="flex items-center gap-4">
                   <p className="text-xl sm:text-2xl font-semibold text-gray-700 dark:text-neutral-200">
@@ -167,11 +179,11 @@ export default function ProductClient({ product }: ProductClientProps) {
                 </div>
               </div>
 
-              {product.description && (
+              {displayDescription && (
                 <div className="prose max-w-none">
                   <div
                     className="text-sm sm:text-base text-gray-600 leading-relaxed dark:text-neutral-400"
-                    dangerouslySetInnerHTML={{ __html: product.description }}
+                    dangerouslySetInnerHTML={{ __html: displayDescription }}
                   />
                 </div>
               )}

@@ -22,10 +22,12 @@ export default function ProductForm({
 
   const [formData, setFormData] = useState({
     title: product?.title || '',
+    title_uk: product?.title_uk || '', // Додано
     price: product?.price || '',
     stock: product?.stock || 0,
     category: product?.category || 'sharpeners',
     description: product?.description || '',
+    description_uk: product?.description_uk || '', // Додано
   });
 
   const [images, setImages] = useState<string[]>(
@@ -40,11 +42,10 @@ export default function ProductForm({
     if (!files || files.length === 0) return;
 
     setUploading(true);
-    const newImages: string[] = [];
 
     try {
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
+      // Створюємо масив промісів для паралельного завантаження
+      const uploadPromises = Array.from(files).map(async (file) => {
         const fileExt = file.name.split('.').pop();
         const fileName = `${Date.now()}-${Math.random()
           .toString(36)
@@ -60,17 +61,23 @@ export default function ProductForm({
         const { data } = supabase.storage
           .from('products')
           .getPublicUrl(filePath);
-        newImages.push(data.publicUrl);
-      }
 
-      setImages((prev) => [...prev, ...newImages]);
-      toast.success('Фото успішно завантажено');
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return data.publicUrl;
+      });
+
+      // Чекаємо завершення всіх завантажень
+      const uploadedUrls = await Promise.all(uploadPromises);
+
+      // Оновлюємо стан всіма новими посиланнями одразу
+      setImages((prev) => [...prev, ...uploadedUrls]);
+      toast.success(`Успішно завантажено фото: ${uploadedUrls.length}`);
     } catch (error: any) {
       console.error('Upload error:', error);
-      toast.error('Помилка завантаження фото');
+      toast.error('Помилка завантаження фото. Спробуйте менші файли.');
     } finally {
       setUploading(false);
+      // Очищуємо input, щоб можна було завантажити ті самі файли повторно, якщо треба
+      e.target.value = '';
     }
   };
 
@@ -102,10 +109,12 @@ export default function ProductForm({
 
       const productData = {
         title: formData.title,
+        title_uk: formData.title_uk, // Додано до відправки
         price: parseFloat(formData.price),
         stock: parseInt(formData.stock.toString()),
         category: formData.category,
         description: formData.description,
+        description_uk: formData.description_uk, // Додано до відправки
         images: images,
         updated_at: new Date().toISOString(),
       };
@@ -149,7 +158,7 @@ export default function ProductForm({
           Фотографії ({images.length})
         </label>
 
-        {/* Адаптивна сітка: 3 колонки на моб, 4 на десктопі */}
+        {/* Адаптивна сітка */}
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
           {images.map((url, index) => (
             <div
@@ -164,14 +173,12 @@ export default function ProductForm({
                 sizes="100px"
               />
 
-              {/* Позначка головного фото */}
               {index === 0 && (
                 <div className="absolute top-1 left-1 bg-green-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm z-10">
                   MAIN
                 </div>
               )}
 
-              {/* Кнопки управління (появляються при наведенні або завжди на тачскрінах) */}
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                 {index !== 0 && (
                   <button
@@ -195,7 +202,6 @@ export default function ProductForm({
             </div>
           ))}
 
-          {/* Кнопка додавання */}
           <label className="relative aspect-square rounded-lg border-2 border-dashed border-gray-300 dark:border-neutral-700 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all group">
             {uploading ? (
               <Loader2 className="animate-spin text-blue-500" />
@@ -224,26 +230,41 @@ export default function ProductForm({
 
       {/* === ПОЛЯ ВВОДУ === */}
       <div className="space-y-4">
-        {/* Назва */}
-        <div>
-          <label className="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">
-            Назва товару
-          </label>
-          <input
-            type="text"
-            required
-            placeholder="Наприклад: Stone Holder PRO"
-            value={formData.title}
-            onChange={(e) =>
-              setFormData({ ...formData, title: e.target.value })
-            }
-            className="w-full px-3 py-2.5 border border-gray-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 focus:ring-2 focus:ring-black dark:focus:ring-white outline-none transition-all"
-          />
+        {/* Назва (Multilingual) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">
+              Назва товару (EN) <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              required
+              placeholder="Stone Holder PRO"
+              value={formData.title}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
+              className="w-full px-3 py-2.5 border border-gray-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 focus:ring-2 focus:ring-black dark:focus:ring-white outline-none transition-all"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">
+              Назва товару (UK)
+            </label>
+            <input
+              type="text"
+              placeholder="Тримач каменів PRO"
+              value={formData.title_uk}
+              onChange={(e) =>
+                setFormData({ ...formData, title_uk: e.target.value })
+              }
+              className="w-full px-3 py-2.5 border border-gray-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 focus:ring-2 focus:ring-black dark:focus:ring-white outline-none transition-all"
+            />
+          </div>
         </div>
 
-        {/* Адаптивний рядок: Ціна та Сток */}
-        {/* grid-cols-1 на моб (один під одним), grid-cols-2 на sm+ (поруч) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Ціна, Сток, Категорія */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">
               Ціна ($)
@@ -267,7 +288,7 @@ export default function ProductForm({
           </div>
           <div>
             <label className="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">
-              Кількість (Stock)
+              Сток (шт)
             </label>
             <input
               type="number"
@@ -284,61 +305,74 @@ export default function ProductForm({
               className="w-full px-3 py-2.5 border border-gray-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 focus:ring-2 focus:ring-black dark:focus:ring-white outline-none transition-all"
             />
           </div>
-        </div>
-
-        {/* Категорія */}
-        <div>
-          <label className="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">
-            Категорія
-          </label>
-          <div className="relative">
-            <select
-              value={formData.category}
-              onChange={(e) =>
-                setFormData({ ...formData, category: e.target.value })
-              }
-              className="w-full px-3 py-2.5 border border-gray-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 focus:ring-2 focus:ring-black dark:focus:ring-white outline-none appearance-none transition-all cursor-pointer"
-            >
-              <option value="sharpeners">Sharpeners (Точила)</option>
-              <option value="stones">Stones (Камені)</option>
-              <option value="accessories">Accessories (Аксесуари)</option>
-            </select>
-            {/* Стрілочка для селекта */}
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+          <div>
+            <label className="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">
+              Категорія
+            </label>
+            <div className="relative">
+              <select
+                value={formData.category}
+                onChange={(e) =>
+                  setFormData({ ...formData, category: e.target.value })
+                }
+                className="w-full px-3 py-2.5 border border-gray-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 focus:ring-2 focus:ring-black dark:focus:ring-white outline-none appearance-none transition-all cursor-pointer"
               >
-                <path d="m6 9 6 6 6-6" />
-              </svg>
+                <option value="sharpeners">Sharpeners</option>
+                <option value="stones">Stones</option>
+                <option value="accessories">Accessories</option>
+              </select>
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Опис */}
-        <div>
-          <label className="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">
-            Опис
-          </label>
-          <textarea
-            rows={5}
-            placeholder="Детальний опис товару..."
-            value={formData.description}
-            onChange={(e) =>
-              setFormData({ ...formData, description: e.target.value })
-            }
-            className="w-full px-3 py-2.5 border border-gray-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 focus:ring-2 focus:ring-black dark:focus:ring-white outline-none transition-all resize-y"
-          />
+        {/* Опис (Multilingual) */}
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">
+              Опис (EN)
+            </label>
+            <textarea
+              rows={4}
+              placeholder="Product description in English..."
+              value={formData.description}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+              className="w-full px-3 py-2.5 border border-gray-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 focus:ring-2 focus:ring-black dark:focus:ring-white outline-none transition-all resize-y"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">
+              Опис (UK)
+            </label>
+            <textarea
+              rows={4}
+              placeholder="Опис товару українською..."
+              value={formData.description_uk}
+              onChange={(e) =>
+                setFormData({ ...formData, description_uk: e.target.value })
+              }
+              className="w-full px-3 py-2.5 border border-gray-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 focus:ring-2 focus:ring-black dark:focus:ring-white outline-none transition-all resize-y"
+            />
+          </div>
         </div>
       </div>
 
-      {/* === КНОПКИ ДІЙ (Sticky Bottom на мобільному для зручності) === */}
+      {/* === КНОПКИ ДІЙ === */}
       <div className="flex justify-end gap-3 pt-4 border-t dark:border-neutral-800">
         <button
           type="button"
