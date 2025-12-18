@@ -96,13 +96,17 @@ export async function POST(req: Request) {
         return NextResponse.json({ id: orderData.id });
 
       } catch (paypalError: any) {
-        console.error('PayPal API Error details:', JSON.stringify(paypalError, null, 2));
-        // Повертаємо деталі помилки для фронтенду
-        return NextResponse.json(
-            { error: 'PayPal creation failed', details: paypalError.message }, 
-            { status: 500 }
-        );
-      }
+    // ЗМІНЕНО: Виводимо об'єкт помилки напряму, а не через JSON.stringify
+    console.error('PayPal API Error Full Object:', paypalError); 
+    console.error('PayPal Error Message:', paypalError.message); // Виводимо текст помилки
+    
+    if (paypalError.statusCode) {
+         console.error('PayPal Status Code:', paypalError.statusCode); // Код відповіді (400, 401, etc.)
+         console.error('PayPal Response Body:', paypalError._originalError?.text || paypalError.message);
+    }
+
+    throw new Error('PayPal creation failed: ' + paypalError.message);
+}
     }
 
     // === MONOBANK ЛОГІКА (Без змін) ===
