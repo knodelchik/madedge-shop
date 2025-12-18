@@ -1,10 +1,9 @@
 // app/lib/paypal.ts
 
-const { PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET, PAYPAL_ENVIRONMENT } = process.env;
+const { PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET, PAYPAL_ENVIRONMENT, NEXT_PUBLIC_PAYPAL_CLIENT_ID } = process.env;
 
-// Визначаємо базовий URL: Sandbox або Production
-// Якщо змінна PAYPAL_ENVIRONMENT дорівнює 'production', використовуємо лайв, інакше - пісочницю
-export const PAYPAL_API_BASE = process.env.PAYPAL_ENVIRONMENT === 'production'
+// Логіка: Якщо явно написано 'production' -> Production API. В усіх інших випадках -> Sandbox API.
+export const PAYPAL_API_BASE = PAYPAL_ENVIRONMENT === 'production'
   ? 'https://api-m.paypal.com'
   : 'https://api-m.sandbox.paypal.com';
 
@@ -12,15 +11,18 @@ export const PAYPAL_API_BASE = process.env.PAYPAL_ENVIRONMENT === 'production'
  * Генерує Access Token для запитів до API
  */
 export async function generateAccessToken() {
-  // Шукаємо ключі. Підтримуємо і NEXT_PUBLIC версію для ID, якщо звичайної немає
-  const clientId = PAYPAL_CLIENT_ID || process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
+  // Пробуємо знайти Client ID у серверній змінній, якщо немає - беремо публічну
+  const clientId = PAYPAL_CLIENT_ID || NEXT_PUBLIC_PAYPAL_CLIENT_ID;
   const clientSecret = PAYPAL_CLIENT_SECRET;
 
   if (!clientId || !clientSecret) {
-    throw new Error("MISSING_API_CREDENTIALS: Перевірте PAYPAL_CLIENT_ID та PAYPAL_CLIENT_SECRET");
+    throw new Error("MISSING_CREDS: Відсутні PAYPAL_CLIENT_ID або PAYPAL_CLIENT_SECRET у змінних середовища.");
   }
 
+  // Кодуємо ключі у формат Basic Auth
   const auth = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
+
+  console.log(`🔌 Connecting to PayPal (${PAYPAL_ENVIRONMENT === 'production' ? 'Live' : 'Sandbox'})...`);
 
   const response = await fetch(`${PAYPAL_API_BASE}/v1/oauth2/token`, {
     method: "POST",
@@ -32,5 +34,12 @@ export async function generateAccessToken() {
   });
 
   const data = await response.json();
+
+  // ПЕРЕВІРКА ПОМИЛКИ: Якщо PayPal відмовив в авторизації (напр. неправильні ключі)
+  if (!response.ok) {
+    console.error("❌ PayPal Token Error:", data);
+    throw new Error(`PayPal Auth Failed: ${data.error_description || data.error || response.statusText}`);
+  }
+
   return data.access_token;
 }
