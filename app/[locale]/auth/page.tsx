@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation'; // Додано useSearchParams
 import AuthForm from '../../Components/AuthForm';
 import { motion, AnimatePresence } from 'framer-motion';
 import { authService } from '../services/authService';
@@ -10,14 +10,27 @@ import { useTranslations } from 'next-intl';
 import { ArrowLeft, KeyRound } from 'lucide-react';
 
 export default function AuthPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Перевіряємо URL параметр ?view=signup
+  const initialView =
+    searchParams.get('view') === 'signup' ? 'signup' : 'signin';
+
   const [authType, setAuthType] = useState<
     'signin' | 'signup' | 'forgot-password'
-  >('signin');
+  >(initialView);
+
   const [emailForReset, setEmailForReset] = useState('');
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
-  // Використовуємо namespace 'Auth' з вашого об'єкта перекладів
+  // Оновлюємо стан, якщо змінюється URL (наприклад, при навігації назад/вперед)
+  useEffect(() => {
+    const view = searchParams.get('view');
+    if (view === 'signup') setAuthType('signup');
+    else if (view === 'signin') setAuthType('signin');
+  }, [searchParams]);
+
   const t = useTranslations('Auth');
 
   const handleSuccess = () => {
@@ -25,7 +38,11 @@ export default function AuthPage() {
   };
 
   const toggleAuthType = () => {
-    setAuthType((prev) => (prev === 'signin' ? 'signup' : 'signin'));
+    // Змінюємо не тільки стейт, а й URL для зручності (опціонально)
+    const newType = authType === 'signin' ? 'signup' : 'signin';
+    setAuthType(newType);
+    // Можна оновлювати URL без перезавантаження, якщо хочете зберегти стан в історії
+    // router.replace(`?view=${newType}`);
   };
 
   // Логіка відновлення паролю
@@ -36,10 +53,8 @@ export default function AuthPage() {
     const { error } = await authService.resetPasswordForEmail(emailForReset);
 
     if (error) {
-      // 'errorPrefix': 'Помилка: '
       toast.error(t('errorPrefix') + error);
     } else {
-      // 'resetLinkSent': 'Посилання надіслано! Перевірте пошту.'
       toast.success(t('resetLinkSent'));
       setAuthType('signin');
       setEmailForReset('');
@@ -75,18 +90,17 @@ export default function AuthPage() {
                 transition={{ duration: 0.3 }}
                 className="p-8"
               >
+                {/* ... (код форми відновлення без змін) ... */}
                 <div className="flex justify-center mb-6">
                   <div className="p-3 bg-blue-50 dark:bg-neutral-800 rounded-full text-blue-600 dark:text-blue-400">
                     <KeyRound size={28} />
                   </div>
                 </div>
 
-                {/* 'forgotPasswordTitle': 'Забули пароль?' */}
                 <h2 className="text-2xl font-bold text-center mb-2 text-gray-900 dark:text-white">
                   {t('forgotPasswordTitle')}
                 </h2>
 
-                {/* 'forgotPasswordDesc': 'Введіть вашу електронну пошту...' */}
                 <p className="text-center text-gray-500 dark:text-gray-400 mb-6 text-sm">
                   {t('forgotPasswordDesc')}
                 </p>
@@ -99,7 +113,6 @@ export default function AuthPage() {
                     <input
                       id="reset-email"
                       type="email"
-                      // 'emailPlaceholder': 'name@example.com'
                       placeholder={t('emailPlaceholder')}
                       value={emailForReset}
                       onChange={(e) => setEmailForReset(e.target.value)}
@@ -113,7 +126,6 @@ export default function AuthPage() {
                     disabled={loading}
                     className="w-full bg-black dark:bg-white text-white dark:text-black font-bold py-3 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
                   >
-                    {/* 'sending': 'Надсилання...', 'sendResetLink': 'Надіслати посилання' */}
                     {loading ? t('sending') : t('sendResetLink')}
                   </button>
                 </form>
@@ -123,7 +135,6 @@ export default function AuthPage() {
                   className="w-full mt-6 flex items-center justify-center gap-2 text-sm text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors"
                 >
                   <ArrowLeft size={16} />
-                  {/* 'backToSignIn': 'Повернутися до входу' */}
                   {t('backToSignIn')}
                 </button>
               </motion.div>

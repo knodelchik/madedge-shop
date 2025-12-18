@@ -15,7 +15,7 @@ import {
   Globe,
   DollarSign,
   ChevronRight,
-  LayoutDashboard, // 1. Додано іконку
+  LayoutDashboard,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useTranslations, useLocale } from 'next-intl';
@@ -60,7 +60,6 @@ export default function BurgerMenu({
   useEffect(() => setMounted(true), []);
 
   const handleNavigation = (path: string) => {
-    // Haptic feedback для мобільних
     if (typeof navigator !== 'undefined' && navigator.vibrate) {
       navigator.vibrate(10);
     }
@@ -98,7 +97,6 @@ export default function BurgerMenu({
     } else {
       document.body.style.overflow = 'unset';
     }
-
     return () => {
       document.body.style.overflow = 'unset';
     };
@@ -122,15 +120,12 @@ export default function BurgerMenu({
 
       {isOpen && (
         <>
-          {/* Бекдроп */}
           <div
-            className="fixed inset-0 z-40 animate-in fade-in duration-300"
+            className="fixed inset-0 z-40 animate-in fade-in duration-300 bg-black/50"
             onClick={() => setIsOpen(false)}
           />
 
-          {/* Бічна панель меню */}
           <div className="fixed top-0 right-0 h-screen w-[80vw] max-w-sm bg-white dark:bg-neutral-900 shadow-2xl z-[999] border-l border-gray-200 dark:border-neutral-700 flex flex-col">
-            {/* Заголовок */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-neutral-700 flex-shrink-0">
               <h2 className="text-lg font-bold text-gray-800 dark:text-white">
                 {t('menu')}
@@ -144,9 +139,8 @@ export default function BurgerMenu({
               </button>
             </div>
 
-            {/* Контент з прокруткою */}
             <div className="flex-1 overflow-y-auto overscroll-contain">
-              {/* Інформація про користувача - КЛІКАБЕЛЬНА */}
+              {/* Інформація про користувача */}
               {user && (
                 <button
                   onClick={() => handleNavigation(`/${locale}/profile`)}
@@ -169,24 +163,21 @@ export default function BurgerMenu({
                 </button>
               )}
 
-              {/* Навігація з активним станом */}
+              {/* Навігація */}
               <div className="p-4 border-b border-gray-200 dark:border-neutral-700">
                 <h3 className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase mb-3 tracking-wide">
                   {t('sections.navigation')}
                 </h3>
                 <nav className="space-y-1">
-                  {/* 2. АДМІН ПАНЕЛЬ (Показується тільки якщо роль 'admin') */}
                   {user?.role === 'admin' && (
                     <button
                       onClick={() => handleNavigation(`/${locale}/admin`)}
                       className="w-full flex items-center p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors text-sm font-semibold active:scale-95 mb-2"
                     >
                       <LayoutDashboard className="h-4 w-4 mr-3" />
-                      {/* Переконайтеся, що ключ adminPanel є у ваших файлах перекладу, або замініть на текст */}
                       Адмін Панель
                     </button>
                   )}
-                  {/* Кінець блоку адмінки */}
 
                   {navigationItems.map((item) => {
                     const isActive = pathname === item.path;
@@ -207,7 +198,7 @@ export default function BurgerMenu({
                 </nav>
               </div>
 
-              {/* Швидкий доступ з лічильниками */}
+              {/* Швидкий доступ */}
               <div className="p-4 border-b border-gray-200 dark:border-neutral-700">
                 <h3 className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase mb-3 tracking-wide">
                   {t('sections.quickAccess')}
@@ -244,12 +235,12 @@ export default function BurgerMenu({
                 </div>
               </div>
 
-              {/* Налаштування */}
+              {/* Налаштування (Тема, Мова, Валюта) - без змін ... */}
               <div className="p-4 border-b border-gray-200 dark:border-neutral-700">
+                {/* ... код налаштувань ... */}
                 <h3 className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase mb-3 tracking-wide">
                   {t('sections.settings')}
                 </h3>
-
                 {/* Тема */}
                 <div className="mb-4">
                   <p className="text-xs font-medium text-black dark:text-white mb-2">
@@ -278,7 +269,7 @@ export default function BurgerMenu({
                         onClick={() => setTheme(themeOption.key)}
                         className={`flex-1 p-3 text-xs transition-colors flex items-center justify-center space-x-1 active:scale-95 ${
                           theme === themeOption.key
-                            ? 'bg-neutral-200 dark:bg-neutral-500/20 text-gray-900 dark:text-white font-semibold'
+                            ? 'bg-neutral-200 dark:dark:bg-neutral-500/20 text-gray-900 dark:text-white font-semibold'
                             : 'hover:bg-gray-100 dark:hover:bg-neutral-800 text-gray-600 dark:text-neutral-400'
                         }`}
                         title={themeOption.label}
@@ -341,7 +332,7 @@ export default function BurgerMenu({
                 </div>
               </div>
 
-              {/* Акаунт */}
+              {/* === АКАУНТ (ВИПРАВЛЕНО) === */}
               <div className="p-4 border-b border-gray-200 dark:border-neutral-700">
                 <h3 className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase mb-3 tracking-wide">
                   {t('sections.account')}
@@ -356,15 +347,20 @@ export default function BurgerMenu({
                   </button>
                 ) : (
                   <div className="space-y-2">
+                    {/* Кнопка Входу: веде просто на /auth */}
                     <button
-                      onClick={() => handleNavigation(`/${locale}/auth/signin`)}
+                      onClick={() => handleNavigation(`/${locale}/auth`)}
                       className="w-full flex items-center justify-center p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors text-gray-700 dark:text-neutral-200 text-sm active:scale-95 border border-gray-200 dark:border-neutral-700"
                     >
                       <User className="h-4 w-4 mr-2" />
                       {t('account.signIn')}
                     </button>
+
+                    {/* Кнопка Реєстрації: веде на /auth з параметром ?view=signup */}
                     <button
-                      onClick={() => handleNavigation(`/${locale}/auth/signup`)}
+                      onClick={() =>
+                        handleNavigation(`/${locale}/auth?view=signup`)
+                      }
                       className="w-full flex items-center justify-center p-3 rounded-lg bg-gradient-to-r from-neutral-200 to-neutral-300 text-neutral-700 dark:from-neutral-600 dark:to-neutral-800 dark:text-white transition-all text-sm font-medium active:scale-95"
                     >
                       {t('account.signUp')}
@@ -373,7 +369,6 @@ export default function BurgerMenu({
                 )}
               </div>
 
-              {/* Футер */}
               <div className="p-4 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-sm">
                 <p className="text-xs text-neutral-500 dark:text-neutral-400 text-center">
                   © {new Date().getFullYear()} {t('footer.copyright')}
