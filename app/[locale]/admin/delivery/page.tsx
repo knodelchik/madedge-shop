@@ -1,14 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/app/lib/supabase'; // 1. Використовуємо спільний клієнт з сесією
 import { Save, RefreshCw, Plus, Trash2, MapPin, Search } from 'lucide-react';
 import { toast } from 'sonner';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 export default function AdminDeliveryPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -79,11 +74,16 @@ export default function AdminDeliveryPage() {
           .eq('id', item.id)
       );
 
-      await Promise.all(updates);
+      const results = await Promise.all(updates);
+      
+      // Перевіряємо на помилки в результатах
+      const hasError = results.some(r => r.error);
+      if (hasError) throw new Error('Не вдалося оновити деякі записи');
+
       toast.success('Ціни оновлено успішно!');
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      toast.error('Помилка при збереженні');
+      toast.error('Помилка при збереженні: ' + (error.message || 'Невідома помилка'));
     } finally {
       setSaving(false);
     }
@@ -105,7 +105,7 @@ export default function AdminDeliveryPage() {
     ]);
 
     if (error) {
-      toast.error('Помилка: ' + error.message);
+      toast.error('Помилка додавання: ' + error.message);
     } else {
       toast.success('Країну додано!');
       setNewCountry({
@@ -125,11 +125,12 @@ export default function AdminDeliveryPage() {
       .from('delivery_settings')
       .delete()
       .eq('id', id);
+
     if (error) {
-      toast.error('Помилка видалення');
+      toast.error('Помилка видалення: ' + error.message);
     } else {
       setSettings((prev) => prev.filter((item) => item.id !== id));
-      toast.success('Видалено');
+      toast.success('Країну видалено');
     }
   };
 
@@ -214,7 +215,6 @@ export default function AdminDeliveryPage() {
             <input
               type="number"
               placeholder="0"
-              // ЛОГІКА ДЛЯ ФОРМИ ДОДАВАННЯ:
               value={
                 newCountry.standard_price === 0 ? '' : newCountry.standard_price
               }
@@ -305,8 +305,6 @@ export default function AdminDeliveryPage() {
                       <input
                         type="number"
                         placeholder="0"
-                        // ЛОГІКА ДЛЯ ТАБЛИЦІ:
-                        // Показуємо пустий рядок, якщо значення 0
                         value={
                           item.standard_price === 0 ? '' : item.standard_price
                         }

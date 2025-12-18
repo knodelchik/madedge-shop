@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/app/lib/supabase'; // Використовуємо спільний клієнт
 import { Trash2, Plus, Search, Edit } from 'lucide-react';
 import Image from 'next/image';
+import { toast } from 'sonner';
 import {
   Sheet,
   SheetContent,
@@ -11,11 +12,6 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import ProductForm from '@/app/[locale]/admin/ProductForm';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 export default function AdminProductsPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -50,8 +46,19 @@ export default function AdminProductsPage() {
 
     if (!error) {
       setProducts(products.filter((p) => p.id !== id));
+      toast.success('Товар успішно видалено');
     } else {
-      alert('Помилка видалення');
+      console.error('Delete error:', error);
+      
+      // Обробка помилки зв'язків (Foreign Key)
+      if (error.code === '23503') {
+        alert(
+          'Неможливо видалити товар, оскільки він є частиною існуючих замовлень або кошиків. ' +
+          'Щоб приховати його з магазину, краще встановіть "Stock" на 0.'
+        );
+      } else {
+        toast.error(`Помилка видалення: ${error.message}`);
+      }
     }
   };
 
@@ -111,7 +118,6 @@ export default function AdminProductsPage() {
         />
       </div>
 
-      {/* Виправлено помилку Hydration: прибрано коментарі всередині table */}
       <div className="bg-white dark:bg-neutral-900 rounded-xl shadow border border-gray-100 dark:border-neutral-800 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left min-w-[700px]">
@@ -120,7 +126,7 @@ export default function AdminProductsPage() {
                 <th className="p-4 w-24">Фото</th>
                 <th className="p-4">Назва</th>
                 <th className="p-4 w-32">Ціна</th>
-                <th className="p-4 w-24">Сток</th>
+                <th className="p-4 w-24">Stock</th>
                 <th className="p-4 w-32">Категорія</th>
                 <th className="p-4 text-right w-24">Дії</th>
               </tr>
