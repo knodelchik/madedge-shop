@@ -10,24 +10,33 @@ export async function POST(req: Request) {
     const body = await req.json();
     console.log('Monobank Webhook:', body);
 
-    // Monobank надсилає таку структуру:
+    // Monobank надсилає таку структуру (приклад):
     // {
-    //   invoiceId: "...",
-    //   status: "success", (або "created", "processing", "failure")
-    //   amount: 100,
+    //   invoiceId: "pOrN7...",
+    //   status: "success",
+    //   amount: 415000,
     //   ccy: 980,
-    //   reference: "order_12345...",  <-- Це наш ID замовлення
-    //   modifiedDate: "..."
+    //   reference: "order_173...",  <-- ID замовлення
+    //   createdDate: "2024-...",
+    //   modifiedDate: "2024-..."
     // }
 
     const { status, reference } = body;
 
+    // Створюємо об'єкт для оновлення.
+    // Зберігаємо весь body від Монобанку в payment_result
+    const updateData: any = {
+      status: status === 'success' ? 'paid' : status === 'failure' ? 'failed' : 'pending', // Краще використовувати 'paid' замість 'success', щоб було як у PayPal
+      payment_result: body, // <--- ОСЬ ТУТ МИ ЗБЕРІГАЄМО ДАНІ
+      updated_at: new Date().toISOString()
+    };
+
     if (status === 'success') {
-      // 1. Оновлюємо статус замовлення
+      // 1. Оновлюємо статус замовлення та записуємо результат
       const { error } = await supabaseAdmin
         .from('orders')
-        .update({ status: 'success' })
-        .eq('id', reference); // reference дорівнює нашому uniqueOrderId
+        .update(updateData)
+        .eq('id', reference);
 
       if (error) {
           console.error('Error updating order status:', error);
@@ -58,13 +67,13 @@ export async function POST(req: Request) {
         }
       }
     } else if (status === 'failure') {
+        // Якщо помилка, теж зберігаємо інфо, чому не вийшло
         await supabaseAdmin
             .from('orders')
-            .update({ status: 'failure' })
+            .update(updateData)
             .eq('id', reference);
     }
 
-    // Monobank очікує 200 OK
     return NextResponse.json({ status: 'ok' });
 
   } catch (error: any) {
