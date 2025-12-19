@@ -508,7 +508,8 @@
     "errorDeliveryUnavailable": "Доставка цього типу недоступна у ваш регіон",
     "errorPaymentLink": "Не вдалося отримати посилання на оплату",
     "errorServer": "Помилка з'єднання з сервером",
-    "quantityLabel": "Кількість"
+    "quantityLabel": "Кількість",
+    "paymentPromo": "Оплата карткою будь-якого банку. <line><bold>Apple Pay</bold> та <bold>Google Pay</bold> доступні.</line>"
   },
   "OrderResult": {
     "processingPayment": "Обробка платежу...",

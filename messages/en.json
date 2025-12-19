@@ -511,7 +511,8 @@
     "errorDeliveryUnavailable": "This delivery type is unavailable for your region",
     "errorPaymentLink": "Failed to get payment link",
     "errorServer": "Server connection error",
-    "quantityLabel": "Quantity"
+    "quantityLabel": "Quantity",
+    "paymentPromo": "Payment by card of any bank. <line><bold>Apple Pay</bold> and <bold>Google Pay</bold> available.</line>"
   },
   "OrderResult": {
     "successTitle": "Thank you for your order!",
