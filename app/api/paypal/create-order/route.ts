@@ -1,6 +1,6 @@
+// app/api/paypal/create-order/route.ts
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-// Переконайтеся, що ви оновили lib/paypal.ts за попередньою інструкцією
 import { generateAccessToken, PAYPAL_API_BASE } from '../../../lib/paypal';
 
 const supabaseAdmin = createClient(
@@ -13,21 +13,68 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { amountUSD, items, shippingAddress, shippingCost, shippingType } = body;
+    // Ігноруємо amountUSD, який прийшов з фронтенду
+    const { items, shippingAddress, shippingType } = body;
 
-    // Валідація
-    if (!amountUSD || !items || !shippingAddress) {
+    if (!items || !items.length || !shippingAddress) {
       return NextResponse.json({ error: 'Відсутні обов\'язкові дані' }, { status: 400 });
     }
 
+    // --- 🛡️ SECURITY CALCULATION ---
+    
+    // 1. Отримуємо товари з БД
+    const itemIds = items.map((i: any) => i.id);
+    const { data: dbProducts, error: prodError } = await supabaseAdmin
+      .from('products')
+      .select('id, price, title, images, stock')
+      .in('id', itemIds);
+
+    if (prodError || !dbProducts) throw new Error("Помилка перевірки товарів");
+
+    let calculatedTotalUSD = 0;
+    const orderItemsData = [];
+
+    for (const clientItem of items) {
+      const dbProduct = dbProducts.find((p) => p.id === clientItem.id);
+      
+      if (!dbProduct) throw new Error(`Товар ${clientItem.title} не знайдено`);
+      
+      const itemTotal = Number(dbProduct.price) * Number(clientItem.quantity);
+      calculatedTotalUSD += itemTotal;
+
+      orderItemsData.push({
+        product_id: dbProduct.id,
+        product_title: dbProduct.title,
+        quantity: clientItem.quantity,
+        price: dbProduct.price,
+        image_url: dbProduct.images?.[0] || ''
+      });
+    }
+
+    // 2. Рахуємо доставку
+    const { data: deliverySettings } = await supabaseAdmin.from('delivery_settings').select('*');
+    let shippingCost = 0;
+    
+    if (deliverySettings) {
+      const countryCode = shippingAddress.country_code;
+      const setting = deliverySettings.find(s => s.country_code === countryCode) || deliverySettings.find(s => s.country_code === 'ROW');
+      if (setting) {
+        shippingCost = shippingType === 'Express' ? Number(setting.express_price) : Number(setting.standard_price);
+      }
+    }
+
+    const finalAmountUSD = calculatedTotalUSD + shippingCost;
+    // --- END SECURITY CALCULATION ---
+
+
+    // 3. Створюємо замовлення в БД
     const uniqueOrderId = `order_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
     const userId = shippingAddress.user_id;
 
-    // 1. Створюємо замовлення в Supabase (PENDING)
     const { error: dbError } = await supabaseAdmin.from('orders').insert({
       id: uniqueOrderId,
       user_id: userId,
-      total_amount: amountUSD,
+      total_amount: finalAmountUSD,
       status: 'pending',
       payment_method: 'paypal',
       shipping_address: shippingAddress,
@@ -37,30 +84,22 @@ export async function POST(req: Request) {
 
     if (dbError) throw new Error(`Supabase Error: ${dbError.message}`);
 
-    // 2. Зберігаємо товари в БД
-    const orderItemsData = items.map((item: any) => ({
-      order_id: uniqueOrderId,
-      product_id: item.id,
-      product_title: item.title,
-      quantity: item.quantity,
-      price: item.price,
-      image_url: item.images?.[0] || ''
-    }));
-    await supabaseAdmin.from('order_items').insert(orderItemsData);
+    // 4. Зберігаємо items
+    const itemsToInsert = orderItemsData.map(item => ({ ...item, order_id: uniqueOrderId }));
+    await supabaseAdmin.from('order_items').insert(itemsToInsert);
 
-    // 3. Створюємо замовлення в PayPal (Native API Call)
+    // 5. Запит до PayPal
     const accessToken = await generateAccessToken();
-    
     const url = `${PAYPAL_API_BASE}/v2/checkout/orders`;
     
     const payload = {
       intent: "CAPTURE",
       purchase_units: [
         {
-          reference_id: uniqueOrderId, // Наш внутрішній ID
+          reference_id: uniqueOrderId,
           amount: {
             currency_code: "USD",
-            value: amountUSD.toFixed(2),
+            value: finalAmountUSD.toFixed(2), // Лише порахована сервером сума
           },
         },
       ],
@@ -92,7 +131,6 @@ export async function POST(req: Request) {
       throw new Error(JSON.stringify(orderData));
     }
 
-    // Повертаємо ID для кнопки PayPal
     return NextResponse.json({ id: orderData.id });
 
   } catch (error: any) {

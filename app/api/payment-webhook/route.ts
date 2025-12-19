@@ -7,27 +7,36 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
 export async function POST(req: Request) {
   try {
+    // --- 🛡️ 1. SECURITY CHECK (Перевірка безпеки) ---
+    const { searchParams } = new URL(req.url);
+    const secret = searchParams.get('secret');
+    const expectedSecret = process.env.MONOBANK_WEBHOOK_SECRET;
+
+    // Перевіряємо, чи ми самі не забули додати ключ у змінні середовища
+    if (!expectedSecret) {
+      console.error('❌ CRITICAL: MONOBANK_WEBHOOK_SECRET is missing in .env');
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+    }
+
+    // Порівнюємо отриманий ключ із правильним
+    if (secret !== expectedSecret) {
+      console.warn('⛔ Webhook Unauthorized Attempt. IP:', req.headers.get('x-forwarded-for') || 'Unknown');
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    // --- END SECURITY CHECK ---
+
+
     const body = await req.json();
     console.log('Monobank Webhook:', body);
 
-    // Monobank надсилає таку структуру (приклад):
-    // {
-    //   invoiceId: "pOrN7...",
-    //   status: "success",
-    //   amount: 415000,
-    //   ccy: 980,
-    //   reference: "order_173...",  <-- ID замовлення
-    //   createdDate: "2024-...",
-    //   modifiedDate: "2024-..."
-    // }
-
     const { status, reference } = body;
 
-    // Створюємо об'єкт для оновлення.
-    // Зберігаємо весь body від Монобанку в payment_result
+    // Уніфікуємо статуси: якщо 'success' -> ставимо 'paid'
+    const orderStatus = status === 'success' ? 'paid' : (status === 'failure' ? 'failure' : 'pending');
+
     const updateData: any = {
-      status: status === 'success' ? 'paid' : status === 'failure' ? 'failed' : 'pending', // Краще використовувати 'paid' замість 'success', щоб було як у PayPal
-      payment_result: body, // <--- ОСЬ ТУТ МИ ЗБЕРІГАЄМО ДАНІ
+      status: orderStatus, 
+      payment_result: body,
       updated_at: new Date().toISOString()
     };
 
@@ -67,7 +76,7 @@ export async function POST(req: Request) {
         }
       }
     } else if (status === 'failure') {
-        // Якщо помилка, теж зберігаємо інфо, чому не вийшло
+        // Якщо помилка, теж зберігаємо інфо
         await supabaseAdmin
             .from('orders')
             .update(updateData)

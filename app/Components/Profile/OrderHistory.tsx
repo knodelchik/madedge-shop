@@ -43,7 +43,6 @@ export default function OrderHistory({ userId }: { userId: string }) {
   const copyTrackingToClipboard = (e: React.MouseEvent, code: string) => {
     e.stopPropagation();
     navigator.clipboard.writeText(code);
-    // ВИПРАВЛЕНО: Використовуємо переклад замість хардкоду
     toast.success(t('copied'));
   };
 
@@ -67,20 +66,24 @@ export default function OrderHistory({ userId }: { userId: string }) {
     return baseUrl;
   };
 
+  // ЄДИНА ЛОГІКА КОЛЬОРІВ (Як і в Адмінці)
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'success':
-      case 'completed':
-        return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
+      case 'paid': // Додаємо підтримку нового статусу
+        return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400';
       case 'shipped':
         return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
       case 'pending':
-        return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400';
+        return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400';
+      case 'completed':
+        // Виконано (Архівовано) - нейтральний сірий
+        return 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300';
       case 'failure':
       case 'cancelled':
         return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
       default:
-        return 'bg-gray-100 text-gray-700';
+        return 'bg-gray-100 text-gray-700 dark:bg-neutral-800 dark:text-neutral-400';
     }
   };
 
@@ -118,7 +121,6 @@ export default function OrderHistory({ userId }: { userId: string }) {
             ? getTrackingLink(order.tracking_number, order.shipping_service)
             : null;
 
-          // ВИПРАВЛЕНО: Додано фолбек-переклад для 'Tracking'
           const serviceDisplay =
             order.shipping_service ||
             order.shipping_type ||
@@ -197,7 +199,6 @@ export default function OrderHistory({ userId }: { userId: string }) {
                               <Truck size={20} />
                             </div>
                             <div>
-                              {/* ВИПРАВЛЕНО: Використання ключа перекладу */}
                               <p className="text-xs font-bold text-blue-600 dark:text-blue-300 uppercase tracking-wide mb-0.5">
                                 {t('trackingInfo')}
                               </p>
@@ -225,7 +226,6 @@ export default function OrderHistory({ userId }: { userId: string }) {
                             </div>
                           </div>
 
-                          {/* ВИПРАВЛЕНО: Використання ключа перекладу для кнопки */}
                           <a
                             href={trackingLink}
                             target="_blank"
@@ -236,8 +236,7 @@ export default function OrderHistory({ userId }: { userId: string }) {
                           </a>
                         </div>
                       )}
-                      {/* ===================== */}
-
+                      
                       <div className="space-y-3 pt-2">
                         <h4 className="text-sm font-medium text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                           {t('itemsHeader')} ({order.order_items.length})
