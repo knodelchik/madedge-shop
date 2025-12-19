@@ -106,7 +106,7 @@ export default function BurgerMenu({
 
   return (
     <div className="lg:hidden">
-      {/* Кнопка бургер-меню */}
+      {/* Кнопка відкриття меню */}
       <button
         onClick={() => {
           onOpen?.();
@@ -120,12 +120,15 @@ export default function BurgerMenu({
 
       {isOpen && (
         <>
+          {/* Фон (Backdrop) */}
           <div
             className="fixed inset-0 z-40 animate-in fade-in duration-300 bg-black/50"
             onClick={() => setIsOpen(false)}
           />
 
-          <div className="fixed top-0 right-0 h-screen w-[80vw] max-w-sm bg-white dark:bg-neutral-900 shadow-2xl z-[999] border-l border-gray-200 dark:border-neutral-700 flex flex-col">
+          {/* КОНТЕЙНЕР МЕНЮ: flex flex-col важливий для притискання футера */}
+          <div className="fixed top-0 right-0 h-screen h-[100dvh] w-[80vw] max-w-sm bg-white dark:bg-neutral-900 shadow-2xl z-[999] border-l border-gray-200 dark:border-neutral-700 flex flex-col">
+            {/* 1. ХЕДЕР (Фіксований зверху) */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-neutral-700 flex-shrink-0">
               <h2 className="text-lg font-bold text-gray-800 dark:text-white">
                 {t('menu')}
@@ -139,6 +142,7 @@ export default function BurgerMenu({
               </button>
             </div>
 
+            {/* 2. СКРОЛ-ЗОНА (Займає весь вільний простір: flex-1) */}
             <div className="flex-1 overflow-y-auto overscroll-contain">
               {/* Інформація про користувача */}
               {user && (
@@ -235,9 +239,8 @@ export default function BurgerMenu({
                 </div>
               </div>
 
-              {/* Налаштування (Тема, Мова, Валюта) - без змін ... */}
+              {/* Налаштування (Тема, Мова, Валюта) */}
               <div className="p-4 border-b border-gray-200 dark:border-neutral-700">
-                {/* ... код налаштувань ... */}
                 <h3 className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase mb-3 tracking-wide">
                   {t('sections.settings')}
                 </h3>
@@ -332,7 +335,7 @@ export default function BurgerMenu({
                 </div>
               </div>
 
-              {/* === АКАУНТ (ВИПРАВЛЕНО) === */}
+              {/* Акаунт */}
               <div className="p-4 border-b border-gray-200 dark:border-neutral-700">
                 <h3 className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase mb-3 tracking-wide">
                   {t('sections.account')}
@@ -347,7 +350,7 @@ export default function BurgerMenu({
                   </button>
                 ) : (
                   <div className="space-y-2">
-                    {/* Кнопка Входу: веде просто на /auth */}
+                    {/* Кнопка Входу */}
                     <button
                       onClick={() => handleNavigation(`/${locale}/auth`)}
                       className="w-full flex items-center justify-center p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors text-gray-700 dark:text-neutral-200 text-sm active:scale-95 border border-gray-200 dark:border-neutral-700"
@@ -356,7 +359,7 @@ export default function BurgerMenu({
                       {t('account.signIn')}
                     </button>
 
-                    {/* Кнопка Реєстрації: веде на /auth з параметром ?view=signup */}
+                    {/* Кнопка Реєстрації */}
                     <button
                       onClick={() =>
                         handleNavigation(`/${locale}/auth?view=signup`)
@@ -368,12 +371,13 @@ export default function BurgerMenu({
                   </div>
                 )}
               </div>
+            </div>
 
-              <div className="p-4 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-sm">
-                <p className="text-xs text-neutral-500 dark:text-neutral-400 text-center">
-                  © {new Date().getFullYear()} {t('footer.copyright')}
-                </p>
-              </div>
+            {/* 3. ФУТЕР (Закріплений знизу) */}
+            <div className="p-4 bg-gray-50 dark:bg-neutral-900/90 border-t border-gray-200 dark:border-neutral-700 flex-shrink-0 pb-8">
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 text-center">
+                © {new Date().getFullYear()} {t('footer.copyright')}
+              </p>
             </div>
           </div>
         </>

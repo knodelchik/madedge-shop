@@ -247,7 +247,8 @@
     "totalItems": "Total items",
     "continueShopping": "Continue shopping",
     "priceUnit": "$",
-    "placeholderAlt": "Product image"
+    "placeholderAlt": "Product image",
+    "soldOut": "Sold Out"
   },
   "BurgerMenu": {
     "openMenu": "Open menu",
