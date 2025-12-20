@@ -31,13 +31,13 @@ export default function ContactSection() {
       try {
         // 1. Отримуємо поточного юзера (щоб дізнатися ID)
         const { user } = await authService.getCurrentUser();
-        
+
         if (user) {
           // 2. Отримуємо профіль саме з "звичайної таблиці" (public.users)
           const { profile } = await authService.getUserProfile(user.id);
-          
+
           // 3. Заповнюємо форму
-          setFormData(prev => ({
+          setFormData((prev) => ({
             ...prev,
             // Якщо в профілі є ім'я/пошта - беремо їх. Якщо ні - беремо з Auth або залишаємо пустим.
             name: profile?.full_name || user.full_name || '',
@@ -74,14 +74,17 @@ export default function ContactSection() {
       const data = await res.json();
 
       if (res.ok) {
-        toast.success(tContacts('formSubmitSuccess') || 'Повідомлення надіслано! Ми зв\'яжемося з вами.');
+        toast.success(
+          tContacts('formSubmitSuccess') ||
+            "Повідомлення надіслано! Ми зв'яжемося з вами."
+        );
         // Очищаємо тільки повідомлення та тему, ім'я та пошту залишаємо (зручно, якщо треба написати ще)
-        setFormData(prev => ({ ...prev, subject: '', message: '' }));
+        setFormData((prev) => ({ ...prev, subject: '', message: '' }));
       } else {
         toast.error(data.error || 'Помилка відправки. Спробуйте пізніше.');
       }
     } catch (error) {
-      toast.error('Помилка з\'єднання.');
+      toast.error("Помилка з'єднання.");
     } finally {
       setIsSubmitting(false);
     }
@@ -251,12 +254,6 @@ export default function ContactSection() {
                     </h3>
                     <p className="text-gray-600 dark:text-neutral-300 text-sm">
                       {tContacts('hoursMonFri')}
-                    </p>
-                    <p className="text-gray-600 dark:text-neutral-300 text-sm">
-                      {tContacts('hoursSat')}
-                    </p>
-                    <p className="text-gray-600 dark:text-neutral-300 text-sm">
-                      {tContacts('hoursSun')}
                     </p>
                   </div>
                 </motion.div>

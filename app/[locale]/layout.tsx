@@ -3,10 +3,11 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { ThemeProvider } from 'next-themes';
 import { Toaster } from 'sonner';
+// 1. Імпортуємо створений провайдер
 import { CurrencyProvider } from '@/app/context/CurrencyContext';
 import Header from '../Components/Header/Header';
 import Footer from '../Components/Footer';
-import '@/app/globals.css'; // ✅ Додай імпорт стилів
+import '@/app/globals.css';
 
 const locales = ['en', 'uk'] as const;
 type Locale = (typeof locales)[number];
@@ -63,6 +64,8 @@ export default async function LocaleLayout({
           enableSystem
           disableTransitionOnChange
         >
+          {/* 2. Обгортаємо все в CurrencyProvider. 
+              Пропси передавати не треба, він сам візьме мову з URL. */}
           <CurrencyProvider>
             <NextIntlClientProvider locale={locale} messages={messages}>
               <div className="flex min-h-screen flex-col">

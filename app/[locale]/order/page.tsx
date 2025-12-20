@@ -39,8 +39,9 @@ export default function OrderPage() {
   const { cartItems } = useCartStore();
   const { formatPrice, rates } = useCurrency();
 
-  const [paymentMethod, setPaymentMethod] = useState<'fondy' | 'paypal'>(
-    'fondy'
+  // ЗМІНА 1: Тип стейту тепер 'monobank' | 'paypal'
+  const [paymentMethod, setPaymentMethod] = useState<'monobank' | 'paypal'>(
+    'monobank'
   );
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
@@ -164,7 +165,8 @@ export default function OrderPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           items: cartItems,
-          method: 'fondy',
+          // ЗМІНА 2: Відправляємо 'monobank'
+          method: 'monobank',
           shippingAddress: selectedAddress,
           shippingCost: shippingCost,
           shippingType,
@@ -474,11 +476,13 @@ export default function OrderPage() {
                   {/* Кнопка PLATA BY MONO */}
                   <button
                     className={`relative h-[56px] px-2 lg:px-4 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-center overflow-hidden ${
-                      paymentMethod === 'fondy'
+                      // ЗМІНА 3: Замінили 'fondy' на 'monobank'
+                      paymentMethod === 'monobank'
                         ? 'border-black bg-black text-white dark:border-white dark:bg-white dark:text-black shadow-md'
                         : 'border-gray-200 bg-white hover:border-gray-300 dark:bg-neutral-900 dark:border-neutral-700'
                     }`}
-                    onClick={() => setPaymentMethod('fondy')}
+                    // ЗМІНА 4: Встановили 'monobank'
+                    onClick={() => setPaymentMethod('monobank')}
                     aria-label="Оплата через plata by mono"
                   >
                     <div className="relative w-full h-full max-w-[130px]">
@@ -487,11 +491,10 @@ export default function OrderPage() {
                         alt="plata by mono"
                         fill
                         className={`object-contain transition-all ${
-                          paymentMethod === 'fondy'
-                            ? 'invert dark:invert-0' // Обраний: інвертуємо для світлої (біле на чорному), dark: залишаємо як є (біле на білому? Ні, темна тема кнопки біла) -> Чекайте, логіка інша.
-                            : // На чорній кнопці (обраній) - лого має бути БІЛИМ. Оригінал ЧОРНИЙ. Значить invert.
-                              // У темній темі (dark): кнопка БІЛА (текст чорний). Оригінал ЧОРНИЙ. Значить invert-0 (не інвертувати).
-                              'dark:invert' // Не обраний. Фон білий (logo чорне -> ок). Dark фон темний (logo має бути білим -> invert).
+                          // ЗМІНА 5: Замінили 'fondy' на 'monobank'
+                          paymentMethod === 'monobank'
+                            ? 'invert dark:invert-0'
+                            : 'dark:invert'
                         }`}
                       />
                     </div>
@@ -524,7 +527,8 @@ export default function OrderPage() {
 
                 {/* --- ДОДАТКОВА ІНФОРМАЦІЯ ДЛЯ PLATA BY MONO --- */}
                 <AnimatePresence>
-                  {paymentMethod === 'fondy' && (
+                  {/* ЗМІНА 6: Замінили 'fondy' на 'monobank' */}
+                  {paymentMethod === 'monobank' && (
                     <motion.div
                       initial={{ opacity: 0, y: -10, height: 0 }}
                       animate={{ opacity: 1, y: 0, height: 'auto' }}

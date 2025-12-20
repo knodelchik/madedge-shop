@@ -1,11 +1,8 @@
 import { createNavigation } from 'next-intl/navigation';
-// або, якщо вам потрібні локалізовані pathnames:
-// import { createLocalizedPathnamesNavigation } from 'next-intl/navigation';
+import { locales, defaultLocale, localePrefix } from './config'; // Імпорт з конфігу
 
-
-
-export const { Link, usePathname, useRouter, redirect } = createNavigation({
-  locales: ['en', 'uk'],
-  defaultLocale: 'en',
-  localePrefix: 'as-needed',
+export const { Link, redirect, usePathname, useRouter } = createNavigation({
+  locales,
+  defaultLocale,
+  localePrefix,
 });

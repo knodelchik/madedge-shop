@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useWishlistStore } from '@/app/[locale]/store/wishlistStore';
-import { useCurrency } from '@/app/context/CurrencyContext'; // Додано для форматування ціни
+import { useCurrency } from '@/app/context/CurrencyContext';
 import Image from 'next/image';
 import Link from 'next/link';
 import { toast } from 'sonner';
@@ -10,7 +10,7 @@ import { ShoppingCart, Trash2, Heart } from 'lucide-react';
 
 export default function WishlistPage({ userId }: { userId: string }) {
   const t = useTranslations('Wishlist');
-  const { formatPrice } = useCurrency(); // Використовуємо контекст валют
+  const { formatPrice } = useCurrency();
 
   const { wishlistItems, removeFromWishlist, moveToCart } = useWishlistStore();
 
@@ -18,16 +18,13 @@ export default function WishlistPage({ userId }: { userId: string }) {
     if (!userId) return;
 
     if (product.stock <= 0) {
-      // ВИПРАВЛЕНО: Переклад помилки наявності
       toast.error(t('outOfStockError'));
       return;
     }
 
     toast.promise(moveToCart(userId, product.id, t), {
       loading: t('addingToCart'),
-
       success: t('addedToCartSuccess', { title: product.title }),
-
       error: t('addToCartError'),
     });
   };
@@ -35,7 +32,6 @@ export default function WishlistPage({ userId }: { userId: string }) {
   const handleRemove = (productId: number) => {
     if (!userId) return;
     removeFromWishlist(userId, productId);
-    // ВИПРАВЛЕНО: Повідомлення про видалення (info замість error для дії користувача)
     toast.info(t('removedMessage'));
   };
 
@@ -79,7 +75,6 @@ export default function WishlistPage({ userId }: { userId: string }) {
                   />
                   {isOutOfStock && (
                     <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-white bg-black/50 rounded-md uppercase">
-                      {/* ВИПРАВЛЕНО: Лейбл на зображенні */}
                       {t('outOfStockBadge')}
                     </span>
                   )}
@@ -90,11 +85,12 @@ export default function WishlistPage({ userId }: { userId: string }) {
                     href={`/shop/${item.products.title
                       .replace(/\s+/g, '-')
                       .toLowerCase()}`}
-                    className="font-medium text-sm truncate hover:underline text-gray-800 dark:text-neutral-100"
+                    // ЗМІНА ТУТ: додано 'block'
+                    className="font-medium text-sm truncate block hover:underline text-gray-800 dark:text-neutral-100"
+                    title={item.products.title} // Щоб користувач міг побачити повну назву при наведенні
                   >
                     {item.products.title}
                   </Link>
-                  {/* ВИПРАВЛЕНО: Використання formatPrice */}
                   <p className="text-green-600 font-semibold text-sm">
                     {formatPrice(item.products.price)}
                   </p>
@@ -106,7 +102,7 @@ export default function WishlistPage({ userId }: { userId: string }) {
                     className={`p-2 rounded-md transition ${
                       isOutOfStock
                         ? 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-neutral-700 dark:text-neutral-500'
-                        : 'text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-neutral-700'
+                        : 'text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-neutral-700 cursor-pointer'
                     }`}
                     title={t('addToCart')}
                   >
@@ -114,7 +110,7 @@ export default function WishlistPage({ userId }: { userId: string }) {
                   </button>
                   <button
                     onClick={() => handleRemove(item.product_id)}
-                    className="p-2 text-red-600 hover:bg-red-50 dark:text-red-500 dark:hover:bg-neutral-700 rounded-md transition"
+                    className="p-2 text-red-600 hover:bg-red-50 dark:text-red-500 dark:hover:bg-neutral-700 rounded-md transition cursor-pointer"
                     title={t('remove')}
                   >
                     <Trash2 className="w-5 h-5" />

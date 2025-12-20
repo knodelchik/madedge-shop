@@ -1,11 +1,8 @@
-// i18n.ts
 import { getRequestConfig } from 'next-intl/server';
 import { notFound } from 'next/navigation';
-
-const locales = ['en', 'uk'];
+import { locales } from './config'; // Перевірте правильність шляху до config.ts
 
 export default getRequestConfig(async ({ requestLocale }) => {
-  // Очікуємо (await) отримання локалі
   const locale = await requestLocale;
 
   // Перевірка валідності

@@ -7,52 +7,43 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
 export async function POST(req: Request) {
   try {
-    // --- 🛡️ 1. SECURITY CHECK (Перевірка безпеки) ---
+    // 1. Перевірка безпеки через secret
     const { searchParams } = new URL(req.url);
     const secret = searchParams.get('secret');
-    const expectedSecret = process.env.MONOBANK_WEBHOOK_SECRET;
 
-    // Перевіряємо, чи ми самі не забули додати ключ у змінні середовища
-    if (!expectedSecret) {
-      console.error('❌ CRITICAL: MONOBANK_WEBHOOK_SECRET is missing in .env');
-      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
-    }
-
-    // Порівнюємо отриманий ключ із правильним
-    if (secret !== expectedSecret) {
-      console.warn('⛔ Webhook Unauthorized Attempt. IP:', req.headers.get('x-forwarded-for') || 'Unknown');
+    if (secret !== process.env.MONOBANK_WEBHOOK_SECRET) {
+      console.warn('Unauthorized webhook attempt');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    // --- END SECURITY CHECK ---
-
 
     const body = await req.json();
     console.log('Monobank Webhook:', body);
 
-    const { status, reference } = body;
+    const { status, reference, invoiceId } = body;
 
-    // Уніфікуємо статуси: якщо 'success' -> ставимо 'paid'
-    const orderStatus = status === 'success' ? 'paid' : (status === 'failure' ? 'failure' : 'pending');
+    // 2. Оновлення статусу
+    let newStatus = 'pending';
+    if (status === 'success') newStatus = 'paid';
+    else if (status === 'failure') newStatus = 'failure';
 
-    const updateData: any = {
-      status: orderStatus, 
-      payment_result: body,
-      updated_at: new Date().toISOString()
-    };
+    // Оновлюємо замовлення
+    const { error: updateError } = await supabaseAdmin
+      .from('orders')
+      .update({
+        status: newStatus,
+        payment_id: invoiceId,
+        payment_result: body,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', reference); // reference = наш uniqueOrderId
 
-    if (status === 'success') {
-      // 1. Оновлюємо статус замовлення та записуємо результат
-      const { error } = await supabaseAdmin
-        .from('orders')
-        .update(updateData)
-        .eq('id', reference);
+    if (updateError) {
+      console.error('DB Update Error:', updateError);
+      return NextResponse.json({ error: 'DB Error' }, { status: 500 });
+    }
 
-      if (error) {
-          console.error('Error updating order status:', error);
-          return NextResponse.json({ status: 'error' }, { status: 500 });
-      }
-
-      // 2. Списання товару (Stock logic)
+    // 3. Списання стоку (лише якщо успіх)
+    if (newStatus === 'paid') {
       const { data: items } = await supabaseAdmin
         .from('order_items')
         .select('product_id, quantity')
@@ -65,26 +56,19 @@ export async function POST(req: Request) {
             .select('stock')
             .eq('id', item.product_id)
             .single();
-            
+
           if (product) {
-             const newStock = Math.max(0, product.stock - item.quantity);
-             await supabaseAdmin
-               .from('products')
-               .update({ stock: newStock })
-               .eq('id', item.product_id);
+            const newStock = Math.max(0, product.stock - item.quantity);
+            await supabaseAdmin
+              .from('products')
+              .update({ stock: newStock })
+              .eq('id', item.product_id);
           }
         }
       }
-    } else if (status === 'failure') {
-        // Якщо помилка, теж зберігаємо інфо
-        await supabaseAdmin
-            .from('orders')
-            .update(updateData)
-            .eq('id', reference);
     }
 
     return NextResponse.json({ status: 'ok' });
-
   } catch (error: any) {
     console.error('Webhook Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });

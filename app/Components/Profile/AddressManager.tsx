@@ -18,7 +18,6 @@ export default function AddressManager({
   userId,
   userPhone,
 }: AddressManagerProps) {
-  // Використовуємо namespace 'Profile'
   const t = useTranslations('Profile');
 
   const [addresses, setAddresses] = useState<Address[]>([]);
@@ -37,6 +36,29 @@ export default function AddressManager({
   }, [userId]);
 
   const handleSave = async (data: AddressFormData) => {
+    // --- ПЕРЕВІРКА НА КРАЇНИ-АГРЕСОРИ ---
+    const blockedCodes = ['RU', 'BY'];
+    const blockedNames = [
+      'Russia',
+      'Belarus',
+      'Russian Federation',
+      'Росія',
+      'Білорусь',
+      'Россия',
+      'Беларусь',
+    ];
+
+    if (
+      (data.country_code && blockedCodes.includes(data.country_code)) ||
+      blockedNames.some((name) =>
+        data.country_name.toLowerCase().includes(name.toLowerCase())
+      )
+    ) {
+      toast.error('Доставка в країни-агресори не здійснюється 🇺🇦');
+      return;
+    }
+    // ------------------------------------
+
     const newAddress = await addressService.addAddress(userId, data);
     if (newAddress) {
       toast.success(t('AddressManager.toasts.addSuccess'));
@@ -78,7 +100,7 @@ export default function AddressManager({
         {!isAdding && (
           <button
             onClick={() => setIsAdding(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-black text-white dark:bg-white dark:text-black text-sm font-medium rounded-lg hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors  cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2 bg-black text-white dark:bg-white dark:text-black text-sm font-medium rounded-lg hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors cursor-pointer"
           >
             <Plus size={16} />
             {t('AddressManager.addButton')}
@@ -175,7 +197,7 @@ export default function AddressManager({
                       )}
                       <button
                         onClick={() => handleDelete(addr.id)}
-                        className="p-2 text-gray-400 hover:text-red-600 transition-colors  cursor-pointer"
+                        className="p-2 text-gray-400 hover:text-red-600 transition-colors cursor-pointer"
                         title={t('AddressManager.deleteTooltip')}
                       >
                         <Trash2 size={18} />

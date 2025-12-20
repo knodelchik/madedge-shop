@@ -57,7 +57,6 @@ export default function AddressForm({
   onCancel,
   defaultPhone = '',
 }: AddressFormProps) {
-  // Використовуємо namespace 'Profile'
   const t = useTranslations('Profile');
   const isDark =
     typeof document !== 'undefined' &&
@@ -76,10 +75,15 @@ export default function AddressForm({
     is_default: false,
   });
 
-  const countries = Country.getAllCountries().map((c) => ({
-    label: c.name,
-    value: c.isoCode,
-  }));
+  // --- БЛОКУВАННЯ КРАЇН У СПИСКУ ---
+  const BLOCKED_COUNTRIES = ['RU', 'BY']; // Росія, Білорусь
+
+  const countries = Country.getAllCountries()
+    .filter((c) => !BLOCKED_COUNTRIES.includes(c.isoCode)) // Фільтруємо агресорів
+    .map((c) => ({
+      label: c.name,
+      value: c.isoCode,
+    }));
 
   useEffect(() => {
     if (selectedCountry) {
