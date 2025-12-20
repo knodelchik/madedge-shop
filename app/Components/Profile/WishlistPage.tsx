@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useWishlistStore } from '@/app/[locale]/store/wishlistStore';
 import { useCurrency } from '@/app/context/CurrencyContext';
 import Image from 'next/image';
-import Link from 'next/link';
+import { Link } from '@/navigation';
 import { toast } from 'sonner';
 import { ShoppingCart, Trash2, Heart } from 'lucide-react';
 

@@ -6,8 +6,8 @@ import 'swiper/css/navigation';
 import { Autoplay } from 'swiper/modules';
 import { motion } from 'framer-motion';
 import { JSX } from 'react';
-import Link from 'next/link';
-import Image from 'next/image'; // 1. Імпортуємо Image
+import { Link } from '@/navigation';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 
 interface Slide {
@@ -43,9 +43,9 @@ export default function CardCarousel(): JSX.Element {
         modules={[Autoplay]}
         autoplay={{ delay: 4000, disableOnInteraction: true }}
         loop
-        spaceBetween={0} // Краще 0 для слайдера на весь екран
+        spaceBetween={0}
         slidesPerView={1}
-        className="w-full h-full" // h-full замість фіксованого h-[60vh]
+        className="w-full h-full"
       >
         {slides.map((slide, index) => {
           const titleKey = `title${slide.translationKey}` as const;
@@ -56,30 +56,23 @@ export default function CardCarousel(): JSX.Element {
 
           return (
             <SwiperSlide key={index} className="relative w-full h-full">
-               {/* 2. Використовуємо Next.js Image замість background-image */}
-               {/* Це дозволить браузеру завантажити оптимізовану, легку версію картинки */}
               <div className="absolute inset-0 w-full h-full">
                 <Image
                   src={slide.img}
                   alt={title}
                   fill
                   className="object-cover"
-                  // 3. Пріоритет для першого слайду (КРИТИЧНО для LCP)
                   priority={index === 0}
-                  // 4. Sizes допомагає браузеру вибрати правильний розмір
                   sizes="100vw"
-                  // placeholder="blur" // Можна додати, якщо згенеруєте blurDataURL
                 />
-                
-                {/* Overlay */}
+
                 <div className="absolute inset-0 bg-gray-900/10 dark:bg-black/30 md:bg-gray-900/10 md:dark:bg-black/30 z-10" />
               </div>
 
-              {/* Контент поверх картинки */}
               <div className="relative z-20 w-full h-full flex items-center justify-center">
                 <motion.div
                   initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }} // Змінив на whileInView для лінивої анімації наступних слайдів
+                  whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6 }}
                   className="

@@ -3,7 +3,7 @@
 import React from 'react';
 import { useTranslations } from 'next-intl';
 import { Lightbulb, Info, Plane, Headphones, ShieldCheck } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from '@/navigation';
 
 interface SpotlightCardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;

@@ -15,7 +15,7 @@ import { useCartStore } from '../../[locale]/store/cartStore';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { Link } from '@/navigation';
 import { User } from '../../types/users';
 import { productsService } from '../../[locale]/services/productService';
 import { Product } from '../../types/products';

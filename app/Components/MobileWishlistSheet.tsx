@@ -5,7 +5,7 @@ import { useWishlistStore } from '@/app/[locale]/store/wishlistStore';
 import { useCartStore } from '@/app/[locale]/store/cartStore';
 import { authService } from '@/app/[locale]/services/authService';
 import { wishlistService } from '@/app/[locale]/services/wishlistService';
-import Link from 'next/link';
+import { Link } from '@/navigation';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { useState, useEffect } from 'react';

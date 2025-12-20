@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useTranslations } from 'next-intl';
-import Link from 'next/link'; // Next link для внутрішньої навігації
+import { Link } from '@/navigation';
 import { User as UserType } from '../../types/users';
 
 interface UserDropdownProps {
@@ -26,7 +26,10 @@ export default function UserDropdown({ user, onSignOut }: UserDropdownProps) {
           <User className="w-6 h-6" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-neutral-900 border-gray-200 dark:border-neutral-800">
+      <DropdownMenuContent
+        align="end"
+        className="w-56 bg-white dark:bg-neutral-900 border-gray-200 dark:border-neutral-800"
+      >
         {user ? (
           <AuthenticatedMenu user={user} onSignOut={onSignOut} />
         ) : (
@@ -37,7 +40,13 @@ export default function UserDropdown({ user, onSignOut }: UserDropdownProps) {
   );
 }
 
-function AuthenticatedMenu({ user, onSignOut }: { user: UserType; onSignOut: () => void }) {
+function AuthenticatedMenu({
+  user,
+  onSignOut,
+}: {
+  user: UserType;
+  onSignOut: () => void;
+}) {
   const t = useTranslations('UserDropdown');
 
   // Перевірка на адміна
@@ -45,12 +54,17 @@ function AuthenticatedMenu({ user, onSignOut }: { user: UserType; onSignOut: () 
 
   return (
     <>
-      <DropdownMenuLabel className="text-gray-900 dark:text-white">{t('myAccount')}</DropdownMenuLabel>
-      
+      <DropdownMenuLabel className="text-gray-900 dark:text-white">
+        {t('myAccount')}
+      </DropdownMenuLabel>
+
       {/* Цей пункт з'явиться ТІЛЬКИ у адміна */}
       {isAdmin && (
         <DropdownMenuItem asChild>
-          <Link href="/admin" className="cursor-pointer w-full flex items-center font-semibold text-blue-600 dark:text-blue-400">
+          <Link
+            href="/admin"
+            className="cursor-pointer w-full flex items-center font-semibold text-blue-600 dark:text-blue-400"
+          >
             <LayoutDashboard className="mr-2 w-4 h-4" />
             Адмін панель
           </Link>
@@ -58,13 +72,16 @@ function AuthenticatedMenu({ user, onSignOut }: { user: UserType; onSignOut: () 
       )}
 
       <DropdownMenuItem asChild>
-        <Link href="/profile" className="cursor-pointer w-full text-gray-700 dark:text-gray-200">
+        <Link
+          href="/profile"
+          className="cursor-pointer w-full text-gray-700 dark:text-gray-200"
+        >
           {t('profile')}
         </Link>
       </DropdownMenuItem>
-      
+
       <DropdownMenuSeparator className="bg-gray-100 dark:bg-neutral-800" />
-      
+
       <DropdownMenuItem
         onClick={onSignOut}
         className="text-red-600 focus:text-red-600 cursor-pointer w-full"
@@ -81,14 +98,22 @@ function UnauthenticatedMenu() {
 
   return (
     <>
-      <DropdownMenuLabel className="text-gray-900 dark:text-white">{t('account')}</DropdownMenuLabel>
+      <DropdownMenuLabel className="text-gray-900 dark:text-white">
+        {t('account')}
+      </DropdownMenuLabel>
       <DropdownMenuItem asChild>
-        <Link href="/auth" className="cursor-pointer w-full text-gray-700 dark:text-gray-200">
+        <Link
+          href="/auth"
+          className="cursor-pointer w-full text-gray-700 dark:text-gray-200"
+        >
           {t('signIn')}
         </Link>
       </DropdownMenuItem>
       <DropdownMenuItem asChild>
-        <Link href="/auth" className="cursor-pointer w-full text-gray-700 dark:text-gray-200">
+        <Link
+          href="/auth"
+          className="cursor-pointer w-full text-gray-700 dark:text-gray-200"
+        >
           {t('signUp')}
         </Link>
       </DropdownMenuItem>

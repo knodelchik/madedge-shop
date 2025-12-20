@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
-import Link from 'next/link';
+import { Link } from '@/navigation';
 import { authService } from '../services/authService';
 import { addressService } from '../services/adressService';
 import { Address } from '../../types/address';

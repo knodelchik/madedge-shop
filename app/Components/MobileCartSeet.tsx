@@ -3,7 +3,7 @@
 import { X, ShoppingCart, Trash2 } from 'lucide-react';
 import { useCartStore } from '../[locale]/store/cartStore';
 import QuantityCounter from './QuantityCounter';
-import Link from 'next/link';
+import { Link } from '@/navigation';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';

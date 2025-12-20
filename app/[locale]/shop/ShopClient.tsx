@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import Link from 'next/link';
+import { Link } from '@/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
