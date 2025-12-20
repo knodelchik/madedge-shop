@@ -20,14 +20,16 @@ export default function ProductForm({
 }: ProductFormProps) {
   const [loading, setLoading] = useState(false);
 
+  // Ініціалізація стану форми
   const [formData, setFormData] = useState({
     title: product?.title || '',
-    title_uk: product?.title_uk || '', // Додано
+    title_uk: product?.title_uk || '',
     price: product?.price || '',
-    stock: product?.stock || 0,
+    // Якщо редагуємо товар, беремо його сток, якщо новий - 0.
+    stock: product?.stock !== undefined ? product.stock : 0,
     category: product?.category || 'sharpeners',
     description: product?.description || '',
-    description_uk: product?.description_uk || '', // Додано
+    description_uk: product?.description_uk || '',
   });
 
   const [images, setImages] = useState<string[]>(
@@ -44,7 +46,6 @@ export default function ProductForm({
     setUploading(true);
 
     try {
-      // Створюємо масив промісів для паралельного завантаження
       const uploadPromises = Array.from(files).map(async (file) => {
         const fileExt = file.name.split('.').pop();
         const fileName = `${Date.now()}-${Math.random()
@@ -65,10 +66,8 @@ export default function ProductForm({
         return data.publicUrl;
       });
 
-      // Чекаємо завершення всіх завантажень
       const uploadedUrls = await Promise.all(uploadPromises);
 
-      // Оновлюємо стан всіма новими посиланнями одразу
       setImages((prev) => [...prev, ...uploadedUrls]);
       toast.success(`Успішно завантажено фото: ${uploadedUrls.length}`);
     } catch (error: any) {
@@ -76,7 +75,6 @@ export default function ProductForm({
       toast.error('Помилка завантаження фото. Спробуйте менші файли.');
     } finally {
       setUploading(false);
-      // Очищуємо input, щоб можна було завантажити ті самі файли повторно, якщо треба
       e.target.value = '';
     }
   };
@@ -107,14 +105,17 @@ export default function ProductForm({
         throw new Error('Сесія закінчилась. Перезавантажте сторінку.');
       }
 
+      // Підготовка даних
       const productData = {
         title: formData.title,
-        title_uk: formData.title_uk, // Додано до відправки
+        title_uk: formData.title_uk,
         price: parseFloat(formData.price),
-        stock: parseInt(formData.stock.toString()),
+        // ВАЖЛИВО: Перевіряємо сток перед відправкою.
+        // Якщо там пустий рядок (користувач все стер), ставимо 0.
+        stock: formData.stock === '' ? 0 : parseInt(formData.stock.toString()),
         category: formData.category,
         description: formData.description,
-        description_uk: formData.description_uk, // Додано до відправки
+        description_uk: formData.description_uk,
         images: images,
         updated_at: new Date().toISOString(),
       };
@@ -123,14 +124,14 @@ export default function ProductForm({
       let error: any;
 
       if (product?.id) {
-        // Оновлення
+        // Оновлення існуючого
         const result = await supabase
           .from('products')
           .update(productData)
           .eq('id', product.id);
         error = result.error;
       } else {
-        // Створення
+        // Створення нового
         const result = await supabase.from('products').insert([productData]);
         error = result.error;
       }
@@ -139,7 +140,6 @@ export default function ProductForm({
 
       toast.success(product ? 'Товар оновлено!' : 'Товар створено!');
       onSaved();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error('Save error:', error);
       toast.error(
@@ -158,7 +158,6 @@ export default function ProductForm({
           Фотографії ({images.length})
         </label>
 
-        {/* Адаптивна сітка */}
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
           {images.map((url, index) => (
             <div
@@ -286,6 +285,8 @@ export default function ProductForm({
               />
             </div>
           </div>
+
+          {/* --- ПОЛЕ СТОК --- */}
           <div>
             <label className="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">
               Сток (шт)
@@ -295,18 +296,21 @@ export default function ProductForm({
               min="0"
               required
               placeholder="0"
-              value={formData.stock === 0 ? '' : formData.stock}
+              // Дозволяємо відображати '', щоб можна було стерти 0
+              value={formData.stock}
               onChange={(e) => {
                 const val = e.target.value;
-
+                // @ts-ignore: Тимчасово дозволяємо пустий рядок у стані
                 setFormData({
                   ...formData,
-                  stock: val === '' ? 0 : parseInt(val),
+                  // Якщо пустий рядок - зберігаємо як '', інакше парсимо число
+                  stock: val === '' ? '' : parseInt(val),
                 });
               }}
               className="w-full px-3 py-2.5 border border-gray-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 focus:ring-2 focus:ring-black dark:focus:ring-white outline-none transition-all"
             />
           </div>
+
           <div>
             <label className="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">
               Категорія
