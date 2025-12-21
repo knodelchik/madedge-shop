@@ -41,8 +41,9 @@ export async function POST(req: Request) {
         type: 'signup',
         email,
         password,
+        // В файлі app/api/auth/signup/route.ts
         options: {
-          // Тепер origin буде https://madedge.net
+          // Видаляємо /api/ з шляху, щоб вийшло /auth/callback
           redirectTo: `${origin}/auth/callback?next=/profile`,
         },
       });
