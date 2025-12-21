@@ -1,7 +1,7 @@
 import createMiddleware from 'next-intl/middleware';
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
-import { locales, defaultLocale, localePrefix } from './config'; // Імпорт з вашого нового файлу
+import { locales, defaultLocale, localePrefix } from './config';
 
 const intlMiddleware = createMiddleware({
   locales,
@@ -10,19 +10,21 @@ const intlMiddleware = createMiddleware({
 });
 
 export default async function middleware(request: NextRequest) {
-  // 1. ПЕРЕВІРКА НА API ТА СТАТИКУ
+  const pathname = request.nextUrl.pathname;
+
+  // 1. ПЕРЕВІРКА НА API ТА СТАТИКУ (Ігноруємо ці шляхи)
   if (
-    request.nextUrl.pathname.startsWith('/api') ||
-    request.nextUrl.pathname.startsWith('/_next') ||
-    request.nextUrl.pathname.includes('.')
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/_next') ||
+    pathname.includes('.')
   ) {
     return NextResponse.next();
   }
 
-  // 2. Запускаємо локалізацію
+  // 2. Запускаємо локалізацію intl
   const response = intlMiddleware(request);
 
-  // 3. Створюємо Supabase клієнт
+  // 3. Створюємо Supabase клієнт для Middleware
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -43,8 +45,25 @@ export default async function middleware(request: NextRequest) {
     }
   );
 
-  // 4. Оновлюємо сесію
-  await supabase.auth.getUser();
+  // 4. Отримуємо користувача та оновлюємо сесію
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // 5. ЛОГІКА РЕДІРЕКТІВ
+
+  // Якщо користувач залогінений і намагається зайти на сторінку підтвердження —
+  // ДОЗВОЛЯЄМО йому там бути, щоб він побачив галочку
+  if (user && pathname.includes('/auth/confirm')) {
+    return response;
+  }
+
+  // Якщо користувач залогінений і заходить на основну сторінку входу —
+  // перекидаємо в профіль
+  if (user && pathname.match(/\/(uk|en)\/auth$/)) {
+    const locale = pathname.split('/')[1] || 'uk';
+    return NextResponse.redirect(new URL(`/${locale}/profile`, request.url));
+  }
 
   return response;
 }
