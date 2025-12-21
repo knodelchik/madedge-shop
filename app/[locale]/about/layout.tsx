@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from '@/navigation';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { toast } from 'sonner'; // <--- 1. Імпорт тостера
 import {
   Factory,
   Target,
@@ -12,8 +13,6 @@ import {
   Gem,
   Blocks,
   Truck,
-  Menu,
-  X,
 } from 'lucide-react';
 import {
   CryingIcon,
@@ -23,7 +22,7 @@ import {
 } from '../../Components/icons/SocialIcons';
 import { motion, AnimatePresence } from 'motion/react';
 
-// --- Інтерфейси ---
+// ... (Ваші інтерфейси MenuItem та SectionMap залишаються без змін) ...
 interface MenuItem {
   title: string;
   icon: React.ReactNode;
@@ -34,7 +33,6 @@ interface MenuItem {
 interface SectionMap {
   [key: string]: { title: string; id: string }[];
 }
-// --- Кінець Інтерфейсів ---
 
 export default function AboutLayout({
   children,
@@ -45,21 +43,19 @@ export default function AboutLayout({
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
   const [feedback, setFeedback] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMenuExpanded, setIsMenuExpanded] = useState(false);
 
-  // Для підсвічування секцій
+  // <--- 2. Додаємо стан завантаження
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const observedRef = useRef<Record<string, IntersectionObserverEntry | null>>(
     {}
   );
 
-  // 1. ВИПРАВЛЕННЯ: Видаляємо префікс локалі для коректної роботи навігації
   const cleanPathname = pathname.replace(/^\/[a-z]{2}/, '');
-
-  // 2. Ініціалізація перекладів
   const t = useTranslations('AboutLayout');
 
-  // 3. Локалізація menuData
+  // ... (Ваші масиви menuData, pageSections, navigationPages, currentSections залишаються без змін) ...
   const menuData: MenuItem[] = [
     {
       title: t('menu.aboutUs'),
@@ -93,7 +89,6 @@ export default function AboutLayout({
     },
   ];
 
-  // 4. Локалізація pageSections
   const pageSections: SectionMap = {
     '/about': [
       { title: t('sections.background'), id: 'our-background' },
@@ -115,7 +110,6 @@ export default function AboutLayout({
       { title: t('sections.stoneUsage'), id: 'usage-guide' },
       { title: t('sections.stoneCare'), id: 'care-instructions' },
     ],
-
     '/about/accessories': [
       { title: t('sections.rotaryMechanism'), id: 'rotary-mechanism' },
       { title: t('sections.tableMount'), id: 'table-mount' },
@@ -133,10 +127,8 @@ export default function AboutLayout({
     ],
   };
 
-  // Використовуємо cleanPathname для коректного відображення розділів
   const currentSections = pageSections[cleanPathname] || [];
 
-  // 5. Локалізація navigationPages
   const navigationPages = [
     { href: '/about/contribution-guide', title: t('nav.guide') },
     { href: '/about', title: t('nav.aboutUs') },
@@ -146,7 +138,6 @@ export default function AboutLayout({
     { href: '/about/delivery', title: t('nav.delivery') },
   ];
 
-  // Використовуємо cleanPathname для пошуку індексу
   const currentPageIndex = navigationPages.findIndex(
     (page) => page.href === cleanPathname
   );
@@ -158,7 +149,6 @@ export default function AboutLayout({
   let previousPage = null;
   let nextPage = null;
 
-  // Визначення PREVIOUS page
   if (currentPageIndex === loopStartIndex) {
     previousPage = navigationPages[loopEndIndex];
   } else if (currentPageIndex > loopStartIndex) {
@@ -167,15 +157,13 @@ export default function AboutLayout({
     previousPage = null;
   }
 
-  // Визначення NEXT page
   if (currentPageIndex === loopEndIndex) {
     nextPage = navigationPages[loopStartIndex];
   } else if (currentPageIndex < loopEndIndex) {
     nextPage = navigationPages[currentPageIndex + 1];
   }
-  // --- КІНЕЦЬ ЛОГІКИ ЦИКЛІЧНОЇ НАВІГАЦІЇ ---
 
-  // Логіка перемикання та закриття форми
+  // --- ОБРОБНИКИ ПОДІЙ ---
   const handleRatingClick = (rating: number) => {
     if (selectedRating === rating) {
       setSelectedRating(null);
@@ -185,13 +173,42 @@ export default function AboutLayout({
     }
   };
 
-  const handleSubmit = () => {
-    console.log('Feedback:', { rating: selectedRating, feedback });
-    setFeedback('');
-    setSelectedRating(null);
-  };
+  // <--- 3. ОНОВЛЕНА ФУНКЦІЯ ВІДПРАВКИ ---
+  const handleSubmit = async () => {
+    if (selectedRating === null) return;
 
-  // ----- EFFECT: спостерігач за прокруткою для підсвічування розділів -----
+    setIsSubmitting(true);
+    try {
+      const res = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          rating: selectedRating,
+          feedback: feedback,
+          pageUrl:
+            typeof window !== 'undefined'
+              ? window.location.href
+              : cleanPathname,
+        }),
+      });
+
+      if (res.ok) {
+        toast.success(t('feedback.success') || 'Дякуємо за ваш відгук!');
+        // Скидаємо форму
+        setFeedback('');
+        setSelectedRating(null);
+      } else {
+        toast.error('Щось пішло не так.');
+      }
+    } catch (error) {
+      toast.error("Помилка з'єднання.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  // ----------------------------------------
+
+  // ... (Ваш useEffect для observer та handleOnPageLinkClick залишаються без змін) ...
   useEffect(() => {
     if (!currentSections || currentSections.length === 0) return;
 
@@ -224,7 +241,6 @@ export default function AboutLayout({
     };
   }, [cleanPathname, JSON.stringify(currentSections)]);
 
-  // Скрол до секції зі зсувом для sticky header
   const handleOnPageLinkClick = (id: string) => {
     const el = document.getElementById(id);
     if (!el) return;
@@ -235,7 +251,11 @@ export default function AboutLayout({
 
   return (
     <div className="min-h-screen bg-white flex flex-col dark:bg-black">
-      {/* Мобільна кнопка меню + акордеон (як на скріншоті) */}
+      {/* ... (Ввесь ваш JSX для Sidebar та Header залишається без змін) ... */}
+
+      {/* Тільки змінюємо мобільний хедер, сайдбари і контент - я їх скорочую для зручності читання, 
+          але у вас вони залишаються тими ж самими */}
+
       <div className="md:hidden border-b border-gray-200 dark:border-neutral-500 sticky top-[72px] z-30 bg-white dark:bg-neutral-900">
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -265,7 +285,6 @@ export default function AboutLayout({
           </motion.div>
         </button>
 
-        {/* Акордеон-вміст */}
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
@@ -276,7 +295,6 @@ export default function AboutLayout({
               className="overflow-hidden "
             >
               <div className="px-4 py-4 space-y-1 bg-white dark:bg-black">
-                {/* Копіюємо той самий вміст, що й у десктопному сайдбарі */}
                 <div className="mb-6">
                   <div className="flex items-center gap-3 p-3 rounded-lg">
                     <Target className="w-5 h-5 text-gray-600" />
@@ -290,7 +308,6 @@ export default function AboutLayout({
                     </div>
                   </div>
                 </div>
-
                 <nav className="space-y-1">
                   {menuData.map((menu) => (
                     <Link
@@ -313,9 +330,11 @@ export default function AboutLayout({
           )}
         </AnimatePresence>
       </div>
+
       <div className="flex flex-1">
-        {/* Sidebar left - hidden on mobile, visible on md+ */}
+        {/* Sidebar Left */}
         <aside className="hidden md:block w-64 border-gray-200 p-6 sticky top-[80px] self-start h-[calc(100vh-80px)] overflow-y-auto">
+          {/* ... (Ваш код Sidebar Left) ... */}
           <div className="mb-8">
             <div className="flex items-center gap-3 p-3 rounded-lg mb-4">
               <Factory className="w-5 h-5 text-blue-400" />
@@ -328,7 +347,6 @@ export default function AboutLayout({
                 </div>
               </div>
             </div>
-
             <div className="flex items-center gap-3 p-3 rounded-lg">
               <Target className="w-5 h-5 text-gray-600" />
               <div>
@@ -341,7 +359,6 @@ export default function AboutLayout({
               </div>
             </div>
           </div>
-
           <nav className="space-y-2">
             {menuData.map((menu) => (
               <Link
@@ -362,17 +379,17 @@ export default function AboutLayout({
           </nav>
         </aside>
 
-        {/* Main Content - адаптивні відступи */}
+        {/* Main Content */}
         <main className="flex-1 px-4 md:px-8 xl:px-12 py-8 md:py-12 xl:py-20">
           {children}
         </main>
 
-        {/* Sidebar right - hidden on md, visible on xl+ */}
+        {/* Sidebar Right */}
         <aside className="w-64 p-6 sticky top-[80px] h-[calc(100vh-80px)] overflow-y-auto hidden xl:block self-start">
+          {/* ... (Ваш код Sidebar Right) ... */}
           <h3 className="text-sm font-semibold text-gray-900 mb-4 dark:text-neutral-100">
             {t('sidebar.onThisPage')}
           </h3>
-
           <nav className="relative">
             <div className="space-y-2">
               {currentSections.map((section) => {
@@ -405,7 +422,6 @@ export default function AboutLayout({
                         <span className="h-6 w-1 flex-shrink-0" aria-hidden />
                       )}
                     </AnimatePresence>
-
                     <span className="flex-1 overflow-hidden text-ellipsis">
                       {section.title}
                     </span>
@@ -417,8 +433,9 @@ export default function AboutLayout({
         </aside>
       </div>
 
-      {/* Навігація Previous/Next - ВИПРАВЛЕНО */}
+      {/* Navigation Footer */}
       <div className="py-4 md:py-6 px-4 md:px-6 xl:px-12">
+        {/* ... (Ваш код Navigation Footer) ... */}
         <div className="max-w-4xl mx-auto flex flex-row justify-between items-center gap-4">
           {previousPage ? (
             <Link
@@ -448,13 +465,12 @@ export default function AboutLayout({
               </div>
             </Link>
           ) : (
-            <div className="w-10" /> /* Порожній блок для збереження структури */
+            <div className="w-10" />
           )}
 
           {nextPage ? (
             <Link
               href={nextPage.href}
-              /* Видалено sm:ml-auto, додано ml-auto, щоб завжди притискалося вправо */
               className="flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-neutral-100 dark:hover:text-neutral-400 transition ml-auto"
             >
               <div className="text-right">
@@ -485,7 +501,7 @@ export default function AboutLayout({
         </div>
       </div>
 
-      {/* Форма відгуку */}
+      {/* Форма відгуку (ОНОВЛЕНА) */}
       <div className="border-gray-200 px-2 py-2 mb-10 mt-10">
         <div className="flex justify-center">
           <motion.div
@@ -501,15 +517,16 @@ export default function AboutLayout({
               damping: 30,
             }}
           >
-            {/* Смайлики та початкові відступи */}
+            {/* Смайлики */}
             <div className="px-8 py-3">
               <div className="flex items-center justify-center gap-2">
                 <span className="text-gray-700 font-sm whitespace-nowrap dark:text-neutral-400">
-                  {t('feedback.title')} {/* 🚀 Переклад */}
+                  {t('feedback.title')}
                 </span>
 
                 <button
                   onClick={() => handleRatingClick(1)}
+                  disabled={isSubmitting} // Блокуємо при відправці
                   className={`rounded-full transition flex-shrink-0 cursor-pointer ${
                     selectedRating === 1
                       ? 'bg-blue-100 text-blue-600'
@@ -521,6 +538,7 @@ export default function AboutLayout({
 
                 <button
                   onClick={() => handleRatingClick(2)}
+                  disabled={isSubmitting}
                   className={`rounded-full transition flex-shrink-0 cursor-pointer ${
                     selectedRating === 2
                       ? 'bg-orange-100 text-orange-600'
@@ -532,6 +550,7 @@ export default function AboutLayout({
 
                 <button
                   onClick={() => handleRatingClick(3)}
+                  disabled={isSubmitting}
                   className={`rounded-full transition flex-shrink-0 cursor-pointer ${
                     selectedRating === 3
                       ? 'bg-yellow-100 text-yellow-600'
@@ -543,6 +562,7 @@ export default function AboutLayout({
 
                 <button
                   onClick={() => handleRatingClick(4)}
+                  disabled={isSubmitting}
                   className={`rounded-full transition flex-shrink-0 cursor-pointer ${
                     selectedRating === 4
                       ? 'bg-green-100 text-green-600'
@@ -573,21 +593,23 @@ export default function AboutLayout({
                     value={feedback}
                     onChange={(e) => setFeedback(e.target.value)}
                     placeholder={t('feedback.placeholder')}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    disabled={isSubmitting} // Блокуємо при відправці
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none disabled:opacity-50"
                     rows={4}
                   />
 
                   <div className="flex justify-between items-center mt-2">
                     <div className="text-xs text-neutral-400">
                       <span className="font-mono">M↓</span>{' '}
-                      {t('feedback.supported')} {/* 🚀 Переклад */}
+                      {t('feedback.supported')}
                     </div>
 
                     <button
                       onClick={handleSubmit}
-                      className="bg-black text-white px-8 py-3 rounded-lg font-medium hover:bg-neutral-800 dark:hover:bg-neutral-700 dark:bg-neutral-800 transition cursor-pointer"
+                      disabled={isSubmitting}
+                      className="bg-black text-white px-8 py-3 rounded-lg font-medium hover:bg-neutral-800 dark:hover:bg-neutral-700 dark:bg-neutral-800 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                     >
-                      {t('feedback.send')}
+                      {isSubmitting ? '...' : t('feedback.send')}
                     </button>
                   </div>
                 </motion.div>

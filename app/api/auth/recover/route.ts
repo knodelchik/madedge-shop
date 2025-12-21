@@ -1,50 +1,59 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
-import { Resend } from 'resend';
+import sgMail from '@sendgrid/mail';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
 export async function POST(req: Request) {
   try {
-    const { email } = await req.json();
-    const origin = new URL(req.url).origin; // http://localhost:3000 або ваш домен
+    const { email, lang } = await req.json(); // Отримуємо lang
+    const origin = new URL(req.url).origin;
 
-    // 1. Генеруємо посилання для відновлення (Supabase не шле лист, тільки дає лінк)
     const { data, error } = await supabaseAdmin.auth.admin.generateLink({
       type: 'recovery',
       email,
-      options: {
-        redirectTo: `${origin}/auth/update-password`, // Куди перекинути користувача
-      },
+      options: { redirectTo: `${origin}/auth/update-password` },
     });
 
-    if (error) {
-      console.error('Generate Link Error:', error);
+    if (error)
       return NextResponse.json({ error: error.message }, { status: 400 });
-    }
 
     const { action_link } = data.properties;
 
-    // 2. Відправляємо свій лист через Resend
-    await resend.emails.send({
-      from: 'MadEdge Security <onboarding@resend.dev>', // Або ваша верифікована пошта
+    // ЛОГІКА МОВИ
+    const isEng = lang === 'en';
+
+    const subject = isEng
+      ? 'Reset Password - MadEdge'
+      : 'Відновлення паролю MadEdge';
+    const title = isEng ? 'Password Recovery' : 'Відновлення паролю';
+    const textMain = isEng
+      ? 'You requested a password change. Click the button below to set a new password:'
+      : 'Ви надіслали запит на зміну паролю. Натисніть кнопку нижче, щоб створити новий пароль:';
+    const buttonText = isEng ? 'Change Password' : 'Змінити пароль';
+    const textIgnore = isEng
+      ? 'If you did not request this, simply ignore this email.'
+      : 'Якщо ви не робили цей запит, просто проігноруйте цей лист.';
+
+    const msg = {
       to: email,
-      subject: 'Відновлення паролю MadEdge',
+      from: 'info@madedge.net',
+      subject: subject,
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2>Відновлення паролю</h2>
-          <p>Ви надіслали запит на зміну паролю. Натисніть кнопку нижче, щоб створити новий пароль:</p>
+          <h2>${title}</h2>
+          <p>${textMain}</p>
           <br/>
-          <a href="${action_link}" style="background-color: #000; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Змінити пароль</a>
+          <a href="${action_link}" style="background-color: #000; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">${buttonText}</a>
           <br/><br/>
-          <p style="color: #666; font-size: 12px;">Якщо ви не робили цей запит, просто проігноруйте цей лист.</p>
+          <p style="color: #666; font-size: 12px;">${textIgnore}</p>
         </div>
       `,
-    });
+    };
 
+    await sgMail.send(msg);
     return NextResponse.json({ success: true });
   } catch (error: any) {
-    console.error('Recover API Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

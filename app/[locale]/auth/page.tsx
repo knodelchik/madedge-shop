@@ -1,17 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation'; // Додано useSearchParams
+import { useRouter, useSearchParams } from 'next/navigation';
 import AuthForm from '../../Components/AuthForm';
 import { motion, AnimatePresence } from 'framer-motion';
 import { authService } from '../services/authService';
 import { toast } from 'sonner';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl'; // 1. Імпорт useLocale
 import { ArrowLeft, KeyRound } from 'lucide-react';
 
 export default function AuthPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const locale = useLocale(); // 2. Отримуємо поточну мову ('uk' або 'en')
 
   // Перевіряємо URL параметр ?view=signup
   const initialView =
@@ -24,7 +25,6 @@ export default function AuthPage() {
   const [emailForReset, setEmailForReset] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Оновлюємо стан, якщо змінюється URL (наприклад, при навігації назад/вперед)
   useEffect(() => {
     const view = searchParams.get('view');
     if (view === 'signup') setAuthType('signup');
@@ -38,19 +38,20 @@ export default function AuthPage() {
   };
 
   const toggleAuthType = () => {
-    // Змінюємо не тільки стейт, а й URL для зручності (опціонально)
     const newType = authType === 'signin' ? 'signup' : 'signin';
     setAuthType(newType);
-    // Можна оновлювати URL без перезавантаження, якщо хочете зберегти стан в історії
-    // router.replace(`?view=${newType}`);
   };
 
-  // Логіка відновлення паролю
+  // === ЛОГІКА ВІДНОВЛЕННЯ ПАРОЛЮ ===
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await authService.resetPasswordForEmail(emailForReset);
+    // 3. Передаємо locale (мову) другим параметром
+    const { error } = await authService.resetPasswordForEmail(
+      emailForReset,
+      locale
+    );
 
     if (error) {
       toast.error(t('errorPrefix') + error);
@@ -90,7 +91,6 @@ export default function AuthPage() {
                 transition={{ duration: 0.3 }}
                 className="p-8"
               >
-                {/* ... (код форми відновлення без змін) ... */}
                 <div className="flex justify-center mb-6">
                   <div className="p-3 bg-blue-50 dark:bg-neutral-800 rounded-full text-blue-600 dark:text-blue-400">
                     <KeyRound size={28} />
@@ -124,7 +124,7 @@ export default function AuthPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-black dark:bg-white text-white dark:text-black font-bold py-3 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
+                    className="w-full bg-black dark:bg-white text-white dark:text-black font-bold py-3 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
                   >
                     {loading ? t('sending') : t('sendResetLink')}
                   </button>
@@ -132,14 +132,14 @@ export default function AuthPage() {
 
                 <button
                   onClick={() => setAuthType('signin')}
-                  className="w-full mt-6 flex items-center justify-center gap-2 text-sm text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors"
+                  className="w-full mt-6 flex items-center justify-center gap-2 text-sm text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors cursor-pointer"
                 >
                   <ArrowLeft size={16} />
                   {t('backToSignIn')}
                 </button>
               </motion.div>
             ) : (
-              // === ЗВИЧАЙНА ФОРМА (ВХІД / РЕЄСТРАЦІЯ) ===
+              // === ЗВИЧАЙНА ФОРМА ===
               <motion.div
                 key={authType}
                 initial={{ opacity: 0, x: authType === 'signin' ? -20 : 20 }}
@@ -148,6 +148,7 @@ export default function AuthPage() {
                 transition={{ duration: 0.3 }}
                 className="p-8"
               >
+                {/* AuthForm всередині вже має логіку useLocale, тому просто рендеримо */}
                 <AuthForm
                   type={authType}
                   onSuccess={handleSuccess}

@@ -13,10 +13,11 @@ export type User = {
   updated_at?: string;
   email_confirmed_at?: string | null;
   role?: 'user' | 'admin' | null;
-}
+};
 
 export type AuthFormData = {
   email: string;
   password: string;
   full_name?: string;
-}
+  lang?: string;
+};

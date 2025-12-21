@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { authService } from '../../app/[locale]/services/authService';
 import { AuthFormData } from '../../app/types/users';
 import { useCartStore } from '../../app/[locale]/store/cartStore';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl'; // 1. Додали useLocale
 import { toast } from 'sonner';
 
 interface AuthFormProps {
@@ -21,12 +21,14 @@ export default function AuthForm({
   onForgotPassword,
 }: AuthFormProps) {
   const t = useTranslations('AuthForm');
-  const tAuth = useTranslations('Auth'); // Використовуємо існуючий namespace для спільних текстів
+  const tAuth = useTranslations('Auth');
+  const locale = useLocale(); // 2. Отримуємо поточну мову ('uk' або 'en')
 
   const [formData, setFormData] = useState<AuthFormData>({
     email: '',
     password: '',
     full_name: '',
+    // lang додамо динамічно при відправці
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,11 +42,14 @@ export default function AuthForm({
       let result;
 
       if (type === 'signup') {
-        result = await authService.signUp(formData);
+        // 3. Передаємо поточну мову разом з даними форми
+        // Ми розширюємо об'єкт formData, додаючи туди lang
+        result = await authService.signUp({
+          ...formData,
+          lang: locale,
+        });
 
-        // === ЛОГІКА ПОВІДОМЛЕННЯ ПРО ПІДТВЕРДЖЕННЯ ===
         if (result?.user && !result.error) {
-          // Використовуємо нові ключі для toast
           toast.message(t('signupSuccessTitle'), {
             description: t('signupSuccessDesc'),
             duration: 8000,
@@ -59,7 +64,6 @@ export default function AuthForm({
       }
 
       if (result?.user) {
-        // Синхронізуємо корзину після входу
         await useCartStore.getState().syncCartWithDatabase(result.user.id);
         onSuccess?.();
       }
@@ -83,6 +87,7 @@ export default function AuthForm({
     }));
   };
 
+  // ... решта JSX без змін ...
   return (
     <div className="max-w-md mx-auto bg-white dark:bg-neutral-800 rounded-2xl shadow-lg p-8 border border-gray-100 dark:border-neutral-800 transition-colors">
       <h2 className="text-2xl font-bold text-gray-800 dark:text-neutral-100 mb-6 text-center">
@@ -163,7 +168,6 @@ export default function AuthForm({
               onClick={onForgotPassword}
               className="text-sm text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors cursor-pointer"
             >
-              {/* Використовуємо ключ з namespace 'Auth', оскільки він там вже є */}
               {tAuth('forgotPasswordLink')}
             </button>
           </div>

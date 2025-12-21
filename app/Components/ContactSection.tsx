@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { Phone, Mail, Clock, Send } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl'; // 1. Імпорт useLocale
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { authService } from '../[locale]/services/authService'; // Імпорт сервісу авторизації
+import { authService } from '../[locale]/services/authService';
 import {
   TelegramIcon,
   YouTubeIcon,
@@ -15,6 +15,7 @@ import {
 
 export default function ContactSection() {
   const tContacts = useTranslations('Contacts');
+  const locale = useLocale(); // 2. Отримуємо поточну мову
 
   const [formData, setFormData] = useState({
     name: '',
@@ -29,17 +30,12 @@ export default function ContactSection() {
   useEffect(() => {
     const loadUserData = async () => {
       try {
-        // 1. Отримуємо поточного юзера (щоб дізнатися ID)
         const { user } = await authService.getCurrentUser();
 
         if (user) {
-          // 2. Отримуємо профіль саме з "звичайної таблиці" (public.users)
           const { profile } = await authService.getUserProfile(user.id);
-
-          // 3. Заповнюємо форму
           setFormData((prev) => ({
             ...prev,
-            // Якщо в профілі є ім'я/пошта - беремо їх. Якщо ні - беремо з Auth або залишаємо пустим.
             name: profile?.full_name || user.full_name || '',
             email: profile?.email || user.email || '',
           }));
@@ -68,7 +64,11 @@ export default function ContactSection() {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        // 3. Передаємо всі дані форми + lang
+        body: JSON.stringify({
+          ...formData,
+          lang: locale,
+        }),
       });
 
       const data = await res.json();
@@ -78,7 +78,6 @@ export default function ContactSection() {
           tContacts('formSubmitSuccess') ||
             "Повідомлення надіслано! Ми зв'яжемося з вами."
         );
-        // Очищаємо тільки повідомлення та тему, ім'я та пошту залишаємо (зручно, якщо треба написати ще)
         setFormData((prev) => ({ ...prev, subject: '', message: '' }));
       } else {
         toast.error(data.error || 'Помилка відправки. Спробуйте пізніше.');
@@ -90,7 +89,6 @@ export default function ContactSection() {
     }
   };
 
-  // Масив із посиланнями та відповідними іконками
   const socialLinks = [
     {
       Icon: TelegramIcon,

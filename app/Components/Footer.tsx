@@ -3,7 +3,7 @@
 import { useTheme } from 'next-themes';
 import { useState, useEffect } from 'react';
 import { Moon, Sun, Monitor } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl'; // 1. Імпортували useLocale
 import {
   FacebookIcon,
   InstagramIcon,
@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 export default function Footer() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const locale = useLocale(); // 2. Отримуємо поточну мову ('uk' або 'en')
 
   // Стан для форми розсилки
   const [email, setEmail] = useState('');
@@ -24,7 +25,7 @@ export default function Footer() {
   const tFooter = useTranslations('Footer');
   const tInfo = useTranslations('Info');
   const tContacts = useTranslations('Contacts');
-  const tTheme = useTranslations('Theme');
+  // const tTheme = useTranslations('Theme'); // Якщо потрібно
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,17 +35,27 @@ export default function Footer() {
     try {
       const res = await fetch('/api/newsletter', {
         method: 'POST',
-        body: JSON.stringify({ email }),
+        // 3. Передаємо email ТА мову
+        body: JSON.stringify({
+          email,
+          lang: locale,
+        }),
       });
 
       if (res.ok) {
-        toast.success('Ви успішно підписались!');
+        toast.success(
+          locale === 'en'
+            ? 'Successfully subscribed!'
+            : 'Ви успішно підписались!'
+        );
         setEmail('');
       } else {
-        toast.error('Щось пішло не так');
+        toast.error(
+          locale === 'en' ? 'Something went wrong' : 'Щось пішло не так'
+        );
       }
     } catch (e) {
-      toast.error("Помилка з'єднання");
+      toast.error(locale === 'en' ? 'Connection error' : "Помилка з'єднання");
     } finally {
       setSubmitting(false);
     }
@@ -59,8 +70,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 py-5">
         {/* Основний контент футера */}
         <div className="flex flex-wrap justify-between text-base">
-          {/* ... (Логотип, меню - залишаємо без змін) ... */}
-
+          {/* Мобільний хедер */}
           <div className="w-full flex justify-between items-start mb-6 mt-5 md:hidden">
             <h2 className="text-2xl font-bold">MadEdge</h2>
             <div className="flex items-center space-x-3 mt-2">
@@ -106,6 +116,7 @@ export default function Footer() {
             </div>
           </div>
 
+          {/* Десктоп хедер */}
           <div className="hidden md:block w-full md:w-auto mb-6 mt-5 md:mb-0">
             <h2 className="text-2xl font-bold">MadEdge</h2>
           </div>
@@ -282,7 +293,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Newsletter (ОНОВЛЕНИЙ БЛОК) */}
+          {/* Newsletter */}
           <div className="w-full md:w-80 md:mt-0">
             <h3 className="font-medium mb-3 mt-6 text-gray-900 dark:text-white text-base transition-colors duration-300">
               {tFooter('footerNewsletterTitle')}
@@ -315,10 +326,9 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Copyright + Theme controls (Без змін, просто скорочую для читабельності) */}
+      {/* Copyright + Theme controls */}
       <div className="dark:border-neutral-700 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-6 py-6">
-          {/* ... (Ваш код копірайту та кнопок теми) ... */}
           <div className="flex sm:hidden items-center justify-between">
             <div className="text-gray-500 dark:text-neutral-400/80 text-sm transition-colors duration-300">
               © 2016-{new Date().getFullYear()} MadEdge, Inc.

@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
+import sgMail from '@sendgrid/mail';
 
+sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-// Вкажіть сюди вашу реальну пошту, куди приходитимуть заявки
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@example.com';
+// Ваша особиста пошта (Gmail), куди будуть падати заявки
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'nekrasovss@gmail.com';
 
 export async function POST(req: Request) {
   try {
@@ -12,14 +12,16 @@ export async function POST(req: Request) {
     const { name, email, subject, message } = body;
 
     if (!email || !message) {
-      return NextResponse.json({ error: 'Email and message are required' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Email and message are required' },
+        { status: 400 }
+      );
     }
 
-    // Відправка листа адміну
-    const { data, error } = await resend.emails.send({
-      from: 'MadEdge Contact <onboarding@resend.dev>',
-      to: [ADMIN_EMAIL],
-      replyTo: email, // Це дозволяє натиснути "Відповісти" в пошті і написати клієнту
+    const msg = {
+      to: ADMIN_EMAIL, // Лист прийде вам
+      from: 'info@madedge.net', // ⚠️ Відправник завжди ваш сайт (SendGrid вимагає цього)
+      replyTo: email, // ⚠️ А ось "Відповісти" буде працювати на пошту клієнта
       subject: `Нове повідомлення: ${subject || 'Без теми'}`,
       html: `
         <div style="font-family: sans-serif;">
@@ -32,15 +34,16 @@ export async function POST(req: Request) {
           <p style="background-color: #f4f4f4; padding: 15px; border-radius: 5px;">${message}</p>
         </div>
       `,
-    });
+    };
 
-    if (error) {
-      console.error('Resend Error:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
+    await sgMail.send(msg);
 
-    return NextResponse.json({ success: true, data });
+    return NextResponse.json({ success: true });
   } catch (error: any) {
+    console.error('SendGrid Error:', error);
+    if (error.response) {
+      console.error(error.response.body); // Деталі помилки, якщо щось піде не так
+    }
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
