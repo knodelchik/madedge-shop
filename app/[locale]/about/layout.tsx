@@ -4,7 +4,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from '@/navigation';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { toast } from 'sonner'; // <--- 1. Імпорт тостера
+import { toast } from 'sonner';
+import { authService } from '@/app/[locale]/services/authService'; // ✅ Імпорт сервісу
 import {
   Factory,
   Target,
@@ -22,7 +23,7 @@ import {
 } from '../../Components/icons/SocialIcons';
 import { motion, AnimatePresence } from 'motion/react';
 
-// ... (Ваші інтерфейси MenuItem та SectionMap залишаються без змін) ...
+// --- Інтерфейси ---
 interface MenuItem {
   title: string;
   icon: React.ReactNode;
@@ -33,6 +34,7 @@ interface MenuItem {
 interface SectionMap {
   [key: string]: { title: string; id: string }[];
 }
+// --- Кінець Інтерфейсів ---
 
 export default function AboutLayout({
   children,
@@ -40,22 +42,47 @@ export default function AboutLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const t = useTranslations('AboutLayout');
+
+  // Стан для форми та UI
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
   const [feedback, setFeedback] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  // <--- 2. Додаємо стан завантаження
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Стан для користувача
+  const [currentUser, setCurrentUser] = useState<{
+    name: string;
+    email: string;
+  } | null>(null);
+
+  // Для підсвічування секцій
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const observedRef = useRef<Record<string, IntersectionObserverEntry | null>>(
     {}
   );
 
   const cleanPathname = pathname.replace(/^\/[a-z]{2}/, '');
-  const t = useTranslations('AboutLayout');
 
-  // ... (Ваші масиви menuData, pageSections, navigationPages, currentSections залишаються без змін) ...
+  // 1. ОТРИМАННЯ ДАНИХ КОРИСТУВАЧА ПРИ ЗАВАНТАЖЕННІ
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const { user } = await authService.getCurrentUser();
+        if (user) {
+          setCurrentUser({
+            name: user.full_name || 'Користувач',
+            email: user.email || '',
+          });
+        }
+      } catch (error) {
+        console.error('Error loading user for feedback:', error);
+      }
+    };
+    loadUser();
+  }, []);
+
+  // Меню та секції
   const menuData: MenuItem[] = [
     {
       title: t('menu.aboutUs'),
@@ -173,7 +200,7 @@ export default function AboutLayout({
     }
   };
 
-  // <--- 3. ОНОВЛЕНА ФУНКЦІЯ ВІДПРАВКИ ---
+  // 2. ОНОВЛЕНА ФУНКЦІЯ ВІДПРАВКИ (з даними юзера)
   const handleSubmit = async () => {
     if (selectedRating === null) return;
 
@@ -189,12 +216,14 @@ export default function AboutLayout({
             typeof window !== 'undefined'
               ? window.location.href
               : cleanPathname,
+          // Передаємо дані користувача або заглушки
+          name: currentUser?.name || 'Анонім',
+          email: currentUser?.email || '',
         }),
       });
 
       if (res.ok) {
         toast.success(t('feedback.success') || 'Дякуємо за ваш відгук!');
-        // Скидаємо форму
         setFeedback('');
         setSelectedRating(null);
       } else {
@@ -206,9 +235,8 @@ export default function AboutLayout({
       setIsSubmitting(false);
     }
   };
-  // ----------------------------------------
 
-  // ... (Ваш useEffect для observer та handleOnPageLinkClick залишаються без змін) ...
+  // Спостерігач скролу
   useEffect(() => {
     if (!currentSections || currentSections.length === 0) return;
 
@@ -251,11 +279,7 @@ export default function AboutLayout({
 
   return (
     <div className="min-h-screen bg-white flex flex-col dark:bg-black">
-      {/* ... (Ввесь ваш JSX для Sidebar та Header залишається без змін) ... */}
-
-      {/* Тільки змінюємо мобільний хедер, сайдбари і контент - я їх скорочую для зручності читання, 
-          але у вас вони залишаються тими ж самими */}
-
+      {/* Мобільна кнопка меню */}
       <div className="md:hidden border-b border-gray-200 dark:border-neutral-500 sticky top-[72px] z-30 bg-white dark:bg-neutral-900">
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -308,6 +332,7 @@ export default function AboutLayout({
                     </div>
                   </div>
                 </div>
+
                 <nav className="space-y-1">
                   {menuData.map((menu) => (
                     <Link
@@ -334,7 +359,6 @@ export default function AboutLayout({
       <div className="flex flex-1">
         {/* Sidebar Left */}
         <aside className="hidden md:block w-64 border-gray-200 p-6 sticky top-[80px] self-start h-[calc(100vh-80px)] overflow-y-auto">
-          {/* ... (Ваш код Sidebar Left) ... */}
           <div className="mb-8">
             <div className="flex items-center gap-3 p-3 rounded-lg mb-4">
               <Factory className="w-5 h-5 text-blue-400" />
@@ -347,6 +371,7 @@ export default function AboutLayout({
                 </div>
               </div>
             </div>
+
             <div className="flex items-center gap-3 p-3 rounded-lg">
               <Target className="w-5 h-5 text-gray-600" />
               <div>
@@ -359,6 +384,7 @@ export default function AboutLayout({
               </div>
             </div>
           </div>
+
           <nav className="space-y-2">
             {menuData.map((menu) => (
               <Link
@@ -386,10 +412,10 @@ export default function AboutLayout({
 
         {/* Sidebar Right */}
         <aside className="w-64 p-6 sticky top-[80px] h-[calc(100vh-80px)] overflow-y-auto hidden xl:block self-start">
-          {/* ... (Ваш код Sidebar Right) ... */}
           <h3 className="text-sm font-semibold text-gray-900 mb-4 dark:text-neutral-100">
             {t('sidebar.onThisPage')}
           </h3>
+
           <nav className="relative">
             <div className="space-y-2">
               {currentSections.map((section) => {
@@ -435,7 +461,6 @@ export default function AboutLayout({
 
       {/* Navigation Footer */}
       <div className="py-4 md:py-6 px-4 md:px-6 xl:px-12">
-        {/* ... (Ваш код Navigation Footer) ... */}
         <div className="max-w-4xl mx-auto flex flex-row justify-between items-center gap-4">
           {previousPage ? (
             <Link
@@ -501,7 +526,7 @@ export default function AboutLayout({
         </div>
       </div>
 
-      {/* Форма відгуку (ОНОВЛЕНА) */}
+      {/* Форма відгуку */}
       <div className="border-gray-200 px-2 py-2 mb-10 mt-10">
         <div className="flex justify-center">
           <motion.div
@@ -526,7 +551,7 @@ export default function AboutLayout({
 
                 <button
                   onClick={() => handleRatingClick(1)}
-                  disabled={isSubmitting} // Блокуємо при відправці
+                  disabled={isSubmitting}
                   className={`rounded-full transition flex-shrink-0 cursor-pointer ${
                     selectedRating === 1
                       ? 'bg-blue-100 text-blue-600'
@@ -593,7 +618,7 @@ export default function AboutLayout({
                     value={feedback}
                     onChange={(e) => setFeedback(e.target.value)}
                     placeholder={t('feedback.placeholder')}
-                    disabled={isSubmitting} // Блокуємо при відправці
+                    disabled={isSubmitting}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none disabled:opacity-50"
                     rows={4}
                   />

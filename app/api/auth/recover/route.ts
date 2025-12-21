@@ -6,7 +6,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
 export async function POST(req: Request) {
   try {
-    const { email, lang } = await req.json(); // Отримуємо lang
+    const { email } = await req.json();
     const origin = new URL(req.url).origin;
 
     const { data, error } = await supabaseAdmin.auth.admin.generateLink({
@@ -20,33 +20,34 @@ export async function POST(req: Request) {
 
     const { action_link } = data.properties;
 
-    // ЛОГІКА МОВИ
-    const isEng = lang === 'en';
-
-    const subject = isEng
-      ? 'Reset Password - MadEdge'
-      : 'Відновлення паролю MadEdge';
-    const title = isEng ? 'Password Recovery' : 'Відновлення паролю';
-    const textMain = isEng
-      ? 'You requested a password change. Click the button below to set a new password:'
-      : 'Ви надіслали запит на зміну паролю. Натисніть кнопку нижче, щоб створити новий пароль:';
-    const buttonText = isEng ? 'Change Password' : 'Змінити пароль';
-    const textIgnore = isEng
-      ? 'If you did not request this, simply ignore this email.'
-      : 'Якщо ви не робили цей запит, просто проігноруйте цей лист.';
-
+    // === ДВОМОВНИЙ ЛИСТ ===
     const msg = {
       to: email,
       from: 'info@madedge.net',
-      subject: subject,
+      subject: 'Reset Password / Відновлення паролю',
       html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2>${title}</h2>
-          <p>${textMain}</p>
-          <br/>
-          <a href="${action_link}" style="background-color: #000; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">${buttonText}</a>
-          <br/><br/>
-          <p style="color: #666; font-size: 12px;">${textIgnore}</p>
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+          
+          <div style="margin-bottom: 20px;">
+            <h2 style="margin-top: 0;">Password Recovery</h2>
+            <p>You requested a password change. Click the button below to set a new password.</p>
+            <p style="font-size: 12px; color: #666;">If you did not request this, simply ignore this email.</p>
+          </div>
+
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${action_link}" style="background-color: #000; color: #fff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block;">
+              Change Password / Змінити пароль
+            </a>
+          </div>
+
+          <hr style="border: 0; border-top: 1px solid #eaeaea; margin: 30px 0;" />
+
+          <div>
+            <h2 style="margin-top: 0;">Відновлення паролю</h2>
+            <p>Ви надіслали запит на зміну паролю. Натисніть кнопку вище, щоб створити новий пароль.</p>
+            <p style="font-size: 12px; color: #666;">Якщо ви не робили цей запит, просто проігноруйте цей лист.</p>
+          </div>
+
         </div>
       `,
     };

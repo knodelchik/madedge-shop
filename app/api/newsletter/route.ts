@@ -13,19 +13,18 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
 export async function POST(req: Request) {
   try {
-    // 1. Отримуємо lang разом з email
-    // Якщо фронтенд не передав мову, за замовчуванням 'en'
+    // 1. Отримуємо email та мову (за замовчуванням 'en')
     const { email, lang = 'en' } = await req.json();
 
     if (!email || !email.includes('@')) {
       return NextResponse.json({ error: 'Invalid email' }, { status: 400 });
     }
 
-    // 2. Зберігаємо email ТА мову в базу
+    // 2. Зберігаємо в базу
     const { error: dbError } = await supabase.from('subscribers').insert([
       {
         email,
-        lang: lang, // Зберігаємо мову для майбутніх розсилок
+        lang: lang,
       },
     ]);
 
@@ -40,25 +39,33 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Database error' }, { status: 500 });
     }
 
-    // 3. Підготовка тексту листа
-    // ЗАГОТОВКА НА МАЙБУТНЄ:
-    // const isUk = lang === 'uk';
-    // const subject = isUk ? 'Вітаємо в MadEdge!' : 'Welcome to MadEdge Community!';
-    // const title = isUk ? 'Дякуємо за підписку! 🎉' : 'Thanks for subscribing! 🎉';
+    // 3. ЛОГІКА МОВИ (Виправляємо тут)
+    const isUk = lang === 'uk';
 
-    // ПОКИ ЩО (Тільки англійська, як ви просили):
-    const subject = 'Welcome to MadEdge Community!';
-    const title = 'Thanks for subscribing! 🎉';
-    const textMain =
-      'You have successfully subscribed to <strong>MadEdge</strong> news.';
-    const textSub =
-      'We will notify you about new products, promotions, and useful sharpening tips.';
-    const footer = 'Best regards,<br/>MadEdge Team';
+    const subject = isUk
+      ? 'Вітаємо в MadEdge!'
+      : 'Welcome to MadEdge Community!';
+
+    const title = isUk
+      ? 'Дякуємо за підписку! 🎉'
+      : 'Thanks for subscribing! 🎉';
+
+    const textMain = isUk
+      ? 'Ви успішно підписалися на новини <strong>MadEdge</strong>.'
+      : 'You have successfully subscribed to <strong>MadEdge</strong> news.';
+
+    const textSub = isUk
+      ? 'Ми будемо повідомляти вам про нові товари, акції та корисні поради із заточки.'
+      : 'We will notify you about new products, promotions, and useful sharpening tips.';
+
+    const footer = isUk
+      ? 'З найкращими побажаннями,<br/>Команда MadEdge'
+      : 'Best regards,<br/>MadEdge Team';
 
     // 4. Відправляємо лист
     const msg = {
       to: email,
-      from: 'info@madedge.net', // Ваш верифікований домен
+      from: 'info@madedge.net',
       subject: subject,
       html: `
         <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto;">

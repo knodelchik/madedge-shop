@@ -6,59 +6,49 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
 export async function POST(req: Request) {
   try {
-    const { email, lang } = await req.json();
+    const { email } = await req.json();
     const origin = new URL(req.url).origin;
 
-    // 1. Генеруємо посилання підтвердження
-    // Тип 'signup' підходить для непідтверджених користувачів
     const { data, error } = await supabaseAdmin.auth.admin.generateLink({
       type: 'signup',
       email,
-      password: 'dummy-password', // Це формальність, пароль користувача не зміниться
+      password: 'dummy-password',
       options: {
         redirectTo: `${origin}/profile`,
       },
     });
 
-    if (error) {
-      console.error('Generate Link Error:', error);
+    if (error)
       return NextResponse.json({ error: error.message }, { status: 400 });
-    }
 
     const { action_link } = data.properties;
 
-    // 2. Логіка вибору мови
-    const isEng = lang === 'en';
-
-    const subject = isEng
-      ? 'Verify your email - MadEdge'
-      : 'Підтвердження пошти MadEdge';
-
-    const title = isEng ? 'Email Verification' : 'Підтвердження пошти';
-
-    const textMain = isEng
-      ? 'You requested to resend the verification email. Click the button below to activate your account:'
-      : 'Ви надіслали запит на повторне підтвердження пошти. Натисніть кнопку нижче, щоб активувати акаунт:';
-
-    const buttonText = isEng ? 'Verify Email' : 'Підтвердити пошту';
-
-    const textIgnore = isEng
-      ? 'If you did not request this, simply ignore this email.'
-      : 'Якщо ви не робили цей запит, просто проігноруйте цей лист.';
-
-    // 3. Відправка через SendGrid
+    // === ДВОМОВНИЙ ЛИСТ ===
     const msg = {
       to: email,
-      from: 'info@madedge.net', // Ваш верифікований відправник
-      subject: subject,
+      from: 'info@madedge.net',
+      subject: 'Verify your email / Підтвердження пошти',
       html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2>${title}</h2>
-          <p>${textMain}</p>
-          <br/>
-          <a href="${action_link}" style="background-color: #000; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">${buttonText}</a>
-          <br/><br/>
-          <p style="color: #666; font-size: 12px;">${textIgnore}</p>
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+          
+          <div style="margin-bottom: 20px;">
+            <h2 style="margin-top: 0;">Email Verification</h2>
+            <p>Please click the button below to verify your email address and activate your account.</p>
+          </div>
+
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${action_link}" style="background-color: #000; color: #fff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block;">
+              Verify Email / Підтвердити пошту
+            </a>
+          </div>
+
+          <hr style="border: 0; border-top: 1px solid #eaeaea; margin: 30px 0;" />
+
+          <div>
+            <h2 style="margin-top: 0;">Підтвердження пошти</h2>
+            <p>Будь ласка, натисніть кнопку вище, щоб підтвердити вашу електронну адресу та активувати акаунт.</p>
+          </div>
+
         </div>
       `,
     };

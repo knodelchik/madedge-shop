@@ -6,11 +6,10 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
 export async function POST(req: Request) {
   try {
-    // 1. Отримуємо lang з фронтенду
-    const { email, password, full_name, lang } = await req.json();
+    const { email, password, full_name } = await req.json();
     const origin = new URL(req.url).origin;
 
-    // Створення юзера...
+    // Створення юзера
     const { data: user, error: createError } =
       await supabaseAdmin.auth.admin.createUser({
         email,
@@ -27,7 +26,7 @@ export async function POST(req: Request) {
         { status: 500 }
       );
 
-    // Генерація посилання...
+    // Генерація лінка
     const { data: linkData, error: linkError } =
       await supabaseAdmin.auth.admin.generateLink({
         type: 'signup',
@@ -41,30 +40,32 @@ export async function POST(req: Request) {
 
     const { action_link } = linkData.properties;
 
-    // 2. ЛОГІКА ВИБОРУ МОВИ
-    const isEng = lang === 'en';
-
-    const subject = isEng
-      ? 'Confirm your registration - MadEdge'
-      : 'Підтвердження реєстрації MadEdge';
-    const title = isEng
-      ? `Welcome, ${full_name}!`
-      : `Ласкаво просимо, ${full_name}!`;
-    const textMain = isEng
-      ? 'Thanks for joining MadEdge. Please confirm your email:'
-      : 'Дякуємо за реєстрацію в MadEdge. Будь ласка, підтвердіть вашу пошту:';
-    const buttonText = isEng ? 'Confirm Email' : 'Підтвердити пошту';
-
+    // === ДВОМОВНИЙ ЛИСТ ===
     const msg = {
       to: email,
       from: 'info@madedge.net',
-      subject: subject,
+      subject: 'Confirm your registration / Підтвердження реєстрації',
       html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-          <h1>${title}</h1>
-          <p>${textMain}</p>
-          <br/>
-          <a href="${action_link}" style="background-color: #000; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">${buttonText}</a>
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+          
+          <div style="margin-bottom: 20px;">
+            <h2 style="margin-top: 0;">Welcome to MadEdge!</h2>
+            <p>Thanks for joining us. Please confirm your email address to activate your account.</p>
+          </div>
+
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${action_link}" style="background-color: #000; color: #fff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block;">
+              Confirm Email / Підтвердити пошту
+            </a>
+          </div>
+
+          <hr style="border: 0; border-top: 1px solid #eaeaea; margin: 30px 0;" />
+
+          <div>
+            <h2 style="margin-top: 0;">Вітаємо в MadEdge!</h2>
+            <p>Дякуємо за реєстрацію. Будь ласка, підтвердіть вашу електронну пошту, щоб активувати акаунт.</p>
+          </div>
+
         </div>
       `,
     };

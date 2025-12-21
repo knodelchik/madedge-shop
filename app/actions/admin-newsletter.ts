@@ -1,28 +1,30 @@
 'use server';
 
-import { createClient } from '@/lib/supabase-server';
+import { createClient } from '@supabase/supabase-js'; // Використовуємо admin client напряму тут для надійності
 import sgMail from '@sendgrid/mail';
 
-// Ініціалізація SendGrid
 sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
+
+// Створюємо клієнт з Service Role Key для обходу RLS
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export type Subscriber = {
   id: number;
   email: string;
-  lang: string; // ✅ Важливо: поле мови з бази
+  lang: string;
   created_at: string;
 };
 
-// Тип даних для однієї мовної версії листа
 export type EmailContent = {
   subject: string;
   htmlBody: string;
 };
 
-// 1. Отримання всіх підписників
+// 1. Отримання підписників
 export async function getSubscribers() {
-  const supabase = await createClient();
-
   const { data, error } = await supabase
     .from('subscribers')
     .select('*')
@@ -30,21 +32,19 @@ export async function getSubscribers() {
 
   if (error) {
     console.error('Error fetching subscribers:', error);
-    throw new Error('Не вдалося завантажити підписників');
+    return [];
   }
-
   return data as Subscriber[];
 }
 
-// 2. Видалення підписника
+// 2. Видалення
 export async function deleteSubscriber(id: number) {
-  const supabase = await createClient();
   const { error } = await supabase.from('subscribers').delete().eq('id', id);
   if (error) throw new Error(error.message);
   return { success: true };
 }
 
-// 3. Масова розсилка (Мультимовна)
+// 3. МАСОВА РОЗСИЛКА (Виправлена логіка)
 export async function sendBulkEmail(
   contentEn: EmailContent,
   contentUk: EmailContent
@@ -52,46 +52,54 @@ export async function sendBulkEmail(
   const subscribers = await getSubscribers();
 
   if (!subscribers || subscribers.length === 0) {
-    return { success: false, message: 'Немає підписників для розсилки' };
+    return { success: false, message: 'Немає підписників' };
   }
 
   let sentCount = 0;
   let errorCount = 0;
 
-  // Promise.allSettled дозволяє відправити всім, навіть якщо один впаде з помилкою
-  const results = await Promise.allSettled(
-    subscribers.map((sub) => {
-      // === ГОЛОВНА ЛОГІКА МОВИ ===
-      // Якщо в базі 'uk' -> беремо контент UK, інакше -> EN
-      const isUk = sub.lang === 'uk';
-      const emailData = isUk ? contentUk : contentEn;
-      const fromName = isUk ? 'MadEdge Україна' : 'MadEdge Global';
+  // Використовуємо map для створення масиву промісів
+  const promises = subscribers.map((sub) => {
+    // ⚠️ ГОЛОВНА ЛОГІКА:
+    // Перевіряємо, чи є lang = 'uk'. Якщо ні — вважаємо 'en'.
+    const isUk = sub.lang === 'uk';
 
-      const msg = {
-        to: sub.email,
-        from: {
-          email: 'info@madedge.net', // Ваш верифікований email
-          name: fromName,
-        },
-        subject: emailData.subject,
-        html: emailData.htmlBody,
-      };
+    // Вибираємо правильний контент
+    const emailData = isUk ? contentUk : contentEn;
 
-      return sgMail.send(msg);
-    })
-  );
+    // Якщо раптом для вибраної мови тема порожня, беремо англійську як запасну
+    const finalSubject = emailData.subject || contentEn.subject;
+    const finalHtml = emailData.htmlBody || contentEn.htmlBody;
 
-  results.forEach((result) => {
-    if (result.status === 'fulfilled') {
+    const msg = {
+      to: sub.email,
+      from: {
+        email: 'info@madedge.net',
+        name: isUk ? 'MadEdge Україна' : 'MadEdge Global',
+      },
+      subject: finalSubject,
+      html: finalHtml,
+    };
+
+    return sgMail
+      .send(msg)
+      .then(() => ({ status: 'fulfilled', email: sub.email }))
+      .catch((err) => ({ status: 'rejected', email: sub.email, reason: err }));
+  });
+
+  const results = await Promise.all(promises);
+
+  results.forEach((res: any) => {
+    if (res.status === 'fulfilled') {
       sentCount++;
     } else {
       errorCount++;
-      console.error('Email send error:', result.reason);
+      console.error(`Failed to send to ${res.email}:`, res.reason);
     }
   });
 
   return {
     success: true,
-    message: `Відправлено: ${sentCount}, Помилок: ${errorCount}`,
+    message: `Успішно: ${sentCount}, Помилок: ${errorCount}`,
   };
 }
