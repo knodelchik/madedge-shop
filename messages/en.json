@@ -1092,24 +1092,24 @@
     },
     "signupSuccessTitle": "Account created!",
     "signupSuccessDesc": "A verification email has been sent. Please confirm it to enable ordering.",
-    "signupSuccessAction": "Got it",
-    "AuthError": {
-      "title": {
-        "expired": "Link Expired",
-        "accessDenied": "Access Denied",
-        "default": "Authentication Error"
-      },
-      "message": {
-        "expired": "The email confirmation link has expired. Please request a new link.",
-        "accessDenied": "Unable to verify your email address.",
-        "default": "An error occurred while confirming your email."
-      },
-      "actions": {
-        "requestNewLink": "Request New Link",
-        "goHome": "Go to Home"
-      },
-      "technicalDetails": "Technical details",
-      "loading": "Loading..."
-    }
+    "signupSuccessAction": "Got it"
+  },
+  "AuthError": {
+    "title": {
+      "expired": "Link Expired",
+      "accessDenied": "Access Denied",
+      "default": "Authentication Error"
+    },
+    "message": {
+      "expired": "The email confirmation link has expired. Please request a new link.",
+      "accessDenied": "Unable to verify your email address.",
+      "default": "An error occurred while confirming your email."
+    },
+    "actions": {
+      "requestNewLink": "Request New Link",
+      "goHome": "Go to Home"
+    },
+    "technicalDetails": "Technical details",
+    "loading": "Loading..."
   }
 }
