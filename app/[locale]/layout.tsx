@@ -3,21 +3,21 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { ThemeProvider } from 'next-themes';
 import { Toaster } from 'sonner';
-// 1. Імпортуємо створений провайдер
 import { CurrencyProvider } from '@/app/context/CurrencyContext';
 import Header from '../Components/Header/Header';
 import Footer from '../Components/Footer';
 import '@/app/globals.css';
+import type { Metadata } from 'next';
 
 const locales = ['en', 'uk'] as const;
 type Locale = (typeof locales)[number];
 
-// SEO
+// SEO та Метадані
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ locale: string }>;
-}) {
+}): Promise<Metadata> {
   const { locale } = await params;
 
   const titles: Record<Locale, string> = {
@@ -32,6 +32,12 @@ export async function generateMetadata({
   return {
     title: titles[locale as Locale] || titles.uk,
     description: descriptions[locale as Locale] || descriptions.uk,
+    // Блок icons видалено, бо ми використовуємо метод file-based (файл icon.png у папці app)
+
+    // Якщо треба Google верифікація:
+    // verification: {
+    //   google: 'ваш-код',
+    // },
   };
 }
 
@@ -64,8 +70,6 @@ export default async function LocaleLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {/* 2. Обгортаємо все в CurrencyProvider. 
-              Пропси передавати не треба, він сам візьме мову з URL. */}
           <CurrencyProvider>
             <NextIntlClientProvider locale={locale} messages={messages}>
               <div className="flex min-h-screen flex-col">

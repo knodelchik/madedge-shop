@@ -2,6 +2,7 @@ import createNextIntlPlugin from 'next-intl/plugin';
 
 const withNextIntl = createNextIntlPlugin('./i18n.ts');
 
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   images: {
@@ -13,6 +14,15 @@ const nextConfig = {
         pathname: '/storage/v1/object/**',
       },
     ],
+  },
+  async redirects() {
+    return [
+      {
+        source: '/c',
+        destination: '/contacts',
+        permanent: true, // Це каже Гуглу, що сторінка переїхала назавжди
+      },
+    ];
   },
 };
 
