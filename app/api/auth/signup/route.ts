@@ -40,8 +40,9 @@ export async function POST(req: Request) {
         email,
         password,
         options: {
-          // Це має бути сторінка яка обробляє hash параметри
-          redirectTo: `${origin}/${userLocale}/auth/confirm`,
+          // ЗМІНЕНО: ведемо на API callback.
+          // Додаємо locale як параметр, щоб callback знав, куди повернути юзера.
+          redirectTo: `${origin}/api/auth/callback?locale=${userLocale}`,
         },
       });
 
