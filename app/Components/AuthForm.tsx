@@ -50,7 +50,6 @@ export default function AuthForm({
         // === РЕЄСТРАЦІЯ ===
         const result = await authService.signUp({
           ...formData,
-          lang: locale,
         });
 
         if (result.error) {
