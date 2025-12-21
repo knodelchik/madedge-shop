@@ -7,7 +7,16 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 export async function POST(req: Request) {
   try {
     const { email, password, full_name } = await req.json();
-    const origin = new URL(req.url).origin;
+
+    // --- ВИПРАВЛЕННЯ ПОЧАТОК ---
+    const requestUrl = new URL(req.url);
+    // Якщо ми на локальному комп'ютері - залишаємо localhost
+    // У всіх інших випадках (продакшн) - ставимо madedge.net
+    const origin =
+      requestUrl.hostname === 'localhost'
+        ? requestUrl.origin
+        : 'https://madedge.net';
+    // --- ВИПРАВЛЕННЯ КІНЕЦЬ ---
 
     // Створення юзера
     const { data: user, error: createError } =
@@ -26,14 +35,14 @@ export async function POST(req: Request) {
         { status: 500 }
       );
 
-    // Генерація лінка (ОНОВЛЕНО redirectTo)
+    // Генерація лінка
     const { data: linkData, error: linkError } =
       await supabaseAdmin.auth.admin.generateLink({
         type: 'signup',
         email,
         password,
         options: {
-          // 👇 Ведемо на callback, а потім на профіль
+          // Тепер origin буде https://madedge.net
           redirectTo: `${origin}/auth/callback?next=/profile`,
         },
       });
