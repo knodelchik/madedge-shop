@@ -10,37 +10,26 @@ export const authService = {
     email,
     password,
     full_name,
-    lang, // <--- 1. Деструктуризуємо lang
-  }: AuthFormData): Promise<{
-    user: User | null;
-    session: Session | null;
-    error: string | null;
-  }> {
+  }: {
+    email: string;
+    password: string;
+    full_name?: string;
+  }) {
     try {
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        // 2. Передаємо lang на сервер
-        body: JSON.stringify({ email, password, full_name, lang }),
+        body: JSON.stringify({ email, password, full_name }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        return {
-          user: null,
-          session: null,
-          error: data.error || 'Помилка реєстрації',
-        };
+        return { user: null, session: null, error: data.error };
       }
 
-      return {
-        user: data.user as unknown as User,
-        session: null,
-        error: null,
-      };
-    } catch (e) {
-      console.error('SignUp Error:', e);
+      return { user: null, session: null, error: null };
+    } catch {
       return {
         user: null,
         session: null,
@@ -48,12 +37,8 @@ export const authService = {
       };
     }
   },
-
   // === ВХІД (Без змін, Supabase сам хендлить це) ===
-  async signIn({
-    email,
-    password,
-  }: AuthFormData): Promise<{
+  async signIn({ email, password }: AuthFormData): Promise<{
     user: User | null;
     session: Session | null;
     error: string | null;
