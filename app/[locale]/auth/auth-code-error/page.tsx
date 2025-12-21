@@ -10,9 +10,8 @@ interface PageProps {
   params: { locale: string };
 }
 
-export default function AuthCodeError({ searchParams, params }: PageProps) {
+export default function AuthCodeError({ searchParams }: PageProps) {
   const t = useTranslations('AuthError');
-  const locale = params.locale || 'uk';
   const [hashParams, setHashParams] = useState<{
     error?: string;
     error_description?: string;
