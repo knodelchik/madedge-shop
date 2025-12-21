@@ -1084,6 +1084,12 @@
     "errors": {
       "unexpected": "An unexpected error occurred. Please try again later."
     },
+    "success": {
+      "title": "Check your email",
+      "sentTo": "We sent an email to",
+      "instruction": "Click the button in the email to activate your account.",
+      "back": "Go back"
+    },
     "signupSuccessTitle": "Account created!",
     "signupSuccessDesc": "A verification email has been sent. Please confirm it to enable ordering.",
     "signupSuccessAction": "Got it"

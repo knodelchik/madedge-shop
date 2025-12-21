@@ -4,8 +4,10 @@ import { useState } from 'react';
 import { authService } from '../../app/[locale]/services/authService';
 import { AuthFormData } from '../../app/types/users';
 import { useCartStore } from '../../app/[locale]/store/cartStore';
-import { useTranslations, useLocale } from 'next-intl'; // 1. Додали useLocale
+import { useTranslations, useLocale } from 'next-intl';
 import { toast } from 'sonner';
+import { Mail, Loader2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface AuthFormProps {
   type: 'signin' | 'signup';
@@ -20,18 +22,23 @@ export default function AuthForm({
   onToggleType,
   onForgotPassword,
 }: AuthFormProps) {
+  // Використовуємо namespace 'AuthForm'
   const t = useTranslations('AuthForm');
+  // Для загальних кнопок/посилань авторизації
   const tAuth = useTranslations('Auth');
-  const locale = useLocale(); // 2. Отримуємо поточну мову ('uk' або 'en')
+  const locale = useLocale();
 
   const [formData, setFormData] = useState<AuthFormData>({
     email: '',
     password: '',
     full_name: '',
-    // lang додамо динамічно при відправці
   });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Стан успішної реєстрації
+  const [successMode, setSuccessMode] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,39 +46,30 @@ export default function AuthForm({
     setError(null);
 
     try {
-      let result;
-
       if (type === 'signup') {
-        // 3. Передаємо поточну мову разом з даними форми
-        // Ми розширюємо об'єкт formData, додаючи туди lang
-        result = await authService.signUp({
+        // === РЕЄСТРАЦІЯ ===
+        const result = await authService.signUp({
           ...formData,
           lang: locale,
         });
 
-        if (result?.user && !result.error) {
-          toast.message(t('signupSuccessTitle'), {
-            description: t('signupSuccessDesc'),
-            duration: 8000,
-            action: {
-              label: t('signupSuccessAction'),
-              onClick: () => console.log('Closed'),
-            },
-          });
+        if (result.error) {
+          setError(result.error);
+        } else {
+          // Показуємо екран успіху
+          setSuccessMode(true);
+          toast.success(t('signupSuccessTitle'));
         }
       } else {
-        result = await authService.signIn(formData);
-      }
+        // === ВХІД ===
+        const result = await authService.signIn(formData);
 
-      if (result?.user) {
-        await useCartStore.getState().syncCartWithDatabase(result.user.id);
-        onSuccess?.();
-      }
-
-      if (result?.error) {
-        setError(result.error);
-      } else {
-        onSuccess?.();
+        if (result.error) {
+          setError(result.error);
+        } else if (result.user) {
+          await useCartStore.getState().syncCartWithDatabase(result.user.id);
+          onSuccess?.();
+        }
       }
     } catch {
       setError(t('errors.unexpected'));
@@ -87,7 +85,36 @@ export default function AuthForm({
     }));
   };
 
-  // ... решта JSX без змін ...
+  // ✅ ВІДОБРАЖЕННЯ: Екран "Перевірте пошту" (З ПЕРЕКЛАДАМИ)
+  if (successMode) {
+    return (
+      <div className="max-w-md mx-auto bg-white dark:bg-neutral-800 rounded-2xl shadow-lg p-8 border border-gray-100 dark:border-neutral-800 text-center">
+        <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6 text-green-600 dark:text-green-400">
+          <Mail size={32} />
+        </div>
+
+        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+          {t('success.title')}
+        </h3>
+
+        <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
+          {t('success.sentTo')} <strong>{formData.email}</strong>. <br />
+          {t('success.instruction')}
+        </p>
+
+        <div className="text-sm text-gray-500">
+          <button
+            onClick={() => setSuccessMode(false)}
+            className="text-black dark:text-white font-bold hover:underline cursor-pointer"
+          >
+            {t('success.back')}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ✅ ВІДОБРАЖЕННЯ: Звичайна форма
   return (
     <div className="max-w-md mx-auto bg-white dark:bg-neutral-800 rounded-2xl shadow-lg p-8 border border-gray-100 dark:border-neutral-800 transition-colors">
       <h2 className="text-2xl font-bold text-gray-800 dark:text-neutral-100 mb-6 text-center">
@@ -95,7 +122,7 @@ export default function AuthForm({
       </h2>
 
       {error && (
-        <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-200 px-4 py-3 rounded-lg mb-4">
+        <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-200 px-4 py-3 rounded-lg mb-4 text-sm">
           {error}
         </div>
       )}
@@ -103,15 +130,11 @@ export default function AuthForm({
       <form onSubmit={handleSubmit} className="space-y-4">
         {type === 'signup' && (
           <div>
-            <label
-              htmlFor="full_name"
-              className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1"
-            >
+            <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1">
               {t('labels.fullName')}
             </label>
             <input
               type="text"
-              id="full_name"
               name="full_name"
               value={formData.full_name}
               onChange={handleChange}
@@ -123,15 +146,11 @@ export default function AuthForm({
         )}
 
         <div>
-          <label
-            htmlFor="email"
-            className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1"
-          >
+          <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1">
             {t('labels.email')}
           </label>
           <input
             type="email"
-            id="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
@@ -142,15 +161,11 @@ export default function AuthForm({
         </div>
 
         <div>
-          <label
-            htmlFor="password"
-            className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1"
-          >
+          <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1">
             {t('labels.password')}
           </label>
           <input
             type="password"
-            id="password"
             name="password"
             value={formData.password}
             onChange={handleChange}
@@ -176,13 +191,15 @@ export default function AuthForm({
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex justify-center items-center gap-2"
         >
-          {loading
-            ? t('buttons.loading')
-            : type === 'signup'
-            ? t('buttons.create')
-            : t('buttons.signin')}
+          {loading ? (
+            <Loader2 className="animate-spin w-5 h-5" />
+          ) : type === 'signup' ? (
+            t('buttons.create')
+          ) : (
+            t('buttons.signin')
+          )}
         </button>
       </form>
 
@@ -190,7 +207,7 @@ export default function AuthForm({
         <button
           type="button"
           onClick={onToggleType}
-          className="text-gray-600 dark:text-neutral-300 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
+          className="text-gray-600 dark:text-neutral-300 hover:text-black dark:hover:text-white transition-colors cursor-pointer text-sm"
         >
           {type === 'signup' ? t('toggle.haveAccount') : t('toggle.noAccount')}
         </button>

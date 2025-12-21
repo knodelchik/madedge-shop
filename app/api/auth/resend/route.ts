@@ -14,7 +14,8 @@ export async function POST(req: Request) {
       email,
       password: 'dummy-password',
       options: {
-        redirectTo: `${origin}/profile`,
+        // 👇 Ведемо на callback, а потім на профіль
+        redirectTo: `${origin}/auth/callback?next=/profile`,
       },
     });
 
@@ -30,25 +31,20 @@ export async function POST(req: Request) {
       subject: 'Verify your email / Підтвердження пошти',
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-          
           <div style="margin-bottom: 20px;">
             <h2 style="margin-top: 0;">Email Verification</h2>
             <p>Please click the button below to verify your email address and activate your account.</p>
           </div>
-
           <div style="text-align: center; margin: 30px 0;">
             <a href="${action_link}" style="background-color: #000; color: #fff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block;">
               Verify Email / Підтвердити пошту
             </a>
           </div>
-
           <hr style="border: 0; border-top: 1px solid #eaeaea; margin: 30px 0;" />
-
           <div>
             <h2 style="margin-top: 0;">Підтвердження пошти</h2>
             <p>Будь ласка, натисніть кнопку вище, щоб підтвердити вашу електронну адресу та активувати акаунт.</p>
           </div>
-
         </div>
       `,
     };
