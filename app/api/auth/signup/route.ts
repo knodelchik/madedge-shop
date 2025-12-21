@@ -34,14 +34,14 @@ export async function POST(req: Request) {
       );
 
     // ВИПРАВЛЕННЯ: використовуємо type: 'signup' але з правильним redirectTo
+    // ЗМІНИ ТИП НА 'invite'
     const { data: linkData, error: linkError } =
       await supabaseAdmin.auth.admin.generateLink({
-        type: 'signup',
+        type: 'invite', // БУЛО 'signup'
         email,
-        password,
+        // Пароль для invite не потрібен тут, бо юзер його вже ввів при реєстрації
+        // і ми створили юзера через createUser вище.
         options: {
-          // ЗМІНЕНО: ведемо на API callback.
-          // Додаємо locale як параметр, щоб callback знав, куди повернути юзера.
           redirectTo: `${origin}/api/auth/callback?locale=${userLocale}`,
         },
       });
