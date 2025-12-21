@@ -1,21 +1,32 @@
+// app/[locale]/auth/callback/route.ts
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase-server'; // Переконайтесь, що шлях правильний до вашого createClient для server components
+import { createClient } from '@/lib/supabase-server';
 
-export async function GET(request: Request) {
+export async function GET(
+  request: Request,
+  { params }: { params: { locale: string } }
+) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
-  // Куди йти після успішного входу (за замовчуванням профіль)
   const next = searchParams.get('next') ?? '/profile';
+  const locale = params.locale || 'uk';
 
   if (code) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`);
+      // Успішна автентифікація - редірект з locale
+      return NextResponse.redirect(`${origin}/${locale}${next}`);
     }
+
+    console.error('Auth callback error:', error);
   }
 
-  // Якщо помилка - повертаємо на сторінку з помилкою
-  return NextResponse.redirect(`${origin}/auth/auth-code-error`);
+  // Якщо помилка - редірект на сторінку помилки з locale
+  return NextResponse.redirect(
+    `${origin}/${locale}/auth/auth-code-error?error=${
+      searchParams.get('error') || 'unknown'
+    }&error_description=${searchParams.get('error_description') || ''}`
+  );
 }

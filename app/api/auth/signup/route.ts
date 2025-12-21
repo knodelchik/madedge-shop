@@ -6,17 +6,16 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
 export async function POST(req: Request) {
   try {
-    const { email, password, full_name } = await req.json();
+    const { email, password, full_name, locale } = await req.json(); // Додаємо locale
 
-    // --- ВИПРАВЛЕННЯ ПОЧАТОК ---
     const requestUrl = new URL(req.url);
-    // Якщо ми на локальному комп'ютері - залишаємо localhost
-    // У всіх інших випадках (продакшн) - ставимо madedge.net
     const origin =
       requestUrl.hostname === 'localhost'
         ? requestUrl.origin
         : 'https://madedge.net';
-    // --- ВИПРАВЛЕННЯ КІНЕЦЬ ---
+
+    // Визначаємо локаль (за замовчуванням 'uk')
+    const userLocale = locale || 'uk';
 
     // Створення юзера
     const { data: user, error: createError } =
@@ -35,16 +34,15 @@ export async function POST(req: Request) {
         { status: 500 }
       );
 
-    // Генерація лінка
+    // Генерація лінка з правильним шляхом (включаючи locale)
     const { data: linkData, error: linkError } =
       await supabaseAdmin.auth.admin.generateLink({
         type: 'signup',
         email,
         password,
-        // В файлі app/api/auth/signup/route.ts
         options: {
-          // Видаляємо /api/ з шляху, щоб вийшло /auth/callback
-          redirectTo: `${origin}/auth/callback?next=/profile`,
+          // ВИПРАВЛЕННЯ: додаємо locale в шлях
+          redirectTo: `${origin}/${userLocale}/auth/callback?next=/profile`,
         },
       });
 
@@ -53,7 +51,7 @@ export async function POST(req: Request) {
 
     const { action_link } = linkData.properties;
 
-    // === ДВОМОВНИЙ ЛИСТ ===
+    // Двомовний лист
     const msg = {
       to: email,
       from: 'info@madedge.net',
