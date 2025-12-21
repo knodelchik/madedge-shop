@@ -1111,5 +1111,21 @@
     },
     "technicalDetails": "Technical details",
     "loading": "Loading..."
+  },
+
+  "AuthConfirm": {
+    "loading": {
+      "title": "Confirming email...",
+      "message": "Please wait a moment"
+    },
+    "success": {
+      "title": "Email confirmed!",
+      "message": "Your email has been successfully verified. We are redirecting you to your profile..."
+    },
+    "error": {
+      "title": "Confirmation error",
+      "message": "The link is invalid or has expired. Redirecting to the signup page..."
+    },
+    "button": "Go to profile"
   }
 }

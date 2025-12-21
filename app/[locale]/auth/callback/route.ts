@@ -18,9 +18,9 @@ export async function GET(
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
+    // В app/api/auth/callback/route.ts
     if (!error) {
-      // Успішна автентифікація - редірект з locale
-      return NextResponse.redirect(`${origin}/${userLocale}${next}`);
+      return NextResponse.redirect(`${origin}/${userLocale}/auth/confirm`);
     }
 
     console.error('Auth callback error:', error);

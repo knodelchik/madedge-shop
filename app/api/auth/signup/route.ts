@@ -6,7 +6,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
 export async function POST(req: Request) {
   try {
-    const { email, password, full_name, locale } = await req.json(); // Додаємо locale
+    const { email, password, full_name, locale } = await req.json();
 
     const requestUrl = new URL(req.url);
     const origin =
@@ -14,7 +14,6 @@ export async function POST(req: Request) {
         ? requestUrl.origin
         : 'https://madedge.net';
 
-    // Визначаємо локаль (за замовчуванням 'uk')
     const userLocale = locale || 'uk';
 
     // Створення юзера
@@ -34,15 +33,15 @@ export async function POST(req: Request) {
         { status: 500 }
       );
 
-    // Генерація лінка з правильним шляхом (включаючи locale)
+    // ВИПРАВЛЕННЯ: використовуємо type: 'signup' але з правильним redirectTo
     const { data: linkData, error: linkError } =
       await supabaseAdmin.auth.admin.generateLink({
         type: 'signup',
         email,
         password,
         options: {
-          // ВИПРАВЛЕННЯ: додаємо locale в шлях
-          redirectTo: `${origin}/${userLocale}/auth/callback?next=/profile`,
+          // Це має бути сторінка яка обробляє hash параметри
+          redirectTo: `${origin}/${userLocale}/auth/confirm`,
         },
       });
 
