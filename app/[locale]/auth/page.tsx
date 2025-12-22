@@ -6,35 +6,18 @@ import AuthForm from '../../Components/AuthForm';
 import { motion, AnimatePresence } from 'framer-motion';
 import { authService } from '../services/authService';
 import { toast } from 'sonner';
-import { useTranslations, useLocale } from 'next-intl'; // 1. Імпорт useLocale
-import { ArrowLeft, KeyRound } from 'lucide-react';
+import { useTranslations, useLocale } from 'next-intl';
+import { ArrowLeft, KeyRound, Loader2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase-client';
 
 export default function AuthPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const locale = useLocale(); // 2. Отримуємо поточну мову ('uk' або 'en')
-  const [checkingSession, setCheckingSession] = useState(true); // Стан перевірки
+  const locale = useLocale();
 
-  // Перевірка сесії при завантаженні
-  useEffect(() => {
-    const checkUser = async () => {
-      const supabase = createClient();
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+  // Стан для відображення лоадера, поки перевіряємо сесію
+  const [checkingSession, setCheckingSession] = useState(true);
 
-      if (!session) {
-        // Якщо немає сесії — викидаємо на сторінку входу
-        router.replace('/auth?view=signin');
-      } else {
-        setCheckingSession(false);
-      }
-    };
-    checkUser();
-  }, [router]);
-
-  // Перевіряємо URL параметр ?view=signup
   const initialView =
     searchParams.get('view') === 'signup' ? 'signup' : 'signin';
 
@@ -45,13 +28,33 @@ export default function AuthPage() {
   const [emailForReset, setEmailForReset] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const t = useTranslations('Auth');
+
+  // === 1. ВИПРАВЛЕНА ЛОГІКА ПЕРЕВІРКИ СЕСІЇ ===
+  useEffect(() => {
+    const checkUser = async () => {
+      const supabase = createClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (session) {
+        // Якщо сесія Є -> йдемо в профіль
+        router.replace('/profile');
+      } else {
+        // Якщо сесії НЕМАЄ -> показуємо форму (вимикаємо лоадер)
+        setCheckingSession(false);
+      }
+    };
+    checkUser();
+  }, [router]);
+
+  // Синхронізація URL параметрів
   useEffect(() => {
     const view = searchParams.get('view');
-    if (view === 'signup') setAuthType('signup');
-    else if (view === 'signin') setAuthType('signin');
-  }, [searchParams]);
-
-  const t = useTranslations('Auth');
+    if (view === 'signup' && authType !== 'signup') setAuthType('signup');
+    else if (view === 'signin' && authType !== 'signin') setAuthType('signin');
+  }, [searchParams, authType]);
 
   const handleSuccess = () => {
     router.push('/profile');
@@ -60,14 +63,20 @@ export default function AuthPage() {
   const toggleAuthType = () => {
     const newType = authType === 'signin' ? 'signup' : 'signin';
     setAuthType(newType);
+
+    // Оновлюємо URL без перезавантаження
+    const newUrl = `/auth?view=${newType}`;
+    window.history.replaceState(
+      { ...window.history.state, as: newUrl, url: newUrl },
+      '',
+      newUrl
+    );
   };
 
-  // === ЛОГІКА ВІДНОВЛЕННЯ ПАРОЛЮ ===
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    // 3. Передаємо locale (мову) другим параметром
     const { error } = await authService.resetPasswordForEmail(
       emailForReset,
       locale
@@ -82,6 +91,15 @@ export default function AuthPage() {
     }
     setLoading(false);
   };
+
+  // Показуємо спінер, поки Supabase перевіряє сесію
+  if (checkingSession) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-black flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-gray-500" />
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -144,8 +162,9 @@ export default function AuthPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-black dark:bg-white text-white dark:text-black font-bold py-3 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
+                    className="w-full bg-black dark:bg-white text-white dark:text-black font-bold py-3 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer flex justify-center items-center gap-2"
                   >
+                    {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                     {loading ? t('sending') : t('sendResetLink')}
                   </button>
                 </form>
@@ -159,7 +178,7 @@ export default function AuthPage() {
                 </button>
               </motion.div>
             ) : (
-              // === ЗВИЧАЙНА ФОРМА ===
+              // === ЗВИЧАЙНА ФОРМА (ВХІД / РЕЄСТРАЦІЯ) ===
               <motion.div
                 key={authType}
                 initial={{ opacity: 0, x: authType === 'signin' ? -20 : 20 }}
@@ -168,9 +187,12 @@ export default function AuthPage() {
                 transition={{ duration: 0.3 }}
                 className="p-8"
               >
-                {/* AuthForm всередині вже має логіку useLocale, тому просто рендеримо */}
+                {/* 2. ВИПРАВЛЕНА ПОМИЛКА TYPESCRIPT:
+                   Ми вже в блоці 'else', тому authType точно не 'forgot-password'.
+                   Ми приводимо тип явно, щоб задовольнити TS.
+                */}
                 <AuthForm
-                  type={authType}
+                  type={authType as 'signin' | 'signup'}
                   onSuccess={handleSuccess}
                   onToggleType={toggleAuthType}
                   onForgotPassword={() => setAuthType('forgot-password')}
