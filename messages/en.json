@@ -1096,29 +1096,28 @@
     "resendEmail": "Resend a letter"
   },
   "AuthError": {
-    "loading": "Loading...",
+    "loading": "Verifying...",
     "title": {
-      "expired": "Link Invalid or Expired",
+      "expired": "Action Required",
       "accessDenied": "Access Denied",
-      "default": "Authentication Error"
+      "default": "Login Error"
     },
     "message": {
-      "expired": "This link has expired.",
-      "expired_suggestion": "This link has already been used. If you just registered, your email might have been automatically verified. Please try logging in.",
+      "expired": "Link invalid.",
+      "expired_suggestion": "If you were resetting your password or signing up, the system might have already verified you automatically. Please click the button below to continue.",
       "accessDenied": "You do not have permission to access this page.",
-      "default": "An unknown error occurred during email verification."
+      "default": "Could not log in automatically."
     },
     "actions": {
-      "tryLogin": "Try Login",
+      "tryLogin": "Go to Profile / Change Password",
       "requestNewLink": "Create New Account",
       "goHome": "Go Home"
     },
-    "enterEmailToResend": "Or enter your email to receive the link again:",
+    "enterEmailToResend": "If the button above didn't work, enter your email for a new link:",
     "resendButton": "Resend Link",
-    "resendSuccess": "Email sent successfully!",
+    "resendSuccess": "Email sent!",
     "resendFailed": "Failed to send email",
-    "successVerified": "Successfully verified!",
-    "technicalDetails": "Technical Details"
+    "successVerified": "Login successful!"
   },
 
   "AuthConfirm": {

@@ -2,7 +2,7 @@
 
 import { Link } from '@/navigation';
 import { useTranslations, useLocale } from 'next-intl';
-import { useEffect, useState, Suspense } from 'react'; // Додав Suspense
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { Loader2, RefreshCw, Mail, LogIn } from 'lucide-react';
@@ -29,6 +29,28 @@ function AuthCodeErrorContent() {
 
   useEffect(() => {
     const handleCheck = async () => {
+      const supabase = createClient();
+
+      // === 0. ГОЛОВНИЙ ФІКС: ПЕРЕВІРКА ТОКЕНА ===
+      // Якщо в URL є #access_token (як на твоєму скріншоті), значить вхід відбувся успішно!
+      // Ми просто ігноруємо відсутність коду і переходимо далі.
+      if (
+        typeof window !== 'undefined' &&
+        window.location.hash.includes('access_token')
+      ) {
+        // Чекаємо мить, щоб Supabase розпарсив хеш
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (session) {
+          toast.success(t('successVerified') || 'Successfully verified!');
+          // Редіректимо на зміну пароля, бо це найімовірніша дія
+          router.replace('/auth/update-password');
+          return;
+        }
+      }
+
       // 1. Зчитуємо параметри з URL (Query Params)
       let errorData = {
         error: searchParams.get('error'),
@@ -58,12 +80,20 @@ function AuthCodeErrorContent() {
       const hasError = !!errorData.error || !!errorData.code;
 
       if (!hasError) {
-        router.replace('/');
+        // Якщо помилок немає взагалі, але є сесія - в профіль, інакше на головну
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (session) {
+          router.replace('/profile');
+        } else {
+          router.replace('/');
+        }
         return;
       }
 
-      // === ФІКС ТУТ ===
-      // Додаємо перевірку на 'no_code_received'
+      // 3. ЛОГІКА "ХИБНОЇ ТРИВОГИ"
+      // Додаємо сюди 'no_code_received'
       const isExpiredError =
         errorData.code === 'otp_expired' ||
         errorData.desc?.includes('expired') ||
@@ -71,14 +101,14 @@ function AuthCodeErrorContent() {
 
       if (isExpiredError) {
         try {
-          const supabase = createClient();
+          // Остання спроба перевірити сесію
           const {
             data: { session },
           } = await supabase.auth.getSession();
 
           if (session) {
             toast.success(t('successVerified') || 'Successfully verified!');
-            router.replace('/profile');
+            router.replace('/profile'); // Або /auth/update-password
             return;
           }
         } catch (e) {
@@ -86,6 +116,7 @@ function AuthCodeErrorContent() {
         }
       }
 
+      // Якщо сесії немає або помилка інша — показуємо екран помилки
       setCheckingSession(false);
       setIsClient(true);
     };
@@ -123,11 +154,10 @@ function AuthCodeErrorContent() {
 
   // Визначаємо тип помилки для UI
   const errorCode = hashParams.error_code || searchParams.get('error_code');
-  const errorParam = hashParams.error || searchParams.get('error'); // Отримуємо параметр error
+  const errorParam = hashParams.error || searchParams.get('error');
   const errorDescription =
     hashParams.error_description || searchParams.get('error_description') || '';
 
-  // === ФІКС ТУТ ТАКОЖ ===
   // Вважаємо посилання "простроченим", якщо код згорів АБО ми не отримали код взагалі
   const isExpired =
     errorCode === 'otp_expired' ||
@@ -136,6 +166,7 @@ function AuthCodeErrorContent() {
 
   const errorTypeKey = isExpired ? 'expired' : 'default';
 
+  // Поки йде перевірка — показуємо лоадер
   if (!isClient || checkingSession) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-neutral-950">
@@ -144,7 +175,7 @@ function AuthCodeErrorContent() {
     );
   }
 
-  // === ВАРІАНТ 1: ПОСИЛАННЯ ЗАСТАРІЛО ===
+  // === ВАРІАНТ 1: ПОСИЛАННЯ ЗАСТАРІЛО (Або Access Token в хеші) ===
   if (isExpired) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-neutral-950 px-4">
