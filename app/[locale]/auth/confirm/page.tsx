@@ -1,21 +1,24 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-export default function AuthSuccessPage() {
-  const t = useTranslations('AuthConfirm');
+export default function AuthConfirm() {
   const router = useRouter();
+  const t = useTranslations('AuthConfirm');
+  const [status, setStatus] = useState<'success'>('success'); // Одразу успіх, бо API вже спрацювало
 
   useEffect(() => {
-    // Даємо 3 секунди, щоб користувач прочитав повідомлення,
-    // а браузер остаточно зберіг куки сесії
+    // Просто чекаємо 3 секунди і кидаємо в профіль
+    // Бо якщо ми тут - значить callback/route.ts вже відпрацював без помилок
     const timer = setTimeout(() => {
       router.push('/profile');
+      // router.refresh(); // Можна розкоментувати, якщо дані профілю не підтягуються одразу
     }, 3000);
+
     return () => clearTimeout(timer);
   }, [router]);
 

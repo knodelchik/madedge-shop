@@ -1,22 +1,30 @@
-// app/api/auth/signup/route.ts
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
+// Використовуємо Service Role Key для адмінських дій, або Anon Key для звичайних
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY! // або anon, якщо без insert у users
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
 export async function POST(req: Request) {
   try {
-    const { email, password, full_name } = await req.json();
+    // 1. Отримуємо locale з тіла запиту (переконайся, що фронтенд її відправляє)
+    const { email, password, full_name, locale } = await req.json();
 
+    const requestUrl = new URL(req.url);
+    const origin = requestUrl.origin; // Автоматично визначає localhost або домен
+
+    const userLocale = locale || 'uk';
+
+    // 2. Реєстрація
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: { full_name },
-        emailRedirectTo: 'https://madedge.net/api/auth/callback',
+        // КЛЮЧОВИЙ МОМЕНТ: додаємо ?locale=...
+        emailRedirectTo: `${origin}/api/auth/callback?locale=${userLocale}`,
       },
     });
 
