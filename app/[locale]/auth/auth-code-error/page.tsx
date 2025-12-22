@@ -14,51 +14,55 @@ function AuthCodeErrorContent() {
   const searchParams = useSearchParams();
   const locale = useLocale();
 
-  const [hashParams, setHashParams] = useState<{
-    error?: string;
-    error_description?: string;
-    error_code?: string;
-  }>({});
+  // Стан для відображення помилки (показуємо тільки якщо вхід точно не вдався)
+  const [showError, setShowError] = useState(false);
 
-  const [isClient, setIsClient] = useState(false);
-  const [checkingSession, setCheckingSession] = useState(true);
+  // Тип помилки для вибору правильного екрану (expired vs default)
+  const [errorType, setErrorType] = useState<'expired' | 'default'>('default');
+  const [errorDesc, setErrorDesc] = useState('');
 
-  // === СТАНИ ДЛЯ ПОВТОРНОЇ ВІДПРАВКИ ===
+  // Стани для форми
   const [email, setEmail] = useState('');
   const [isResending, setIsResending] = useState(false);
 
   useEffect(() => {
-    const handleCheck = async () => {
-      const supabase = createClient();
+    const supabase = createClient();
+    let isMounted = true;
 
-      // === 0. ГОЛОВНИЙ ФІКС: ПЕРЕВІРКА ТОКЕНА ===
-      // Якщо в URL є #access_token, значить вхід відбувся успішно!
-      // Ми просто ігноруємо відсутність коду і переходимо далі.
-      if (
-        typeof window !== 'undefined' &&
-        window.location.hash.includes('access_token')
-      ) {
-        // Чекаємо мить, щоб Supabase розпарсив хеш
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        if (session) {
+    // 1. СЛУХАЧ ПОДІЙ (Головний фікс)
+    // Якщо в URL є токен, Supabase сам його знайде і викличе цю подію
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        if (session && isMounted) {
           toast.success(t('successVerified') || 'Successfully verified!');
-          // Редіректимо на зміну пароля, бо це найімовірніша дія
+          // ВАЖЛИВО: Редірект на зміну пароля
           router.replace('/auth/update-password');
-          return;
         }
       }
+    });
 
-      // 1. Зчитуємо параметри з URL (Query Params)
+    // 2. ФУНКЦІЯ ПЕРЕВІРКИ (Запускається з затримкою)
+    const checkStatus = async () => {
+      // Спочатку перевіряємо, чи ми вже залогінені
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (session) {
+        if (isMounted) router.replace('/auth/update-password');
+        return;
+      }
+
+      // Якщо сесії немає — розбираємо помилки з URL
       let errorData = {
         error: searchParams.get('error'),
         desc: searchParams.get('error_description'),
         code: searchParams.get('error_code'),
       };
 
-      // 2. Зчитуємо параметри з Хешу (Hash), якщо вони є
+      // Перевіряємо хеш (іноді помилки там)
       if (typeof window !== 'undefined' && window.location.hash) {
         const hash = window.location.hash.substring(1);
         const params = new URLSearchParams(hash);
@@ -71,57 +75,30 @@ function AuthCodeErrorContent() {
         }
       }
 
-      setHashParams({
-        error: errorData.error || undefined,
-        error_description: errorData.desc || undefined,
-        error_code: errorData.code || undefined,
-      });
-
-      const hasError = !!errorData.error || !!errorData.code;
-
-      if (!hasError) {
-        // Якщо помилок немає взагалі, але є сесія - в профіль, інакше на головну
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        if (session) {
-          router.replace('/profile');
-        } else {
-          router.replace('/');
-        }
-        return;
-      }
-
-      // 3. ЛОГІКА "ХИБНОЇ ТРИВОГИ"
-      // Додаємо сюди 'no_code_received', щоб це вважалося "просроченим" посиланням, а не фатальною помилкою
-      const isExpiredError =
+      // Визначаємо тип помилки
+      const isExpired =
         errorData.code === 'otp_expired' ||
         errorData.desc?.includes('expired') ||
         errorData.error === 'no_code_received';
 
-      if (isExpiredError) {
-        try {
-          // Остання спроба перевірити сесію
-          const {
-            data: { session },
-          } = await supabase.auth.getSession();
-
-          if (session) {
-            toast.success(t('successVerified') || 'Successfully verified!');
-            router.replace('/profile'); // Або /auth/update-password
-            return;
-          }
-        } catch (e) {
-          console.error('Session check failed', e);
-        }
+      if (isMounted) {
+        setErrorType(isExpired ? 'expired' : 'default');
+        setErrorDesc(errorData.desc || '');
+        // Тільки тепер показуємо екран помилки
+        setShowError(true);
       }
-
-      // Якщо сесії немає або помилка інша — показуємо екран помилки
-      setCheckingSession(false);
-      setIsClient(true);
     };
 
-    handleCheck();
+    // Даємо Supabase 1.5 секунди на обробку токена перед тим, як кричати "Помилка"
+    const timer = setTimeout(() => {
+      checkStatus();
+    }, 1500);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+      subscription.unsubscribe();
+    };
   }, [searchParams, router, t]);
 
   // === ОБРОБНИК ПОВТОРНОЇ ВІДПРАВКИ ===
@@ -152,22 +129,8 @@ function AuthCodeErrorContent() {
     }
   };
 
-  // Визначаємо тип помилки для UI
-  const errorCode = hashParams.error_code || searchParams.get('error_code');
-  const errorParam = hashParams.error || searchParams.get('error');
-  const errorDescription =
-    hashParams.error_description || searchParams.get('error_description') || '';
-
-  // Вважаємо посилання "простроченим", якщо код згорів АБО ми не отримали код взагалі
-  const isExpired =
-    errorCode === 'otp_expired' ||
-    errorDescription.includes('expired') ||
-    errorParam === 'no_code_received';
-
-  const errorTypeKey = isExpired ? 'expired' : 'default';
-
-  // Поки йде перевірка — показуємо лоадер
-  if (!isClient || checkingSession) {
+  // === ЛОАДЕР (Поки чекаємо обробки токена) ===
+  if (!showError) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-neutral-950">
         <Loader2 className="w-8 h-8 animate-spin text-gray-500" />
@@ -175,8 +138,8 @@ function AuthCodeErrorContent() {
     );
   }
 
-  // === ВАРІАНТ 1: ПОСИЛАННЯ ЗАСТАРІЛО (Або Access Token в хеші) ===
-  if (isExpired) {
+  // === ВАРІАНТ 1: ПОСИЛАННЯ ЗАСТАРІЛО (EXPIRED) ===
+  if (errorType === 'expired') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-neutral-950 px-4">
         <div className="max-w-md w-full bg-white dark:bg-neutral-900 rounded-[2rem] shadow-xl p-8 text-center border border-gray-100 dark:border-neutral-800">
@@ -244,7 +207,7 @@ function AuthCodeErrorContent() {
     );
   }
 
-  // === ВАРІАНТ 2: ІНШІ ПОМИЛКИ (Generic Error) ===
+  // === ВАРІАНТ 2: ІНШІ ПОМИЛКИ (DEFAULT) ===
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-neutral-950 px-4">
       <div className="max-w-md w-full bg-white dark:bg-neutral-900 rounded-lg shadow-lg p-8 text-center border border-gray-100 dark:border-neutral-800">
@@ -266,10 +229,10 @@ function AuthCodeErrorContent() {
 
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            {t(`title.${errorTypeKey}`) || 'Помилка автентифікації'}
+            {t(`title.default`) || 'Помилка автентифікації'}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            {errorDescription || t(`message.${errorTypeKey}`)}
+            {errorDesc || t(`message.default`)}
           </p>
         </div>
 
