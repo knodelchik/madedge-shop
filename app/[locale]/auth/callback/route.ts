@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server';
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
 export async function GET(request: Request) {
+  // 1. ЛОГУВАННЯ (Дивись логи Vercel)
+  console.log('🔹 CALLBACK STARTED:', request.url);
+
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
   const locale = searchParams.get('locale') || 'uk';
@@ -11,7 +14,6 @@ export async function GET(request: Request) {
   if (code) {
     const cookieStore = await cookies();
 
-    // Створюємо клієнт вручну, щоб мати контроль над методами set/setAll
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -26,30 +28,29 @@ export async function GET(request: Request) {
                 cookieStore.set(name, value, options)
               );
             } catch {
-              // The `setAll` method was called from a Server Component.
-              // This can be ignored if you have middleware refreshing
-              // user sessions.
+              // Ігноруємо помилку setAll у Server Component
             }
           },
         },
       }
     );
 
-    // Обмінюємо код на сесію.
-    // Завдяки налаштуванню вище, Supabase запише токени в куки браузера.
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
-      // Важливо: переконайся, що next починається зі слеша, щоб URL був коректним
       const cleanNext = next.startsWith('/') ? next : `/${next}`;
+      // Формуємо фінальний URL
+      const finalUrl = `${origin}/${locale}${cleanNext}`;
 
-      // Редірект на потрібну сторінку
-      return NextResponse.redirect(`${origin}/${locale}${cleanNext}`);
+      console.log('✅ LOGIN SUCCESS. Redirecting to:', finalUrl);
+      return NextResponse.redirect(finalUrl);
     } else {
-      console.error('Callback auth error:', error.message);
+      console.error('❌ AUTH ERROR:', error.message);
     }
+  } else {
+    console.error('❌ NO CODE FOUND in URL');
   }
 
-  // Якщо коду немає або сталася помилка
+  // Якщо помилка - на сторінку помилки
   return NextResponse.redirect(`${origin}/${locale}/auth/auth-code-error`);
 }

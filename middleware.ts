@@ -10,7 +10,7 @@ const intlMiddleware = createMiddleware({
 });
 
 export default async function middleware(request: NextRequest) {
-  // 1. Ігноруємо API та статичні файли
+  // 1. Ігноруємо системні файли
   if (
     request.nextUrl.pathname.startsWith('/api') ||
     request.nextUrl.pathname.startsWith('/_next') ||
@@ -19,10 +19,10 @@ export default async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 2. Спочатку запускаємо локалізацію (щоб мати правильний response)
+  // 2. Локалізація
   const response = intlMiddleware(request);
 
-  // 3. Створюємо Supabase клієнт для Middleware
+  // 3. Supabase клієнт
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -32,32 +32,32 @@ export default async function middleware(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            request.cookies.set(name, value);
-          });
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options);
-          });
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          );
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          );
         },
       },
     }
   );
 
-  // 4. Отримуємо користувача (оновлюємо сесію)
+  // 4. Перевірка користувача
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   // === ЗАХИСТ МАРШРУТІВ ===
-
-  // Перевіряємо, чи намагається юзер зайти на сторінку зміни пароля
-  // (вона може бути /uk/auth/update-password або /en/auth/update-password)
   if (request.nextUrl.pathname.includes('/auth/update-password')) {
-    // Якщо користувача немає (незалогінений) — кидаємо на вхід
     if (!user) {
-      const locale = request.nextUrl.locale || defaultLocale;
+      // Визначаємо локаль з шляху (наприклад /uk/auth... -> uk)
+      const pathname = request.nextUrl.pathname;
+      const pathLocale =
+        locales.find((l) => pathname.startsWith(`/${l}`)) || defaultLocale;
+
       const url = request.nextUrl.clone();
-      url.pathname = `/${locale}/auth`;
+      url.pathname = `/${pathLocale}/auth`;
       url.searchParams.set('view', 'signin');
       return NextResponse.redirect(url);
     }
