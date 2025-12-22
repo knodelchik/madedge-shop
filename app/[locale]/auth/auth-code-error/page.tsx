@@ -32,7 +32,7 @@ function AuthCodeErrorContent() {
       const supabase = createClient();
 
       // === 0. ГОЛОВНИЙ ФІКС: ПЕРЕВІРКА ТОКЕНА ===
-      // Якщо в URL є #access_token (як на твоєму скріншоті), значить вхід відбувся успішно!
+      // Якщо в URL є #access_token, значить вхід відбувся успішно!
       // Ми просто ігноруємо відсутність коду і переходимо далі.
       if (
         typeof window !== 'undefined' &&
@@ -93,7 +93,7 @@ function AuthCodeErrorContent() {
       }
 
       // 3. ЛОГІКА "ХИБНОЇ ТРИВОГИ"
-      // Додаємо сюди 'no_code_received'
+      // Додаємо сюди 'no_code_received', щоб це вважалося "просроченим" посиланням, а не фатальною помилкою
       const isExpiredError =
         errorData.code === 'otp_expired' ||
         errorData.desc?.includes('expired') ||
