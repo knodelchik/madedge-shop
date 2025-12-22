@@ -1,23 +1,82 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+// 👇 ОСЬ ТУТ БУЛА ПОМИЛКА. Тепер ми імпортуємо з нового файлу
+import { createClient } from '@/lib/supabase-client';
 
-export default function AuthSuccessPage() {
-  const t = useTranslations('AuthConfirm');
+export default function AuthConfirm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const t = useTranslations('AuthConfirm');
+  const [status, setStatus] = useState<'loading' | 'success'>('loading');
 
   useEffect(() => {
-    // Даємо 3 секунди, щоб користувач прочитав повідомлення,
-    // а браузер остаточно зберіг куки сесії
-    const timer = setTimeout(() => {
-      router.push('/profile');
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, [router]);
+    const handleAuth = async () => {
+      // Створюємо клієнт саме для браузера
+      const supabase = createClient();
+
+      // 1. СЦЕНАРІЙ: Серверний код (?code=...)
+      // Якщо Supabase прислав код, ми кидаємо його на API, щоб сервер сам розібрався
+      const code = searchParams.get('code');
+      if (code) {
+        const locale = window.location.pathname.split('/')[1] || 'uk';
+        // next=/profile гарантує, що після обміну коду API кине нас в профіль
+        router.replace(
+          `/api/auth/callback?code=${code}&locale=${locale}&next=/profile`
+        );
+        return;
+      }
+
+      // 2. СЦЕНАРІЙ: Клієнтський хеш (#access_token=...)
+      // Якщо Supabase прислав хеш (що часто буває при signup), ловимо його тут
+      const hash = window.location.hash;
+      if (hash && hash.includes('access_token')) {
+        try {
+          const hashParams = new URLSearchParams(hash.substring(1));
+          const access_token = hashParams.get('access_token');
+          const refresh_token = hashParams.get('refresh_token');
+
+          if (access_token && refresh_token) {
+            const { error } = await supabase.auth.setSession({
+              access_token,
+              refresh_token,
+            });
+
+            if (!error) {
+              setStatus('success');
+              // Оновлюємо роутер (router.refresh), щоб Middleware побачив нові куки
+              setTimeout(() => {
+                router.push('/profile');
+                router.refresh();
+              }, 1000);
+              return;
+            }
+          }
+        } catch (e) {
+          console.error('Hash auth error:', e);
+        }
+      }
+
+      // 3. СЦЕНАРІЙ: Перевірка існуючої сесії
+      // Можливо, ми вже залогінені
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session) {
+        setStatus('success');
+        setTimeout(() => {
+          router.push('/profile');
+          router.refresh();
+        }, 1000);
+      }
+    };
+
+    handleAuth();
+  }, [router, searchParams]);
 
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4 bg-white dark:bg-neutral-950">
