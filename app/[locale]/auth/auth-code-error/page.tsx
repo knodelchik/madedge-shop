@@ -2,13 +2,13 @@
 
 import { Link } from '@/navigation';
 import { useTranslations, useLocale } from 'next-intl';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react'; // Додав Suspense
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { Loader2, RefreshCw, Mail, LogIn } from 'lucide-react';
-import { createClient } from '@/lib/supabase-client'; // Імпорт клієнта для перевірки сесії
+import { createClient } from '@/lib/supabase-client';
 
-export default function AuthCodeError() {
+function AuthCodeErrorContent() {
   const t = useTranslations('AuthError');
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -21,7 +21,7 @@ export default function AuthCodeError() {
   }>({});
 
   const [isClient, setIsClient] = useState(false);
-  const [checkingSession, setCheckingSession] = useState(true); // Стан перевірки сесії
+  const [checkingSession, setCheckingSession] = useState(true);
 
   // === СТАНИ ДЛЯ ПОВТОРНОЇ ВІДПРАВКИ ===
   const [email, setEmail] = useState('');
@@ -40,11 +40,11 @@ export default function AuthCodeError() {
       if (typeof window !== 'undefined' && window.location.hash) {
         const hash = window.location.hash.substring(1);
         const params = new URLSearchParams(hash);
-        if (params.get('error')) {
+        if (params.get('error') || params.get('error_code')) {
           errorData = {
-            error: params.get('error'),
-            desc: params.get('error_description'),
-            code: params.get('error_code'),
+            error: params.get('error') || errorData.error,
+            desc: params.get('error_description') || errorData.desc,
+            code: params.get('error_code') || errorData.code,
           };
         }
       }
@@ -58,19 +58,18 @@ export default function AuthCodeError() {
       const hasError = !!errorData.error || !!errorData.code;
 
       if (!hasError) {
-        // Якщо помилок немає взагалі — на головну
         router.replace('/');
         return;
       }
 
-      // 3. ЛОГІКА "ХИБНОЇ ТРИВОГИ"
-      // Якщо помилка "otp_expired", перевіряємо, чи ми вже залогінені.
-      // Часто поштові боти переходять по посиланню першими, "з'їдають" токен,
-      // але сесія може бути вже встановлена.
-      if (
+      // === ФІКС ТУТ ===
+      // Додаємо перевірку на 'no_code_received'
+      const isExpiredError =
         errorData.code === 'otp_expired' ||
-        errorData.desc?.includes('expired')
-      ) {
+        errorData.desc?.includes('expired') ||
+        errorData.error === 'no_code_received';
+
+      if (isExpiredError) {
         try {
           const supabase = createClient();
           const {
@@ -78,7 +77,6 @@ export default function AuthCodeError() {
           } = await supabase.auth.getSession();
 
           if (session) {
-            // Ура! Ми залогінені. Ігноруємо помилку.
             toast.success(t('successVerified') || 'Successfully verified!');
             router.replace('/profile');
             return;
@@ -88,7 +86,6 @@ export default function AuthCodeError() {
         }
       }
 
-      // Якщо сесії немає або помилка інша — показуємо екран помилки
       setCheckingSession(false);
       setIsClient(true);
     };
@@ -126,14 +123,19 @@ export default function AuthCodeError() {
 
   // Визначаємо тип помилки для UI
   const errorCode = hashParams.error_code || searchParams.get('error_code');
+  const errorParam = hashParams.error || searchParams.get('error'); // Отримуємо параметр error
   const errorDescription =
     hashParams.error_description || searchParams.get('error_description') || '';
 
+  // === ФІКС ТУТ ТАКОЖ ===
+  // Вважаємо посилання "простроченим", якщо код згорів АБО ми не отримали код взагалі
   const isExpired =
-    errorCode === 'otp_expired' || errorDescription.includes('expired');
+    errorCode === 'otp_expired' ||
+    errorDescription.includes('expired') ||
+    errorParam === 'no_code_received';
+
   const errorTypeKey = isExpired ? 'expired' : 'default';
 
-  // Поки йде перевірка — показуємо лоадер
   if (!isClient || checkingSession) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-neutral-950">
@@ -142,7 +144,7 @@ export default function AuthCodeError() {
     );
   }
 
-  // === ВАРІАНТ 1: ПОСИЛАННЯ ЗАСТАРІЛО (Найчастіший випадок) ===
+  // === ВАРІАНТ 1: ПОСИЛАННЯ ЗАСТАРІЛО ===
   if (isExpired) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-neutral-950 px-4">
@@ -157,7 +159,7 @@ export default function AuthCodeError() {
 
           <p className="text-gray-600 dark:text-gray-400 mb-8 leading-relaxed text-sm">
             {t('message.expired_suggestion') ||
-              'Це посилання вже було використано. Якщо ви щойно реєструвалися, ваша пошта могла бути підтверджена автоматично.'}
+              'Це посилання вже було використано. Спробуйте увійти або надішліть запит знову.'}
           </p>
 
           <div className="space-y-3">
@@ -285,5 +287,20 @@ export default function AuthCodeError() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Огортаємо в Suspense, щоб useSearchParams не ламав білд
+export default function AuthCodeError() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader2 className="animate-spin" />
+        </div>
+      }
+    >
+      <AuthCodeErrorContent />
+    </Suspense>
   );
 }

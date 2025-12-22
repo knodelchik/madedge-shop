@@ -3,9 +3,6 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
 export async function GET(request: Request) {
-  // 1. ЛОГУВАННЯ (Дивись логи Vercel)
-  console.log('🔹 CALLBACK STARTED:', request.url);
-
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
   const locale = searchParams.get('locale') || 'uk';
@@ -28,7 +25,7 @@ export async function GET(request: Request) {
                 cookieStore.set(name, value, options)
               );
             } catch {
-              // Ігноруємо помилку setAll у Server Component
+              // Ігноруємо
             }
           },
         },
@@ -39,18 +36,18 @@ export async function GET(request: Request) {
 
     if (!error) {
       const cleanNext = next.startsWith('/') ? next : `/${next}`;
-      // Формуємо фінальний URL
-      const finalUrl = `${origin}/${locale}${cleanNext}`;
-
-      console.log('✅ LOGIN SUCCESS. Redirecting to:', finalUrl);
-      return NextResponse.redirect(finalUrl);
+      return NextResponse.redirect(`${origin}/${locale}${cleanNext}`);
     } else {
-      console.error('❌ AUTH ERROR:', error.message);
+      console.error('Callback auth error:', error.message);
+      // Якщо помилка обміну коду
+      return NextResponse.redirect(
+        `${origin}/${locale}/auth/auth-code-error?error=exchange_failed`
+      );
     }
-  } else {
-    console.error('❌ NO CODE FOUND in URL');
   }
 
-  // Якщо помилка - на сторінку помилки
-  return NextResponse.redirect(`${origin}/${locale}/auth/auth-code-error`);
+  // 🔥 ВИПРАВЛЕННЯ: Додаємо параметр error, щоб сторінка помилки не кидала на головну
+  return NextResponse.redirect(
+    `${origin}/${locale}/auth/auth-code-error?error=no_code_received`
+  );
 }
