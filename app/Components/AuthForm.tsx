@@ -6,7 +6,7 @@ import { AuthFormData } from '../../app/types/users';
 import { useCartStore } from '../../app/[locale]/store/cartStore';
 import { useTranslations, useLocale } from 'next-intl';
 import { toast } from 'sonner';
-import { Mail, Loader2 } from 'lucide-react';
+import { Mail, Loader2, RefreshCw } from 'lucide-react'; // Додав іконку RefreshCw
 import { motion } from 'framer-motion';
 
 interface AuthFormProps {
@@ -22,9 +22,7 @@ export default function AuthForm({
   onToggleType,
   onForgotPassword,
 }: AuthFormProps) {
-  // Використовуємо namespace 'AuthForm'
   const t = useTranslations('AuthForm');
-  // Для загальних кнопок/посилань авторизації
   const tAuth = useTranslations('Auth');
   const locale = useLocale();
 
@@ -35,11 +33,11 @@ export default function AuthForm({
   });
 
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false); // Стан для повторної відправки
   const [error, setError] = useState<string | null>(null);
-
-  // Стан успішної реєстрації
   const [successMode, setSuccessMode] = useState(false);
 
+  // === ВХІД / РЕЄСТРАЦІЯ ===
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -47,20 +45,15 @@ export default function AuthForm({
 
     try {
       if (type === 'signup') {
-        // === РЕЄСТРАЦІЯ ===
-        const result = await authService.signUp({
-          ...formData,
-        });
+        const result = await authService.signUp({ ...formData });
 
         if (result.error) {
           setError(result.error);
         } else {
-          // Показуємо екран успіху
           setSuccessMode(true);
           toast.success(t('signupSuccessTitle'));
         }
       } else {
-        // === ВХІД ===
         const result = await authService.signIn(formData);
 
         if (result.error) {
@@ -77,6 +70,28 @@ export default function AuthForm({
     }
   };
 
+  // === ПОВТОРНА ВІДПРАВКА ЛИСТА ===
+  const handleResend = async () => {
+    setResending(true);
+    try {
+      // Викликаємо метод resendVerificationEmail (переконайся, що він є в authService)
+      const result = await authService.resendVerificationEmail(
+        formData.email,
+        locale
+      );
+
+      if (result.error) {
+        toast.error(t('errors.resendFailed') || 'Error sending email');
+      } else {
+        toast.success(t('resendSuccess') || 'Email sent again!');
+      }
+    } catch (e) {
+      toast.error('Unexpected error');
+    } finally {
+      setResending(false);
+    }
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev: any) => ({
       ...prev,
@@ -84,7 +99,7 @@ export default function AuthForm({
     }));
   };
 
-  // ✅ ВІДОБРАЖЕННЯ: Екран "Перевірте пошту" (З ПЕРЕКЛАДАМИ)
+  // ✅ ВІДОБРАЖЕННЯ: Екран "Перевірте пошту"
   if (successMode) {
     return (
       <div className="max-w-md mx-auto bg-white dark:bg-neutral-800 rounded-2xl shadow-lg p-8 border border-gray-100 dark:border-neutral-800 text-center">
@@ -101,7 +116,23 @@ export default function AuthForm({
           {t('success.instruction')}
         </p>
 
-        <div className="text-sm text-gray-500">
+        {/* КНОПКА ПОВТОРНОЇ ВІДПРАВКИ */}
+        <div className="mb-6">
+          <button
+            onClick={handleResend}
+            disabled={resending}
+            className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 flex items-center justify-center gap-2 mx-auto disabled:opacity-50 cursor-pointer"
+          >
+            {resending ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <RefreshCw className="w-4 h-4" />
+            )}
+            {t('resendEmail')}
+          </button>
+        </div>
+
+        <div className="text-sm text-gray-500 pt-4 border-t border-gray-100 dark:border-neutral-700">
           <button
             onClick={() => setSuccessMode(false)}
             className="text-black dark:text-white font-bold hover:underline cursor-pointer"
@@ -113,7 +144,7 @@ export default function AuthForm({
     );
   }
 
-  // ✅ ВІДОБРАЖЕННЯ: Звичайна форма
+  // ✅ ВІДОБРАЖЕННЯ: Звичайна форма (без змін)
   return (
     <div className="max-w-md mx-auto bg-white dark:bg-neutral-800 rounded-2xl shadow-lg p-8 border border-gray-100 dark:border-neutral-800 transition-colors">
       <h2 className="text-2xl font-bold text-gray-800 dark:text-neutral-100 mb-6 text-center">

@@ -5,26 +5,24 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { CheckCircle2, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
-// 👇 ОСЬ ТУТ БУЛА ПОМИЛКА. Тепер ми імпортуємо з нового файлу
 import { createClient } from '@/lib/supabase-client';
 
 export default function AuthConfirm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations('AuthConfirm');
+
+  // Явно вказуємо типи, щоб TypeScript був щасливий
   const [status, setStatus] = useState<'loading' | 'success'>('loading');
 
   useEffect(() => {
     const handleAuth = async () => {
-      // Створюємо клієнт саме для браузера
       const supabase = createClient();
 
       // 1. СЦЕНАРІЙ: Серверний код (?code=...)
-      // Якщо Supabase прислав код, ми кидаємо його на API, щоб сервер сам розібрався
       const code = searchParams.get('code');
       if (code) {
         const locale = window.location.pathname.split('/')[1] || 'uk';
-        // next=/profile гарантує, що після обміну коду API кине нас в профіль
         router.replace(
           `/api/auth/callback?code=${code}&locale=${locale}&next=/profile`
         );
@@ -32,7 +30,6 @@ export default function AuthConfirm() {
       }
 
       // 2. СЦЕНАРІЙ: Клієнтський хеш (#access_token=...)
-      // Якщо Supabase прислав хеш (що часто буває при signup), ловимо його тут
       const hash = window.location.hash;
       if (hash && hash.includes('access_token')) {
         try {
@@ -48,11 +45,11 @@ export default function AuthConfirm() {
 
             if (!error) {
               setStatus('success');
-              // Оновлюємо роутер (router.refresh), щоб Middleware побачив нові куки
+              // Чекаємо 1.5 секунди, щоб юзер побачив галочку
               setTimeout(() => {
                 router.push('/profile');
                 router.refresh();
-              }, 1000);
+              }, 1500);
               return;
             }
           }
@@ -61,23 +58,38 @@ export default function AuthConfirm() {
         }
       }
 
-      // 3. СЦЕНАРІЙ: Перевірка існуючої сесії
-      // Можливо, ми вже залогінені
+      // 3. СЦЕНАРІЙ: "Зайвий пасажир" (перевірка існуючої сесії)
       const {
         data: { session },
       } = await supabase.auth.getSession();
+
       if (session) {
-        setStatus('success');
-        setTimeout(() => {
-          router.push('/profile');
-          router.refresh();
-        }, 1000);
+        router.replace('/profile');
+      } else {
+        router.replace('/auth?view=signin');
       }
     };
 
     handleAuth();
   }, [router, searchParams]);
 
+  // === ВІДОБРАЖЕННЯ ===
+
+  // 1. СТАН ЗАВАНТАЖЕННЯ
+  // (Показується поки йде перевірка або "тихий" редірект)
+  if (status !== 'success') {
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center px-4 bg-white dark:bg-neutral-950">
+        <div className="flex flex-col items-center justify-center py-8">
+          <Loader2 className="w-12 h-12 text-black dark:text-white animate-spin mb-4" />
+          <p className="text-gray-500">{t('verifying')}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. СТАН УСПІХУ
+  // (Показується ТІЛЬКИ якщо ми реально підтвердили пошту через хеш)
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4 bg-white dark:bg-neutral-950">
       <motion.div
@@ -99,12 +111,9 @@ export default function AuthConfirm() {
         </div>
 
         <div className="pt-4">
-          <button
-            onClick={() => router.push('/profile')}
-            className="w-full py-4 bg-black text-white dark:bg-white dark:text-black rounded-2xl font-bold hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer shadow-lg"
-          >
-            {t('button')}
-          </button>
+          <p className="text-sm text-gray-400 animate-pulse">
+            {t('redirecting')}
+          </p>
         </div>
       </motion.div>
     </div>

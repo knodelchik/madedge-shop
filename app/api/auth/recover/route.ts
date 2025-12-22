@@ -6,15 +6,23 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
 export async function POST(req: Request) {
   try {
-    const { email } = await req.json();
-    const origin = new URL(req.url).origin;
+    // 1. Зчитуємо lang разом з email
+    const { email, lang } = await req.json();
+    const requestUrl = new URL(req.url);
+    const origin = requestUrl.origin;
+
+    // 2. Визначаємо локаль (або те, що прийшло, або 'uk')
+    const userLocale = lang || 'uk';
 
     const { data, error } = await supabaseAdmin.auth.admin.generateLink({
       type: 'recovery',
       email,
       options: {
-        // 👇 Ведемо на callback, а потім на зміну паролю
-        redirectTo: `${origin}/auth/callback?next=/auth/update-password`,
+        // 3. ВАЖЛИВО:
+        // - Ведемо на /api/auth/callback
+        // - Передаємо next=/auth/update-password (наша нова сторінка)
+        // - Передаємо locale=${userLocale} (щоб зберегти мову)
+        redirectTo: `${origin}/api/auth/callback?next=/auth/update-password&locale=${userLocale}`,
       },
     });
 
@@ -24,10 +32,11 @@ export async function POST(req: Request) {
     const { action_link } = data.properties;
 
     // === ДВОМОВНИЙ ЛИСТ ===
+    // (Трохи покращив тему листа, щоб вона теж залежала від мови, якщо хочеш)
     const msg = {
       to: email,
       from: 'info@madedge.net',
-      subject: 'Reset Password / Відновлення паролю',
+      subject: userLocale === 'en' ? 'Reset Password' : 'Відновлення паролю',
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
           <div style="margin-bottom: 20px;">

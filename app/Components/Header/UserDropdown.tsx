@@ -101,17 +101,21 @@ function UnauthenticatedMenu() {
       <DropdownMenuLabel className="text-gray-900 dark:text-white">
         {t('account')}
       </DropdownMenuLabel>
+
+      {/* Кнопка ВХІД */}
       <DropdownMenuItem asChild>
         <Link
-          href="/auth"
+          href="/auth?view=signin"
           className="cursor-pointer w-full text-gray-700 dark:text-gray-200"
         >
           {t('signIn')}
         </Link>
       </DropdownMenuItem>
+
+      {/* Кнопка РЕЄСТРАЦІЯ - додано ?view=signup */}
       <DropdownMenuItem asChild>
         <Link
-          href="/auth"
+          href="/auth?view=signup"
           className="cursor-pointer w-full text-gray-700 dark:text-gray-200"
         >
           {t('signUp')}

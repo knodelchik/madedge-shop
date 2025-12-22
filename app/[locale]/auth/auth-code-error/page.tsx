@@ -1,42 +1,95 @@
-// app/[locale]/auth/auth-code-error/page.tsx
 'use client';
 
 import { Link } from '@/navigation';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl'; // Додаємо useLocale
 import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { toast } from 'sonner'; // Додаємо тости для сповіщень
+import { Loader2, RefreshCw, Mail } from 'lucide-react'; // Іконки
 
-interface PageProps {
-  searchParams: { error?: string; error_description?: string };
-  params: { locale: string };
-}
-
-export default function AuthCodeError({ searchParams }: PageProps) {
+export default function AuthCodeError() {
   const t = useTranslations('AuthError');
+  // Можливо, доведеться додати нові ключі в AuthError або використати існуючі
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const locale = useLocale(); // Отримуємо поточну мову
+
   const [hashParams, setHashParams] = useState<{
     error?: string;
     error_description?: string;
   }>({});
+
   const [isClient, setIsClient] = useState(false);
 
+  // === СТАНИ ДЛЯ ПОВТОРНОЇ ВІДПРАВКИ ===
+  const [email, setEmail] = useState('');
+  const [isResending, setIsResending] = useState(false);
+
   useEffect(() => {
-    setIsClient(true);
+    const queryError = searchParams.get('error');
+    const queryDesc = searchParams.get('error_description');
+    const hasSearchError = !!queryError || !!queryDesc;
+
+    let hasHashError = false;
+
     if (typeof window !== 'undefined') {
       const hash = window.location.hash.substring(1);
       const params = new URLSearchParams(hash);
-      setHashParams({
-        error: params.get('error') || undefined,
-        error_description: params.get('error_description') || undefined,
-      });
-    }
-  }, []);
+      const hashError = params.get('error');
+      const hashDesc = params.get('error_description');
 
-  const errorCode = searchParams.error || hashParams.error || 'unknown_error';
+      if (hashError || hashDesc) {
+        hasHashError = true;
+        setHashParams({
+          error: hashError || undefined,
+          error_description: hashDesc || undefined,
+        });
+      }
+    }
+
+    if (!hasSearchError && !hasHashError) {
+      router.replace('/');
+    } else {
+      setIsClient(true);
+    }
+  }, [searchParams, router]);
+
+  // === ЛОГІКА ПОВТОРНОЇ ВІДПРАВКИ ===
+  const handleResend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+
+    setIsResending(true);
+    try {
+      const res = await fetch('/api/auth/resend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, lang: locale }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.error || t('resendFailed') || 'Error sending email');
+      } else {
+        toast.success(t('resendSuccess') || 'Email sent successfully!');
+        // Можна очистити поле або перекинути на сторінку входу
+        setEmail('');
+      }
+    } catch (error) {
+      toast.error('Network error');
+    } finally {
+      setIsResending(false);
+    }
+  };
+
+  const errorCode =
+    searchParams.get('error') || hashParams.error || 'unknown_error';
   const errorDescription =
-    searchParams.error_description ||
+    searchParams.get('error_description') ||
     hashParams.error_description ||
     'An unknown error occurred';
 
-  // Визначаємо тип помилки для правильного перекладу
   const getErrorType = (code: string, description: string) => {
     if (code === 'otp_expired' || description.includes('expired')) {
       return 'expired';
@@ -83,6 +136,40 @@ export default function AuthCodeError({ searchParams }: PageProps) {
           <p className="text-gray-600">{t(`message.${errorType}`)}</p>
         </div>
 
+        {/* === БЛОК ПОВТОРНОЇ ВІДПРАВКИ === */}
+        <div className="mb-8 bg-gray-50 p-4 rounded-xl border border-gray-100">
+          <p className="text-sm text-gray-600 mb-3 font-medium">
+            {t('enterEmailToResend') ||
+              'Введіть email, щоб отримати посилання знову:'}
+          </p>
+          <form onSubmit={handleResend} className="flex flex-col gap-3">
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your@email.com"
+                required
+                className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={isResending || !email}
+              className="w-full bg-black text-white py-2 rounded-lg text-sm font-medium hover:bg-neutral-800 disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {isResending ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <RefreshCw className="w-4 h-4" />
+              )}
+              {t('resendButton') || 'Надіслати повторно'}
+            </button>
+          </form>
+        </div>
+
+        {/* ТЕХНІЧНІ ДЕТАЛІ (тільки для dev) */}
         {process.env.NODE_ENV === 'development' && (
           <details className="mb-6 text-left">
             <summary className="cursor-pointer text-sm text-gray-500 mb-2">
@@ -95,14 +182,6 @@ export default function AuthCodeError({ searchParams }: PageProps) {
               <p>
                 <strong>Description:</strong> {errorDescription}
               </p>
-              <p>
-                <strong>Source:</strong>{' '}
-                {searchParams.error
-                  ? 'query string'
-                  : hashParams.error
-                  ? 'hash'
-                  : 'default'}
-              </p>
             </div>
           </details>
         )}
@@ -110,13 +189,13 @@ export default function AuthCodeError({ searchParams }: PageProps) {
         <div className="space-y-3">
           <Link
             href="/auth/signup"
-            className="block w-full bg-black text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-800 transition"
+            className="block w-full border border-gray-200 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-50 transition"
           >
-            {t('actions.requestNewLink')}
+            {t('actions.requestNewLink')} {/* Або "Створити новий акаунт" */}
           </Link>
           <Link
             href="/"
-            className="block w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-200 transition"
+            className="block w-full text-gray-500 hover:text-black text-sm py-2 transition"
           >
             {t('actions.goHome')}
           </Link>

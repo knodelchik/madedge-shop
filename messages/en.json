@@ -1092,25 +1092,30 @@
     },
     "signupSuccessTitle": "Account created!",
     "signupSuccessDesc": "A verification email has been sent. Please confirm it to enable ordering.",
-    "signupSuccessAction": "Got it"
+    "signupSuccessAction": "Got it",
+    "resendEmail": "Resend a letter"
   },
   "AuthError": {
+    "loading": "Loading...",
     "title": {
       "expired": "Link Expired",
       "accessDenied": "Access Denied",
       "default": "Authentication Error"
     },
     "message": {
-      "expired": "The email confirmation link has expired. Please request a new link.",
-      "accessDenied": "Unable to verify your email address.",
-      "default": "An error occurred while confirming your email."
+      "expired": "This link has expired. Please request a new one.",
+      "accessDenied": "You do not have permission to access this page.",
+      "default": "An unknown error occurred during email verification."
     },
+    "technicalDetails": "Technical Details",
+    "enterEmailToResend": "Enter your email to receive the link again:",
+    "resendButton": "Resend Link",
+    "resendSuccess": "Email sent successfully!",
+    "resendFailed": "Failed to send email",
     "actions": {
-      "requestNewLink": "Request New Link",
-      "goHome": "Go to Home"
-    },
-    "technicalDetails": "Technical details",
-    "loading": "Loading..."
+      "requestNewLink": "Create New Account",
+      "goHome": "Go Home"
+    }
   },
 
   "AuthConfirm": {
@@ -1126,6 +1131,8 @@
       "title": "Confirmation error",
       "message": "The link is invalid or has expired. Redirecting to the signup page..."
     },
-    "button": "Go to profile"
+    "button": "Go to profile",
+    "redirecting": "Redirecting to profile...",
+    "verifying": "Verifying..."
   }
 }
