@@ -1098,24 +1098,27 @@
   "AuthError": {
     "loading": "Loading...",
     "title": {
-      "expired": "Link Expired",
+      "expired": "Link Invalid or Expired",
       "accessDenied": "Access Denied",
       "default": "Authentication Error"
     },
     "message": {
-      "expired": "This link has expired. Please request a new one.",
+      "expired": "This link has expired.",
+      "expired_suggestion": "This link has already been used. If you just registered, your email might have been automatically verified. Please try logging in.",
       "accessDenied": "You do not have permission to access this page.",
       "default": "An unknown error occurred during email verification."
     },
-    "technicalDetails": "Technical Details",
-    "enterEmailToResend": "Enter your email to receive the link again:",
+    "actions": {
+      "tryLogin": "Try Login",
+      "requestNewLink": "Create New Account",
+      "goHome": "Go Home"
+    },
+    "enterEmailToResend": "Or enter your email to receive the link again:",
     "resendButton": "Resend Link",
     "resendSuccess": "Email sent successfully!",
     "resendFailed": "Failed to send email",
-    "actions": {
-      "requestNewLink": "Create New Account",
-      "goHome": "Go Home"
-    }
+    "successVerified": "Successfully verified!",
+    "technicalDetails": "Technical Details"
   },
 
   "AuthConfirm": {
