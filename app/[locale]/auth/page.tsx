@@ -8,11 +8,31 @@ import { authService } from '../services/authService';
 import { toast } from 'sonner';
 import { useTranslations, useLocale } from 'next-intl'; // 1. Імпорт useLocale
 import { ArrowLeft, KeyRound } from 'lucide-react';
+import { createClient } from '@/lib/supabase-client';
 
 export default function AuthPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const locale = useLocale(); // 2. Отримуємо поточну мову ('uk' або 'en')
+  const [checkingSession, setCheckingSession] = useState(true); // Стан перевірки
+
+  // Перевірка сесії при завантаженні
+  useEffect(() => {
+    const checkUser = async () => {
+      const supabase = createClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) {
+        // Якщо немає сесії — викидаємо на сторінку входу
+        router.replace('/auth?view=signin');
+      } else {
+        setCheckingSession(false);
+      }
+    };
+    checkUser();
+  }, [router]);
 
   // Перевіряємо URL параметр ?view=signup
   const initialView =

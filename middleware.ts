@@ -10,21 +10,19 @@ const intlMiddleware = createMiddleware({
 });
 
 export default async function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname;
-
-  // 1. Ігноруємо системні файли та API
+  // 1. Ігноруємо API та статичні файли
   if (
-    pathname.startsWith('/api') ||
-    pathname.startsWith('/_next') ||
-    pathname.includes('.')
+    request.nextUrl.pathname.startsWith('/api') ||
+    request.nextUrl.pathname.startsWith('/_next') ||
+    request.nextUrl.pathname.includes('.')
   ) {
     return NextResponse.next();
   }
 
-  // 2. Ініціалізуємо локалізацію
+  // 2. Спочатку запускаємо локалізацію (щоб мати правильний response)
   const response = intlMiddleware(request);
 
-  // 3. Створюємо клієнт Supabase для Middleware
+  // 3. Створюємо Supabase клієнт для Middleware
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -34,7 +32,7 @@ export default async function middleware(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => {
+          cookiesToSet.forEach(({ name, value, options }) => {
             request.cookies.set(name, value);
           });
           cookiesToSet.forEach(({ name, value, options }) => {
@@ -45,29 +43,24 @@ export default async function middleware(request: NextRequest) {
     }
   );
 
-  // 4. Отримуємо користувача та оновлюємо сесію
+  // 4. Отримуємо користувача (оновлюємо сесію)
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // 5. Логіка редіректів
+  // === ЗАХИСТ МАРШРУТІВ ===
 
-  // ДОЗВОЛЯЄМО бути на сторінці confirm, навіть якщо залогінений
-  if (user && pathname.includes('/auth/confirm')) {
-    return response;
-  }
-
-  // Якщо залогінений і намагається зайти на сторінку входу (/auth)
-  const isAuthPage = pathname.endsWith('/auth') || pathname.endsWith('/auth/');
-  if (user && isAuthPage) {
-    const locale = pathname.split('/')[1] || 'uk';
-    return NextResponse.redirect(new URL(`/${locale}/profile`, request.url));
-  }
-
-  // ЗАХИСТ ПРОФІЛЮ: Якщо НЕ залогінений і лізе в /profile
-  if (!user && pathname.includes('/profile')) {
-    const locale = pathname.split('/')[1] || 'uk';
-    return NextResponse.redirect(new URL(`/${locale}/auth`, request.url));
+  // Перевіряємо, чи намагається юзер зайти на сторінку зміни пароля
+  // (вона може бути /uk/auth/update-password або /en/auth/update-password)
+  if (request.nextUrl.pathname.includes('/auth/update-password')) {
+    // Якщо користувача немає (незалогінений) — кидаємо на вхід
+    if (!user) {
+      const locale = request.nextUrl.locale || defaultLocale;
+      const url = request.nextUrl.clone();
+      url.pathname = `/${locale}/auth`;
+      url.searchParams.set('view', 'signin');
+      return NextResponse.redirect(url);
+    }
   }
 
   return response;
