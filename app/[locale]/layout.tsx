@@ -6,6 +6,7 @@ import { Toaster } from 'sonner';
 import { CurrencyProvider } from '@/app/context/CurrencyContext';
 import Header from '../Components/Header/Header';
 import Footer from '../Components/Footer';
+import AuthErrorListener from '../Components/AuthErrorListener'; // 1. Імпорт слухача помилок
 import '@/app/globals.css';
 import type { Metadata } from 'next';
 
@@ -32,12 +33,6 @@ export async function generateMetadata({
   return {
     title: titles[locale as Locale] || titles.uk,
     description: descriptions[locale as Locale] || descriptions.uk,
-    // Блок icons видалено, бо ми використовуємо метод file-based (файл icon.png у папці app)
-
-    // Якщо треба Google верифікація:
-    // verification: {
-    //   google: 'ваш-код',
-    // },
   };
 }
 
@@ -72,6 +67,9 @@ export default async function LocaleLayout({
         >
           <CurrencyProvider>
             <NextIntlClientProvider locale={locale} messages={messages}>
+              {/* 2. Слухач помилок тут. Він невидимий, але працює на всіх сторінках */}
+              <AuthErrorListener />
+
               <div className="flex min-h-screen flex-col">
                 <Header />
                 <main className="flex-grow">{children}</main>
