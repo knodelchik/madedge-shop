@@ -37,10 +37,9 @@ export default function AdminLayout({
 
         // Якщо роль не адмін -> на головну
         if (profile?.role !== 'admin') {
-          // ТИМЧАСОВО МОЖНА ЗАКОМЕНТУВАТИ ЦЮ ПЕРЕВІРКУ, ЯКЩО ВОНА БЛОКУЄ
-          // router.push('/');
-          // alert('Доступ заборонено: потрібні права адміна');
-          // return;
+          router.push('/');
+          alert('Доступ заборонено: потрібні права адміна');
+          return;
         }
 
         setAuthorized(true);
