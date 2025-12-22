@@ -14,55 +14,78 @@ function AuthCodeErrorContent() {
   const searchParams = useSearchParams();
   const locale = useLocale();
 
-  // Стан для відображення помилки (показуємо тільки якщо вхід точно не вдався)
+  // Стан завантаження (поки ми розбираємося з токеном)
+  const [isProcessing, setIsProcessing] = useState(true);
+
+  // Стан помилки (показуємо ТІЛЬКИ якщо токен не спрацював)
   const [showError, setShowError] = useState(false);
 
-  // Тип помилки для вибору правильного екрану (expired vs default)
-  const [errorType, setErrorType] = useState<'expired' | 'default'>('default');
-  const [errorDesc, setErrorDesc] = useState('');
+  // Дані помилки для відображення
+  const [errorDetails, setErrorDetails] = useState({
+    type: 'default', // 'expired' | 'default'
+    message: '',
+  });
 
-  // Стани для форми
+  // Форма
   const [email, setEmail] = useState('');
   const [isResending, setIsResending] = useState(false);
 
   useEffect(() => {
-    const supabase = createClient();
-    let isMounted = true;
+    const handleAuth = async () => {
+      const supabase = createClient();
 
-    // 1. СЛУХАЧ ПОДІЙ (Головний фікс)
-    // Якщо в URL є токен, Supabase сам його знайде і викличе цю подію
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        if (session && isMounted) {
-          toast.success(t('successVerified') || 'Successfully verified!');
-          // ВАЖЛИВО: Редірект на зміну пароля
-          router.replace('/auth/update-password');
+      // 1. РУЧНИЙ ПАРСИНГ ХЕШУ (Найголовніше)
+      // Ми не чекаємо supabase.auth.onAuthStateChange, ми беремо все в свої руки.
+      if (typeof window !== 'undefined' && window.location.hash) {
+        const hashString = window.location.hash.substring(1); // Прибираємо '#'
+        const params = new URLSearchParams(hashString);
+
+        const accessToken = params.get('access_token');
+        const refreshToken = params.get('refresh_token');
+        const type = params.get('type'); // 'recovery', 'signup' etc.
+
+        if (accessToken) {
+          try {
+            // ПРИМУСОВО ВСТАНОВЛЮЄМО СЕСІЮ
+            const { data, error } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken || '',
+            });
+
+            if (!error && data.session) {
+              toast.success(t('successVerified') || 'Success!');
+
+              // Якщо це відновлення пароля — на зміну пароля
+              if (type === 'recovery') {
+                router.replace('/auth/update-password');
+              } else {
+                router.replace('/profile');
+              }
+              return; // Виходимо, щоб не показати помилку
+            }
+          } catch (e) {
+            console.error('Manual session set failed:', e);
+          }
         }
       }
-    });
 
-    // 2. ФУНКЦІЯ ПЕРЕВІРКИ (Запускається з затримкою)
-    const checkStatus = async () => {
-      // Спочатку перевіряємо, чи ми вже залогінені
+      // 2. ЯКЩО ХЕШУ НЕМАЄ АБО ВІН НЕ СПРАЦЮВАВ -> ПЕРЕВІРЯЄМО ЗВИЧАЙНУ СЕСІЮ
       const {
         data: { session },
       } = await supabase.auth.getSession();
-
       if (session) {
-        if (isMounted) router.replace('/auth/update-password');
+        router.replace('/auth/update-password'); // або /profile
         return;
       }
 
-      // Якщо сесії немає — розбираємо помилки з URL
+      // 3. ЯКЩО НІЧОГО НЕ СПРАЦЮВАЛО -> АНАЛІЗУЄМО ПОМИЛКУ
       let errorData = {
         error: searchParams.get('error'),
         desc: searchParams.get('error_description'),
         code: searchParams.get('error_code'),
       };
 
-      // Перевіряємо хеш (іноді помилки там)
+      // Перевіряємо хеш на наявність повідомлень про помилки (Supabase іноді кидає їх туди)
       if (typeof window !== 'undefined' && window.location.hash) {
         const hash = window.location.hash.substring(1);
         const params = new URLSearchParams(hash);
@@ -75,30 +98,24 @@ function AuthCodeErrorContent() {
         }
       }
 
-      // Визначаємо тип помилки
+      // Класифікуємо помилку
       const isExpired =
         errorData.code === 'otp_expired' ||
         errorData.desc?.includes('expired') ||
         errorData.error === 'no_code_received';
 
-      if (isMounted) {
-        setErrorType(isExpired ? 'expired' : 'default');
-        setErrorDesc(errorData.desc || '');
-        // Тільки тепер показуємо екран помилки
-        setShowError(true);
-      }
+      setErrorDetails({
+        type: isExpired ? 'expired' : 'default',
+        message: errorData.desc || '',
+      });
+
+      // Показуємо екран помилки
+      setIsProcessing(false);
+      setShowError(true);
     };
 
-    // Даємо Supabase 1.5 секунди на обробку токена перед тим, як кричати "Помилка"
-    const timer = setTimeout(() => {
-      checkStatus();
-    }, 1500);
-
-    return () => {
-      isMounted = false;
-      clearTimeout(timer);
-      subscription.unsubscribe();
-    };
+    // Запускаємо логіку
+    handleAuth();
   }, [searchParams, router, t]);
 
   // === ОБРОБНИК ПОВТОРНОЇ ВІДПРАВКИ ===
@@ -129,17 +146,21 @@ function AuthCodeErrorContent() {
     }
   };
 
-  // === ЛОАДЕР (Поки чекаємо обробки токена) ===
-  if (!showError) {
+  // === ЛОАДЕР (Поки працюємо з токеном) ===
+  // Якщо ми ще думаємо (isProcessing) АБО ми не показуємо помилку (значить все ок, йде редірект)
+  if (isProcessing || !showError) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-neutral-950">
-        <Loader2 className="w-8 h-8 animate-spin text-gray-500" />
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-10 h-10 animate-spin text-gray-500" />
+          <p className="text-sm text-gray-500">Авторизація...</p>
+        </div>
       </div>
     );
   }
 
-  // === ВАРІАНТ 1: ПОСИЛАННЯ ЗАСТАРІЛО (EXPIRED) ===
-  if (errorType === 'expired') {
+  // === ЕКРАН 1: ПОСИЛАННЯ ЗАСТАРІЛО (EXPIRED) ===
+  if (errorDetails.type === 'expired') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-neutral-950 px-4">
         <div className="max-w-md w-full bg-white dark:bg-neutral-900 rounded-[2rem] shadow-xl p-8 text-center border border-gray-100 dark:border-neutral-800">
@@ -157,7 +178,6 @@ function AuthCodeErrorContent() {
           </p>
 
           <div className="space-y-3">
-            {/* Головна дія - Спробувати увійти */}
             <Link
               href="/auth?view=signin"
               className="w-full bg-black text-white dark:bg-white dark:text-black py-3.5 rounded-xl font-bold hover:opacity-90 transition flex items-center justify-center gap-2"
@@ -177,15 +197,12 @@ function AuthCodeErrorContent() {
               </div>
             </div>
 
-            {/* Додаткова дія - Відправити знову */}
             <form onSubmit={handleResend} className="flex flex-col gap-3">
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder={
-                  t('enterEmailToResend') || 'Введіть email для повтору'
-                }
+                placeholder={t('enterEmailToResend') || 'Email'}
                 className="w-full px-4 py-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white outline-none text-sm transition-all"
               />
               <button
@@ -207,7 +224,7 @@ function AuthCodeErrorContent() {
     );
   }
 
-  // === ВАРІАНТ 2: ІНШІ ПОМИЛКИ (DEFAULT) ===
+  // === ЕКРАН 2: ІНШІ ПОМИЛКИ (DEFAULT) ===
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-neutral-950 px-4">
       <div className="max-w-md w-full bg-white dark:bg-neutral-900 rounded-lg shadow-lg p-8 text-center border border-gray-100 dark:border-neutral-800">
@@ -229,40 +246,11 @@ function AuthCodeErrorContent() {
 
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            {t(`title.default`) || 'Помилка автентифікації'}
+            {t(`title.default`) || 'Помилка'}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            {errorDesc || t(`message.default`)}
+            {errorDetails.message || t(`message.default`)}
           </p>
-        </div>
-
-        {/* Блок повторної відправки для інших помилок */}
-        <div className="mb-8 bg-gray-50 dark:bg-neutral-800 p-4 rounded-xl border border-gray-100 dark:border-neutral-700">
-          <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 font-medium">
-            {t('enterEmailToResend') || 'Введіть email, щоб спробувати знову:'}
-          </p>
-          <form onSubmit={handleResend} className="flex flex-col gap-3">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="your@email.com"
-              required
-              className="w-full px-4 py-2 text-sm border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all"
-            />
-            <button
-              type="submit"
-              disabled={isResending || !email}
-              className="w-full bg-black text-white dark:bg-white dark:text-black py-2 rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
-            >
-              {isResending ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <RefreshCw className="w-4 h-4" />
-              )}
-              {t('resendButton') || 'Надіслати повторно'}
-            </button>
-          </form>
         </div>
 
         <div className="space-y-3">
@@ -284,7 +272,6 @@ function AuthCodeErrorContent() {
   );
 }
 
-// Огортаємо в Suspense, щоб useSearchParams не ламав білд
 export default function AuthCodeError() {
   return (
     <Suspense
