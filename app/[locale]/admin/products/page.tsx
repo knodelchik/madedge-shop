@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { supabase } from '@/app/lib/supabase'; // Використовуємо спільний клієнт
-import { Trash2, Plus, Search, Edit } from 'lucide-react';
+import { useEffect, useState, useMemo } from 'react';
+import { supabase } from '@/app/lib/supabase';
+import { Trash2, Plus, Search, Edit, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import Image from 'next/image';
 import { toast } from 'sonner';
 import {
@@ -13,11 +13,19 @@ import {
 } from '@/components/ui/sheet';
 import ProductForm from '@/app/[locale]/admin/ProductForm';
 
+type SortConfig = {
+  key: string;
+  direction: 'asc' | 'desc';
+} | null;
+
 export default function AdminProductsPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Стан для сортування
+  const [sortConfig, setSortConfig] = useState<SortConfig>(null);
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -50,7 +58,6 @@ export default function AdminProductsPage() {
     } else {
       console.error('Delete error:', error);
       
-      // Обробка помилки зв'язків (Foreign Key)
       if (error.code === '23503') {
         alert(
           'Неможливо видалити товар, оскільки він є частиною існуючих замовлень або кошиків. ' +
@@ -78,9 +85,68 @@ export default function AdminProductsPage() {
     loadProducts();
   };
 
-  const filteredProducts = products.filter((product) =>
-    product.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // --- ЛОГІКА СОРТУВАННЯ ---
+
+  const handleSort = (key: string) => {
+    let direction: 'asc' | 'desc' = 'asc';
+
+    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+
+    setSortConfig({ key, direction });
+  };
+
+  // Спочатку фільтруємо, потім сортуємо
+  const sortedProducts = useMemo(() => {
+    const filtered = products.filter((product) =>
+      product.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    if (sortConfig !== null) {
+      filtered.sort((a, b) => {
+        const aValue = a[sortConfig.key];
+        const bValue = b[sortConfig.key];
+
+        // Перевірка на числа
+        if (typeof aValue === 'number' && typeof bValue === 'number') {
+           return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
+        }
+
+        // Перевірка на рядки
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
+          return sortConfig.direction === 'asc'
+            ? aValue.localeCompare(bValue)
+            : bValue.localeCompare(aValue);
+        }
+
+        return 0;
+      });
+    }
+
+    return filtered;
+  }, [products, searchTerm, sortConfig]);
+
+  // Допоміжний компонент для заголовка таблиці
+  const SortableHeader = ({ label, sortKey, width }: { label: string; sortKey: string; width?: string }) => {
+    const isActive = sortConfig?.key === sortKey;
+    
+    return (
+      <th 
+        className={`p-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors select-none ${width || ''}`}
+        onClick={() => handleSort(sortKey)}
+      >
+        <div className="flex items-center gap-2">
+          {label}
+          {isActive ? (
+            sortConfig.direction === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />
+          ) : (
+            <ArrowUpDown size={14} className="opacity-30" />
+          )}
+        </div>
+      </th>
+    );
+  };
 
   if (loading)
     return (
@@ -124,22 +190,25 @@ export default function AdminProductsPage() {
             <thead className="bg-gray-50 dark:bg-neutral-800 text-gray-500 dark:text-gray-400 text-sm uppercase font-semibold">
               <tr>
                 <th className="p-4 w-24">Фото</th>
-                <th className="p-4">Назва</th>
-                <th className="p-4 w-32">Ціна</th>
-                <th className="p-4 w-24">Stock</th>
-                <th className="p-4 w-32">Категорія</th>
-                <th className="p-4 text-right w-24">Дії</th>
+                
+                {/* Сортувальні заголовки */}
+                <SortableHeader label="Назва" sortKey="title" />
+                <SortableHeader label="Ціна" sortKey="price" width="w-32" />
+                <SortableHeader label="Stock" sortKey="stock" width="w-24" />
+                <SortableHeader label="Категорія" sortKey="category" width="w-32" />
+
+                <th className="pr-6 text-right w-24">Дії</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-neutral-800">
-              {filteredProducts.length === 0 ? (
+              {sortedProducts.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="p-8 text-center text-gray-500">
                     Товарів не знайдено
                   </td>
                 </tr>
               ) : (
-                filteredProducts.map((product) => (
+                sortedProducts.map((product) => (
                   <tr
                     key={product.id}
                     onClick={() => handleEdit(product)}
@@ -184,7 +253,7 @@ export default function AdminProductsPage() {
                         {product.category}
                       </span>
                     </td>
-                    <td className="p-4 text-right">
+                    <td className="pr-4 text-right">
                       <div className="flex justify-end gap-2">
                         <button
                           onClick={(e) => {
