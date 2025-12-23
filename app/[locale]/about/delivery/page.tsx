@@ -8,6 +8,7 @@ import { Country, State } from 'country-state-city';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useCurrency } from '@/app/context/CurrencyContext'; // 1. Імпорт контексту валют
 
 // --- 1. Налаштування Supabase ---
 const supabase = createClient(
@@ -88,6 +89,9 @@ export default function DeliveryPage() {
   const t_calc = useTranslations('DeliveryPage.calculator');
   const t_returns = useTranslations('DeliveryPage.returns');
   const t_service = useTranslations('DeliveryPage.service');
+
+  // 2. Отримуємо функцію форматування ціни
+  const { formatPrice } = useCurrency();
 
   const SERVICE_OPTIONS: SelectOption[] = [
     { label: t_service('standard'), value: 'Standard' },
@@ -264,21 +268,21 @@ export default function DeliveryPage() {
         let finalPrice = opt.price;
         let finalService = opt.service;
         let finalServiceKey = opt.serviceKey;
-        let finalTimeKey = opt.timeKey; // Додаємо змінну для ключа часу
+        let finalTimeKey = opt.timeKey;
 
         // 🇺🇦 UA Special Logic
         if (countryCode === 'UA') {
           const isStandard = opt.service.toLowerCase().includes('standard');
 
           if (isStandard) {
-            finalPrice = 'Free';
+            // 3. ЗМІНА: Україна тепер не обов'язково Free, беремо ціну з бази (opt.price)
+            finalPrice = opt.price; 
             finalServiceKey = 'options.uaStandard.name';
-            finalTimeKey = 'options.uaStandard.time'; // 👈 Встановлюємо правильний час для Стандарту
+            finalTimeKey = 'options.uaStandard.time';
           } else {
-            // Експрес залишаємо як є з бази (але якщо там 0, то в UI буде безкоштовно)
             finalPrice = opt.price;
             finalServiceKey = 'options.uaExpress.name';
-            finalTimeKey = 'options.uaExpress.time'; // 👈 Встановлюємо правильний час для Експресу
+            finalTimeKey = 'options.uaExpress.time';
           }
 
           return {
@@ -391,10 +395,7 @@ export default function DeliveryPage() {
               {t('policy.keyTitle')}
             </h3>
             <ul className="space-y-2 text-gray-700 list-disc list-inside ml-4 dark:text-neutral-300 text-sm sm:text-base">
-              <li>
-                <strong>{t('policy.key1Strong')}:</strong>{' '}
-                {t('policy.key1Text')}
-              </li>
+
               <li>
                 <strong>{t('policy.key2Strong')}:</strong>{' '}
                 {t('policy.key2Text')}
@@ -539,7 +540,6 @@ export default function DeliveryPage() {
                   {shippingOptions.map((option, index) => (
                     <motion.div
                       key={index}
-                      // 🟢 ВИПРАВЛЕНА ЛОГІКА КОЛЬОРІВ: якщо 'Free' АБО 0 — то зелений
                       className={`flex flex-col sm:flex-row sm:items-center items-start p-4 sm:p-5 rounded-xl transition shadow-md border
                         ${
                           selectedCountryCode === 'RU' ||
@@ -586,12 +586,12 @@ export default function DeliveryPage() {
                               : 'text-gray-900 dark:text-neutral-100'
                           }`}
                         >
-                          {/* 🟢 ВІДОБРАЖЕННЯ ЦІНИ: якщо 0, пишемо БЕЗКОШТОВНО */}
+                          {/* 4. ВИКОРИСТАННЯ КОНВЕРТАЦІЇ ВАЛЮТИ */}
                           {option.price === 'Free' || option.price === 0
                             ? t_calc('resultsFree')
                             : option.price === 'N/A'
                             ? t_calc('resultsNA')
-                            : `${(option.price as number).toFixed(2)}`}
+                            : formatPrice(option.price as number)}
                         </p>
                         {option.price !== 'N/A' &&
                           option.price !== 'Free' &&
