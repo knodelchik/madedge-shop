@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import AuthForm from '../../Components/AuthForm';
 import { motion, AnimatePresence } from 'framer-motion';
 import { authService } from '../services/authService';
@@ -13,6 +13,7 @@ import { createClient } from '@/lib/supabase-client';
 export default function AuthPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname(); // ✅ Додано для отримання поточного шляху
   const locale = useLocale();
 
   // Стан для відображення лоадера, поки перевіряємо сесію
@@ -30,7 +31,7 @@ export default function AuthPage() {
 
   const t = useTranslations('Auth');
 
-  // === 1. ВИПРАВЛЕНА ЛОГІКА ПЕРЕВІРКИ СЕСІЇ ===
+  // === 1. ПЕРЕВІРКА СЕСІЇ ===
   useEffect(() => {
     const checkUser = async () => {
       const supabase = createClient();
@@ -49,28 +50,35 @@ export default function AuthPage() {
     checkUser();
   }, [router]);
 
-  // Синхронізація URL параметрів
+  // === 2. СИНХРОНІЗАЦІЯ СТАНУ З URL ===
+  // Цей ефект спрацьовує, коли router.replace оновлює URL
   useEffect(() => {
     const view = searchParams.get('view');
-    if (view === 'signup' && authType !== 'signup') setAuthType('signup');
-    else if (view === 'signin' && authType !== 'signin') setAuthType('signin');
+    if (view === 'signup' && authType !== 'signup') {
+      setAuthType('signup');
+    } else if ((view === 'signin' || !view) && authType !== 'signin' && authType !== 'forgot-password') {
+      // Примітка: перевірка !== 'forgot-password' потрібна, щоб не скидати форму відновлення, 
+      // якщо в URL немає параметрів
+      setAuthType('signin');
+    }
   }, [searchParams, authType]);
 
   const handleSuccess = () => {
     router.push('/profile');
   };
 
+  // === 3. ВИПРАВЛЕНА ФУНКЦІЯ ПЕРЕМИКАННЯ ===
   const toggleAuthType = () => {
-    const newType = authType === 'signin' ? 'signup' : 'signin';
-    setAuthType(newType);
+    // Визначаємо, який тип має бути наступним
+    const nextType = authType === 'signin' ? 'signup' : 'signin';
 
-    // Оновлюємо URL без перезавантаження
-    const newUrl = `/auth?view=${newType}`;
-    window.history.replaceState(
-      { ...window.history.state, as: newUrl, url: newUrl },
-      '',
-      newUrl
-    );
+    // Створюємо нові параметри URL
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('view', nextType);
+
+    // Оновлюємо URL. Next.js помітить це, оновить searchParams,
+    // і спрацює useEffect вище, який і оновить authType.
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   const handleResetPassword = async (e: React.FormEvent) => {
@@ -187,10 +195,6 @@ export default function AuthPage() {
                 transition={{ duration: 0.3 }}
                 className="p-8"
               >
-                {/* 2. ВИПРАВЛЕНА ПОМИЛКА TYPESCRIPT:
-                   Ми вже в блоці 'else', тому authType точно не 'forgot-password'.
-                   Ми приводимо тип явно, щоб задовольнити TS.
-                */}
                 <AuthForm
                   type={authType as 'signin' | 'signup'}
                   onSuccess={handleSuccess}
