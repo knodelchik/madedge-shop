@@ -7,7 +7,7 @@ import { authService } from '@/app/[locale]/services/authService';
 import { wishlistService } from '@/app/[locale]/services/wishlistService';
 import { Link } from '@/navigation';
 import Image from 'next/image';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl'; // ✅ 1. Додано useLocale
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
@@ -29,6 +29,7 @@ export default function MobileWishlistSheet({
   onClose,
 }: MobileWishlistSheetProps) {
   const t = useTranslations('WishlistSheet');
+  const locale = useLocale(); // ✅ 2. Отримуємо поточну мову
 
   const {
     wishlistItems,
@@ -122,6 +123,8 @@ export default function MobileWishlistSheet({
       addToCart({
         id: productId,
         title: productData.title || '',
+        // ✅ 3. Передаємо title_uk, щоб він зберігся в кошику
+        title_uk: productData.title_uk, 
         price: productData.price || 0,
         images: productData.images || [],
         category: productData.category || 'accessories',
@@ -236,7 +239,7 @@ export default function MobileWishlistSheet({
 
                       const productData = item.products || item;
                       const isOutOfStock = (productData.stock || 0) <= 0;
-                      // Генеруємо slug для посилання
+                      
                       const slug = createSlug(productData.title || '');
 
                       return (
@@ -246,7 +249,6 @@ export default function MobileWishlistSheet({
                         >
                           {!isLocalItem ? (
                             <>
-                              {/* ОБГОРНУЛИ КАРТИНКУ В LINK */}
                               <Link
                                 href={`/shop/${slug}`}
                                 onClick={onClose}
@@ -266,7 +268,10 @@ export default function MobileWishlistSheet({
                               <div className="flex-1 min-w-0">
                                 <Link href={`/shop/${slug}`} onClick={onClose}>
                                   <h3 className="font-semibold text-sm text-gray-900 dark:text-white truncate mb-1">
-                                    {productData.title || 'Product'}
+                                    {/* ✅ 4. Логіка відображення назви */}
+                                    {locale === 'uk' 
+                                      ? (productData.title_uk || productData.title || 'Product') 
+                                      : (productData.title || 'Product')}
                                   </h3>
                                 </Link>
                                 <p className="text-sm font-bold text-gray-700 dark:text-neutral-300 mb-2">

@@ -3,6 +3,7 @@
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react"; // Додамо іконку завантаження
 
 interface PayPalCheckoutProps {
   amountUSD: number;
@@ -44,7 +45,7 @@ export default function PayPalCheckout({
       const order = await res.json();
       if (!res.ok) throw new Error(order.error || "Order creation failed");
       
-      return order.id; // Повертаємо orderId для PayPal Buttons
+      return order.id;
     } catch (err: any) {
       toast.error(err.message);
       throw err;
@@ -57,15 +58,13 @@ export default function PayPalCheckout({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          orderID: data.orderID, // Це ID, який згенерував PayPal
+          orderID: data.orderID,
         }),
       });
 
       const details = await res.json();
       if (!res.ok) throw new Error(details.error || "Capture failed");
 
-      // Успіх! Перенаправляємо на сторінку результату
-      // Отримуємо внутрішній ID з відповіді (reference_id) або використовуємо той, що у нас є, якщо потрібно
       const internalOrderId = details.data.purchase_units[0].reference_id;
       
       router.push(`/order/result?source=paypal&orderId=${internalOrderId}`);
@@ -79,15 +78,37 @@ export default function PayPalCheckout({
   return (
     <div className="w-full z-0 relative">
       <PayPalScriptProvider options={initialOptions}>
-        <PayPalButtons
-          style={{ layout: "vertical", shape: "rect", color: "black" }}
-          createOrder={handleCreateOrder}
-          onApprove={handleApprove}
-          onError={(err) => {
-            console.error("PayPal Error:", err);
-            toast.error("PayPal Error occurred");
-          }}
-        />
+        {/* ОБГОРТКА ДЛЯ АДАПТИВУ:
+            1. transition-all: плавна зміна стилів
+            2. dark:bg-neutral-100: у темній темі робимо фон світлим (майже білим)
+            3. dark:p-4 dark:rounded-xl: додаємо відступи та скруглення, щоб це виглядало як картка
+            Таким чином чорні кнопки PayPal будуть чітко видні на світлому фоні навіть у темній темі.
+        */}
+        <div className="w-full transition-all duration-300 rounded-xl overflow-hidden
+          bg-transparent 
+          dark:bg-neutral-100 dark:p-5 dark:shadow-md"
+        >
+          {/* Заголовок тільки для темної теми, щоб пояснити зміну фону (опціонально) */}
+          <div className="hidden dark:block mb-3 text-sm font-medium text-neutral-500 text-center">
+            PayPal Secure Checkout
+          </div>
+
+          <PayPalButtons
+            style={{ 
+              layout: "vertical", 
+              shape: "rect", 
+              color: "black",
+              label: "pay" // Або 'checkout', 'buynow'
+            }}
+            className="relative z-10"
+            createOrder={handleCreateOrder}
+            onApprove={handleApprove}
+            onError={(err) => {
+              console.error("PayPal Error:", err);
+              toast.error("PayPal Error occurred");
+            }}
+          />
+        </div>
       </PayPalScriptProvider>
     </div>
   );

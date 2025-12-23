@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl'; // ✅ 1. Додано useLocale
 import { useWishlistStore } from '@/app/[locale]/store/wishlistStore';
 import { useCurrency } from '@/app/context/CurrencyContext';
 import Image from 'next/image';
@@ -10,6 +10,7 @@ import { ShoppingCart, Trash2, Heart } from 'lucide-react';
 
 export default function WishlistPage({ userId }: { userId: string }) {
   const t = useTranslations('Wishlist');
+  const locale = useLocale(); // ✅ 2. Отримуємо локаль
   const { formatPrice } = useCurrency();
 
   const { wishlistItems, removeFromWishlist, moveToCart } = useWishlistStore();
@@ -24,7 +25,12 @@ export default function WishlistPage({ userId }: { userId: string }) {
 
     toast.promise(moveToCart(userId, product.id, t), {
       loading: t('addingToCart'),
-      success: t('addedToCartSuccess', { title: product.title }),
+      // Тут ми теж можемо використати локалізовану назву, якщо передамо її,
+      // але зазвичай в toast 'product.title' (оригінальна) теж ок.
+      // Якщо хочете і тут локалізацію - треба брати (product.title_uk || product.title)
+      success: t('addedToCartSuccess', { 
+        title: locale === 'uk' ? (product.title_uk || product.title) : product.title 
+      }),
       error: t('addToCartError'),
     });
   };
@@ -57,6 +63,15 @@ export default function WishlistPage({ userId }: { userId: string }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {wishlistItems.map((item) => {
             const isOutOfStock = (item.products.stock || 0) <= 0;
+            
+            // ✅ 3. Визначаємо правильну назву для відображення
+            // Оскільки в WishlistStore дані приходять з БД, item.products 
+            // повинен містити title_uk, якщо він є в базі.
+            // Приводимо до any, якщо TypeScript лається, що title_uk немає в типі.
+            const productData = item.products as any;
+            const productTitle = locale === 'uk' 
+              ? (productData.title_uk || productData.title) 
+              : productData.title;
 
             return (
               <div
@@ -66,7 +81,7 @@ export default function WishlistPage({ userId }: { userId: string }) {
                 <div className="relative">
                   <Image
                     src={item.products.images?.[0] || '/images/placeholder.jpg'}
-                    alt={item.products.title}
+                    alt={productTitle}
                     width={64}
                     height={64}
                     className={`w-16 h-16 object-cover rounded-md flex-shrink-0 ${
@@ -85,11 +100,11 @@ export default function WishlistPage({ userId }: { userId: string }) {
                     href={`/shop/${item.products.title
                       .replace(/\s+/g, '-')
                       .toLowerCase()}`}
-                    // ЗМІНА ТУТ: додано 'block'
                     className="font-medium text-sm truncate block hover:underline text-gray-800 dark:text-neutral-100"
-                    title={item.products.title} // Щоб користувач міг побачити повну назву при наведенні
+                    title={productTitle}
                   >
-                    {item.products.title}
+                    {/* ✅ 4. Виводимо локалізовану назву */}
+                    {productTitle}
                   </Link>
                   <p className="text-green-600 font-semibold text-sm">
                     {formatPrice(item.products.price)}

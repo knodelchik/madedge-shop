@@ -5,7 +5,7 @@ import { useCartStore } from '../[locale]/store/cartStore';
 import QuantityCounter from './QuantityCounter';
 import { Link } from '@/navigation';
 import Image from 'next/image';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl'; // ✅ 1. Додано useLocale
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 
 interface MobileCartSheetProps {
@@ -13,7 +13,6 @@ interface MobileCartSheetProps {
   onClose: () => void;
 }
 
-// Додали helper createSlug
 const createSlug = (str: string) =>
   str
     .toLowerCase()
@@ -25,6 +24,8 @@ export default function MobileCartSheet({
   onClose,
 }: MobileCartSheetProps) {
   const t = useTranslations('CartSheet');
+  const locale = useLocale(); // ✅ 2. Отримуємо поточну мову
+
   const { cartItems, increaseQuantity, decreaseQuantity, removeFromCart } =
     useCartStore();
 
@@ -130,7 +131,6 @@ export default function MobileCartSheet({
                           key={item.id}
                           className="flex gap-3 bg-gray-50 dark:bg-neutral-800 rounded-xl p-3 border border-gray-200 dark:border-neutral-700"
                         >
-                          {/* ОБГОРНУЛИ КАРТИНКУ В LINK */}
                           <Link
                             href={`/shop/${slug}`}
                             onClick={onClose}
@@ -146,10 +146,12 @@ export default function MobileCartSheet({
                           </Link>
 
                           <div className="flex-1 min-w-0">
-                            {/* Також можна обгорнути заголовок */}
                             <Link href={`/shop/${slug}`} onClick={onClose}>
                               <h3 className="font-semibold text-sm text-gray-900 dark:text-white truncate mb-1">
-                                {item.title}
+                                {/* ✅ 3. Відображення назви залежно від мови */}
+                                {locale === 'uk'
+                                  ? item.title_uk || item.title
+                                  : item.title}
                               </h3>
                             </Link>
                             <p className="text-sm font-bold text-gray-700 dark:text-neutral-300">
@@ -159,7 +161,8 @@ export default function MobileCartSheet({
                             <div className="mt-2">
                               <QuantityCounter
                                 value={item.quantity}
-                                onIncrease={() => increaseQuantity(item.id)}
+                                // ✅ 4. Передаємо t для локалізації помилок ліміту
+                                onIncrease={() => increaseQuantity(item.id, t)}
                                 onDecrease={() => decreaseQuantity(item.id)}
                               />
                             </div>

@@ -545,6 +545,16 @@
     "success": "Password changed successfully!",
     "error": "Error updating password"
   },
+  "Cart": {
+    "title": "Cart",
+    "empty": {
+      "title": "Your cart is empty",
+      "description": "Looks like you haven't added anything yet.",
+      "button": "Start Shopping"
+    },
+    "total": "Total",
+    "checkout": "Checkout"
+  },
   "CartSheet": {
     "title": "Your Cart",
     "emptyMessage": "Your cart is empty",

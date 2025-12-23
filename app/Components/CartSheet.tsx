@@ -12,13 +12,14 @@ import { useCartStore } from '../[locale]/store/cartStore';
 import QuantityCounter from './QuantityCounter';
 import { Link } from '@/navigation';
 import Image from 'next/image';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl'; // ✅ 1. Імпортуємо useLocale
 import { useState } from 'react';
 import { useCurrency } from '@/app/context/CurrencyContext';
 
 interface CartItem {
   id: number;
   title: string;
+  title_uk?: string; // ✅ 2. Додаємо поле в інтерфейс
   price: number;
   images: string[];
   quantity: number;
@@ -26,8 +27,9 @@ interface CartItem {
 
 export default function CartSheet() {
   const t = useTranslations('CartSheet');
-  // 1. ДОДАНО: Отримуємо переклади для помилок кошика (там де ключі 'maxStockReached' тощо)
   const tCart = useTranslations('CartSheet');
+  
+  const locale = useLocale(); // ✅ 3. Отримуємо поточну мову
 
   const { cartItems, increaseQuantity, decreaseQuantity } = useCartStore();
   const [open, setOpen] = useState(false);
@@ -110,7 +112,8 @@ export default function CartSheet() {
                   />
                   <div className="flex-1 flex flex-col justify-between min-w-0">
                     <p className="font-medium text-gray-800 dark:text-neutral-100 truncate">
-                      {item.title}
+                      {/* ✅ 4. Перевіряємо мову і показуємо правильну назву */}
+                      {locale === 'uk' ? (item.title_uk || item.title) : item.title}
                     </p>
                     <p className="text-sm text-gray-500 dark:text-neutral-400 mt-1">
                       {formatPrice(item.price)}
@@ -119,7 +122,6 @@ export default function CartSheet() {
 
                   <QuantityCounter
                     value={item.quantity}
-                    // 2. ВИПРАВЛЕНО: Передаємо tCart другим аргументом
                     onIncrease={() => increaseQuantity(item.id, tCart)}
                     onDecrease={() => decreaseQuantity(item.id)}
                   />

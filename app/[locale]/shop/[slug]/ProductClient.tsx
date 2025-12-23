@@ -81,10 +81,10 @@ export default function ProductClient({ product }: ProductClientProps) {
     <div className="min-h-screen bg-gray-50 py-4 sm:py-6 md:py-8 dark:bg-black">
       <div className="max-w-6xl mx-auto px-4">
         <Link
-          href={from === 'checkout' ? '/checkout' : '/shop'}
+          href={from === 'order' ? '/order' : '/shop'}
           className="inline-flex items-center text-blue-500 hover:text-blue-700 mb-4 sm:mb-6 text-sm sm:text-base"
         >
-          {from === 'checkout' ? t('backToCheckout') : t('backToShopButton')}
+          {from === 'order' ? t('backToCheckout') : t('backToShopButton')}
         </Link>
 
         <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 md:p-8 dark:bg-neutral-800">

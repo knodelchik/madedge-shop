@@ -1,6 +1,6 @@
 'use client';
 
-import { Heart, ShoppingCart, Trash2, Check, Loader2 } from 'lucide-react'; // Додав іконки Check та Loader2
+import { Heart, ShoppingCart, Trash2, Check, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import {
   DropdownMenu,
@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useWishlistStore } from '../../[locale]/store/wishlistStore';
 import { useCartStore } from '../../[locale]/store/cartStore';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl'; // ✅ 1. Додано useLocale
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Link } from '@/navigation';
@@ -24,11 +24,13 @@ interface WishlistDropdownProps {
   user: User | null;
 }
 
+// ✅ 2. Оновлено інтерфейс: додано title_uk
 interface WishlistItem {
   id: string;
   product_id: number;
   products: {
     title: string;
+    title_uk?: string; // <--
     price: number;
     images: string[];
   };
@@ -37,24 +39,28 @@ interface WishlistItem {
 interface WishlistItemsProps {
   items: WishlistItem[];
   movingItem: number | null;
-  successItem: number | null; // Додано
+  successItem: number | null;
   onMoveToCart: (e: React.MouseEvent, productId: number) => void;
   onRemove: (productId: number) => void;
+  locale: string; // ✅ Передаємо локаль
 }
 
 interface LocalWishlistItemsProps {
   productIds: number[];
   movingItem: number | null;
-  successItem: number | null; // Додано
+  successItem: number | null;
   onMoveToCart: (e: React.MouseEvent, productId: number) => void;
   onRemove: (productId: number) => void;
   productsData: Product[];
+  locale: string; // ✅ Передаємо локаль
 }
 
 export default function WishlistDropdown({ user }: WishlistDropdownProps) {
   const t = useTranslations('Wishlist');
+  const locale = useLocale(); // ✅ 3. Отримуємо локаль
+
   const [movingItem, setMovingItem] = useState<number | null>(null);
-  const [successItem, setSuccessItem] = useState<number | null>(null); // Стан для успішного додавання
+  const [successItem, setSuccessItem] = useState<number | null>(null);
   const [localProducts, setLocalProducts] = useState<Product[]>([]);
   const router = useRouter();
   const {
@@ -86,9 +92,7 @@ export default function WishlistDropdown({ user }: WishlistDropdownProps) {
     loadLocalProducts();
   }, [localWishlist]);
 
-  // Оновлена функція з обробкою подій
   const handleMoveToCart = async (e: React.MouseEvent, productId: number) => {
-    // Критично важливо для мобільних пристроїв:
     e.preventDefault();
     e.stopPropagation();
 
@@ -96,23 +100,19 @@ export default function WishlistDropdown({ user }: WishlistDropdownProps) {
 
     try {
       if (user) {
-        // Логіка для авторизованих
-        // Спочатку додаємо до кошика (якщо moveToCart робить і те, і інше - ок)
         await moveToCart(user.id, productId, t);
       } else {
-        // Логіка для гостей
         const product = localProducts.find((p) => p.id === productId);
         if (product) {
+          // Тут ми передаємо весь об'єкт product, який містить title_uk,
+          // тому cartStore коректно його збереже
           addToCart({ ...product, quantity: 1 });
         }
-        // Видаляємо локально
         removeFromLocalWishlist(productId);
       }
 
-      // Показуємо успіх
       setSuccessItem(productId);
 
-      // Скидаємо статуси через короткий час (хоча товар вже може зникнути зі списку через оновлення стору)
       setTimeout(() => {
         setSuccessItem(null);
       }, 2000);
@@ -137,7 +137,7 @@ export default function WishlistDropdown({ user }: WishlistDropdownProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="relative flex items-center gap-2 hover:text-gray-600 transition-colors p-2 rounded-lg hover:bg-gray-100 cursor-pointer outline-none" // outline-none для кращого вигляду
+          className="relative flex items-center gap-2 hover:text-gray-600 transition-colors p-2 rounded-lg hover:bg-gray-100 cursor-pointer outline-none"
           aria-label="Wishlist"
         >
           <Heart className="w-6 h-6" />
@@ -159,11 +159,12 @@ export default function WishlistDropdown({ user }: WishlistDropdownProps) {
           <EmptyWishlist />
         ) : user ? (
           <WishlistItems
-            items={wishlistItems}
+            items={wishlistItems as unknown as WishlistItem[]} // Приведення типів, якщо потрібно
             movingItem={movingItem}
             successItem={successItem}
             onMoveToCart={handleMoveToCart}
             onRemove={handleRemoveFromWishlist}
+            locale={locale} // ✅ Передаємо локаль
           />
         ) : (
           <LocalWishlistItems
@@ -173,6 +174,7 @@ export default function WishlistDropdown({ user }: WishlistDropdownProps) {
             onMoveToCart={handleMoveToCart}
             onRemove={handleRemoveFromWishlist}
             productsData={localProducts}
+            locale={locale} // ✅ Передаємо локаль
           />
         )}
 
@@ -211,6 +213,7 @@ function WishlistItems({
   successItem,
   onMoveToCart,
   onRemove,
+  locale,
 }: WishlistItemsProps) {
   const t = useTranslations('Wishlist');
 
@@ -229,7 +232,10 @@ function WishlistItems({
 
             <div className="flex-1 min-w-0">
               <p className="font-medium text-sm truncate">
-                {item.products.title}
+                {/* ✅ Логіка назви */}
+                {locale === 'uk'
+                  ? item.products.title_uk || item.products.title
+                  : item.products.title}
               </p>
               <p className="text-green-600 font-semibold text-sm ">
                 ${item.products.price}
@@ -237,7 +243,6 @@ function WishlistItems({
             </div>
 
             <div className="flex flex-col gap-1">
-              {/* Кнопка кошика */}
               <button
                 onClick={(e) => onMoveToCart(e, item.product_id)}
                 disabled={
@@ -269,7 +274,6 @@ function WishlistItems({
               </button>
             </div>
           </div>
-          {/* Текстове повідомлення */}
           {movingItem === item.product_id && (
             <div className="text-xs text-green-600 mt-1 flex items-center gap-1">
               {t('addingToCart')}
@@ -288,6 +292,7 @@ function LocalWishlistItems({
   onMoveToCart,
   onRemove,
   productsData,
+  locale,
 }: LocalWishlistItemsProps) {
   const t = useTranslations('Wishlist');
 
@@ -309,7 +314,12 @@ function LocalWishlistItems({
 
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-sm truncate">
-                  {product?.title || `Product #${productId}`}
+                  {/* ✅ Логіка назви для локальних товарів */}
+                  {product
+                    ? locale === 'uk'
+                      ? product.title_uk || product.title
+                      : product.title
+                    : `Product #${productId}`}
                 </p>
                 <p className="text-green-600 font-semibold text-sm">
                   {product ? `$${product.price}` : t('loading')}

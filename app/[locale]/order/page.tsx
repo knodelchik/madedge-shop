@@ -3,7 +3,7 @@
 import { useCartStore } from '../store/cartStore';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl'; // ✅ 1. Додали useLocale
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@/navigation';
 import { authService } from '../services/authService';
@@ -36,10 +36,11 @@ const createSlug = (str: string) =>
 
 export default function OrderPage() {
   const t = useTranslations('Order');
+  const locale = useLocale(); // ✅ 2. Отримуємо поточну мову
+  
   const { cartItems } = useCartStore();
   const { formatPrice, rates } = useCurrency();
 
-  // ЗМІНА 1: Тип стейту тепер 'monobank' | 'paypal'
   const [paymentMethod, setPaymentMethod] = useState<'monobank' | 'paypal'>(
     'monobank'
   );
@@ -165,7 +166,6 @@ export default function OrderPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           items: cartItems,
-          // ЗМІНА 2: Відправляємо 'monobank'
           method: 'monobank',
           shippingAddress: selectedAddress,
           shippingCost: shippingCost,
@@ -228,6 +228,7 @@ export default function OrderPage() {
                     index={index}
                     formatPrice={formatPrice}
                     t={t}
+                    locale={locale} // ✅ 3. Передаємо locale
                   />
                 ))}
               </AnimatePresence>
@@ -476,12 +477,10 @@ export default function OrderPage() {
                   {/* Кнопка PLATA BY MONO */}
                   <button
                     className={`relative h-[56px] px-2 lg:px-4 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-center overflow-hidden ${
-                      // ЗМІНА 3: Замінили 'fondy' на 'monobank'
                       paymentMethod === 'monobank'
                         ? 'border-black bg-black text-white dark:border-white dark:bg-white dark:text-black shadow-md'
                         : 'border-gray-200 bg-white hover:border-gray-300 dark:bg-neutral-900 dark:border-neutral-700'
                     }`}
-                    // ЗМІНА 4: Встановили 'monobank'
                     onClick={() => setPaymentMethod('monobank')}
                     aria-label="Оплата через plata by mono"
                   >
@@ -491,7 +490,6 @@ export default function OrderPage() {
                         alt="plata by mono"
                         fill
                         className={`object-contain transition-all ${
-                          // ЗМІНА 5: Замінили 'fondy' на 'monobank'
                           paymentMethod === 'monobank'
                             ? 'invert dark:invert-0'
                             : 'dark:invert'
@@ -500,7 +498,7 @@ export default function OrderPage() {
                     </div>
                   </button>
 
-                  {/* Кнопка PayPal (оновлена з лого) */}
+                  {/* Кнопка PayPal */}
                   <button
                     className={`relative h-[56px] px-2 lg:px-4 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-center overflow-hidden ${
                       paymentMethod === 'paypal'
@@ -527,7 +525,6 @@ export default function OrderPage() {
 
                 {/* --- ДОДАТКОВА ІНФОРМАЦІЯ ДЛЯ PLATA BY MONO --- */}
                 <AnimatePresence>
-                  {/* ЗМІНА 6: Замінили 'fondy' на 'monobank' */}
                   {paymentMethod === 'monobank' && (
                     <motion.div
                       initial={{ opacity: 0, y: -10, height: 0 }}
@@ -562,13 +559,11 @@ export default function OrderPage() {
                         {/* Текст з перекладом і форматуванням */}
                         <p className="leading-tight">
                           {t.rich('paymentPromo', {
-                            // Жирний текст
                             bold: (chunks) => (
                               <span className="font-medium text-gray-900 dark:text-white">
                                 {chunks}
                               </span>
                             ),
-
                             line: (chunks) => (
                               <>
                                 <br className="sm:hidden" />
@@ -584,9 +579,7 @@ export default function OrderPage() {
               </div>
 
               {/* КНОПКИ ОПЛАТИ (Умовний рендеринг) */}
-
               {paymentMethod === 'paypal' ? (
-                // Якщо вибрано PayPal - рендеримо компонент з кнопками
                 selectedAddressId ? (
                   <PayPalCheckout
                     amountUSD={total}
@@ -601,7 +594,6 @@ export default function OrderPage() {
                   </div>
                 )
               ) : (
-                // Якщо вибрано Monobank/Fondy
                 <button
                   onClick={handleMonobankPayment}
                   disabled={processing || !selectedAddressId}
@@ -626,10 +618,10 @@ export default function OrderPage() {
 }
 
 // === Cart Components ===
-function CartItem({ item, index, formatPrice, t }: any) {
+function CartItem({ item, index, formatPrice, t, locale }: any) {
   const slug = createSlug(item.title);
   return (
-    <Link href={`/shop/${slug}?from=checkout`} className="block">
+    <Link href={`/shop/${slug}?from=order`} className="block">
       <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
@@ -646,7 +638,8 @@ function CartItem({ item, index, formatPrice, t }: any) {
         </div>
         <div className="flex-1 min-w-0 flex flex-col justify-center h-full">
           <p className="font-semibold text-sm lg:text-lg text-gray-900 dark:text-neutral-100 line-clamp-2 leading-tight">
-            {item.title}
+            {/* ✅ 4. Логіка вибору мови */}
+            {locale === 'uk' ? (item.title_uk || item.title) : item.title}
           </p>
           <p className="text-gray-500 dark:text-neutral-400 mt-1 text-xs lg:text-base">
             {t('quantityLabel')}: {item.quantity}

@@ -5,9 +5,11 @@ import { authService } from '../services/authService';
 import { Product } from '../../types/products';
 import { toast } from 'sonner';
 
+// 1. Додаємо title_uk у тип CartItem
 type CartItem = {
   id: number;
   title: string;
+  title_uk?: string; // <-- ВАЖЛИВО
   price: number;
   images: string[];
   quantity: number;
@@ -19,7 +21,6 @@ interface CartStore {
   isSyncing: boolean;
   lastUser: string | null;
 
-  // ОНОВЛЕНО: додано аргумент t?: any
   addToCart: (product: Product & { quantity: number }, t?: any) => void;
   removeFromCart: (productId: number) => void;
   updateQuantity: (productId: number, quantity: number, t?: any) => void;
@@ -39,7 +40,6 @@ export const useCartStore = create<CartStore>()(
       isSyncing: false,
       lastUser: null,
 
-      // ОНОВЛЕНО: приймаємо t
       addToCart: (product, t) => {
         const { cartItems } = get();
         const existingItem = cartItems.find((item) => item.id === product.id);
@@ -49,7 +49,6 @@ export const useCartStore = create<CartStore>()(
         const limit = product.stock ?? 999;
 
         if (requestedTotal > limit) {
-          // ВИКОРИСТОВУЄМО t ДЛЯ ПЕРЕКЛАДУ
           const message = t
             ? t('addToCartLimit', { limit, current: currentQty })
             : `Limit reached: ${limit}`;
@@ -71,11 +70,13 @@ export const useCartStore = create<CartStore>()(
               : item
           );
         } else {
+          // 2. Зберігаємо title_uk при додаванні
           newCartItems = [
             ...cartItems,
             {
               id: product.id,
               title: product.title,
+              title_uk: product.title_uk, // <-- ОСЬ ТУТ ВОНО ЗБЕРІГАЄТЬСЯ
               price: product.price,
               images: product.images,
               quantity: product.quantity,
@@ -89,7 +90,6 @@ export const useCartStore = create<CartStore>()(
         const syncWithDB = async () => {
           const { user } = await authService.getCurrentUser();
           if (user) {
-            console.log('🔄 Syncing add to cart for user:', user.id);
             await cartService.addToCart(
               user.id,
               product.id,
@@ -118,18 +118,14 @@ export const useCartStore = create<CartStore>()(
         syncWithDB();
       },
 
-      // ОНОВЛЕНО: приймаємо t
       updateQuantity: (productId, quantity, t) => {
         const { cartItems } = get();
-
         const item = cartItems.find((i) => i.id === productId);
 
-        // Перевірка ліміту при ручному введенні
         if (item && quantity > item.stock) {
           const message = t
             ? t('updateLimit', { max: item.stock })
             : `Max available: ${item.stock}`;
-
           toast.error(message);
           quantity = item.stock;
         }
@@ -154,7 +150,6 @@ export const useCartStore = create<CartStore>()(
         syncWithDB();
       },
 
-      // ОНОВЛЕНО: приймаємо t
       increaseQuantity: (productId, t) => {
         const { cartItems } = get();
         const item = cartItems.find((item) => item.id === productId);
@@ -162,11 +157,9 @@ export const useCartStore = create<CartStore>()(
         if (item) {
           if (item.quantity >= item.stock) {
             const message = t ? t('maxStockReached') : 'Max stock reached';
-
             toast.error(message);
             return;
           }
-          // Передаємо t далі в updateQuantity
           get().updateQuantity(productId, item.quantity + 1, t);
         }
       },
@@ -201,8 +194,6 @@ export const useCartStore = create<CartStore>()(
             productId: item.id,
             quantity: item.quantity,
           }));
-
-          console.log('🔄 Syncing cart to database:', cartForSync);
           await cartService.syncCart(userId, cartForSync);
           set({ lastUser: userId });
         } catch (error) {
@@ -215,19 +206,21 @@ export const useCartStore = create<CartStore>()(
       loadCartFromDatabase: async (userId: string) => {
         set({ isSyncing: true });
         try {
-          console.log('🔄 Loading cart from database for user:', userId);
           const cartItemsFromDB = await cartService.getCart(userId);
 
           const formattedCartItems: CartItem[] = cartItemsFromDB
             .map((item) => {
               if (!item.products) return null;
+              const prod = item.products as any;
+              // 3. Завантажуємо title_uk з бази
               return {
                 id: item.product_id,
-                title: item.products.title,
-                price: item.products.price,
-                images: item.products.images,
+                title: prod.title,
+                title_uk: prod.title_uk, 
+                price: prod.price,
+                images: prod.images,
                 quantity: item.quantity,
-                stock: item.products.stock || 0,
+                stock: prod.stock || 0,
               };
             })
             .filter((item) => item !== null) as CartItem[];
