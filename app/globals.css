@@ -146,3 +146,51 @@
     opacity: 0;
   }
 }
+
+/* Налаштування React Quill для темної теми */
+.rich-text-editor .ql-toolbar {
+  border-color: #e5e7eb !important; /* gray-200 */
+  background-color: #f9fafb; /* gray-50 */
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
+}
+
+.dark .rich-text-editor .ql-toolbar {
+  border-color: #262626 !important; /* neutral-800 */
+  background-color: #171717; /* neutral-900 */
+}
+
+.dark .rich-text-editor .ql-toolbar .ql-stroke {
+  stroke: #d4d4d4 !important; /* neutral-300 */
+}
+
+.dark .rich-text-editor .ql-toolbar .ql-fill {
+  fill: #d4d4d4 !important; /* neutral-300 */
+}
+
+.dark .rich-text-editor .ql-toolbar button:hover .ql-stroke {
+  stroke: #ffffff !important;
+}
+
+.rich-text-editor .ql-container {
+  border-color: #e5e7eb !important;
+  border-bottom-left-radius: 0.75rem;
+  border-bottom-right-radius: 0.75rem;
+  font-family: inherit;
+  font-size: 0.875rem; /* text-sm */
+}
+
+.dark .rich-text-editor .ql-container {
+  border-color: #262626 !important;
+  color: #fff;
+}
+
+.rich-text-editor .ql-editor {
+  min-height: 150px;
+}
+
+/* Виділений текст в редакторі */
+.rich-text-editor .ql-editor.ql-blank::before {
+  color: #9ca3af; /* gray-400 */
+  font-style: normal;
+}

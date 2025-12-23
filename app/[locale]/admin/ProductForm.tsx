@@ -5,6 +5,8 @@ import { supabase } from '@/app/lib/supabase';
 import { Loader2, Upload, Star, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import Image from 'next/image';
+// Імпортуємо наш новий компонент
+import RichTextEditor from '@/app/Components/RichTextEditor';
 
 interface ProductFormProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -25,7 +27,6 @@ export default function ProductForm({
     title: product?.title || '',
     title_uk: product?.title_uk || '',
     price: product?.price || '',
-    // Якщо редагуємо товар, беремо його сток, якщо новий - 0.
     stock: product?.stock !== undefined ? product.stock : 0,
     category: product?.category || 'sharpeners',
     description: product?.description || '',
@@ -105,13 +106,10 @@ export default function ProductForm({
         throw new Error('Сесія закінчилась. Перезавантажте сторінку.');
       }
 
-      // Підготовка даних
       const productData = {
         title: formData.title,
         title_uk: formData.title_uk,
         price: parseFloat(formData.price),
-        // ВАЖЛИВО: Перевіряємо сток перед відправкою.
-        // Якщо там пустий рядок (користувач все стер), ставимо 0.
         stock: formData.stock === '' ? 0 : parseInt(formData.stock.toString()),
         category: formData.category,
         description: formData.description,
@@ -124,14 +122,12 @@ export default function ProductForm({
       let error: any;
 
       if (product?.id) {
-        // Оновлення існуючого
         const result = await supabase
           .from('products')
           .update(productData)
           .eq('id', product.id);
         error = result.error;
       } else {
-        // Створення нового
         const result = await supabase.from('products').insert([productData]);
         error = result.error;
       }
@@ -286,7 +282,6 @@ export default function ProductForm({
             </div>
           </div>
 
-          {/* --- ПОЛЕ СТОК --- */}
           <div>
             <label className="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">
               Сток (шт)
@@ -296,16 +291,11 @@ export default function ProductForm({
               min="0"
               required
               placeholder="0"
-              // Дозволяємо відображати '', щоб можна було стерти 0
               value={formData.stock}
               onChange={(e) => {
                 const val = e.target.value;
-                // @ts-ignore: Тимчасово дозволяємо пустий рядок у стані
-                setFormData({
-                  ...formData,
-                  // Якщо пустий рядок - зберігаємо як '', інакше парсимо число
-                  stock: val === '' ? '' : parseInt(val),
-                });
+                // @ts-ignore
+                setFormData({ ...formData, stock: val === '' ? '' : parseInt(val) });
               }}
               className="w-full px-3 py-2.5 border border-gray-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 focus:ring-2 focus:ring-black dark:focus:ring-white outline-none transition-all"
             />
@@ -345,34 +335,34 @@ export default function ProductForm({
           </div>
         </div>
 
-        {/* Опис (Multilingual) */}
+
+        {/* Опис (Multilingual) за допомогою RichTextEditor */}
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">
-              Опис (EN)
-            </label>
-            <textarea
-              rows={4}
-              placeholder="Product description in English..."
+            <div className="flex justify-between items-center mb-1.5">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Опис (EN)
+              </label>
+            </div>
+            <RichTextEditor
               value={formData.description}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
-              className="w-full px-3 py-2.5 border border-gray-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 focus:ring-2 focus:ring-black dark:focus:ring-white outline-none transition-all resize-y"
+              // ✅ ВИПРАВЛЕНО: використовуємо (prev) => ...
+              onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
+              placeholder="Product description in English..."
             />
           </div>
+
           <div>
-            <label className="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300">
-              Опис (UK)
-            </label>
-            <textarea
-              rows={4}
-              placeholder="Опис товару українською..."
+            <div className="flex justify-between items-center mb-1.5">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Опис (UK)
+              </label>
+            </div>
+            <RichTextEditor
               value={formData.description_uk}
-              onChange={(e) =>
-                setFormData({ ...formData, description_uk: e.target.value })
-              }
-              className="w-full px-3 py-2.5 border border-gray-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 focus:ring-2 focus:ring-black dark:focus:ring-white outline-none transition-all resize-y"
+              // ✅ ВИПРАВЛЕНО: використовуємо (prev) => ...
+              onChange={(value) => setFormData(prev => ({ ...prev, description_uk: value }))}
+              placeholder="Опис товару українською..."
             />
           </div>
         </div>
