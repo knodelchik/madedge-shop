@@ -592,7 +592,13 @@
     "formMessageLabel": "Message",
     "formMessagePlaceholder": "Tell us more about your inquiry...",
     "formSubmit": "Send Message",
-    "formSubmitting": "Sending..."
+    "formSubmitting": "Sending...",
+    "fillAllFields": "Please fill in all fields",
+    "invalidEmail": "Please enter a valid email",
+    "nameTooShort": "Name is too short",
+    "subjectTooShort": "Subject is too short",
+    "messageTooShort": "Message must be at least 10 characters",
+    "formSubmitSuccess": "Message sent! We'll be in touch."
   },
   "AboutPage": {
     "title": "About Us",

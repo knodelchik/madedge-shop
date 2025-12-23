@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Phone, Mail, Clock, Send } from 'lucide-react';
-import { useTranslations, useLocale } from 'next-intl'; // 1. Імпорт useLocale
+import { useTranslations, useLocale } from 'next-intl';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { authService } from '../[locale]/services/authService';
@@ -13,9 +13,12 @@ import {
   FacebookIcon,
 } from './icons/SocialIcons';
 
+// Простий регекс для валідації email
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export default function ContactSection() {
   const tContacts = useTranslations('Contacts');
-  const locale = useLocale(); // 2. Отримуємо поточну мову
+  const locale = useLocale();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -56,17 +59,63 @@ export default function ContactSection() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // === ВАЛІДАЦІЯ ===
+  const validateForm = () => {
+    // 1. Обрізаємо зайві пробіли для перевірки
+    const name = formData.name.trim();
+    const email = formData.email.trim();
+    const subject = formData.subject.trim();
+    const message = formData.message.trim();
+
+    // 2. Перевірка на порожні поля
+    if (!name || !email || !subject || !message) {
+      toast.error(tContacts('fillAllFields') || 'Будь ласка, заповніть усі поля');
+      return false;
+    }
+
+    // 3. Валідація Email
+    if (!EMAIL_REGEX.test(email)) {
+      toast.error(tContacts('invalidEmail') || 'Введіть коректний email');
+      return false;
+    }
+
+    // 4. Перевірка на "сміття" (мінімальна довжина)
+    if (name.length < 2) {
+      toast.error(tContacts('nameTooShort') || "Ім'я надто коротке");
+      return false;
+    }
+    
+    if (subject.length < 3) {
+      toast.error(tContacts('subjectTooShort') || 'Тема повідомлення надто коротка');
+      return false;
+    }
+
+    if (message.length < 10) {
+      toast.error(tContacts('messageTooShort') || 'Повідомлення має містити мінімум 10 символів');
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+
+    // Запускаємо валідацію. Якщо не пройшла - зупиняємось.
+    if (!validateForm()) return;
+
     setIsSubmitting(true);
 
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        // 3. Передаємо всі дані форми + lang
+        // Відправляємо вже "чисті" дані (trim тут за бажанням, або на сервері)
         body: JSON.stringify({
-          ...formData,
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          subject: formData.subject.trim(),
+          message: formData.message.trim(),
           lang: locale,
         }),
       });
@@ -78,6 +127,7 @@ export default function ContactSection() {
           tContacts('formSubmitSuccess') ||
             "Повідомлення надіслано! Ми зв'яжемося з вами."
         );
+        // Очищаємо лише тему і повідомлення, ім'я та емейл залишаємо
         setFormData((prev) => ({ ...prev, subject: '', message: '' }));
       } else {
         toast.error(data.error || 'Помилка відправки. Спробуйте пізніше.');
@@ -89,6 +139,8 @@ export default function ContactSection() {
     }
   };
 
+  // ... (решта коду без змін: socialLinks, variants і return)
+  
   const socialLinks = [
     {
       Icon: TelegramIcon,
@@ -331,6 +383,7 @@ export default function ContactSection() {
                         value={formData.name}
                         onChange={handleInputChange}
                         placeholder={tContacts('formNamePlaceholder')}
+                        // Залишаємо required для базової перевірки
                         required
                         className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-gray-900 dark:focus:ring-neutral-300 focus:border-transparent focus:bg-white dark:focus:bg-neutral-700 transition-all duration-200 text-gray-900 dark:text-neutral-100 text-sm sm:text-base"
                       />
