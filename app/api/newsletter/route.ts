@@ -29,17 +29,19 @@ export async function POST(req: Request) {
     ]);
 
     if (dbError) {
+      // Перевірка на унікальність (код помилки Postgres для unique violation - 23505)
       if (dbError.code === '23505') {
+        // ВАЖЛИВО: Повертаємо 409 Conflict, щоб фронтенд знав, що це дублікат
         return NextResponse.json(
           { message: 'Already subscribed' },
-          { status: 200 }
+          { status: 409 }
         );
       }
       console.error('DB Error:', dbError);
       return NextResponse.json({ error: 'Database error' }, { status: 500 });
     }
 
-    // 3. ЛОГІКА МОВИ (Виправляємо тут)
+    // 3. ЛОГІКА МОВИ
     const isUk = lang === 'uk';
 
     const subject = isUk
@@ -65,7 +67,7 @@ export async function POST(req: Request) {
     // 4. Відправляємо лист
     const msg = {
       to: email,
-      from: 'info@madedge.net',
+      from: 'info@madedge.net', // Переконайтеся, що цей email верифікований у SendGrid
       subject: subject,
       html: `
         <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto;">

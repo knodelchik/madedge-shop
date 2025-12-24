@@ -3,7 +3,7 @@
 import { useTheme } from 'next-themes';
 import { useState, useEffect } from 'react';
 import { Moon, Sun, Monitor } from 'lucide-react';
-import { useTranslations, useLocale } from 'next-intl'; // 1. Імпортували useLocale
+import { useTranslations, useLocale } from 'next-intl';
 import {
   FacebookIcon,
   InstagramIcon,
@@ -12,11 +12,12 @@ import {
 } from './icons/SocialIcons';
 import { Link } from '@/navigation';
 import { toast } from 'sonner';
+import { authService } from '@/app/[locale]/services/authService'; // ✅ 1. Імпорт сервісу авторизації
 
 export default function Footer() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const locale = useLocale(); // 2. Отримуємо поточну мову ('uk' або 'en')
+  const locale = useLocale();
 
   // Стан для форми розсилки
   const [email, setEmail] = useState('');
@@ -25,7 +26,6 @@ export default function Footer() {
   const tFooter = useTranslations('Footer');
   const tInfo = useTranslations('Info');
   const tContacts = useTranslations('Contacts');
-  // const tTheme = useTranslations('Theme'); // Якщо потрібно
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,29 +33,38 @@ export default function Footer() {
 
     setSubmitting(true);
     try {
+      // ✅ 2. Перевірка авторизації
+      const { user } = await authService.getCurrentUser();
+
+      if (!user) {
+        toast.error(tFooter('subscribeLoginRequired'));
+        setSubmitting(false);
+        return;
+      }
+
       const res = await fetch('/api/newsletter', {
         method: 'POST',
-        // 3. Передаємо email ТА мову
         body: JSON.stringify({
           email,
           lang: locale,
         }),
       });
 
+      const data = await res.json();
+
       if (res.ok) {
-        toast.success(
-          locale === 'en'
-            ? 'Successfully subscribed!'
-            : 'Ви успішно підписались!'
-        );
+        toast.success(tFooter('subscribeSuccess'));
         setEmail('');
       } else {
-        toast.error(
-          locale === 'en' ? 'Something went wrong' : 'Щось пішло не так'
-        );
+        // ✅ 3. Обробка помилок (дублікат або серверна помилка)
+        if (res.status === 409 || data.message?.includes('already')) {
+          toast.info(tFooter('subscribeAlreadySubscribed'));
+        } else {
+          toast.error(tFooter('subscribeError'));
+        }
       }
     } catch (e) {
-      toast.error(locale === 'en' ? 'Connection error' : "Помилка з'єднання");
+      toast.error(tFooter('subscribeError'));
     } finally {
       setSubmitting(false);
     }

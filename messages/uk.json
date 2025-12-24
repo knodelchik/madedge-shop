@@ -188,7 +188,11 @@
     "footerNewsletterTitle": "Підписка на розсилку",
     "footerNewsletterDesc": "Будьте в курсі нових релізів та функцій",
     "footerEmailLabel": "Електронна пошта",
-    "footerSubscribeButton": "Підписатися"
+    "footerSubscribeButton": "Підписатися",
+    "subscribeSuccess": "Ви успішно підписалися на розсилку!",
+    "subscribeError": "Щось пішло не так",
+    "subscribeLoginRequired": "Будь ласка, увійдіть в акаунт, щоб підписатися.",
+    "subscribeAlreadySubscribed": "Ви вже підписані на розсилку."
   },
   "Theme": {
     "themeLight": "Світла тема",
@@ -662,7 +666,11 @@
     "serviceBulkOrdersText": "Спеціальні ціни та опції налаштування для шкіл, студій та корпорацій.",
     "stayUpdatedTitle": "Будьте в курсі",
     "stayUpdatedText": "Підпишіться на нашу розсилку, щоб отримувати сповіщення про нові події, запуски продуктів та ексклюзивні пропозиції.",
-    "subscribeButton": "Підписатися зараз"
+    "subscribeButton": "Підписатися зараз",
+    "subscribeSuccess": "Ви успішно підписалися на розсилку!",
+    "subscribeError": "Помилка при підписці. Спробуйте пізніше.",
+    "subscribeLoginRequired": "Будь ласка, увійдіть в акаунт, щоб підписатися.",
+    "subscribeAlreadySubscribed": "Ви вже підписані на розсилку."
   },
   "AboutLayout": {
     "sidebar": {

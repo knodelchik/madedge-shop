@@ -1,12 +1,15 @@
 'use client';
 
-import React from 'react';
-import { Calendar, Wrench, ChevronRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { ChevronRight, Loader2 } from 'lucide-react'; // Додав Loader2
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
+import { authService } from '@/app/[locale]/services/authService';
 
 export default function AboutPage() {
   const t = useTranslations('AboutPage');
+  const [isSubscribing, setIsSubscribing] = useState(false);
 
   const fadeInUp = {
     initial: { opacity: 0, y: 20 },
@@ -26,6 +29,50 @@ export default function AboutPage() {
     initial: { opacity: 0, scale: 0.9 },
     animate: { opacity: 1, scale: 1 },
     transition: { duration: 0.4 },
+  };
+
+  // --- ЛОГІКА ПІДПИСКИ ---
+  const handleSubscribe = async () => {
+    setIsSubscribing(true);
+    try {
+      // 1. Перевірка авторизації
+      const { user } = await authService.getCurrentUser();
+
+      if (!user) {
+        toast.error(t('subscribeLoginRequired'));
+        return;
+      }
+
+      if (!user.email) {
+        toast.error(t('subscribeError'));
+        return;
+      }
+
+      // 2. Відправка запиту
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: user.email }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        toast.success(t('subscribeSuccess'));
+      } else {
+        // Перевірка на дублікат (залежить від вашого API, зазвичай 409 або повідомлення)
+        if (res.status === 409 || data.message?.includes('already')) {
+          toast.info(t('subscribeAlreadySubscribed'));
+        } else {
+          toast.error(data.error || t('subscribeError'));
+        }
+      }
+    } catch (error) {
+      console.error('Newsletter error:', error);
+      toast.error(t('subscribeError'));
+    } finally {
+      setIsSubscribing(false);
+    }
   };
 
   return (
@@ -102,7 +149,7 @@ export default function AboutPage() {
                 initial="initial"
                 animate="animate"
               >
-                {['2016', '2017', '2018', '2021', '2025'].map((year, index) => (
+                {['2016', '2017', '2018', '2021', '2025'].map((year) => (
                   <motion.li
                     key={year}
                     className="flex items-start"
@@ -419,7 +466,7 @@ export default function AboutPage() {
                 ),
                 key: 'BulkOrders',
               },
-            ].map((service, index) => (
+            ].map((service) => (
               <motion.div
                 key={service.key}
                 className="border border-gray-200 p-4 sm:p-5 rounded-lg hover:shadow-lg transition-shadow dark:border-neutral-800 dark:bg-gray-900"
@@ -470,10 +517,15 @@ export default function AboutPage() {
               {t('stayUpdatedText')}
             </p>
             <motion.button
-              className="bg-blue-600 text-white px-5 sm:px-6 py-2 rounded-lg font-medium hover:bg-blue-700 dark:bg-neutral-600 dark:hover:bg-neutral-700 transition-colors cursor-pointer text-sm sm:text-base"
+              onClick={handleSubscribe}
+              disabled={isSubscribing}
+              className="bg-blue-600 text-white px-5 sm:px-6 py-2 rounded-lg font-medium hover:bg-blue-700 dark:bg-neutral-600 dark:hover:bg-neutral-700 transition-colors cursor-pointer text-sm sm:text-base disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
+              {isSubscribing && (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              )}
               {t('subscribeButton')}
             </motion.button>
           </motion.div>
