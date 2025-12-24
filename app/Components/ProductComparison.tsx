@@ -2,9 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl'; // ✅ 1. Додали useLocale
 import { motion, AnimatePresence } from 'framer-motion';
-// Імпортуємо сервіс замість прямого клієнта Supabase
 import { productsService } from '@/app/[locale]/services/productService';
 import {
   Select,
@@ -14,7 +13,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-// Базовий URL для картинок
 const STORAGE_URL = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/products`;
 
 interface ProductFeature {
@@ -30,14 +28,14 @@ interface ComparisonProduct {
 
 const ProductComparison: React.FC = () => {
   const t = useTranslations('Product');
+  const locale = useLocale(); // ✅ 2. Отримуємо мову
 
-  // 1. ДАНІ ПОРІВНЯННЯ БЕРЕМО З ПЕРЕКЛАДІВ
   const products = t.raw('products') as ComparisonProduct[];
 
-  // 2. СТАН ДЛЯ КАРТИНОК (Словник: "ID" -> "URL Картинки")
-  const [imagesMap, setImagesMap] = useState<Record<string, string>>({});
+  // ✅ 3. Змінили стейт: тепер зберігаємо весь об'єкт товару з БД, а не тільки картинку
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [dbProducts, setDbProducts] = useState<Record<string, any>>({});
 
-  // Стейт для вибраних ID (для Select)
   const [firstId, setFirstId] = useState<string>(
     products.length > 0 ? products[0].id.toString() : ''
   );
@@ -45,38 +43,56 @@ const ProductComparison: React.FC = () => {
     products.length > 1 ? products[1].id.toString() : ''
   );
 
-  // 3. ЗАВАНТАЖЕННЯ ЗОБРАЖЕНЬ ЧЕРЕЗ СЕРВІС
   useEffect(() => {
-    const loadImages = async () => {
+    const loadProductsData = async () => {
       try {
         const allProducts = await productsService.getAllProducts();
-        const map: Record<string, string> = {};
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const map: Record<string, any> = {};
 
         if (allProducts && allProducts.length > 0) {
           allProducts.forEach((item) => {
-            if (item.images && item.images.length > 0) {
-              map[item.id.toString()] = item.images[0];
-            }
+            // Зберігаємо весь об'єкт товару по ID
+            map[item.id.toString()] = item;
           });
         }
-        setImagesMap(map);
+        setDbProducts(map);
       } catch (e) {
-        console.error('Error loading comparison images:', e);
+        console.error('Error loading comparison data:', e);
       }
     };
 
-    loadImages();
+    loadProductsData();
   }, []);
 
   const product1 = products.find((p) => p.id.toString() === firstId);
   const product2 = products.find((p) => p.id.toString() === secondId);
 
-  // 4. ФУНКЦІЯ ОТРИМАННЯ КАРТИНКИ ПО ID
+  // ✅ 4. Функція для отримання локалізованої назви
+  const getProductName = (p: ComparisonProduct) => {
+    const dbProduct = dbProducts[p.id.toString()];
+    
+    // Якщо є дані з БД, беремо назву звідти відповідно до мови
+    if (dbProduct) {
+      return locale === 'uk' 
+        ? (dbProduct.title_uk || dbProduct.title) 
+        : dbProduct.title;
+    }
+    
+    // Фоллбек: беремо назву з JSON, якщо дані з БД ще не завантажились
+    return p.name;
+  };
+
   const getImageUrl = (productId: number) => {
     const idStr = productId.toString();
-    const imagePath = imagesMap[idStr];
+    const dbProduct = dbProducts[idStr];
+    
+    // Перевіряємо, чи є картинки в об'єкті з БД
+    if (!dbProduct || !dbProduct.images || dbProduct.images.length === 0) {
+      return '/images/notfound.png';
+    }
 
-    if (!imagePath) return '/images/notfound.png';
+    const imagePath = dbProduct.images[0];
     if (imagePath.startsWith('http')) return imagePath;
 
     return `${STORAGE_URL}/${imagePath}`;
@@ -92,7 +108,6 @@ const ProductComparison: React.FC = () => {
     return f ? f.value : '-';
   };
 
-  // Анімації
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
@@ -128,9 +143,7 @@ const ProductComparison: React.FC = () => {
 
         {/* SELECTS */}
         <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-8 mb-10 max-w-2xl mx-auto">
-          {/* --- ПЕРШИЙ СЕЛЕКТ (ЛІВИЙ) --- */}
           <div className="w-full min-w-0">
-            {/* ТУТ БУЛА ПОМИЛКА: value={secondId} -> value={firstId} */}
             <Select value={firstId} onValueChange={setFirstId}>
               <SelectTrigger className="w-full bg-white dark:bg-[#111111] border-gray-300 dark:border-neutral-800 rounded-xl">
                 <SelectValue placeholder="Select product" />
@@ -140,18 +153,17 @@ const ProductComparison: React.FC = () => {
                   <SelectItem
                     key={p.id}
                     value={p.id.toString()}
-                    // Блокуємо, якщо цей продукт обраний у другому селекті
                     disabled={p.id.toString() === secondId}
                     className="cursor-pointer"
                   >
-                    {p.name}
+                    {/* ✅ Використовуємо функцію для назви */}
+                    {getProductName(p)}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
-          {/* --- ДРУГИЙ СЕЛЕКТ (ПРАВИЙ) --- */}
           <div className="w-full min-w-0">
             <Select value={secondId} onValueChange={setSecondId}>
               <SelectTrigger className="w-full bg-white dark:bg-[#111111] border-gray-300 dark:border-neutral-800 rounded-xl">
@@ -162,11 +174,11 @@ const ProductComparison: React.FC = () => {
                   <SelectItem
                     key={p.id}
                     value={p.id.toString()}
-                    // Блокуємо, якщо цей продукт обраний у першому селекті
                     disabled={p.id.toString() === firstId}
                     className="cursor-pointer"
                   >
-                    {p.name}
+                    {/* ✅ Використовуємо функцію для назви */}
+                    {getProductName(p)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -188,14 +200,16 @@ const ProductComparison: React.FC = () => {
               <div className="relative w-full max-w-[280px] lg:max-w-[320px] aspect-square mx-auto">
                 <Image
                   src={getImageUrl(product1.id)}
-                  alt={product1.name}
+                  // ✅ Локалізована назва в alt
+                  alt={getProductName(product1)}
                   fill
                   onError={onImgError}
                   className="rounded-xl shadow-lg object-contain bg-white dark:bg-[#111] border border-gray-200 dark:border-neutral-800 p-2"
                 />
               </div>
               <h3 className="mt-4 font-semibold text-lg text-gray-900 dark:text-white">
-                {product1.name}
+                {/* ✅ Локалізована назва */}
+                {getProductName(product1)}
               </h3>
             </motion.div>
           </AnimatePresence>
@@ -239,14 +253,16 @@ const ProductComparison: React.FC = () => {
               <div className="relative w-full max-w-[280px] lg:max-w-[320px] aspect-square mx-auto">
                 <Image
                   src={getImageUrl(product2.id)}
-                  alt={product2.name}
+                  // ✅ Локалізована назва в alt
+                  alt={getProductName(product2)}
                   fill
                   onError={onImgError}
                   className="rounded-xl shadow-lg object-contain bg-white dark:bg-[#111] border border-gray-200 dark:border-neutral-800 p-2"
                 />
               </div>
               <h3 className="mt-4 font-semibold text-lg text-gray-900 dark:text-white">
-                {product2.name}
+                {/* ✅ Локалізована назва */}
+                {getProductName(product2)}
               </h3>
             </motion.div>
           </AnimatePresence>
@@ -259,14 +275,15 @@ const ProductComparison: React.FC = () => {
             <div className="relative w-[200px] h-[200px] mx-auto mb-4">
               <Image
                 src={getImageUrl(product1.id)}
-                alt={product1.name}
+                alt={getProductName(product1)}
                 fill
                 onError={onImgError}
                 className="object-contain rounded-xl"
               />
             </div>
             <h3 className="text-center font-bold mb-4 text-gray-900 dark:text-white">
-              {product1.name}
+              {/* ✅ Локалізована назва */}
+              {getProductName(product1)}
             </h3>
             {product1.features.map((f, i) => (
               <div
@@ -286,14 +303,15 @@ const ProductComparison: React.FC = () => {
             <div className="relative w-[200px] h-[200px] mx-auto mb-4">
               <Image
                 src={getImageUrl(product2.id)}
-                alt={product2.name}
+                alt={getProductName(product2)}
                 fill
                 onError={onImgError}
                 className="object-contain rounded-xl"
               />
             </div>
             <h3 className="text-center font-bold mb-4 text-gray-900 dark:text-white">
-              {product2.name}
+              {/* ✅ Локалізована назва */}
+              {getProductName(product2)}
             </h3>
             {product2.features.map((f, i) => (
               <div
