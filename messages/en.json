@@ -721,7 +721,10 @@
       "title": "Was this helpful?",
       "placeholder": "Your feedback...",
       "supported": "supported",
-      "send": "Send"
+      "send": "Send",
+      "success": "Thank you for your feedback!",
+      "errorEmpty": "Please write your feedback",
+      "errorShort": "Feedback is too short"
     }
   },
   "SharpenersPage": {

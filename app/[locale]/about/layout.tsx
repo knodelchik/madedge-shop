@@ -5,7 +5,7 @@ import { Link } from '@/navigation';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
-import { authService } from '@/app/[locale]/services/authService'; // ✅ Імпорт сервісу
+import { authService } from '@/app/[locale]/services/authService';
 import {
   Factory,
   Target,
@@ -169,7 +169,6 @@ export default function AboutLayout({
     (page) => page.href === cleanPathname
   );
 
-  // --- ЛОГІКА ЦИКЛІЧНОЇ НАВІГАЦІЇ ---
   const loopStartIndex = 1;
   const loopEndIndex = navigationPages.length - 1;
 
@@ -200,9 +199,31 @@ export default function AboutLayout({
     }
   };
 
-  // 2. ОНОВЛЕНА ФУНКЦІЯ ВІДПРАВКИ (з даними юзера)
+  // ✅ 1. ФУНКЦІЯ ВАЛІДАЦІЇ
+  const validateForm = () => {
+    const text = feedback.trim();
+
+    // Перевірка на порожнє поле
+    if (!text) {
+      toast.error(t('feedback.errorEmpty') || 'Будь ласка, напишіть відгук');
+      return false;
+    }
+
+    // Перевірка на мінімальну довжину (як в Contacts, наприклад, 5-10 символів)
+    if (text.length < 5) {
+      toast.error(t('feedback.errorShort') || 'Відгук занадто короткий');
+      return false;
+    }
+
+    return true;
+  };
+
+  // 2. ОНОВЛЕНА ФУНКЦІЯ ВІДПРАВКИ
   const handleSubmit = async () => {
     if (selectedRating === null) return;
+
+    // Викликаємо валідацію перед відправкою
+    if (!validateForm()) return;
 
     setIsSubmitting(true);
     try {
@@ -211,19 +232,19 @@ export default function AboutLayout({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           rating: selectedRating,
-          feedback: feedback,
+          feedback: feedback.trim(), // Відправляємо очищений текст
           pageUrl:
             typeof window !== 'undefined'
               ? window.location.href
               : cleanPathname,
-          // Передаємо дані користувача або заглушки
+          // Передаємо ім'я, навіть якщо юзер не авторизований
           name: currentUser?.name || 'Анонім',
           email: currentUser?.email || '',
         }),
       });
 
       if (res.ok) {
-        toast.success(t('feedback.success') || 'Дякуємо за ваш відгук!');
+        toast.success(t('feedback.success'));
         setFeedback('');
         setSelectedRating(null);
       } else {
