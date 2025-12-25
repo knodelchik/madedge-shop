@@ -1,11 +1,10 @@
 'use server';
 
-import { createClient } from '@supabase/supabase-js'; // Використовуємо admin client напряму тут для надійності
+import { createClient } from '@supabase/supabase-js';
 import sgMail from '@sendgrid/mail';
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
-// Створюємо клієнт з Service Role Key для обходу RLS
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -23,7 +22,6 @@ export type EmailContent = {
   htmlBody: string;
 };
 
-// 1. Отримання підписників
 export async function getSubscribers() {
   const { data, error } = await supabase
     .from('subscribers')
@@ -37,17 +35,17 @@ export async function getSubscribers() {
   return data as Subscriber[];
 }
 
-// 2. Видалення
 export async function deleteSubscriber(id: number) {
   const { error } = await supabase.from('subscribers').delete().eq('id', id);
   if (error) throw new Error(error.message);
   return { success: true };
 }
 
-// 3. МАСОВА РОЗСИЛКА (Виправлена логіка)
+// --- ОНОВЛЕНА ФУНКЦІЯ МАСОВОЇ РОЗСИЛКИ ---
 export async function sendBulkEmail(
   contentEn: EmailContent,
-  contentUk: EmailContent
+  contentUk: EmailContent,
+  target: 'all' | 'uk' | 'en' // Новий параметр
 ) {
   const subscribers = await getSubscribers();
 
@@ -55,21 +53,39 @@ export async function sendBulkEmail(
     return { success: false, message: 'Немає підписників' };
   }
 
+  // 1. Фільтруємо аудиторію на сервері
+  const recipients = subscribers.filter((sub) => {
+    if (target === 'all') return true;
+    if (target === 'uk') return sub.lang === 'uk';
+    if (target === 'en') return sub.lang !== 'uk'; // Всі, хто не 'uk', вважаються міжнародними
+    return false;
+  });
+
+  if (recipients.length === 0) {
+    return { success: false, message: 'Немає підписників для обраної аудиторії' };
+  }
+
   let sentCount = 0;
   let errorCount = 0;
 
-  // Використовуємо map для створення масиву промісів
-  const promises = subscribers.map((sub) => {
-    // ⚠️ ГОЛОВНА ЛОГІКА:
-    // Перевіряємо, чи є lang = 'uk'. Якщо ні — вважаємо 'en'.
+  const promises = recipients.map((sub) => {
     const isUk = sub.lang === 'uk';
+    
+    // 2. Вибираємо контент.
+    // Якщо ми шлемо тільки на EN, то contentUk може бути пустим, і це ок.
+    let emailData;
+    
+    if (target === 'all') {
+       emailData = isUk ? contentUk : contentEn;
+    } else if (target === 'uk') {
+       emailData = contentUk;
+    } else {
+       emailData = contentEn;
+    }
 
-    // Вибираємо правильний контент
-    const emailData = isUk ? contentUk : contentEn;
-
-    // Якщо раптом для вибраної мови тема порожня, беремо англійську як запасну
-    const finalSubject = emailData.subject || contentEn.subject;
-    const finalHtml = emailData.htmlBody || contentEn.htmlBody;
+    // Фоллбек, якщо щось пішло не так з контентом
+    const finalSubject = emailData.subject || 'MadEdge News';
+    const finalHtml = emailData.htmlBody || '<p>News from MadEdge</p>';
 
     const msg = {
       to: sub.email,
@@ -100,6 +116,6 @@ export async function sendBulkEmail(
 
   return {
     success: true,
-    message: `Успішно: ${sentCount}, Помилок: ${errorCount}`,
+    message: `Відправлено: ${sentCount}, Помилок: ${errorCount}`,
   };
 }
