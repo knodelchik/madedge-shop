@@ -170,8 +170,6 @@ export default function OrderPage() {
           shippingAddress: selectedAddress,
           shippingCost: shippingCost,
           shippingType,
-          amountUSD: total,
-          amountUAH: totalUAH,
         }),
       });
 
