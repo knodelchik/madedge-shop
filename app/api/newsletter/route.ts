@@ -11,6 +11,8 @@ const supabase = createClient(
 // SendGrid Init
 sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://madedge.net';
+
 export async function POST(req: Request) {
   try {
     // 1. Отримуємо email та мову (за замовчуванням 'en')
@@ -41,7 +43,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Database error' }, { status: 500 });
     }
 
-    // 3. ЛОГІКА МОВИ
+    // 3. ЛОГІКА МОВИ ТА КОНТЕНТУ
     const isUk = lang === 'uk';
 
     const subject = isUk
@@ -64,18 +66,32 @@ export async function POST(req: Request) {
       ? 'З найкращими побажаннями,<br/>Команда MadEdge'
       : 'Best regards,<br/>MadEdge Team';
 
+    // --- НОВЕ: Текст кнопки ---
+    const buttonText = isUk ? 'Перейти на сайт' : 'Visit Website';
+
     // 4. Відправляємо лист
     const msg = {
       to: email,
       from: 'info@madedge.net', // Переконайтеся, що цей email верифікований у SendGrid
       subject: subject,
       html: `
-        <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto;">
-          <h1 style="color: #000;">${title}</h1>
-          <p>${textMain}</p>
-          <p>${textSub}</p>
-          <br />
-          <p>${footer}</p>
+        <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h1 style="color: #000; text-align: center;">${title}</h1>
+          
+          <div style="font-size: 16px; line-height: 1.5;">
+            <p>${textMain}</p>
+            <p>${textSub}</p>
+          </div>
+
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${BASE_URL}" target="_blank" style="background-color: #000000; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block;">
+              ${buttonText}
+            </a>
+          </div>
+
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;" />
+          
+          <p style="font-size: 14px; color: #666;">${footer}</p>
         </div>
       `,
     };

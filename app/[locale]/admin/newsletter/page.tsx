@@ -10,6 +10,8 @@ import {
   sendBulkEmail,
   type Subscriber,
 } from '@/app/actions/admin-newsletter';
+// 1. Імпортуємо наш редактор
+import RichTextEditor from '@/app/Components/RichTextEditor';
 
 export default function NewsletterPage() {
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
@@ -60,6 +62,7 @@ export default function NewsletterPage() {
     }
   }
 
+  // 2. Оновлений обробник. Тепер він універсальний для input (e.target.value) і для Editor (value string)
   const handleInputChange = (field: 'subject' | 'message', value: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -80,17 +83,19 @@ export default function NewsletterPage() {
     });
   }, [subscribers, targetAudience]);
 
+  // Генератор HTML: тепер він просто обгортає контент з редактора
   const generateHtml = (text: string, title: string, lang: 'en' | 'uk') => {
     const footerText =
       lang === 'en'
         ? 'You received this email because you subscribed to MadEdge news.'
         : 'Ви отримали цей лист, бо підписалися на новини MadEdge.';
 
+    // text вже містить HTML теги (<p>, <b> тощо) від редактора, тому не потрібно робити replace(/\n/g, '<br>')
     return `
       <div style="font-family: sans-serif; padding: 20px; color: #333; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #000; border-bottom: 2px solid #000; padding-bottom: 10px;">${title}</h2>
         <div style="font-size: 16px; line-height: 1.6; padding: 20px 0;">
-          ${text.replace(/\n/g, '<br>')}
+          ${text}
         </div>
         <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;" />
         <p style="font-size: 12px; color: #888; text-align: center;">
@@ -105,12 +110,15 @@ export default function NewsletterPage() {
     const checkEn = targetAudience === 'all' || targetAudience === 'en';
     const checkUk = targetAudience === 'all' || targetAudience === 'uk';
 
-    if (checkEn && (!formData.en.subject.trim() || !formData.en.message.trim())) {
+    // Перевіряємо на пустоту, але враховуємо що пустий редактор може давати "<p><br></p>"
+    const isEditorEmpty = (html: string) => !html || html === '<p><br></p>' || html.trim() === '';
+
+    if (checkEn && (!formData.en.subject.trim() || isEditorEmpty(formData.en.message))) {
       toast.warning('Заповніть англійську версію!');
       setActiveLangTab('en');
       return;
     }
-    if (checkUk && (!formData.uk.subject.trim() || !formData.uk.message.trim())) {
+    if (checkUk && (!formData.uk.subject.trim() || isEditorEmpty(formData.uk.message))) {
       toast.warning('Заповніть українську версію!');
       setActiveLangTab('uk');
       return;
@@ -226,7 +234,7 @@ export default function NewsletterPage() {
               <Send className="w-5 h-5" /> Крок 2. Зміст листа
             </h2>
 
-            {/* Вкладки мов (Показуємо тільки якщо 'all', інакше просто лейбл) */}
+            {/* Вкладки мов */}
             {targetAudience === 'all' ? (
                 <div className="flex bg-gray-100 dark:bg-neutral-800 p-1 rounded-lg">
                 <button
@@ -280,16 +288,18 @@ export default function NewsletterPage() {
               <label className="text-sm font-medium dark:text-gray-300">
                 Текст повідомлення ({activeLangTab === 'en' ? 'EN' : 'UA'})
               </label>
-              <textarea
-                className={`${inputClassName} min-h-[300px] resize-y`}
-                placeholder={
-                    activeLangTab === 'en'
-                    ? 'Write your email content here (HTML supported)...'
-                    : 'Напишіть текст листа тут (HTML підтримується)...'
-                }
-                value={formData[activeLangTab].message}
-                onChange={(e) => handleInputChange('message', e.target.value)}
-              />
+              {/* 3. Заміна textarea на RichTextEditor */}
+              <div className="prose-editor-wrapper">
+                <RichTextEditor
+                    value={formData[activeLangTab].message}
+                    onChange={(value) => handleInputChange('message', value)}
+                    placeholder={
+                        activeLangTab === 'en'
+                        ? 'Write your email content here...'
+                        : 'Напишіть текст листа тут...'
+                    }
+                />
+              </div>
             </div>
           </div>
 
