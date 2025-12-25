@@ -182,7 +182,7 @@ export default function ProductClient({ product }: ProductClientProps) {
               {displayDescription && (
                 <div className="prose max-w-none">
                   <div
-                    className="text-sm sm:text-base text-gray-600 leading-relaxed dark:text-neutral-400"
+                    className="rich-text-content text-sm sm:text-base text-gray-600 leading-relaxed dark:text-neutral-400"
                     dangerouslySetInnerHTML={{ __html: displayDescription }}
                   />
                 </div>
