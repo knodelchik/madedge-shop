@@ -90,14 +90,27 @@ export default function NewsletterPage() {
         ? 'You received this email because you subscribed to MadEdge news.'
         : 'Ви отримали цей лист, бо підписалися на новини MadEdge.';
 
-    // text вже містить HTML теги (<p>, <b> тощо) від редактора, тому не потрібно робити replace(/\n/g, '<br>')
+    const buttonText = lang === 'en' ? 'Visit Website' : 'Перейти на сайт';
+    
+    // Посилання на сайт (якщо змінна оточення не задана, використовуємо домен за замовчуванням)
+    const siteUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://madedge.net';
+
     return `
-      <div style="font-family: sans-serif; padding: 20px; color: #333; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #000; border-bottom: 2px solid #000; padding-bottom: 10px;">${title}</h2>
+      <div style="font-family: Arial, sans-serif; padding: 20px; color: #333; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+        <h2 style="color: #000; border-bottom: 2px solid #000; padding-bottom: 10px; margin-top: 0;">${title}</h2>
+        
         <div style="font-size: 16px; line-height: 1.6; padding: 20px 0;">
           ${text}
         </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="${siteUrl}" target="_blank" style="background-color: #000000; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block; font-family: Arial, sans-serif;">
+              ${buttonText}
+            </a>
+        </div>
+
         <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;" />
+        
         <p style="font-size: 12px; color: #888; text-align: center;">
           ${footerText}
         </p>
