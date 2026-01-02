@@ -194,3 +194,37 @@
   color: #9ca3af; /* gray-400 */
   font-style: normal;
 }
+
+/* Стилі для контенту з редактора */
+.rich-text-content {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+
+.rich-text-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+}
+
+.rich-text-content ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.rich-text-content ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.rich-text-content p {
+  margin-bottom: 0.75rem;
+}
+
+.rich-text-content a {
+  color: #3b82f6;
+  text-decoration: underline;
+}
