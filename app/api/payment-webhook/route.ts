@@ -7,7 +7,7 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
 export async function POST(req: Request) {
   try {
-    // 1. Перевірка безпеки через secret
+    // 1. Перевірка безпеки
     const { searchParams } = new URL(req.url);
     const secret = searchParams.get('secret');
 
@@ -19,32 +19,32 @@ export async function POST(req: Request) {
     const body = await req.json();
     console.log('Monobank Webhook:', body);
 
-    const { status, reference, invoiceId } = body;
+    const { status, reference } = body;
 
     // 2. Оновлення статусу
-    // ВИПРАВЛЕННЯ: Використовуємо 'success' замість 'paid', щоб відповідати ENUM у базі даних
+    // Використовуємо 'success' замість 'paid', щоб відповідати вашій схемі
     let newStatus = 'pending';
     if (status === 'success') newStatus = 'success';
     else if (status === 'failure') newStatus = 'failure';
 
-    // Оновлюємо замовлення
+    // 3. Оновлення замовлення в БД
+    // Прибрали payment_id, оскільки його немає в таблиці.
+    // Вся інформація про платіж (включно з invoiceId) збережеться в payment_result.
     const { error: updateError } = await supabaseAdmin
       .from('orders')
       .update({
         status: newStatus,
-        payment_id: invoiceId,
-        payment_result: body,
+        payment_result: body, // Тут вже є invoiceId всередині JSON
         updated_at: new Date().toISOString(),
       })
-      .eq('id', reference); // reference = наш uniqueOrderId
+      .eq('id', reference);
 
     if (updateError) {
       console.error('DB Update Error:', updateError);
       return NextResponse.json({ error: 'DB Error' }, { status: 500 });
     }
 
-    // 3. Списання стоку (лише якщо успіх)
-    // ВИПРАВЛЕННЯ: Перевіряємо статус 'success'
+    // 4. Списання стоку (лише якщо успіх)
     if (newStatus === 'success') {
       const { data: items } = await supabaseAdmin
         .from('order_items')
