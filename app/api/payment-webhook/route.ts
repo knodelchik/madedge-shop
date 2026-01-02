@@ -22,8 +22,9 @@ export async function POST(req: Request) {
     const { status, reference, invoiceId } = body;
 
     // 2. Оновлення статусу
+    // ВИПРАВЛЕННЯ: Використовуємо 'success' замість 'paid', щоб відповідати ENUM у базі даних
     let newStatus = 'pending';
-    if (status === 'success') newStatus = 'paid';
+    if (status === 'success') newStatus = 'success';
     else if (status === 'failure') newStatus = 'failure';
 
     // Оновлюємо замовлення
@@ -43,7 +44,8 @@ export async function POST(req: Request) {
     }
 
     // 3. Списання стоку (лише якщо успіх)
-    if (newStatus === 'paid') {
+    // ВИПРАВЛЕННЯ: Перевіряємо статус 'success'
+    if (newStatus === 'success') {
       const { data: items } = await supabaseAdmin
         .from('order_items')
         .select('product_id, quantity')
