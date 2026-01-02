@@ -169,6 +169,8 @@ export default function OrderPage() {
           method: 'monobank',
           shippingAddress: selectedAddress,
           shippingCost: shippingCost,
+          amountUSD: total,
+          amountUAH: totalUAH,
           shippingType,
         }),
       });
