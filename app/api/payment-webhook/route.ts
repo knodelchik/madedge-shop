@@ -22,19 +22,18 @@ export async function POST(req: Request) {
     const { status, reference } = body;
 
     // 2. Оновлення статусу
-    // Використовуємо 'success' замість 'paid', щоб відповідати вашій схемі
+    // Змінюємо логіку: якщо успіх від банку -> статус 'paid'
     let newStatus = 'pending';
-    if (status === 'success') newStatus = 'success';
+    if (status === 'success') newStatus = 'paid';
     else if (status === 'failure') newStatus = 'failure';
 
     // 3. Оновлення замовлення в БД
-    // Прибрали payment_id, оскільки його немає в таблиці.
-    // Вся інформація про платіж (включно з invoiceId) збережеться в payment_result.
+    // Ми не пишемо в payment_id, бо його немає, вся інфо буде в payment_result
     const { error: updateError } = await supabaseAdmin
       .from('orders')
       .update({
         status: newStatus,
-        payment_result: body, // Тут вже є invoiceId всередині JSON
+        payment_result: body,
         updated_at: new Date().toISOString(),
       })
       .eq('id', reference);
@@ -44,8 +43,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'DB Error' }, { status: 500 });
     }
 
-    // 4. Списання стоку (лише якщо успіх)
-    if (newStatus === 'success') {
+    // 4. Списання стоку (Тільки якщо статус 'paid')
+    if (newStatus === 'paid') {
       const { data: items } = await supabaseAdmin
         .from('order_items')
         .select('product_id, quantity')
@@ -73,6 +72,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ status: 'ok' });
   } catch (error: any) {
     console.error('Webhook Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Internal Error' }, { status: 500 });
   }
 }

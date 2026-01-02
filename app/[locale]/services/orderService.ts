@@ -13,7 +13,7 @@ export interface Order {
   id: string;
   created_at: string;
   total_amount: number;
-  status: 'pending' | 'success' | 'failure';
+  status: 'pending' | 'success' | 'failure' | 'paid';
   shipping_address: any;
   shipping_cost: number;
   shipping_type: string;
