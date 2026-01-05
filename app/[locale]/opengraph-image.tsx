@@ -14,8 +14,8 @@ export default async function Image() {
   // Поки розробляєте локально, картинка може не відображатись, це нормально.
   // Краще взяти посилання на логотип, який вже десь лежить в інтернеті, або вказати ваш домен.
   const logoUrl = process.env.NEXT_PUBLIC_BASE_URL 
-    ? 'https://madedge.net/og-img.jpg'
-    : 'https://madedge.net/og-img.jpg'; 
+    ? 'https://madedge.net/logo2.png'
+    : 'https://madedge.net/logo2.png'; 
 
   return new ImageResponse(
     (
