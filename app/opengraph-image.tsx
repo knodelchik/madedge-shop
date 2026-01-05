@@ -14,8 +14,8 @@ export default async function Image() {
   // Поки розробляєте локально, картинка може не відображатись, це нормально.
   // Краще взяти посилання на логотип, який вже десь лежить в інтернеті, або вказати ваш домен.
   const logoUrl = process.env.NEXT_PUBLIC_BASE_URL 
-    ? `${process.env.NEXT_PUBLIC_BASE_URL}/_next/image?url=https%3A%2F%2Fumnwnrvuonyiwylxqoiq.supabase.co%2Fstorage%2Fv1%2Fobject%2Fsign%2Fproduct%2520images%2Fmadedgemodel3-1.jpg%3Ftoken%3DeyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mYTY2MjExZi1lZmNjLTQ0ZmMtOWY2Ni0xZDM5N2NhNGE3NzYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9kdWN0IGltYWdlcy9tYWRlZGdlbW9kZWwzLTEuanBnIiwiaWF0IjoxNzYxMzMzODEyLCJleHAiOjIwNzY2OTM4MTJ9.1cJxG-WOnzr5euvyHAdSww-GPHqGwcvlaVGcuBo8hww&w=3840&q=75` 
-    : 'https://madedge.net/_next/image?url=https%3A%2F%2Fumnwnrvuonyiwylxqoiq.supabase.co%2Fstorage%2Fv1%2Fobject%2Fsign%2Fproduct%2520images%2Fmadedgemodel3-1.jpg%3Ftoken%3DeyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mYTY2MjExZi1lZmNjLTQ0ZmMtOWY2Ni0xZDM5N2NhNGE3NzYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9kdWN0IGltYWdlcy9tYWRlZGdlbW9kZWwzLTEuanBnIiwiaWF0IjoxNzYxMzMzODEyLCJleHAiOjIwNzY2OTM4MTJ9.1cJxG-WOnzr5euvyHAdSww-GPHqGwcvlaVGcuBo8hww&w=3840&q=75'; 
+    ? 'https://umnwnrvuonyiwylxqoiq.supabase.co/storage/v1/object/sign/product%20images/madedgemodel3-1.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtlZXl9mYTY2MjExZi1lZmNjLTQ0ZmMtOWY2Ni0xZDM5N2NhNGE3NzYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9kdWN0IGltYWdlcy9tYWRlZGdlbW9kZWwzLTEuanBnIiwiaWF0IjoxNzYxMzMzODEyLCJleHAiOjIwNzY2OTM4MTJ9.1cJxG-WOnzr5euvyHAdSww-GPHqGwcvlaVGcuBo8hww'
+    : 'https://umnwnrvuonyiwylxqoiq.supabase.co/storage/v1/object/sign/product%20images/madedgemodel3-1.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtlZXl9mYTY2MjExZi1lZmNjLTQ0ZmMtOWY2Ni0xZDM5N2NhNGE3NzYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwcm9kdWN0IGltYWdlcy9tYWRlZGdlbW9kZWwzLTEuanBnIiwiaWF0IjoxNzYxMzMzODEyLCJleHAiOjIwNzY2OTM4MTJ9.1cJxG-WOnzr5euvyHAdSww-GPHqGwcvlaVGcuBo8hww'; 
 
   return new ImageResponse(
     (
