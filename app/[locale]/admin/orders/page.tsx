@@ -559,7 +559,7 @@ export default function AdminOrdersPage() {
                   <div className="flex justify-between border-b border-dashed border-gray-200 dark:border-neutral-800 pb-2">
                     <span className="text-gray-500">Регіон / Штат:</span>
                     <span className="font-medium text-right">
-                      {selectedOrder.shipping_address?.state || '-'}
+                      {selectedOrder.shipping_address?.state_name || '-'}
                     </span>
                   </div>
                   <div className="flex justify-between border-b border-dashed border-gray-200 dark:border-neutral-800 pb-2">
