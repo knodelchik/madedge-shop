@@ -133,7 +133,10 @@ async function sendAdminNotification(orderId: string, orderData: any, status: st
 
   const msg = {
     to: process.env.ADMIN_EMAIL, // Вкажіть вашу пошту в .env
-    from: process.env.SMTP_FROM || 'madedge.shop@gmail.com', // Вкажіть пошту-відправника (Verified Sender в SendGrid)
+   from: {
+        email: 'info@madedge.net',
+        name: 'MadEdge',
+      },
     subject: `${subjectPrefix} #${orderId}`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 20px;">
